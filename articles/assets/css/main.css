@@ -53,7 +53,9 @@ table {
 body {
 	-webkit-text-size-adjust: none;
 }
-
+video {
+    object-fit: cover;
+}
 mark {
 	background-color: transparent;
 	color: inherit;
