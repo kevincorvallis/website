@@ -1,14 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <nav id="nav">
-    <ul class="links">
-      <li class="active"><a href="/index.html">Home</a></li>
-    </ul>
-  </nav>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chris Park's Videos</title>
-
+    <title>Chris Park #33</title>
     <style>
       body {
         font-family: sans-serif;
@@ -39,8 +32,6 @@
         height: auto;
         display: block;
         margin-bottom: 20px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
       }
 
       .video-container {
@@ -49,68 +40,30 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         padding: 20px;
         margin-bottom: 20px;
-        overflow: hidden;
-      }
-
-      .video-title {
-        font-size: 24px;
-        margin-top: 0;
-        margin-bottom: 10px;
-      }
-
-      @media screen and (max-width: 480px) {
-        .video-title {
-          font-size: 18px;
-        }
-      }
-
-      .video-play-button {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background-color: #333;
-        color: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 30px;
-        cursor: pointer;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1;
-      }
-
-      .video-play-button:before {
-        content: "\25B6";
-      }
-
-      .video-play-button:hover {
-        background-color: #666;
       }
     </style>
   </head>
   <body>
     <header>
-      <h1>Chris Park collab with Kobe</h1>
+      <h1>My Video Page</h1>
     </header>
     <main>
       <div class="video-container">
-        <h2 class="video-title">10,000 Hours by Dan and Shay (Cover)</h2>
-        <video>
+        <h2>Chris1 Video</h2>
+        <video controls>
           <source src="chrisvideos/chris1.mp4" type="video/mp4">
           <source src="chrisvideos/chris1.mov" type="video/quicktime">
           Your browser does not support the video tag.
         </video>
-        <div class="video-play-button"></div>
       </div>
       <div class="video-container">
-        <h2 class="video-title">XO by Beyonce (Cover)</h2>
-        <video >
+        <h2>Chris2 Video</h2>
+        <video controls>
           <source src="chrisvideos/chris2.mp4" type="video/mp4">
           <source src="chrisvideos/chris2.mov" type="video/quicktime">
           Your browser does not support the video tag.
         </video>
-        <div class="video-play-button"></div>
       </div>
+    </main>
+  </body>
+</html>
