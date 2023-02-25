@@ -30,6 +30,8 @@ footer, header, hgroup, menu, nav, section {
 
 body {
 	line-height: 1;
+	text-align: center;
+	background-color: #f2f2f2;
 }
 
 ol, ul {
@@ -45,6 +47,7 @@ blockquote, q {
 		content: none;
 	}
 
+	
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
