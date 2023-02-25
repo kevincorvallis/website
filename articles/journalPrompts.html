@@ -1,41 +1,45 @@
 <!DOCTYPE HTML>
-<!--
-	Hyperspace by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
-	<head>
-		<meta charset="utf-8" />
-		aa
-		
-		Journal
-		jutewewetwer<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-		
-		  </head>
-		  <body>
-			<h1>Daily Journal Prompt Generator</h1>
-			<button onclick="generatePrompt()">Generate Prompt</button>
-			<div id="prompt-text"></div>
-			<h2>Add Your Own Prompt</h2>
-			<form onsubmit="addPrompt(); return false;">
-			  <label for="user-prompt">Enter your prompt:</label>
-			  <input type="text" id="user-prompt">
-			  <button type="submit">Add Prompt</button>
-			</form>., 
-, cx  c,x/cv,c xcasc			<script src="assets/js/chatGPT.js"></script>
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></sJustin827!
+<head>
+    <meta charset="utf-8" />
+    <title>Journal App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
 
-			
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
+<body>
+    <h1>Daily Journal Prompt Generator</h1>
+    <button onclick="generatePrompt()">Generate Prompt</button>
+    <div id="prompt-text"></div>
+
+    <h2>Add Your Own Prompt</h2>
+    <form onsubmit="addPrompt(); return false;">
+        <label for="user-prompt">Enter your prompt:</label>
+        <input type="text" id="user-prompt">
+        <button type="submit">Add Prompt</button>
+    </form>
+
+    <h2>Write Your Journal Entry</h2>
+    <form onsubmit="submitEntry(); return false;">
+        <label for="entry-title">Title:</label>
+        <input type="text" id="entry-title" required>
+        <label for="entry-text">Entry:</label>
+        <textarea id="entry-text" required></textarea>
+        <button type="submit">Save Entry</button>
+    </form>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="assets/js/chatGPT.js"></script>
+<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></sJustin827!
+
+	
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
 
 	</body>
 </html>

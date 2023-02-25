@@ -8,10 +8,11 @@ namespace Backend
     {
         private MySqlConnection conn;
 
-        public Db(string connectionString = "Server=database-1.cwzjhkgs6o1v.us-west-1.rds.amazonaws.com;Database=journalDB;User ID=klee;Password=dlfrlTmsmsskfdldi;")
+        public Db(string connectionString = "Server=journaldb.cwzjhkgs6o1v.us-west-1.rds.amazonaws.com;Database=journalDB;User ID=klee;Password=dlfrlTmsmsskfdldi;")
         {
             conn = new MySqlConnection(connectionString);
         }
+        
         public void Open()
         {
             if (conn.State != ConnectionState.Open)
@@ -54,17 +55,16 @@ namespace Backend
                 return dt;
             }
         }
+        
         public void InsertPrompt(string promptText)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            Open();
+            using (var cmd = new MySqlCommand("INSERT INTO Prompts (PromptText) VALUES (@PromptText)", conn))
             {
-                conn.Open();
-                using (var cmd = new SqlCommand("INSERT INTO Prompts (PromptText) VALUES (@PromptText)", conn))
-                {
-                    cmd.Parameters.AddWithValue("@PromptText", promptText);
-                    cmd.ExecuteNonQuery();
-                }
+                cmd.Parameters.AddWithValue("@PromptText", promptText);
+                cmd.ExecuteNonQuery();
             }
+            Close();
         }
     }
 }
