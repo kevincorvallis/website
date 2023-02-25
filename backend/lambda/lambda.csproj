@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp6</TargetFramework>
+    <AWSProjectType>Lambda</AWSProjectType>
+    <AWSRegion>us-west-1</AWSRegion>
+    <AWSProfile>default</AWSProfile>
+    <AWSLambdaOutputPackage>bin/release/netcoreapp3.1/deployment.zip</AWSLambdaOutputPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
+  </ItemGroup>
+
+</Project>
