@@ -1,9 +1,11 @@
 function generatePrompt() {
   // Make an HTTP GET request to retrieve a random prompt
   $.ajax({
-    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/lambdaJournal',
+    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/prompt',
     headers: {
-      'x-api-key': 'X4KCzuCA7u6XqdGSC8NIA9N3SV7h0aIO7cXC8GCW'
+      'x-api-key': 'X4KCzuCA7u6XqdGSC8NIA9N3SV7h0aIO7cXC8GCW',
+      'Access-Control-Allow-Origin': '*'
+
     },
     success: function(data) {
       // Display the prompt text in the page
