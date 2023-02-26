@@ -1,7 +1,7 @@
 function generatePrompt() {
   // Make an HTTP GET request to retrieve a random prompt
   $.ajax({
-    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/lambdaJournal/prompt',
+    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/lambdaJournal',
     headers: {
       'x-api-key': 'X4KCzuCA7u6XqdGSC8NIA9N3SV7h0aIO7cXC8GCW'
     },
@@ -21,7 +21,7 @@ function addPrompt() {
   var userPrompt = $('#user-prompt').val();
   // Make an HTTP POST request to add the prompt to the database
   $.ajax({
-    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/lambdaJournal/prompt',
+    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/lambdaJournal',
     method: 'POST',
     headers: {
       'x-api-key': 'X4KCzuCA7u6XqdGSC8NIA9N3SV7h0aIO7cXC8GCW'
@@ -45,7 +45,7 @@ function submitEntry() {
   var text = $('#entry-text').val();
   // Make an HTTP POST request to add the entry to the database
   $.ajax({
-    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/lambdaJournal/entry',
+    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/lambdaJournal',
     method: 'POST',
     headers: {
       'x-api-key': 'X4KCzuCA7u6XqdGSC8NIA9N3SV7h0aIO7cXC8GCW'
