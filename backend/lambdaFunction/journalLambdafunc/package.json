@@ -1,0 +1,18 @@
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "My project description",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1323.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.1.2"
+  },
+  "devDependencies": {
+    "esm": "^3.2.25"
+  }
+}

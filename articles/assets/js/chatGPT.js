@@ -1,9 +1,15 @@
 function generatePrompt() {
   // Make an HTTP GET request to retrieve a random prompt
   $.ajax({
-    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/prompt',
+    url: 'https://sx6t6c5ma8.execute-api.us-west-1.amazonaws.com/prod/prompts',
     headers: {
+      'Content-Type': 'application/json',
       'x-api-key': 'X4KCzuCA7u6XqdGSC8NIA9N3SV7h0aIO7cXC8GCW',
+      'Access-Control-Allow-Origin': '*',
+      "Access-Control-Allow-Methods": '*',
+      "Access-Control-Allow-Headers" : "Content-Type",
+      "Access-Control-Allow-Credentials" : true // Required for cookies, authorization headers with HTTPS
+
     },
     success: function(data) {
       // Display the prompt text in the page
