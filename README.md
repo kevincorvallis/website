@@ -4,16 +4,31 @@ To run locally, make sure you have npm install http-server -g.
 Then run http-server in local directory
 
 
-## Challenges Faced
+## Challenges and Solutions
 
-- **API Gateway to Lambda connection**: The learning curve for building an AWS CRUD application was steep, particularly when connecting API Gateway to Lambda and managing CORS headers. The static S3 hosting initially raised concerns about potential issues with the origin domain.
+### API Gateway and Lambda connection
 
-- **Database choice**: After extensive experimentation, the decision was made to move from MySQL to DynamoDB. DynamoDB's convenience and seamless integration with other AWS services proved more advantageous.
+**Challenge:** The learning curve for building an AWS CRUD application was steep, especially when it came to connecting API Gateway with Lambda functions and managing CORS headers. As the website was hosted statically via S3, concerns arose about potential issues with the origin domain.
 
-- **IAM roles and custom policies**: Proper configuration of IAM roles and custom policies was a major challenge. Ensuring the Lambda function had the necessary access to various resources required careful planning and implementation.
+**Solution:** Overcoming this challenge required experimentation, adjusting configurations, and ensuring the correct headers were passed between the services. This allowed for seamless communication between the API Gateway and Lambda functions.
 
-- **CORS IS a headache**: I tested my API with Postman multiple times and it was a somewhat gruesome process as I kept sawing internal errors (502) and (400). But once you get the hang of it, it makes sense. 
+### Database choice
 
+**Challenge:** Initially, MySQL was chosen as the primary database for the project. However, after extensive experimentation and weighing the pros and cons, the decision was made to switch to DynamoDB.
+
+**Solution:** The primary reason for this change was DynamoDB's convenience and seamless integration with other AWS services, which provided a more robust and efficient solution. This made managing and scaling the database easier, allowing the project to better adapt to future requirements.
+
+### IAM roles and custom policies
+
+**Challenge:** Proper configuration of IAM roles and custom policies was a major challenge. Ensuring the Lambda function had the necessary access to various resources required careful planning and implementation.
+
+**Solution:** This issue was addressed by thoroughly reviewing and updating IAM roles and policies to ensure the correct access levels were granted. This allowed the Lambda function to interact with the necessary resources without compromising security.
+
+### CORS and API testing
+
+**Challenge:** During API testing with Postman, several internal errors (502 and 400) were encountered, causing difficulties in validating the API's functionality.
+
+**Solution:** Understanding and managing CORS headers played a crucial role in resolving these issues. By configuring the API Gateway and Lambda functions correctly, a smooth and error-free testing process was achieved.
 
 
 ## Future Enhancements
