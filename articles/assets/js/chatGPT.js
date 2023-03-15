@@ -20,9 +20,9 @@ function onSignIn(googleUser) {
   // Hide the sign-in button
   document.getElementsByClassName('g-signin2')[0].style.display = 'none';
 
-  showWelcomePopup(userName);
+  // showWelcomePopup(userName);
   userFirstName = profile.getGivenName();
-  showUserBanner(userFirstName);
+  // showUserBanner(userFirstName);
   // Redirect to the journalPrompts.html page
   window.location.href = '../../journalPrompts.html';
 
