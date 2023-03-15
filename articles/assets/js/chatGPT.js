@@ -16,7 +16,30 @@ function onSignIn(googleUser) {
 
   // Hide the sign-in button
   document.getElementsByClassName('g-signin2')[0].style.display = 'none';
+
+  showWelcomePopup(userName);
+
 }
+
+function showWelcomePopup(userName) {
+  // Create the welcome popup
+  var popup = document.createElement('div');
+  popup.id = 'welcome-popup';
+  popup.innerHTML = `<p>Welcome, ${userName}!</p>`;
+  
+  // Add the welcome popup to the body
+  document.body.appendChild(popup);
+  
+  // Remove the welcome popup after 3 seconds
+  setTimeout(function () {
+      popup.style.opacity = '0';
+      setTimeout(function () {
+          document.body.removeChild(popup);
+      }, 1000);
+  }, 3000);
+}
+
+
 
 function signOut() {
   var auth2 = gapi.auth2.getAuthInstance();
