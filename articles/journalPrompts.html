@@ -12,6 +12,10 @@
 <body>
     <div class="login-container">
       <div class="g-signin2" data-onsuccess="onSignIn"></div>
+      <div id="user-info" style="display: none;">
+        <p>Welcome, <span id="user-name"></span>! Your user ID is <span id="user-id-display"></span>.</p>
+        <button onclick="signOut();">Sign out</button>
+      </div>
     </div>
 
     <h1>Daily Journal Prompt Generator</h1>

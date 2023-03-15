@@ -6,11 +6,28 @@ function onSignIn(googleUser) {
 
   // Get basic profile information about the user
   var profile = googleUser.getBasicProfile();
-  userId = profile.getId(); // Set the global userId variable
+  var userId = profile.getId();
   var userName = profile.getName();
   var userEmail = profile.getEmail();
 
-  // Perform any other actions needed after a successful sign-in
+  // Display user information
+  document.getElementById('user-info').style.display = 'block';
+  document.getElementById('user-name').textContent = userName;
+  document.getElementById('user-id-display').textContent = userId;
+
+  // Hide the sign-in button
+  document.getElementsByClassName('g-signin2')[0].style.display = 'none';
+}
+
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    console.log('User signed out.');
+
+    // Hide user information and show the sign-in button
+    document.getElementById('user-info').style.display = 'none';
+    document.getElementsByClassName('g-signin2')[0].style.display = 'block';
+  });
 }
 
 function addPrompt() {
