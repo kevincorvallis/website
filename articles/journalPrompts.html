@@ -6,45 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="assets/css/main.css" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <meta name="google-signin-client_id" content="801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com">
 </head>
 
 <body>
+    <div class="login-container">
+      <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    </div>
+
     <h1>Daily Journal Prompt Generator</h1>
     <button onclick="generatePrompt()">Generate Prompt</button>
     <div id="prompt"></div>
 
     <h2>Add Your Own Prompt</h2>
     <form onsubmit="addPrompt(); return false;">
-      <label for="user-id">User ID:</label>
-      <input type="text" id="user-id">
       <label for="custom-prompt">Enter your prompt:</label>
       <input type="text" id="custom-prompt" required>
       <button type="submit">Add Prompt</button>
     </form>
-    
 
     <h2>Add Your Own Journal Entry</h2>
     <form onsubmit="event.preventDefault(); submitJournalEntry();">
-        <label for="user-id">User ID:</label>
-        <input type="text" id="user-id">
         <label for="entry-title">Title:</label>
         <input type="text" id="entry-title">
         <label for="entry-text">Text:</label>
         <input type="text" id="entry-text">
         <button type="submit">Add Journal Entry</button>
     </form>
-
-
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="assets/js/chatGPT.js"></script>
 <!-- Scripts -->
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/js/jquery.scrollex.min.js"></script>
-	<script src="assets/js/jquery.scrolly.min.js"></script>
-	<script src="assets/js/browser.min.js"></script>
-	<script src="assets/js/breakpoints.min.js"></script>
-	<script src="assets/js/util.js"></script>
-	<script src="assets/js/main.js"></script>
 
-	</body>
+    <script src="assets/js/chatGPT.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+</body>
 </html>
