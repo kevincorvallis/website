@@ -120,3 +120,20 @@ function generateEntryId() {
   // Generate a unique entry ID (e.g., using a timestamp or a UUID library)
   return new Date().getTime().toString();
 }
+
+
+async function generatePrompt() {
+  const apiUrl = "https://api.quotable.io/random";
+  
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const prompt = data.content;
+
+    document.getElementById("prompt").innerHTML = prompt;
+  } catch (error) {
+    console.error("Error fetching prompt:", error);
+    document.getElementById("prompt").innerHTML = "Error fetching prompt. Please try again.";
+  }
+}
+
