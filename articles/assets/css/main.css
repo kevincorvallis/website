@@ -38,6 +38,18 @@ ol, ul {
 	list-style: none;
 }
 
+#user-banner {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	background-color: rgba(0, 0, 0, 0.8);
+	color: white;
+	padding: 10px;
+	border-radius: 5px;
+	font-size: 1em;
+	text-align: center;
+	z-index: 1000;
+}
 
 #welcome-popup {
 	position: fixed;

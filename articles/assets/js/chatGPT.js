@@ -1,4 +1,5 @@
 var userEmail; // Declare a global variable to store the user email
+var userFirstName = '';
 
 function onSignIn(googleUser) {
   // Get the user's ID token, which you can send to your server for verification
@@ -8,6 +9,8 @@ function onSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
   userEmail = profile.getEmail(); // Use the email as the user ID
   var userName = profile.getName();
+  userFirstName = profile.getGivenName();
+
 
   // Display user information
   document.getElementById('user-info').style.display = 'block';
@@ -18,6 +21,10 @@ function onSignIn(googleUser) {
   document.getElementsByClassName('g-signin2')[0].style.display = 'none';
 
   showWelcomePopup(userName);
+  userFirstName = profile.getGivenName();
+  showUserBanner(userFirstName);
+  // Redirect to the journalPrompts.html page
+  window.location.href = 'articles/journalPrompts.html';
 
 }
 
@@ -37,6 +44,14 @@ function showWelcomePopup(userName) {
           document.body.removeChild(popup);
       }, 1000);
   }, 3000);
+}
+
+function showUserBanner(userFirstName) {
+  var banner = document.createElement('div');
+  banner.id = 'user-banner';
+  banner.innerHTML = `Hi, ${userFirstName}!`;
+
+  document.body.appendChild(banner);
 }
 
 
