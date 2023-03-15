@@ -1,4 +1,4 @@
-var userId; // Declare a global variable to store the user ID
+var userEmail; // Declare a global variable to store the user email
 
 function onSignIn(googleUser) {
   // Get the user's ID token, which you can send to your server for verification
@@ -6,11 +6,50 @@ function onSignIn(googleUser) {
 
   // Get basic profile information about the user
   var profile = googleUser.getBasicProfile();
-  userId = profile.getId(); // Set the global userId variable
+  userEmail = profile.getEmail(); // Use the email as the user ID
   var userName = profile.getName();
-  var userEmail = profile.getEmail();
 
-  // Perform any other actions needed after a successful sign-in
+  // Display user information
+  document.getElementById('user-info').style.display = 'block';
+  document.getElementById('user-name').textContent = userName;
+  document.getElementById('user-id-display').textContent = userEmail;
+
+  // Hide the sign-in button
+  document.getElementsByClassName('g-signin2')[0].style.display = 'none';
+
+  showWelcomePopup(userName);
+
+}
+
+function showWelcomePopup(userName) {
+  // Create the welcome popup
+  var popup = document.createElement('div');
+  popup.id = 'welcome-popup';
+  popup.innerHTML = `<p>Welcome, ${userName}!</p>`;
+  
+  // Add the welcome popup to the body
+  document.body.appendChild(popup);
+  
+  // Remove the welcome popup after 3 seconds
+  setTimeout(function () {
+      popup.style.opacity = '0';
+      setTimeout(function () {
+          document.body.removeChild(popup);
+      }, 1000);
+  }, 3000);
+}
+
+
+
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    console.log('User signed out.');
+
+    // Hide user information and show the sign-in button
+    document.getElementById('user-info').style.display = 'none';
+    document.getElementsByClassName('g-signin2')[0].style.display = 'block';
+  });
 }
 
 function addPrompt() {
@@ -26,7 +65,7 @@ function addPrompt() {
     headers: {
       'Content-Type': 'application/json',
     },
-    data: JSON.stringify({ userId: userId, prompt: customPrompt }),
+    data: JSON.stringify({ userId: userEmail, prompt: customPrompt }),
     success: function () {
       $('#custom-prompt').val(''); // Clear the input field
       alert('Your prompt was added!');
@@ -40,11 +79,8 @@ function addPrompt() {
 function submitJournalEntry() {
   var title = $('#entry-title').val();
   var text = $('#entry-text').val();
-  addJournalEntry(userId, title, text);
+  addJournalEntry(userEmail, title, text);
 }
-
-
-
 
 function addJournalEntry(userId, title, text) {
   // Make an HTTP POST request to add a journal entry to the database
@@ -64,6 +100,7 @@ function addJournalEntry(userId, title, text) {
     }
   });
 }
+
 function generateEntryId() {
   // Generate a unique entry ID (e.g., using a timestamp or a UUID library)
   return new Date().getTime().toString();

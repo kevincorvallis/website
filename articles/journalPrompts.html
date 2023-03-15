@@ -6,24 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="assets/css/main.css" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-    <meta name="google-signin-client_id" content="801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com">
 </head>
 
 <body>
-    <div class="login-container">
-      <div class="g-signin2" data-onsuccess="onSignIn"></div>
-    </div>
-
     <h1>Daily Journal Prompt Generator</h1>
     <button onclick="generatePrompt()">Generate Prompt</button>
     <div id="prompt"></div>
 
     <h2>Add Your Own Prompt</h2>
+    <div class="prompt-description">
+        <p>
+            We believe that everyone has unique insights and ideas for journal prompts. That's why we rotate our prompts every week, showcasing those submitted by our users. By sharing your prompt, you have the opportunity to inspire countless others in their journaling journey. We encourage you to submit your favorite prompts, and who knows? Yours might just be featured next week! Together, we can create a diverse and engaging collection of prompts to help unlock creativity and self-reflection for everyone.
+        </p>
+    </div>    
     <form onsubmit="addPrompt(); return false;">
       <label for="custom-prompt">Enter your prompt:</label>
       <input type="text" id="custom-prompt" required>
       <button type="submit">Add Prompt</button>
     </form>
+    
 
     <h2>Add Your Own Journal Entry</h2>
     <form onsubmit="event.preventDefault(); submitJournalEntry();">
@@ -34,9 +35,7 @@
         <button type="submit">Add Journal Entry</button>
     </form>
 <!-- Scripts -->
-
     <script src="assets/js/chatGPT.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/jquery.scrollex.min.js"></script>
     <script src="assets/js/jquery.scrolly.min.js"></script>
