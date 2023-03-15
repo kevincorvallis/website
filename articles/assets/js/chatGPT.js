@@ -1,26 +1,19 @@
-function getJournalEntry(userId, entryId) {
-  // Make an HTTP GET request to retrieve a journal entry
-  $.ajax({
-    url: 'https://0a65j03yja.execute-api.us-west-2.amazonaws.com/prod/journalentry',
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: {userId: userId, entryId: entryId},
-    success: function(data) {
-      // Display the journal entry in the page
-      $('#entry-title').text(data.title);
-      $('#entry-text').text(data.text);
-    },
-    error: function() {
-      alert('Error getting journal entry');
-    }
-  });
+var userId; // Declare a global variable to store the user ID
+
+function onSignIn(googleUser) {
+  // Get the user's ID token, which you can send to your server for verification
+  var id_token = googleUser.getAuthResponse().id_token;
+
+  // Get basic profile information about the user
+  var profile = googleUser.getBasicProfile();
+  userId = profile.getId(); // Set the global userId variable
+  var userName = profile.getName();
+  var userEmail = profile.getEmail();
+
+  // Perform any other actions needed after a successful sign-in
 }
 
-
 function addPrompt() {
-  var userId = $('#user-id').val(); // Get the user ID
   var customPrompt = $('#custom-prompt').val();
   if (customPrompt.trim() === "") {
     alert("Please enter a non-empty prompt.");
@@ -33,7 +26,6 @@ function addPrompt() {
     headers: {
       'Content-Type': 'application/json',
     },
-    // Include userId in the data you send to your API
     data: JSON.stringify({ userId: userId, prompt: customPrompt }),
     success: function () {
       $('#custom-prompt').val(''); // Clear the input field
@@ -44,6 +36,13 @@ function addPrompt() {
     },
   });
 }
+
+function submitJournalEntry() {
+  var title = $('#entry-title').val();
+  var text = $('#entry-text').val();
+  addJournalEntry(userId, title, text);
+}
+
 
 
 
@@ -68,10 +67,4 @@ function addJournalEntry(userId, title, text) {
 function generateEntryId() {
   // Generate a unique entry ID (e.g., using a timestamp or a UUID library)
   return new Date().getTime().toString();
-}
-function submitJournalEntry() {
-  var userId = $('#user-id').val();
-  var title = $('#entry-title').val();
-  var text = $('#entry-text').val();
-  addJournalEntry(userId, title, text);
 }
