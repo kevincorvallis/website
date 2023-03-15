@@ -1,33 +1,6 @@
 var userEmail; // Declare a global variable to store the user email
 var userFirstName = '';
 
-function onSignIn(googleUser) {
-  // Get the user's ID token, which you can send to your server for verification
-  var id_token = googleUser.getAuthResponse().id_token;
-
-  // Get basic profile information about the user
-  var profile = googleUser.getBasicProfile();
-  userEmail = profile.getEmail(); // Use the email as the user ID
-  var userName = profile.getName();
-  userFirstName = profile.getGivenName();
-
-
-  // Display user information
-  document.getElementById('user-info').style.display = 'block';
-  document.getElementById('user-name').textContent = userName;
-  document.getElementById('user-id-display').textContent = userEmail;
-
-  // Hide the sign-in button
-  document.getElementsByClassName('g-signin2')[0].style.display = 'none';
-
-  // showWelcomePopup(userName);
-  userFirstName = profile.getGivenName();
-  // showUserBanner(userFirstName);
-  // Redirect to the journalPrompts.html page
-  window.location.href = 'articles/journalPrompts.html';
-
-}
-
 function showWelcomePopup(userName) {
   // Create the welcome popup
   var popup = document.createElement('div');
