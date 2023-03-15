@@ -24,7 +24,7 @@ function onSignIn(googleUser) {
   userFirstName = profile.getGivenName();
   // showUserBanner(userFirstName);
   // Redirect to the journalPrompts.html page
-  window.location = '<redirect_url>'
+  window.location = 'articles/journalPrompts.html'
 
 
 }
