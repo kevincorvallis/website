@@ -78,7 +78,6 @@ let conn;
 
 exports.handler = async (event, context) => {        
     console.log("Starting query ...\n");
-    console.log("Running iam auth ...\n");
     
     var signer = new AWS.RDS.Signer({
         region: 'us-west-1', // example: us-east-2
@@ -89,7 +88,7 @@ exports.handler = async (event, context) => {
 
     let token = signer.getAuthToken({
         username: 'klee'
-      });
+    });
 
     console.log ("IAM Token obtained\n");
 

@@ -15,19 +15,26 @@
 
     <h2>Add Your Own Prompt</h2>
     <form onsubmit="addPrompt(); return false;">
-        <label for="user-prompt">Enter your prompt:</label>
-        <input type="text" id="user-prompt">
-        <button type="submit">Add Prompt</button>
+      <label for="user-id">User ID:</label>
+      <input type="text" id="user-id">
+      <label for="custom-prompt">Enter your prompt:</label>
+      <input type="text" id="custom-prompt" required>
+      <button type="submit">Add Prompt</button>
+    </form>
+    
+
+    <h2>Add Your Own Journal Entry</h2>
+    <form onsubmit="event.preventDefault(); submitJournalEntry();">
+        <label for="user-id">User ID:</label>
+        <input type="text" id="user-id">
+        <label for="entry-title">Title:</label>
+        <input type="text" id="entry-title">
+        <label for="entry-text">Text:</label>
+        <input type="text" id="entry-text">
+        <button type="submit">Add Journal Entry</button>
     </form>
 
-    <h2>Write Your Journal Entry</h2>
-    <form onsubmit="submitEntry(); return false;">
-        <label for="entry-title">Title:</label>
-        <input type="text" id="entry-title" required>
-        <label for="entry-text">Entry:</label>
-        <textarea id="entry-text" required></textarea>
-        <button type="submit">Save Entry</button>
-    </form>
+
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="assets/js/chatGPT.js"></script>
 <!-- Scripts -->
