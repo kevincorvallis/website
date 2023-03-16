@@ -1,26 +1,23 @@
 function initializeSignInButton() {
-  const signInButton = document.getElementById('signin-btn');
-
-  signInButton.addEventListener('click', async () => {
-    try {
-      const response = await new Promise((resolve, reject) => {
-        google.accounts.id.renderButton(
-          signInButton,
-          {
-            client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
-            callback: resolve,
-            cancel_on_tap_outside: true,
-            scope: 'email profile',
-          }
-        );
+  gapi.load('auth2', () => {
+    gapi.auth2.init({
+      client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
+    }).then(() => {
+      const auth2 = gapi.auth2.getAuthInstance();
+      const signInButton = document.getElementById('signin-btn');
+      signInButton.addEventListener('click', () => {
+        auth2.signIn({
+          scope: 'email profile',
+        }).then((user) => {
+          onSignIn(user.getAuthResponse());
+        }).catch((error) => {
+          console.error('Error during sign-in:', error);
+        });
       });
-
-      onSignIn(response.getAuthResponse());
-    } catch (error) {
-      console.error('Error during sign-in:', error);
-    }
+    });
   });
 }
+
 
 
 
@@ -44,14 +41,20 @@ function getJournalEntry(userId, entryId) {
   });
 }
 
-function onSignIn(auth) {
-  const user = auth.getBasicUserProfile();
-  const userId = user.getEmail();
-  const firstName = user.getGivenName();
-  $('#user-id').val(userId); // Set the value of the "User ID" input field to userId
+async function handleCredentialResponse(response) {
+  try {
+    const token = response.credential;
+    const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + token);
+    const userData = await userInfo.json();
 
-  // Display the welcome message with the user's first name
-  $('#welcome-message').text('Welcome, ' + firstName + '!');
+    const userId = userData.email;
+    const firstName = userData.given_name;
+
+    $('#user-id').val(userId);
+    $('#welcome-message').text('Welcome, ' + firstName + '!');
+  } catch (error) {
+    console.error('Error handling credential response:', error);
+  }
 }
 
 
