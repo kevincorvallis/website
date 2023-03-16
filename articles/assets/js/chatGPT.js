@@ -1,5 +1,3 @@
-const gisAuth = new GoogleIdentityService();
-
 function initializeSignInButton() {
   const signInButton = document.getElementById('signin-btn');
 
@@ -23,7 +21,6 @@ function initializeSignInButton() {
     }
   });
 }
-
 
 
 function getJournalEntry(userId, entryId) {
