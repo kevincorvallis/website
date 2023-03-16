@@ -149,5 +149,54 @@ function submitJournalEntry() {
   addJournalEntry(userId, title, text);
 }
  
-window.initializeSignInButton = initializeSignInButton;
+$("#google-signin-btn").on("click", function () {
+  google.accounts.id.prompt(function (response) {
+    if (response && response.credential) {
+      authenticateUser(response.credential);
+    }
+  });
+});
+
+function authenticateUser(idToken) {
+    $.ajax({
+        url: "https://0a65j03yja.execute-api.us-west-2.amazonaws.com/prod/authenticate",
+        method: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({
+            "id_token": idToken
+        }),
+        success: function (response) {
+            // Handle successful authentication here
+            console.log("Authentication successful:", response);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            // Handle authentication error here
+            console.error("Authentication error:", textStatus, errorThrown);
+        }
+    });
+}
+
+async function handleCredentialResponse(response) {
+  try {
+    const token = response.credential;
+    const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + token);
+    const userData = await userInfo.json();
+
+    const userId = userData.email;
+    const firstName = userData.given_name;
+
+    $('#user-id').val(userId);
+    $('#welcome-message').text('Welcome, ' + firstName + '!');
+  } catch (error) {
+    console.error('Error handling credential response:', error);
+  }
+}
+$("#google-signin-btn").on("click", function () {
+  google.accounts.id.prompt(function (response) {
+      if (response && response.credential) {
+          authenticateUser(response.credential);
+      }
+  });
+});
 
