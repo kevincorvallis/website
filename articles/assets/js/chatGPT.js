@@ -43,7 +43,7 @@ function signOut() {
 
 
 function addPrompt() {
-  var userId = $('#user-id').val(); // Get the user ID
+  var userId = $('#user-id').val(profile.getEmail());  // Get the user ID
   var customPrompt = $('#custom-prompt').val();
   if (customPrompt.trim() === "") {
     alert("Please enter a non-empty prompt.");
@@ -93,7 +93,7 @@ function generateEntryId() {
 }
 
 function submitJournalEntry() {
-  var userId = $('#user-id').val();
+  var userId = $('#user-id').val(profile.getEmail());
   var title = $('#entry-title').val();
   var text = $('#entry-text').val();
   addJournalEntry(userId, title, text);
