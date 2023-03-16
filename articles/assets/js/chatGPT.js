@@ -40,11 +40,12 @@ function onSignIn(auth) {
   const user = auth.getBasicUserProfile();
   const userId = user.getEmail();
   const firstName = user.getGivenName();
-  $('#user-id').val(userId); // Use userId instead of googleId
+  $('#user-id').val(userId); // Set the value of the "User ID" input field to userId
 
   // Display the welcome message with the user's first name
   $('#welcome-message').text('Welcome, ' + firstName + '!');
 }
+
 
 // Function to handle the sign-out process
 function signOut() {
