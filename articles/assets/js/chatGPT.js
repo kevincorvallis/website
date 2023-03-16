@@ -119,3 +119,4 @@ function submitJournalEntry() {
   addJournalEntry(userId, title, text);
 }
  
+window.initializeSignInButton = initializeSignInButton;
