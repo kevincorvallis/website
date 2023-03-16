@@ -1,3 +1,21 @@
+function initializeSignInButton() {
+  const signInButton = document.getElementById('signin-btn');
+
+  signInButton.addEventListener('click', async () => {
+    try {
+      const auth = await gisAuth.signInWithPopup({
+        client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
+        scope: 'email profile',
+      });
+
+      onSignIn(auth);
+    } catch (error) {
+      console.error('Error during sign-in:', error);
+    }
+  });
+}
+
+
 function getJournalEntry(userId, entryId) {
   // Make an HTTP GET request to retrieve a journal entry
   $.ajax({
@@ -18,16 +36,13 @@ function getJournalEntry(userId, entryId) {
   });
 }
 
-function onSignIn(googleUser) {
-  // Get the Google user profile
-  var profile = googleUser.getBasicProfile();
-
-  // Get the user's Google ID and set it as the user ID
-  var googleId = profile.getId();
-  $('#user-id').val(googleId);
+function onSignIn(auth) {
+  const user = auth.getBasicUserProfile();
+  const userId = user.getEmail();
+  const firstName = user.getGivenName();
+  $('#user-id').val(userId); // Use userId instead of googleId
 
   // Display the welcome message with the user's first name
-  var firstName = profile.getGivenName();
   $('#welcome-message').text('Welcome, ' + firstName + '!');
 }
 
@@ -43,7 +58,7 @@ function signOut() {
 
 
 function addPrompt() {
-  var userId = $('#user-id').val(profile.getEmail());  // Get the user ID
+  var userId = $('#user-id').val(); // Use userId instead of profile.getEmail()
   var customPrompt = $('#custom-prompt').val();
   if (customPrompt.trim() === "") {
     alert("Please enter a non-empty prompt.");
@@ -93,8 +108,10 @@ function generateEntryId() {
 }
 
 function submitJournalEntry() {
-  var userId = $('#user-id').val(profile.getEmail());
+  var userId = $('#user-id').val(); // Use userId instead of profile.getEmail()
   var title = $('#entry-title').val();
   var text = $('#entry-text').val();
   addJournalEntry(userId, title, text);
 }
+
+initializeSignInButton();

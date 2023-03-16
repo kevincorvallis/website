@@ -18,7 +18,7 @@
 <body>
     <h1>Journal</h1>
     <div class="signin-container">
-        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+        <button id="signin-btn">Sign In with Google</button>
     </div>
     <div id="welcome-message"></div>
     <button onclick="generatePrompt()">Generate Prompt</button>
@@ -51,7 +51,7 @@
     </form>
     <button onclick="signOut()">Sign Out</button>
 <!-- Scripts -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://www.gstatic.com/identity/gis/v1/identity-gis.js" async defer></script>
     <script src="assets/js/chatGPT.js"></script>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/jquery.scrollex.min.js"></script>
