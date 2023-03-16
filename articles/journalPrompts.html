@@ -51,14 +51,24 @@
     </form>
     <button onclick="signOut()">Sign Out</button>
 <!-- Scripts -->
-    <script src="assets/js/chatGPT.js"></script>
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/jquery.scrollex.min.js"></script>
-    <script src="assets/js/jquery.scrolly.min.js"></script>
-    <script src="assets/js/browser.min.js"></script>
-    <script src="assets/js/breakpoints.min.js"></script>
-    <script src="assets/js/util.js"></script>
-    <script src="assets/js/main.js"></script>
+<!-- Include jQuery first -->
+<script src="assets/js/jquery.min.js"></script>
+
+<!-- Load Google API library -->
+<script src="https://www.gstatic.com/identity/gis/v1/identity-gis.js" async defer></script>
+
+<!-- Then include your chatGPT.js -->
+<script src="assets/js/chatGPT.js"></script>
+
+<!-- Include other scripts -->
+<script src="assets/js/jquery.scrollex.min.js"></script>
+<script src="assets/js/jquery.scrolly.min.js"></script>
+<script src="assets/js/browser.min.js"></script>
+<script src="assets/js/breakpoints.min.js"></script>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/main.js"></script>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 </body>
 </html>
