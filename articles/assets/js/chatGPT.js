@@ -1,20 +1,12 @@
 function initializeSignInButton() {
-  gapi.load('auth2', () => {
-    gapi.auth2.init({
-      client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
-    }).then(() => {
-      const auth2 = gapi.auth2.getAuthInstance();
-      const signInButton = document.getElementById('signin-btn');
-      signInButton.addEventListener('click', () => {
-        auth2.signIn({
-          scope: 'email profile',
-        }).then((user) => {
-          onSignIn(user.getAuthResponse());
-        }).catch((error) => {
-          console.error('Error during sign-in:', error);
-        });
+  gapi.load('auth2', function() {
+      // Initialize the GoogleAuth object
+      gapi.auth2.init({
+          client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com'
+      }).then(function(authInstance) {
+          // Attach the click handler to the sign-in button
+          authInstance.attachClickHandler('google-signin-btn', {}, onSuccess, onFailure);
       });
-    });
   });
 }
 
