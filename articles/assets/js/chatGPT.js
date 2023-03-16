@@ -120,3 +120,7 @@ function submitJournalEntry() {
 }
  
 window.initializeSignInButton = initializeSignInButton;
+
+$(document).ready(function() {
+  initializeSignInButton();
+});
