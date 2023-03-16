@@ -13,9 +13,9 @@ function onSignIn(googleUser) {
 
 
   // Display user information
-  // document.getElementById('user-info').style.display = 'block';
-  // document.getElementById('user-name').textContent = userName;
-  // document.getElementById('user-id-display').textContent = userEmail;
+  document.getElementById('user-info').style.display = 'block';
+  document.getElementById('user-name').textContent = userName;
+  document.getElementById('user-id-display').textContent = userEmail;
 
   // Hide the sign-in button
   // document.getElementsByClassName('g-signin2')[0].style.display = 'none';
@@ -27,6 +27,12 @@ function onSignIn(googleUser) {
   window.location = 'articles/journalPrompts.html'
 
 
+}
+
+function startApp() {
+  gapi.load('auth2', function() {
+      gapi.auth2.init();
+  });
 }
 
 function showWelcomePopup(userName) {
