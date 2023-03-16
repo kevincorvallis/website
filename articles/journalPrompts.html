@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="assets/css/main.css" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <meta name="google-signin-client_id" content="801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com">
     <style>
         .signin-container {
             display: flex;
@@ -17,10 +18,6 @@
 <body>
     <h1>Journal</h1>
     <div class="signin-container">
-        <!-- Remove the old sign-in button -->
-        <!-- <button id="signin-btn">Sign In with Google</button> -->
-        <!-- Remove the duplicate google-identity-button without the data-callback -->
-        <!-- <google-identity-button id="signin-btn"></google-identity-button> -->
         <google-identity-button id="signin-btn" data-callback="handleCredentialResponse"></google-identity-button>
     </div>
     <div id="welcome-message"></div>
@@ -58,16 +55,10 @@
 <!-- Include jQuery first -->
 <script src="assets/js/jquery.min.js"></script>
 
-<!-- Remove the old Google Sign-In API script -->
-<!-- <script src="https://apis.google.com/js/platform.js?onload=initializeSignInButton" async defer></script> -->
-
 <!-- Then include your chatGPT.js -->
 <script src="assets/js/chatGPT.js"></script>
 <!-- Include the new Google Identity Services API script -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<!-- Remove the duplicate Google Sign-In API script -->
-<!-- <script src="https://apis.google.com/js/platform.js" async defer></script> -->
 
 <!-- Include other scripts -->
 <script src="assets/js/jquery.scrollex.min.js"></script>
