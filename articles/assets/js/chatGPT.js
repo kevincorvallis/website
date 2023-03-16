@@ -1,3 +1,5 @@
+const gisAuth = new GoogleIdentityService();
+
 function initializeSignInButton() {
   const signInButton = document.getElementById('signin-btn');
 
