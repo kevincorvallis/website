@@ -20,6 +20,7 @@
     <div class="signin-container">
         <div class="g-signin2" data-onsuccess="onSignIn"></div>
     </div>
+    <div id="welcome-message"></div>
     <button onclick="generatePrompt()">Generate Prompt</button>
     <div id="prompt"></div>
 
@@ -30,6 +31,8 @@
         </p>
     </div>    
     <form onsubmit="addPrompt(); return false;">
+      <label for="user-id">User ID:</label>
+      <input type="text" id="user-id" readonly>
       <label for="custom-prompt">Enter your prompt:</label>
       <input type="text" id="custom-prompt" required>
       <button type="submit">Add Prompt</button>
@@ -38,14 +41,17 @@
 
     <h2>Add Your Own Journal Entry</h2>
     <form onsubmit="event.preventDefault(); submitJournalEntry();">
+        <label for="user-id">User ID:</label>
+        <input type="text" id="user-id" readonly>
         <label for="entry-title">Title:</label>
         <input type="text" id="entry-title">
         <label for="entry-text">Text:</label>
         <input type="text" id="entry-text">
         <button type="submit">Add Journal Entry</button>
     </form>
+    <button onclick="signOut()">Sign Out</button>
 <!-- Scripts -->
-    <script src="https://apis.google.com/js/platform.js?onload=startApp" async defer></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="assets/js/chatGPT.js"></script>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/jquery.scrollex.min.js"></script>
