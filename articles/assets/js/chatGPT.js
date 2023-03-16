@@ -150,3 +150,4 @@ function submitJournalEntry() {
 }
  
 window.initializeSignInButton = initializeSignInButton;
+
