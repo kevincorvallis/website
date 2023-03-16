@@ -19,6 +19,29 @@ function initializeSignInButton() {
 }
 
 
+function init() {
+  gapi.load('auth2', function() {
+    gapi.auth2.init({
+      client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
+    }).then(function() {
+      renderButton();
+    });
+  });
+}
+
+function renderButton() {
+  gapi.signin2.render('signin-btn', {
+    'scope': 'profile email',
+    'width': 250,
+    'height': 50,
+    'longtitle': true,
+    'theme': 'dark',
+    'onsuccess': handleCredentialResponse,
+    'onfailure': function() {
+      console.log('Sign-in error');
+    }
+  });
+}
 
 
 function getJournalEntry(userId, entryId) {

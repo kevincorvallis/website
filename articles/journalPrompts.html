@@ -14,11 +14,22 @@
         }
     </style>
 </head>
-
 <body>
     <h1>Journal</h1>
     <div class="signin-container">
-        <google-identity-button id="signin-btn" data-callback="handleCredentialResponse"></google-identity-button>
+        <div id="g_id_onload"
+             data-client_id="801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com"
+             data-login_uri="https://0a65j03yja.execute-api.us-west-2.amazonaws.com/prod/authenticate"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="rectangular"
+             data-logo_alignment="left">
+        </div>
     </div>
     <div id="welcome-message"></div>
     <button onclick="generatePrompt()">Generate Prompt</button>
@@ -51,6 +62,8 @@
         <button type="submit">Add Journal Entry</button>
     </form>
     <button onclick="signOut()">Sign Out</button>
+
+
 <!-- Scripts -->
 <!-- Include jQuery first -->
 <script src="assets/js/jquery.min.js"></script>
