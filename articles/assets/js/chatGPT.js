@@ -5,17 +5,25 @@ function initializeSignInButton() {
 
   signInButton.addEventListener('click', async () => {
     try {
-      const auth = await gisAuth.signInWithPopup({
-        client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
-        scope: 'email profile',
+      const response = await new Promise((resolve, reject) => {
+        google.accounts.id.renderButton(
+          signInButton,
+          {
+            client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
+            callback: resolve,
+            cancel_on_tap_outside: true,
+            scope: 'email profile',
+          }
+        );
       });
 
-      onSignIn(auth);
+      onSignIn(response.getAuthResponse());
     } catch (error) {
       console.error('Error during sign-in:', error);
     }
   });
 }
+
 
 
 function getJournalEntry(userId, entryId) {
