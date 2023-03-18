@@ -1,7 +1,18 @@
 // Load the Google Identity Services (GIS) library
 function initializeSignInButton() {
-  gapi.load('signin', renderSignInButton);
+  gapi.load('signin2', function() {
+    gapi.signin2.render('google-signin-btn', {
+      'scope': 'email',
+      'width': 240,
+      'height': 50,
+      'longtitle': true,
+      'theme': 'dark',
+      'onsuccess': onSignIn,
+      'onfailure': onFailure
+    });
+  });
 }
+
 
 // Render the Google Sign-In button
 function renderSignInButton() {
