@@ -111,3 +111,34 @@ function submitJournalEntry() {
   var text = $('#entry-text').val();
   addJournalEntry(userId, title, text);
 }
+
+var client;
+var access_token;
+
+function initClient() {
+  client = google.accounts.oauth2.initTokenClient({
+    client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
+    scope: 'profile email',
+    callback: (tokenResponse) => {
+      access_token = tokenResponse.access_token;
+    },
+  });
+}
+function getToken() {
+  client.requestAccessToken();
+}
+function revokeToken() {
+  google.accounts.oauth2.revoke(access_token, () => {console.log('access token revoked')});
+}
+function listMajors() {
+  var spreadsheetId = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
+  var range = 'Class Data!A2:E';
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      console.log(this.responseText);
+    }
+  };
+  xhr.open('GET', `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`);
+  xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
+  xhr.send();
