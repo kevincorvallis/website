@@ -111,4 +111,3 @@ function submitJournalEntry() {
   var text = $('#entry-text').val();
   addJournalEntry(userId, title, text);
 }
-window.addEventListener('load', initializeSignInButton);
