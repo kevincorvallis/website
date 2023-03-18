@@ -30,6 +30,7 @@ async function onSignIn(googleUser) {
   $('#welcome-message').text(`Welcome, ${firstName}!`);
 }
 
+
 // Function to handle the sign-out process
 function signOut() {
   const auth2 = gapi.auth2.getAuthInstance();
@@ -54,14 +55,5 @@ async function handleCredentialResponse(response) {
   } catch (error) {
     console.error('Error handling credential response:', error);
   }
-}
-
-function signOut() {
-  const auth2 = gapi.auth2.getAuthInstance();
-  auth2.signOut().then(() => {
-    // Clear the user ID field and welcome message
-    $('#user-id').val('');
-    $('#welcome-message').text('');
-  });
 }
 
