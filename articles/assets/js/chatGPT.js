@@ -59,3 +59,4 @@ async function handleCredentialResponse(response) {
 
 
 
+initializeSignInButton();
