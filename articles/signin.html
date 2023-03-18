@@ -1,6 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="https://accounts.google.com/gsi/client" onload="initClient()" async defer></script>
+  </head>
+  <body>
+    <script>
+      var client;
+      function initClient() {
+        client = google.accounts.oauth2.initCodeClient({
+            client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq',
+          scope: 'https://www.googleapis.com/auth/calendar.readonly',
+          ux_mode: 'popup',
+          callback: (response) => {
+            var code_receiver_uri = 'https://0a65j03yja.execute-api.us-west-2.amazonaws.com/prod/authentication'
+            // Send auth code to your backend platform
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', code_receiver_uri, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onload = function() {
+              console.log('Signed in as: ' + xhr.responseText);
+            };
+            xhr.send('code=' + response.code);
+            // After receipt, the code is exchanged for an access token and
+            // refresh token, and the platform then updates this web app
+            // running in user's browser with the requested calendar info.
+          },
+        });
+      }
+      function getAuthCode() {
+        // Request authorization code and obtain user consent
+          client.requestCode();
+      }
+    </script>
+    <button onclick="getAuthCode();">Load Your Calendar</button>
+  </body>
+</html>
+<!-- 
+
+<!DOCTYPE html>
+<html>
+  <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://accounts.google.com/gsi/client" onload="initClient()" async defer></script>
   </head>
@@ -57,7 +97,7 @@
   </body>
   <script src="signin.js"></script>
 
-</html>
+</html> -->
 
 <!-- 
 <!DOCTYPE HTML>
