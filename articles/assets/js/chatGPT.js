@@ -11,7 +11,7 @@ function initializeSignInButton() {
       'longtitle': true,
       'theme': 'dark',
       'onsuccess': onSignIn,
-      'onfailure': onFailure
+      'onfailure': onSignInFailure
     });
   });
 }
