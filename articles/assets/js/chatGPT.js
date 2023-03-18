@@ -1,3 +1,6 @@
+var userId; // Declare a global variable to store the user ID
+
+
 // Load the Google Identity Services (GIS) library
 function initializeSignInButton() {
   gapi.load('signin2', function() {
@@ -31,7 +34,7 @@ async function onSignIn(googleUser) {
   const userInfoResponse = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${id_token}`);
   const userInfo = await userInfoResponse.json();
 
-  const userId = userInfo.email;
+  userId = userInfo.email;
   const firstName = userInfo.given_name;
 
   $('#user-id').val(userId);
@@ -76,4 +79,35 @@ function signIn() {
 
 function onSignInFailure(error) {
   console.error('Error during sign-in:', error);
+}
+
+
+function addPrompt() {
+  var customPrompt = $('#custom-prompt').val();
+  if (customPrompt.trim() === "") {
+    alert("Please enter a non-empty prompt.");
+    return;
+  }
+
+  $.ajax({
+    url: 'https://0a65j03yja.execute-api.us-west-2.amazonaws.com/prod/addprompt',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: JSON.stringify({ userId: userId, prompt: customPrompt }),
+    success: function () {
+      $('#custom-prompt').val(''); // Clear the input field
+      alert('Your prompt was added!');
+    },
+    error: function () {
+      alert('Error adding prompt');
+    },
+  });
+}
+
+function submitJournalEntry() {
+  var title = $('#entry-title').val();
+  var text = $('#entry-text').val();
+  addJournalEntry(userId, title, text);
 }
