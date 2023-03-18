@@ -58,5 +58,6 @@ async function handleCredentialResponse(response) {
 }
 
 
+window.onload = initializeSignInButton;
 
 initializeSignInButton();
