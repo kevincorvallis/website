@@ -17,27 +17,48 @@
     <button onclick="generatePrompt()">Generate Prompt</button>
     <div id="prompt"></div>
     <div id="prompt-container"></div>
-
+    <div class="example-prompts-container"></div>
+    
     <script>
       window.addEventListener('load', fetchPrompts);
     </script>
-    <h2>Add Your Own Prompt</h2>
-    <div class="prompt-description">
-        <p>
-            We believe that everyone has unique insights and ideas for journal prompts. That's why we rotate our prompts every week, showcasing those submitted by our users. By sharing your prompt, you have the opportunity to inspire countless others in their journaling journey. We encourage you to submit your favorite prompts, and who knows? Yours might just be featured next week! Together, we can create a diverse and engaging collection of prompts to help unlock creativity and self-reflection for everyone.
-        </p>
-    </div>    
-    <form onsubmit="addPrompt(); return false;">
+<h2>Add Your Own Prompt</h2>
+<div class="prompt-description">
+    <div class="prompt-description-text">We believe that everyone has unique insights and ideas for journal prompts. That's why we rotate our prompts every week, showcasing those submitted by our users. By sharing your prompt, you have the opportunity to inspire countless others in their journaling journey. We encourage you to submit your favorite prompts, and who knows? Yours might just be featured next week! Together, we can create a diverse and engaging collection of prompts to help unlock creativity and self-reflection for everyone.</div>
+  </div>
+  
+  <div id="add-prompt-modal" class="modal">
+    <div class="modal-content">
+      <form onsubmit="addPrompt(); return false;">
+        <label for="user-name">Name:</label>
+        <input type="text" id="user-name" required>
         <label for="user-email">Email:</label>
         <input type="email" id="user-email" required>
-      <label for="custom-prompt">Enter your prompt:</label>
-      <input type="text" id="custom-prompt" required>
-      <button type="submit">Add Prompt</button>
-    </form>
-   
+        <label for="custom-prompt">Enter your prompt:</label>
+        <input type="text" id="custom-prompt" required>
+        <button type="submit">Add Prompt</button>
+      </form>
+    </div>
+  </div>
 
-    <h2>Add Your Own Journal Entry</h2>
-    <form onsubmit="event.preventDefault(); submitJournalEntry();">
+
+<script>
+  function showPromptDescription() {
+    var modal = document.getElementById("add-prompt-modal");
+    modal.style.display = "block";
+  }
+
+  window.onclick = function(event) {
+    var modal = document.getElementById("add-prompt-modal");
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>
+
+<h2>Add Your Own Journal Entry</h2>
+<p>Submit your journal entry below. Entries will be sent out weekly to your email along with others that participate.</p>
+<form onsubmit="event.preventDefault(); submitJournalEntry();">    <form onsubmit="event.preventDefault(); submitJournalEntry();">
         <label for="user-email">Email:</label>
         <input type="email" id="user-email" required>
         <label for="entry-title">Title:</label>

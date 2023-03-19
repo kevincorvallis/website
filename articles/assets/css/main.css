@@ -37,7 +37,38 @@ body {
 ol, ul {
 	list-style: none;
 }
-
+.prompt-description {
+	position: relative;
+	display: inline-block;
+  }
+  
+  .prompt-description-text {
+	display: none;
+	position: absolute;
+	z-index: 1;
+	background-color: #fff;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+	font-size: 0.5em;
+	color: #333;
+  }
+  
+  
+  .prompt-description-link {
+	color: blue;
+	text-decoration: underline;
+  }
+  
+  .prompt-description:hover .prompt-description-text {
+	display: block;
+  }
+  
+  .prompt-description-link:focus + .prompt-description-text {
+	display: block;
+  }
+  
 #user-banner {
 	position: fixed;
 	top: 20px;
