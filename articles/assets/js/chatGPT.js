@@ -1,11 +1,10 @@
-var userId; // Declare a global variable to store the user ID
-
-
+const uniqueId = Date.now().toString();
 
 function addPrompt() {
-  var customPrompt = $('#custom-prompt').val();
-  var userEmail = $('#user-email').val();
-  var name = $("#user-name").val();
+  const customPrompt = $('#custom-prompt').val();
+  const userEmail = $('#user-email').val();
+  const name = $("#user-name").val();
+
   if (customPrompt.trim() === "") {
     alert("Please enter a non-empty prompt.");
     return;
@@ -17,11 +16,10 @@ function addPrompt() {
     headers: {
       'Content-Type': 'application/json',
     },
-    data: JSON.stringify({ userId: userEmail, prompt: customPrompt, userName: name}),
+    data: JSON.stringify({ userId: uniqueId, prompt: customPrompt, userName: name, userEmail: userEmail}),
     success: function () {
       $('#custom-prompt').val(''); // Clear the input field
       alert("Thank you for submitting your prompt!");
-
     },
     error: function () {
       alert('Error adding prompt');
@@ -30,9 +28,9 @@ function addPrompt() {
 }
 
 function submitJournalEntry() {
-  var userEmail = $('#user-email').val();
-  var title = $('#entry-title').val();
-  var text = $('#entry-text').val();
+  const userEmail = $('#user-email').val();
+  const title = $('#entry-title').val();
+  const text = $('#entry-text').val();
   addJournalEntry(userEmail, title, text);
 }
 
@@ -44,7 +42,6 @@ function fetchPrompts() {
       'Content-Type': 'application/json',
     },
     success: function (response) {
-      // const prompts = JSON.parse(response);
       displayPrompts(response);
     },
     error: function () {
@@ -56,41 +53,44 @@ function fetchPrompts() {
 function displayPrompts(prompts) {
   const promptContainer = $('#prompt-container');
   const promptList = $('<ul class="prompt-list"></ul>');
+
   prompts.forEach((prompt) => {
     const promptElement = $('<li class="prompt"></li>');
     promptElement.text(`${prompt.userName} - "${prompt.prompt}"`);
     promptList.append(promptElement);
   });
+
   promptContainer.append(promptList);
   promptContainer.css('overflow-y', 'scroll');
   promptContainer.css('height', '200px');
 }
 
-
 function generatePrompt() {
-  const author = "Anonymous"; // replace with the user's name if available
-  const prompts = ["What was your favorite memory from the past week?", 
-                   "What is something you've been wanting to try but haven't had the chance to?", 
-                   "What have you been procrastinating on lately?", 
-                   "What are some ways you can practice self-care today?", 
-                   "What is something you're grateful for right now?", 
-                   "What is a challenge you've recently overcome?", 
-                   "What are some small steps you can take today to work towards your goals?", 
-                   "What is something that's been weighing on your mind lately?", 
-                   "What is something you can do to show kindness to someone else today?",
-                   "What is a lesson you've learned recently?",
-                   "What is something that inspires you?",
-                   "What is something you're looking forward to?",
-                   "What is a place you've always wanted to visit?",
-                   "What is something that's been bringing you joy lately?"];
+  const author = "Anonymous";
+  const prompts = [
+    "What was your favorite memory from the past week?",
+    "What is something you've been wanting to try but haven't had the chance to?",
+    "What have you been procrastinating on lately?",
+    "What are some ways you can practice self-care today?",
+    "What is something you're grateful for right now?",
+    "What is a challenge you've recently overcome?",
+    "What are some small steps you can take today to work towards your goals?",
+    "What is something that's been weighing on your mind lately?",
+    "What is something you can do to show kindness to someone else today?",
+    "What is a lesson you've learned recently?",
+    "What is something that inspires you?",
+    "What is something you're looking forward to?",
+    "What is a place you've always wanted to visit?",
+    "What is something that's been bringing you joy lately?"
+  ];
+
   const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
   const prompt = `${author} suggests: ${randomPrompt}`;
   $('#prompt').text(prompt);
 }
 
-
 function showPromptDescription() {
-  var modal = document.getElementById("add-prompt-modal");
+  const modal = document.getElementById("add-prompt-modal");
   modal.style.display = "block";
 }
 

@@ -15,9 +15,14 @@
    
     <div id="welcome-message"></div>
     <button onclick="generatePrompt()">Generate Prompt</button>
-    <div id="prompt"></div>
-    <div id="prompt-container"></div>
-    <div class="example-prompts-container"></div>
+    <div class="container">
+        <h2 class="title">Prompts</h2>
+        <div id="prompt-container">
+          <div class="columns is-multiline is-centered" id="prompt-list">
+          </div>
+        </div>
+      </div>
+      
     
     <script>
       window.addEventListener('load', fetchPrompts);
@@ -71,10 +76,12 @@
 
 <!-- Scripts -->
 <!-- Include jQuery first -->
+
 <script src="assets/js/jquery.min.js"></script>
 
 <!-- Then include your chatGPT.js -->
 <!-- Include other scripts -->
+
 <script src="assets/js/jquery.scrollex.min.js"></script>
 <script src="assets/js/jquery.scrolly.min.js"></script>
 <script src="assets/js/browser.min.js"></script>
