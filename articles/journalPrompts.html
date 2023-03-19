@@ -1,22 +1,30 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-    <meta charset="utf-8" />
-    <title>Journal App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="assets/css/main.css" />
-    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-    <script src="assets/js/chatGPT.js"></script>
-
-</head>
-<body>
-
-    <h1>Journal</h1>
-   
+    <head>
+        <meta charset="utf-8" />
+        <title>Journal App</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="assets/css/main.css" />
+        <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+        <script src="assets/js/chatGPT.js"></script>
+    </head>
+    <body>
+    
+        <h1 class="language" data-english="Journal" data-korean="일기">Journal</h1>
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="toggle-language">
+                <span class="slider round"></span>
+            </label>
+            <button id="switch-language" class="language" data-english="한국어" data-korean="English">한국어</button>
+        </div>
+    
     <div id="welcome-message"></div>
     <button onclick="generatePrompt()">Generate Prompt</button>
+    <p id="generated-prompt" class="language" data-english="" data-korean=""></p>
+    
     <div class="container">
-        <h2 class="title">Prompts</h2>
+        <h2 >Prompts by other people </h2>
         <div id="prompt-container">
           <div class="columns is-multiline is-centered" id="prompt-list">
           </div>
@@ -27,27 +35,68 @@
     <script>
       window.addEventListener('load', fetchPrompts);
     </script>
-<h2>Add Your Own Prompt</h2>
-<div class="prompt-description">
-    <div class="prompt-description-text">We believe that everyone has unique insights and ideas for journal prompts. That's why we rotate our prompts every week, showcasing those submitted by our users. By sharing your prompt, you have the opportunity to inspire countless others in their journaling journey. We encourage you to submit your favorite prompts, and who knows? Yours might just be featured next week! Together, we can create a diverse and engaging collection of prompts to help unlock creativity and self-reflection for everyone.</div>
-  </div>
+    <h2 class="language" data-english="Add Your Own Prompt" data-korean="나만의 프롬프트 추가하기">Add Your Own Prompt</h2>
+    <div class="prompt-description">
+        <div class="prompt-description-text language" data-english="We believe that everyone has unique insights and ideas for journal prompts. That's why we rotate our prompts every week, showcasing those submitted by our users. By sharing your prompt, you have the opportunity to inspire countless others in their journaling journey. We encourage you to submit your favorite prompts, and who knows? Yours might just be featured next week! Together, we can create a diverse and engaging collection of prompts to help unlock creativity and self-reflection for everyone." data-korean="우리는 모두가 독특한 통찰력과 일기 프롬프트에 대한 아이디어를 가지고 있다고 믿습니다. 그래서 우리는 매주 사용자들이 제출한 프롬프트를 전시하며 프롬프트를 바꿉니다. 프롬프트를 공유함으로써 다른 사람들의 일기 쓰기 여행에서 영감을 줄 수 있는 기회가 됩니다. 좋아하는 프롬프트를 제출해 보세요. 누가 알아요? 다음 주에는 당신의 프롬프트가 특집될 수도 있습니다. 함께 다양하고 흥미로운 프롬프트 모음을 만들어 창의력과 자기 성찰을 도와줍시다.">We believe that everyone has unique insights and ideas for journal prompts...</div>
+    </div>
   
   <div id="add-prompt-modal" class="modal">
     <div class="modal-content">
       <form onsubmit="addPrompt(); return false;">
-        <label for="user-name">Name:</label>
+        <label for="user-name" class="language" data-english="Name:" data-korean="이름:">Name:</label>
         <input type="text" id="user-name" required>
-        <label for="user-email">Email:</label>
+        <label for="user-email" class="language" data-english="Email:" data-korean="이메일:">Email:</label>
         <input type="email" id="user-email" required>
-        <label for="custom-prompt">Enter your prompt:</label>
+        <label for="custom-prompt" class="language" data-english="Enter your prompt:" data-korean="새로운 프롬프트를 입력하세요:">Enter your prompt:</label>
         <input type="text" id="custom-prompt" required>
-        <button type="submit">Add Prompt</button>
-      </form>
+        <button type="submit" class="language" data-english="Add Prompt" data-korean="프롬프트 추가하기">Add Prompt</button>
+    </form>
     </div>
   </div>
 
 
+
+
+<h2 class="language" data-english="Add Your Own Journal Entry" data-korean="나만의 일기 추가하기">Add Your Own Journal Entry</h2>
+<p class="language" data-english="Submit your journal" data-korean="일기 제출하기">Submit your journal</p>
+
+<div id="add-prompt-modal" class="modal">
+    <div class="modal-content">
+        <form onsubmit="addPrompt(); return false;">
+            <label for="user-name" class="language" data-english="Name:" data-korean="이름:">Name:</label>
+            <input type="text" id="user-name" required>
+            <label for="user-email" class="language" data-english="Email:" data-korean="이메일:">Email:</label>
+            <input type="email" id="user-email" required>
+            <label for="custom-prompt" class="language" data-english="Enter your prompt:" data-korean="새로운 프롬프트를 입력하세요:">Enter your prompt:</label>
+            <input type="text" id="custom-prompt" required>
+            <button type="submit" class="language" data-english="Add Prompt" data-korean="프롬프트 추가하기">Add Prompt</button>
+        </form>
+    </div>
+</div>
+
 <script>
+    const toggleSwitch = document.querySelector('#toggle-language');
+    const languageElements = document.querySelectorAll('.language');
+
+    function setLanguage() {
+        const isKorean = toggleSwitch.checked;
+        for (let i = 0; i < languageElements.length; i++) {
+            const languageElement = languageElements[i];
+            if (isKorean) {
+                // Set Korean text
+                languageElement.textContent = languageElement.getAttribute('data-korean');
+            } else {
+                // Set English text
+                languageElement.textContent = languageElement.getAttribute('data-english');
+            }
+        }
+    }
+
+    // Set the initial language on page load
+    setLanguage();
+
+    // Update the language when the toggle is changed
+    toggleSwitch.addEventListener('change', setLanguage);
   function showPromptDescription() {
     var modal = document.getElementById("add-prompt-modal");
     modal.style.display = "block";
@@ -60,20 +109,6 @@
     }
   }
 </script>
-
-<h2>Add Your Own Journal Entry</h2>
-<p>Submit your journal entry below. Entries will be sent out weekly to your email along with others that participate.</p>
-<form onsubmit="event.preventDefault(); submitJournalEntry();">    <form onsubmit="event.preventDefault(); submitJournalEntry();">
-        <label for="user-email">Email:</label>
-        <input type="email" id="user-email" required>
-        <label for="entry-title">Title:</label>
-        <input type="text" id="entry-title">
-        <label for="entry-text">Text:</label>
-        <input type="text" id="entry-text">
-        <button type="submit">Add Journal Entry</button>
-    </form>
-    <button onclick="signOut()">Sign Out</button>
-
 <!-- Scripts -->
 <!-- Include jQuery first -->
 

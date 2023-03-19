@@ -2,6 +2,7 @@
   "dependencies": {
     "g": "^2.0.1",
     "http-server": "^14.1.0",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "openai": "^3.2.1"
   }
 }

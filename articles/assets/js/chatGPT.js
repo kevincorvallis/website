@@ -50,20 +50,24 @@ function fetchPrompts() {
   });
 }
 
-function displayPrompts(prompts) {
+async function displayPrompts(prompts) {
   const promptContainer = $('#prompt-container');
   const promptList = $('<ul class="prompt-list"></ul>');
 
-  prompts.forEach((prompt) => {
-    const promptElement = $('<li class="prompt"></li>');
-    promptElement.text(`${prompt.userName} - "${prompt.prompt}"`);
+  for (const prompt of prompts) {
+    const promptElement = $('<li class="prompt language"></li>');
+    const koreanPrompt = await translateText(prompt.prompt, 'ko');
+    promptElement.attr('data-english', `${prompt.userName} - "${prompt.prompt}"`);
+    promptElement.attr('data-korean', `${prompt.userName} - "${koreanPrompt}"`);
     promptList.append(promptElement);
-  });
+  }
 
   promptContainer.append(promptList);
   promptContainer.css('overflow-y', 'scroll');
   promptContainer.css('height', '200px');
+  setLanguage();
 }
+
 
 function generatePrompt() {
   const author = "Anonymous";
@@ -100,3 +104,5 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
+
+
