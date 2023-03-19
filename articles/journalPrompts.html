@@ -6,28 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="assets/css/main.css" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-    
+    <script src="assets/js/chatGPT.js"></script>
+
 </head>
 <body>
-    <h1>Journal</h1>
-    <!-- Set up the Google Sign-In button -->
-    <div id="g_id_onload"
-        data-client_id="801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com"
-        data-auto_prompt="false">
-    </div>
-    <div class="g_id_signin"
-        data-type="standard"
-        data-size="large"
-        data-theme="outline"
-        data-text="sign_in_with"
-        data-shape="rectangular"
-        data-logo_alignment="left">
-    </div>
 
+    <h1>Journal</h1>
+   
     <div id="welcome-message"></div>
     <button onclick="generatePrompt()">Generate Prompt</button>
     <div id="prompt"></div>
+    <div id="prompt-container"></div>
 
+    <script>
+      window.addEventListener('load', fetchPrompts);
+    </script>
     <h2>Add Your Own Prompt</h2>
     <div class="prompt-description">
         <p>
@@ -35,17 +28,18 @@
         </p>
     </div>    
     <form onsubmit="addPrompt(); return false;">
-      <label for="user-id">User ID:</label>
-      <input type="text" id="user-id" readonly>
+        <label for="user-email">Email:</label>
+        <input type="email" id="user-email" required>
       <label for="custom-prompt">Enter your prompt:</label>
       <input type="text" id="custom-prompt" required>
       <button type="submit">Add Prompt</button>
     </form>
-    
+   
+
     <h2>Add Your Own Journal Entry</h2>
     <form onsubmit="event.preventDefault(); submitJournalEntry();">
-        <label for="user-id">User ID:</label>
-        <input type="text" id="user-id" readonly>
+        <label for="user-email">Email:</label>
+        <input type="email" id="user-email" required>
         <label for="entry-title">Title:</label>
         <input type="text" id="entry-title">
         <label for="entry-text">Text:</label>
@@ -57,15 +51,9 @@
 <!-- Scripts -->
 <!-- Include jQuery first -->
 <script src="assets/js/jquery.min.js"></script>
-<script src="https://accounts.google.com/gsi/client" onload="gisInit()" async defer></script>
-<script src="https://apis.google.com/js/api.js" onload="gapiLoad()" async defer></script>
 
 <!-- Then include your chatGPT.js -->
-<script src="assets/js/chatGPT.js"></script>
 <!-- Include other scripts -->
-<script> 
-    window.addEventListener('load', initializeSignInButton);
-</script>
 <script src="assets/js/jquery.scrollex.min.js"></script>
 <script src="assets/js/jquery.scrolly.min.js"></script>
 <script src="assets/js/browser.min.js"></script>

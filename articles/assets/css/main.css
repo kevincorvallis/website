@@ -50,6 +50,21 @@ ol, ul {
 	text-align: center;
 	z-index: 1000;
 }
+#prompt-container {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+  width: 100%;
+  animation: scrolling 10s linear infinite;
+}
+
+.prompt {
+  display: inline-block;
+  padding: 0 20px;
+}
+
+
 
 #welcome-popup {
 	position: fixed;

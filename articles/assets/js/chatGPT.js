@@ -1,89 +1,10 @@
 var userId; // Declare a global variable to store the user ID
 
 
-// Load the Google Identity Services (GIS) library
-function initializeSignInButton() {
-  gapi.load('signin2', function() {
-    gapi.signin2.render('google-signin-btn', {
-      'scope': 'email',
-      'width': 240,
-      'height': 50,
-      'longtitle': true,
-      'theme': 'dark',
-      'onsuccess': onSignIn,
-      'onfailure': onSignInFailure
-    });
-  });
-}
-
-
-// Render the Google Sign-In button
-function renderSignInButton() {
-  gapi.signin.render('google-signin-btn', {
-    'client_id': '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
-    'callback': onSignIn,
-    'scope': 'profile email',
-    'ux_mode': 'popup',
-    'theme': 'dark'
-  });
-}
-
-// Handle successful sign-in
-async function onSignIn(googleUser) {
-  const id_token = googleUser.getAuthResponse().id_token;
-  const userInfoResponse = await fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${id_token}`);
-  const userInfo = await userInfoResponse.json();
-
-  userId = userInfo.email;
-  const firstName = userInfo.given_name;
-
-  $('#user-id').val(userId);
-  $('#welcome-message').text(`Welcome, ${firstName}!`);
-}
-
-// Function to handle the sign-out process
-function signOut() {
-  const auth2 = gapi.auth2.getAuthInstance();
-  auth2.signOut().then(function () {
-    // Clear the user ID field and welcome message
-    $('#user-id').val('');
-    $('#welcome-message').text('');
-  });
-}
-
-// Initialize the Google Sign-In button
-function initGoogleAuth() {
-  gapi.load('auth2', () => {
-    gapi.auth2.init({
-      client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
-      scope: 'profile email',
-    }).then(() => {
-      attachSignInHandler();
-    });
-  });
-}
-
-function attachSignInHandler() {
-  const signInButton = document.getElementById('google-signin-btn');
-  signInButton.addEventListener('click', () => {
-    signIn();
-  });
-}
-
-function signIn() {
-  const auth2 = gapi.auth2.getAuthInstance();
-  auth2.signIn()
-    .then(onSignIn)
-    .catch(onSignInFailure);
-}
-
-function onSignInFailure(error) {
-  console.error('Error during sign-in:', error);
-}
-
 
 function addPrompt() {
   var customPrompt = $('#custom-prompt').val();
+  var userEmail = $('#user-email').val();
   if (customPrompt.trim() === "") {
     alert("Please enter a non-empty prompt.");
     return;
@@ -95,7 +16,7 @@ function addPrompt() {
     headers: {
       'Content-Type': 'application/json',
     },
-    data: JSON.stringify({ userId: userId, prompt: customPrompt }),
+    data: JSON.stringify({ userId: userEmail, prompt: customPrompt }),
     success: function () {
       $('#custom-prompt').val(''); // Clear the input field
       alert('Your prompt was added!');
@@ -107,38 +28,38 @@ function addPrompt() {
 }
 
 function submitJournalEntry() {
+  var userEmail = $('#user-email').val();
   var title = $('#entry-title').val();
   var text = $('#entry-text').val();
-  addJournalEntry(userId, title, text);
+  addJournalEntry(userEmail, title, text);
 }
 
-var client;
-var access_token;
-
-function initClient() {
-  client = google.accounts.oauth2.initTokenClient({
-    client_id: '801961296119-s4u306t6rggorr92gtq8pc54uuhalirq.apps.googleusercontent.com',
-    scope: 'profile email',
-    callback: (tokenResponse) => {
-      access_token = tokenResponse.access_token;
+function fetchPrompts() {
+  $.ajax({
+    url: 'https://0a65j03yja.execute-api.us-west-2.amazonaws.com/prod/prompts',
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    success: function (response) {
+      // const prompts = JSON.parse(response);
+      displayPrompts(response);
+    },
+    error: function () {
+      console.error('Error fetching prompts');
     },
   });
 }
-function getToken() {
-  client.requestAccessToken();
+
+function displayPrompts(prompts) {
+  const promptContainer = $('#prompt-container');
+  const promptList = $('<ul class="prompt-list"></ul>');
+  prompts.forEach((prompt) => {
+    const promptElement = $('<li class="prompt"></li>');
+    promptElement.text(`[${prompt.userId}] ${prompt.prompt}`);
+    promptList.append(promptElement);
+  });
+  promptContainer.append(promptList);
+  promptContainer.css('overflow-y', 'scroll');
+  promptContainer.css('height', '200px');
 }
-function revokeToken() {
-  google.accounts.oauth2.revoke(access_token, () => {console.log('access token revoked')});
-}
-function listMajors() {
-  var spreadsheetId = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
-  var range = 'Class Data!A2:E';
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      console.log(this.responseText);
-    }
-  };
-  xhr.open('GET', `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`);
-  xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
-  xhr.send();
