@@ -42,6 +42,7 @@ function fetchPrompts() {
       'Content-Type': 'application/json',
     },
     success: function (response) {
+      // const prompts = JSON.parse(response);
       displayPrompts(response);
     },
     error: function () {
@@ -49,25 +50,20 @@ function fetchPrompts() {
     },
   });
 }
-
-async function displayPrompts(prompts) {
+function displayPrompts(prompts) {
   const promptContainer = $('#prompt-container');
   const promptList = $('<ul class="prompt-list"></ul>');
 
-  for (const prompt of prompts) {
-    const promptElement = $('<li class="prompt language"></li>');
-    const koreanPrompt = await translateText(prompt.prompt, 'ko');
-    promptElement.attr('data-english', `${prompt.userName} - "${prompt.prompt}"`);
-    promptElement.attr('data-korean', `${prompt.userName} - "${koreanPrompt}"`);
+  prompts.forEach((prompt) => {
+    const promptElement = $('<li class="prompt"></li>');
+    promptElement.text(`${prompt.userName} - "${prompt.prompt}"`);
     promptList.append(promptElement);
-  }
+  });
 
   promptContainer.append(promptList);
   promptContainer.css('overflow-y', 'scroll');
   promptContainer.css('height', '200px');
-  setLanguage();
 }
-
 
 function generatePrompt() {
   const author = "Anonymous";
