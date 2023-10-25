@@ -1,46 +1,27 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Photography Showcase</title>
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-    <style>
-      /* Add your custom CSS here */
-      /* This is just an example */
-      .photo {
-        max-width: 100%;
-        height: auto;
-        object-fit: cover;
-        margin-bottom: 20px;
-      }
-      .swiper-container.gallery {
-        margin: 0 auto;
-        max-width: 50%;
-      }
-    </style>
-  </head>
-  <body>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
     <h1>My Photography Showcase</h1>
     <div class="swiper-container gallery">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide"><img src="images/1.jpg" alt="Photo 1" class="photo"></div>
-        <div class="swiper-slide"><img src="images/2.jpg" alt="Photo 2" class="photo"></div>
-        <div class="swiper-slide"><img src="images/3.jpg" alt="Photo 3" class="photo"></div>
-        <div class="swiper-slide"><img src="images/4.jpg" alt="Photo 4" class="photo"></div>
-        <div class="swiper-slide"><img src="images/5.jpg" alt="Photo 5" class="photo"></div>
-        <div class="swiper-slide"><img src="images/6.jpg" alt="Photo 6" class="photo"></div>
-      </div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="images/1.jpg" alt="Photo 1" class="photo"></div>
+            <div class="swiper-slide"><img src="images/2.jpg" alt="Photo 2" class="photo"></div>
+            <div class="swiper-slide"><img src="images/3.jpg" alt="Photo 3" class="photo"></div>
+            <div class="swiper-slide"><img src="images/4.jpg" alt="Photo 4" class="photo"></div>
+            <div class="swiper-slide"><img src="images/5.jpg" alt="Photo 5" class="photo"></div>
+            <div class="swiper-slide"><img src="images/6.jpg" alt="Photo 6" class="photo"></div>
+        </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
     </div>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-    <script>
-      var swiper = new Swiper('.gallery', {
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-      });
-    </script>
-  </body>
+    <script src="scripts.js"></script>
+</body>
 </html>

@@ -2948,3 +2948,4 @@ node_modules/openai/dist/configuration.d.ts
 node_modules/openai/dist/configuration.js
 node_modules/openai/dist/index.d.ts
 node_modules/openai/dist/index.js
+.DS_Store

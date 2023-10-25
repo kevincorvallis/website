@@ -1,0 +1,10 @@
+{
+    "name": "my-lambda-function",
+    "version": "1.0.0",
+    "description": "A Lambda function",
+    "main": "index.js",
+    "dependencies": {
+      "mysql": "^2.18.1"
+    }
+  }
+  
