@@ -120,3 +120,6 @@ async function saveToDynamoDB(userData) {
         alert(`There was an error: ${error.message}. Please try again.`);
     }
 }
+
+
+// get rid of userID
