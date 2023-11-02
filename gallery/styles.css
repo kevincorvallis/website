@@ -1,40 +1,28 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
-    line-height: 1.6;
+/* Styles for the collage container */
+.collage {
+    display: grid; /* Using a grid layout */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* This will create a responsive grid where images take up at least 200px width and expand to fit the container */
+    gap: 16px; /* Spacing between the images */
+    padding: 16px; /* Padding around the collage */
 }
 
-h1 {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 2.5em;
+/* Styles for the images */
+.collage .image {
+    width: 100%; /* Make the images fill their grid cell */
+    height: auto; /* Keep the original aspect ratio */
+    border-radius: 8px; /* Optional: Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: A slight shadow for some depth */
+    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+    cursor: pointer; /* Indicate that the images are clickable */
 }
 
-.photo {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+.collage .image:hover {
+    transform: scale(1.05); /* Slightly enlarge the image on hover for a subtle effect */
 }
 
-.swiper-container.gallery {
-    margin: 20px auto;
-    max-width: 80%;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    border-radius: 8px;
+/* Styles for PhotoSwipe (usually, the default is good but you can customize further) */
+.pswp__bg {
+    background: rgba(0, 0, 0, 0.9); /* Adjust the background color and opacity of the PhotoSwipe overlay */
 }
 
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2em;
-    }
-    
-    .swiper-container.gallery {
-        max-width: 95%;
-    }
-}
+/* Additional styles, if any, for other elements or customizations can be added below */
