@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Kevin Lee - Music Collection</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 50px 0;
+        }
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.2em;
+            color: #777;
+        }
+        .music-section {
+            margin: 50px 0;
+        }
+        .music-section h2 {
+            font-size: 2em;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .music-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .music-item img {
+            max-width: 100%;
+            flex: 1 1 200px;
+            height: auto;
+            margin-right: 20px;
+        }
+        .music-item audio,
+        .music-item iframe {
+            width: 100%;
+            flex: 2 1 400px;
+        }
+        .music-item .content {
+            flex: 2 1 400px;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+        }
+        .video-container iframe,
+        .video-container object,
+        .video-container embed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .music-section h2 {
+                font-size: 1.5em;
+            }
+            .music-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .music-item img {
+                margin: 0 0 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="header">
+            <h1>Kevin Lee</h1>
+            <p>Music Collection - Live and Originals</p>
+        </header>
+
+        <section class="music-section">
+            <h2>Live Performances</h2>
+            <div class="music-item">
+                <img src="../images/olivia.webp" alt="Live Performance 1">
+                <div class="content">
+                    <h3>Live at the Jazz Club</h3>
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/KGczofguB0c?t=813" title="Olivia Rodrigo: Tiny Desk (Home) Concert" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="music-item">
+                <img src="../images/live-performance2.jpg" alt="Live Performance 2">
+                <div class="content">
+                    <h3>Acoustic Session</h3>
+                    <div class="video-container">
+                        <iframe src="https://www.youtube.com/embed/livevideo2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="music-section">
+            <h2>Original Tracks</h2>
+            <div class="music-item">
+                <img src="../images/original-track1.jpg" alt="Original Track 1">
+                <div class="content">
+                    <h3>Sunset Melody</h3>
+                    <audio controls>
+                        <source src="../music/sunset-melody.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+            <div class="music-item">
+                <img src="../images/original-track2.jpg" alt="Original Track 2">
+                <div class="content">
+                    <h3>Midnight Blues</h3>
+                    <audio controls>
+                        <source src="../music/midnight-blues.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/jquery.scrollex.min.js"></script>
+    <script src="../assets/js/jquery.scrolly.min.js"></script>
+    <script src="../assets/js/browser.min.js"></script>
+    <script src="../assets/js/breakpoints.min.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/main.js"></script>
+
+</body>
+</html>
