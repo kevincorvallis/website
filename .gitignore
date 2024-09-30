@@ -1,3 +1,44 @@
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Git directory itself
+/.git
+
+# Ignore log files and temporary files
+*.log
+*.tmp
+*.bak
+
+# Ignore compiled files (if using C/C++/Java)
+*.class
+*.o
+*.out
+
+# Ignore Node.js dependencies (if applicable)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore Python cache files (if applicable)
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ignore IDE specific files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Ignore coverage reports (if applicable)
+coverage/
+.nyc_output/
+
+# Ignore specific directory files (adjust as needed)
+.env
 
 .DS_Store
 node_modules/bignumber.js/doc/API 2.html

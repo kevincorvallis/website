@@ -1,58 +1,52 @@
-(function($) {
+document.addEventListener('DOMContentLoaded', function () {
+    const adviceForm = document.getElementById('adviceForm');
+    const responseMessage = document.getElementById('responseMessage');
+    const adviceList2024 = document.getElementById('adviceList2024');
 
-	var $window = $(window),
-		$body = $('body'),
-		$sidebar = $('#sidebar');
+    // Handle form submission
+    adviceForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        
+        // Get the advice input
+        const adviceInput = document.getElementById('adviceInput').value;
+        
+        try {
+            // Make the POST request to the API
+            const response = await fetch('https://your-api-endpoint.amazonaws.com/submit-advice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ advice: adviceInput }),
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
 
-	// Play initial animations on page load.
-	$window.on('load', function() {
-		window.setTimeout(function() {
-			$body.removeClass('is-preload');
-		}, 100);
-	});
+                // Add the new advice to the DOM dynamically
+                const newAdvice = document.createElement('div');
+                newAdvice.classList.add('col-md-6');
+                newAdvice.innerHTML = `
+                    <div class="advice-card p-4 shadow-sm bg-dark text-white rounded">
+                        <p class="fs-5">${adviceInput}</p>
+                    </div>
+                `;
+                
+                // Append the new advice to the 2024 section
+                adviceList2024.appendChild(newAdvice);
+                
+                // Animate the new advice using GSAP
+                gsap.from(newAdvice, { opacity: 0, y: 50, duration: 0.8 });
 
-	// Remove unnecessary elements
-	$('header, #footer').remove();
-
-	// Sidebar.
-	if ($sidebar.length > 0) {
-
-		var $sidebar_a = $sidebar.find('a');
-
-		$sidebar_a.each(function() {
-
-			var $this = $(this),
-				id = $this.attr('href'),
-				$section = $(id);
-
-			if ($section.length < 1)
-				return;
-
-			// Scrollex.
-			$section.scrollex({
-				mode: 'middle',
-				top: '-20vh',
-				bottom: '-20vh',
-				initialize: function() {
-					// Deactivate section.
-					$section.addClass('inactive');
-				},
-				enter: function() {
-					// Activate section.
-					$section.removeClass('inactive');
-				}
-			});
-		});
-	}
-
-	// Scrolly.
-	$('.scrolly').scrolly({
-		speed: 1000,
-		offset: function() {
-			if ($sidebar.length > 0)
-				return $sidebar.height();
-			return 0;
-		}
-	});
-
-})(jQuery);
+                // Show success message
+                responseMessage.innerHTML = `<p class="text-success">Advice submitted successfully!</p>`;
+                responseMessage.classList.add('animate__fadeIn');
+                adviceForm.reset(); // Clear the form
+            } else {
+                responseMessage.innerHTML = `<p class="text-danger">Failed to submit advice. Please try again.</p>`;
+            }
+        } catch (error) {
+            responseMessage.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+        }
+    });
+});
