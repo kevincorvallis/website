@@ -19,6 +19,33 @@ const db = getFirestore(app); // Initialize Firestore
 
 auth.languageCode = 'it'; // Optional: Set language
 
+// // Turn off app verification for testing (IMPORTANT: Never do this in production)
+// auth.settings.appVerificationDisabledForTesting = true;
+// // Mock Phone Number and OTP for testing
+// const phoneNumber = "+15412433053"; // Replace with a valid test phone number
+// const testVerificationCode = "123456"; // Mock OTP for testing
+
+// Function to initialize reCAPTCHA
+function onCaptchaVerify() {
+    if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+            size: 'invisible', // Invisible reCAPTCHA
+            callback: (response) => {
+                console.log("reCAPTCHA solved");
+            },
+            'expired-callback': () => {
+                alert('reCAPTCHA expired. Please try again.');
+            }
+        }, 500);
+    }
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app); // Initialize Firebase Auth
+const db = getFirestore(app); // Initialize Firestore
+
+auth.languageCode = 'it'; // Optional: Set language
+
 // Function to initialize reCAPTCHA
 function onCaptchaVerify() {
     if (!window.recaptchaVerifier) {
