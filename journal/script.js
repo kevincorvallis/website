@@ -1,125 +1,157 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const container = document.querySelector(".container");
+// script.js
 
-    // This function updates the content of the container.
-    const showContent = (title, content) => {
-        container.classList.add("fade-out");
-    
-        setTimeout(() => {
-            container.innerHTML = `
-                <h1>${title}</h1>
-                ${content}
-            `;
-            container.classList.remove("fade-out");
-    
-            if(title === "Welcome to Journaling") {
-                document.getElementById("backBtn").style.display = "none";
-            } else {
-                document.getElementById("backBtn").style.display = "block";
-            }
-        }, 500);
+// Import Firebase functions from CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+
+// Your Firebase configuration (replace with your actual config)
+const firebaseConfig = {
+    apiKey: "AIzaSyC2YGi_HPjp6edncQMAnSI6XHaRrUWus6o",
+    authDomain: "coffeethoughts-41651.firebaseapp.com",
+    projectId: "coffeethoughts-41651",
+    storageBucket: "coffeethoughts-41651.appspot.com",
+    messagingSenderId: "342424038908",
+    appId: "1:342424038908:web:60bea2fba592d922e79679",
+    measurementId: "G-Y02MZF303B"
+    };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const analytics = getAnalytics(app); // Initialize Analytics
+
+// Initialize reCAPTCHA verifier
+window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+    'size': 'invisible',
+    'callback': (response) => {
+        // reCAPTCHA solved, proceed with signInWithPhoneNumber
+        sendOTP();
+    }
+}, auth);
+
+// Function to handle sending OTP
+window.sendOTP = () => {
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    if (!phoneNumber) {
+        alert('Please enter a valid phone number.');
+        return;
     }
 
-    const prompts = [
-        { label: "First Name", id: "userFirstName", buttonId: "submitFirstName" },
-        { label: "Last Name", id: "userLastName", buttonId: "submitLastName" },
-        { label: "Email", id: "userEmail", type: "email", buttonId: "submitEmail" },
-        { label: "Date of Birth", id: "userDOB", type: "date", buttonId: "submitDOB" },
-        { label: "UserID", id: "userID", buttonId: "submitUserID" },
-        { label: "Address", id: "userAddress", buttonId: "submitAddress" },
-        { label: "Phone Number", id: "userPhone", type: "tel", buttonId: "submitPhone" }
-    ];
-    
-    let currentPromptIndex = 0;
-    let userData = {};
-    
-    document.getElementById("firstTime").addEventListener("click", function() {
-        showNextPrompt();
-    });
-    
-    container.addEventListener("click", function(event) {
-        if (event.target.id === prompts[currentPromptIndex].buttonId) {
-            userData[prompts[currentPromptIndex].id] = document.getElementById(prompts[currentPromptIndex].id).value;
-            currentPromptIndex++;
-    
-            if (currentPromptIndex < prompts.length) {
-                showNextPrompt();
-            } else {
-                saveToDynamoDB(userData);
-            }
-        }
-    });
-    
-    function showNextPrompt() {
-        const prompt = prompts[currentPromptIndex];
-        showContent(`Enter your ${prompt.label}`, getPrompt(prompt.label, prompt.id, prompt.type || "text", prompt.buttonId));
+    // Inform users about SMS
+    if (!confirm('By signing in with your phone number, you may receive an SMS for verification. Standard rates apply. Do you want to proceed?')) {
+        return;
     }
-    
-    function getPrompt(label, inputId, type, buttonId) {
-        return `
-            <p>What's your ${label}?</p>
-            <input type="${type}" id="${inputId}" placeholder="Enter your ${label}" />
-            <button id="${buttonId}">Next</button>
-        `;
-    }
-    
 
-    document.getElementById("returningUser").addEventListener("click", function() {
-        showContent("Welcome Back!", "<p>This is the next page content for returning users.</p>");
-    });
+    const appVerifier = window.recaptchaVerifier;
 
-    document.getElementById("backBtn").addEventListener("click", function() {
-        showContent("Welcome to Journaling", `
-            <div class="buttons">
-                <div class="g-signin2" data-onsuccess="onSignIn"></div>
-                <button id="firstTime">First time here</button>
-                <button id="returningUser">I've been here</button>
-            </div>
-        `);
-    });
-});
-
-async function saveToDynamoDB(userData) {
-    try {
-        // Construct the request body
-        const requestBody = {
-            routeKey: "PUT /users",
-            body: {
-                email: userData.userEmail,
-                userid: userData.userID, // Ensure you have this userID field in your userData
-                firstName: userData.userFirstName,
-                lastName: userData.userLastName,
-                dateOfBirth: userData.userDOB,
-                address: userData.userAddress, // Assuming Address is an object with a Street property
-                phoneNumber: userData.userPhone
-            }
-        };
-
-        // Send the request to the API Gateway endpoint
-        const response = await fetch('https://twr7x5bzvf.execute-api.us-west-2.amazonaws.com/users', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
+    signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+        .then((confirmationResult) => {
+            window.confirmationResult = confirmationResult;
+            alert('OTP has been sent to your phone.');
+            document.getElementById('otpSection').style.display = 'block';
+        })
+        .catch((error) => {
+            console.error('Error during signInWithPhoneNumber', error);
+            alert('Error sending OTP. Please try again.');
+            // Reset reCAPTCHA
+            window.recaptchaVerifier.clear();
+            window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+                'size': 'invisible',
+                'callback': (response) => {
+                    sendOTP();
+                }
+            }, auth);
         });
+};
 
-        if (!response.ok) {
-            throw new Error(`Server responded with status: ${response.status}`);
-        }
-        
-        const data = await response.json();
+// Function to handle verifying OTP
+window.verifyOTP = () => {
+    const otp = document.getElementById('otp').value.trim();
+    if (!otp) {
+        alert('Please enter the OTP sent to your phone.');
+        return;
+    }
 
-        if (data.statusCode === 200) {
-            showContent("Thanks!", "<p>Your data has been saved successfully!</p>");
-            return;
+    window.confirmationResult.confirm(otp)
+        .then((result) => {
+            const user = result.user;
+            alert('Phone number verified and user signed in!');
+            // Fetch and display personal note
+            fetchPersonalNote(user.phoneNumber);
+        })
+        .catch((error) => {
+            console.error('Error verifying OTP', error);
+            alert('Invalid OTP. Please try again.');
+        });
+};
+
+// Function to fetch personal note from Firestore
+window.fetchPersonalNote = async (phoneNumber) => {
+    try {
+        const docRef = doc(db, 'contacts', phoneNumber);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            displayPersonalNote(data.personalNote, data.firstName, data.lastName);
         } else {
-            alert(`There was an error saving your data: ${data.body}`);
+            displayDefaultMessage();
         }
     } catch (error) {
-        alert(`There was an error: ${error.message}. Please try again.`);
+        console.error('Error fetching personal note:', error);
+        alert('Error fetching your personal note. Please try again.');
     }
-}
+};
 
+// Function to display personal note
+window.displayPersonalNote = (note, firstName, lastName) => {
+    const noteContent = document.getElementById('noteContent');
+    const personalNoteDiv = document.getElementById('personalNote');
 
-// get rid of userID
+    // Optionally personalize the message
+    noteContent.textContent = `Hi ${firstName} ${lastName}, ${note}`;
+    personalNoteDiv.style.display = 'block';
+    // Hide sign-in sections
+    document.querySelector('.container').style.display = 'none';
+};
+
+// Function to display default message for unknown users
+window.displayDefaultMessage = () => {
+    const noteContent = document.getElementById('noteContent');
+    const personalNoteDiv = document.getElementById('personalNote');
+
+    noteContent.textContent = "Welcome to Journaling! We're glad to have you here.";
+    personalNoteDiv.style.display = 'block';
+    // Hide sign-in sections
+    document.querySelector('.container').style.display = 'none';
+};
+
+// Function to sign out the user
+window.signOutUser = () => {
+    signOut(auth)
+        .then(() => {
+            alert('You have been signed out.');
+            // Reset UI
+            document.getElementById('personalNote').style.display = 'none';
+            document.querySelector('.container').style.display = 'block';
+        })
+        .catch((error) => {
+            console.error('Error signing out:', error);
+            alert('Error signing out. Please try again.');
+        });
+};
+
+// Auth state listener to handle persistent sessions
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is signed in, fetch and display personal note
+        fetchPersonalNote(user.phoneNumber);
+    } else {
+        // User is signed out, ensure UI shows the sign-in options
+        document.getElementById('personalNote').style.display = 'none';
+        document.querySelector('.container').style.display = 'block';
+    }
+});

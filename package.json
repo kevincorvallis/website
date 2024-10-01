@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "firebase-admin": "^12.6.0",
     "g": "^2.0.1",
     "http-server": "^14.1.0",
     "mongodb": "^6.9.0",
