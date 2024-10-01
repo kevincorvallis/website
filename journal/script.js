@@ -1,10 +1,6 @@
-// script.js
-
-// Import Firebase functions from CDN
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 // Your Firebase configuration (replace with your actual config)
 const firebaseConfig = {
@@ -13,39 +9,45 @@ const firebaseConfig = {
     projectId: "coffeethoughts-41651",
     storageBucket: "coffeethoughts-41651.appspot.com",
     messagingSenderId: "342424038908",
-    appId: "1:342424038908:web:60bea2fba592d922e79679",
-    measurementId: "G-Y02MZF303B"
-    };
+    appId: "1:342424038908:web:60bea2fba592d922e79679"
+};
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-let analytics;
+const auth = getAuth(app); // Initialize Firebase Auth
+const db = getFirestore(app); // Initialize Firestore
 
-if (firebaseConfig.measurementId) {
-    analytics = getAnalytics(app);
+auth.languageCode = 'it'; // Optional: Set language
+
+// Function to initialize reCAPTCHA
+function onCaptchaVerify() {
+    if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth,'recaptcha-container', {
+            size: 'invisible', // Invisible reCAPTCHA
+            callback: (response) => {
+                console.log("reCAPTCHA solved");
+            },
+            'expired-callback': () => {
+                alert('reCAPTCHA expired. Please try again.');
+            }
+        }, auth);
+        window.recaptchaVerifier.render().then((widgetId) => {
+            window.recaptchaWidgetId = widgetId;
+        });
+    }
 }
 
-// Initialize reCAPTCHA verifier
-window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-    'size': 'invisible',
-    'callback': (response) => {
-        // reCAPTCHA solved, proceed with signInWithPhoneNumber
-        sendOTP();
-    }
+// Ensure reCAPTCHA is initialized when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    onCaptchaVerify();
 });
 
 // Function to handle sending OTP
 window.sendOTP = () => {
-    const phoneNumber = document.getElementById('phoneNumber').value.trim();
-    if (!phoneNumber) {
-        alert('Please enter a valid phone number.');
-        return;
-    }
+    const phoneNumber = getPhoneNumberFromUserInput();
 
-    // Inform users about SMS
-    if (!confirm('By signing in with your phone number, you may receive an SMS for verification. Standard rates apply. Do you want to proceed?')) {
+    if (!phoneNumber) {
+        alert("Please enter a valid phone number.");
         return;
     }
 
@@ -53,43 +55,61 @@ window.sendOTP = () => {
 
     signInWithPhoneNumber(auth, phoneNumber, appVerifier)
         .then((confirmationResult) => {
+            // SMS sent. Prompt user to type the code from the message
             window.confirmationResult = confirmationResult;
-            alert('OTP has been sent to your phone.');
-            document.getElementById('otpSection').style.display = 'block';
+            alert('OTP has been sent. Please check your phone.');
+            document.getElementById('otpSection').style.display = 'block'; // Show OTP input section
         })
         .catch((error) => {
-            console.error('Error during signInWithPhoneNumber', error);
-            alert('Error sending OTP. Please try again.');
-            // Reset reCAPTCHA
-            window.recaptchaVerifier.clear();
-            window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-                'size': 'invisible',
-                'callback': (response) => {
-                    sendOTP();
-                }
-            }, auth);
+            // Handle errors during signInWithPhoneNumber
+            console.error('Error during signInWithPhoneNumber:', error);
+            let errorMessage = 'Error sending OTP. Please try again.';
+            if (error.code === 'auth/invalid-phone-number') {
+                errorMessage = 'The provided phone number is not valid.';
+            } else if (error.code === 'auth/too-many-requests') {
+                errorMessage = 'Too many requests. Please try again later.';
+            }
+            alert(errorMessage);
+            grecaptcha.reset(window.recaptchaWidgetId);  // Reset reCAPTCHA if error occurs
         });
 };
 
-// Function to handle verifying OTP
+// Function to verify OTP
 window.verifyOTP = () => {
-    const otp = document.getElementById('otp').value.trim();
-    if (!otp) {
+    const otpCode = document.getElementById('otp').value.trim();
+
+    if (!otpCode) {
         alert('Please enter the OTP sent to your phone.');
         return;
     }
 
-    window.confirmationResult.confirm(otp)
+    if (!window.confirmationResult) {
+        alert('OTP not sent. Please request the OTP again.');
+        return;
+    }
+
+    // Confirm the OTP entered by the user
+    window.confirmationResult.confirm(otpCode)
         .then((result) => {
+            // User signed in successfully.
             const user = result.user;
-            alert('Phone number verified and user signed in!');
-            // Fetch and display personal note
-            fetchPersonalNote(user.phoneNumber);
+            alert('Phone number verified and user signed in successfully!');
+            console.log('User data:', user);
+            // Perform additional actions after sign-in, if necessary
         })
         .catch((error) => {
-            console.error('Error verifying OTP', error);
+            console.error('Error verifying OTP:', error);
             alert('Invalid OTP. Please try again.');
         });
+};
+
+// Helper function to get phone number from user input
+const getPhoneNumberFromUserInput = () => {
+    const phoneNumberInput = document.getElementById('phoneNumber').value.trim();
+    if (!phoneNumberInput) {
+        return null; // Return null if no valid input
+    }
+    return `+1${phoneNumberInput}`; // Append the country code for US numbers (adjust as necessary)
 };
 
 // Function to fetch personal note from Firestore
@@ -147,15 +167,3 @@ window.signOutUser = () => {
             alert('Error signing out. Please try again.');
         });
 };
-
-// Auth state listener to handle persistent sessions
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // User is signed in, fetch and display personal note
-        fetchPersonalNote(user.phoneNumber);
-    } else {
-        // User is signed out, ensure UI shows the sign-in options
-        document.getElementById('personalNote').style.display = 'none';
-        document.querySelector('.container').style.display = 'block';
-    }
-});
