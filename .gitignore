@@ -26,7 +26,7 @@ __pycache__/
 
 # === Node.js Dependencies ===
 # If your project uses Node.js (e.g., for Firebase tools, build scripts)
-journal/node_modules/*
+journal/
 node_modules/*
 package-lock.json
 yarn.lock

@@ -21,16 +21,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const analytics = getAnalytics(app); // Initialize Analytics
+let analytics;
+
+if (firebaseConfig.measurementId) {
+    analytics = getAnalytics(app);
+}
 
 // Initialize reCAPTCHA verifier
-window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
     'size': 'invisible',
     'callback': (response) => {
         // reCAPTCHA solved, proceed with signInWithPhoneNumber
         sendOTP();
     }
-}, auth);
+});
 
 // Function to handle sending OTP
 window.sendOTP = () => {
