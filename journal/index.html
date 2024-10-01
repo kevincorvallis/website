@@ -4,29 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Journaling</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- <script src="https://apis.google.com/js/platform.js" async defer></script> -->
+    <!-- Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
 
-    <!-- Add the Google Sign-In meta tag with your client ID here -->
-    <!-- <meta name="google-signin-client_id" content="1055818180975-fh08gprue6g403vpju190vsa0c3oksgq.apps.googleusercontent.com"> -->
+    <!-- Add Firebase JS SDK and FirebaseUI libraries -->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
 
 </head>
 <body>
     <div class="container">
         <h1>Welcome to Journaling</h1>
         <div class="buttons">
-            <div class="g-signin2" data-onsuccess="onSignIn"></div>
+            <!-- Phone Number Sign-In Button -->
+            <button id="phoneSignInBtn" onclick="document.getElementById('phoneSignInForm').style.display = 'block'">Sign in with Phone Number</button>
             <button id="firstTime">First time here</button>
             <button id="returningUser">I've been here</button>
         </div>
     </div>
-    <div class="back-icon" id="backBtn" style="display: none;">
+
+    <!-- Back Button -->
+    <div class="back-icon" id="backBtn" style="display: none;" onclick="document.getElementById('phoneSignInForm').style.display = 'none'">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M20 11V13H8L13.5 18.5L12.08 19.92L4.16 12L12.08 4.08L13.5 5.5L8 11H20Z" fill="currentColor"></path>
         </svg>
     </div>
+
+    <!-- Registration Form -->
     <div class="user-form" id="registerForm" style="display: none;">
         <h2>Register</h2>
         <input type="email" id="registerEmail" placeholder="Email">
@@ -36,12 +45,36 @@
         <button id="registerBtn">Register</button>
     </div>
     
+    <!-- Login Form -->
     <div class="user-form" id="loginForm" style="display: none;">
         <h2>Login</h2>
         <input type="email" id="loginEmail" placeholder="Email">
         <button id="loginBtn">Login</button>
     </div>
     
-    <script src="script.js"></script>
+    <!-- Phone Number Sign-In Form -->
+    <div class="user-form" id="phoneSignInForm" style="display: none;">
+        <h2>Sign in with Phone Number</h2>
+        <input type="tel" id="phoneNumber" placeholder="Enter phone number">
+        <div id="recaptcha-container"></div> <!-- Important for reCAPTCHA -->
+        <div id="otpSection" style="display: none;">
+            <input type="text" id="otp" placeholder="Enter OTP">
+            <button onclick="verifyOTP()">Verify OTP</button>
+        </div>
+        <button id="sendOtpBtn" onclick="sendOTP()">Send OTP</button>
+    </div>
+    
+    <!-- FirebaseUI Auth Container (Optional if using FirebaseUI) -->
+    <div id="firebaseui-auth-container"></div>
+
+    <!-- Personal Note Section -->
+    <div class="user-form" id="personalNote" style="display: none;">
+        <h2>Your Personal Note</h2>
+        <p id="noteContent"></p>
+        <button onclick="signOutUser()">Sign Out</button>
+    </div>
+
+    <!-- External Script -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
