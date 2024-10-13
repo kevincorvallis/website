@@ -20,11 +20,16 @@ const db = getFirestore(app); // Initialize Firestore
 
 auth.languageCode = 'it'; // Optional: Set language
 
-// Ensure reCAPTCHA is initialized when the DOM is fully loaded
+// Initialize reCAPTCHA when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+    initializeRecaptcha();  // Initialize reCAPTCHA on page load
+});
+
+// Function to initialize reCAPTCHA
+function initializeRecaptcha() {
     if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-            size: 'invisible', // Invisible reCAPTCHA
+            size: 'invisible', // Invisible reCAPTCHA or 'normal' for visible one
             callback: (response) => {
                 console.log("reCAPTCHA solved");
             },
@@ -36,10 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
             window.recaptchaWidgetId = widgetId;
         });
     }
-});
+}
 
 // Function to handle sending OTP
 window.sendOTP = () => {
+    onCaptchaVerify();  // Ensure reCAPTCHA is verified for this specific action
+
     const phoneNumber = getPhoneNumberFromUserInput();
 
     if (!phoneNumber) {
@@ -100,26 +107,22 @@ window.verifyOTP = () => {
 };
 
 // Callback function to initialize reCAPTCHA
-function onloadCallback() {
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'normal',  // 'invisible' can also be used for invisible reCAPTCHA
-        'callback': function(response) {
-            // reCAPTCHA solved, allow the user to proceed
-            console.log('reCAPTCHA solved:', response);
-        },
-        'expired-callback': function() {
-            // Response expired. Ask the user to solve reCAPTCHA again.
-            alert('reCAPTCHA expired. Please solve the reCAPTCHA again.');
-        }
-    });
-
-    // Render the reCAPTCHA
-    window.recaptchaVerifier.render().then(function(widgetId) {
-        window.recaptchaWidgetId = widgetId;
-    });
+function onCaptchaVerify() {
+    if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+            size: 'invisible', // Invisible reCAPTCHA or 'normal' for visible one
+            callback: (response) => {
+                console.log("reCAPTCHA solved");
+            },
+            'expired-callback': () => {
+                alert('reCAPTCHA expired. Please try again.');
+            }
+        }, auth);
+        window.recaptchaVerifier.render().then((widgetId) => {
+            window.recaptchaWidgetId = widgetId;
+        });
+    }
 }
-
-
 
 // Helper function to get phone number from user input
 const getPhoneNumberFromUserInput = () => {
