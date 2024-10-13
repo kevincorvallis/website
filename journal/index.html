@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Journaling</title>
+    <title>Living day by day</title>
     <!-- Google Fonts for better typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -19,53 +19,25 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to Journaling</h1>
+        <h1>Day by Day</h1>
         <div class="buttons">
             <!-- Phone Number Sign-In Button -->
-            <button id="phoneSignInBtn" onclick="document.getElementById('phoneSignInForm').style.display = 'block'">Sign in with Phone Number</button>
-            <button id="firstTime">First time here</button>
+            <button id="phoneSignInBtn" onclick="showFirebaseUI()">Sign in</button>
+            <button id="firstTime">About me</button>
             <button id="returningUser">I've been here</button>
         </div>
     </div>
 
     <!-- Back Button -->
-    <div class="back-icon" id="backBtn" style="display: none;" onclick="document.getElementById('phoneSignInForm').style.display = 'none'">
+    <div class="back-icon" id="backBtn" style="display: none;" onclick="hideFirebaseUI()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M20 11V13H8L13.5 18.5L12.08 19.92L4.16 12L12.08 4.08L13.5 5.5L8 11H20Z" fill="currentColor"></path>
         </svg>
     </div>
 
-    <!-- Registration Form -->
-    <div class="user-form" id="registerForm" style="display: none;">
-        <h2>Register</h2>
-        <input type="email" id="registerEmail" placeholder="Email">
-        <input type="text" id="registerFirstName" placeholder="First Name">
-        <input type="text" id="registerLastName" placeholder="Last Name">
-        <!-- ... add other fields as needed ... -->
-        <button id="registerBtn">Register</button>
-    </div>
-    
-    <!-- Login Form -->
-    <div class="user-form" id="loginForm" style="display: none;">
-        <h2>Login</h2>
-        <input type="email" id="loginEmail" placeholder="Email">
-        <button id="loginBtn">Login</button>
-    </div>
-    
-    <!-- Phone Number Sign-In Form -->
-    <div class="user-form" id="phoneSignInForm" style="display: none;">
-        <h2>Sign in with Phone Number</h2>
-        <input type="tel" id="phoneNumber" placeholder="Enter phone number">
-        <div id="recaptcha-container"></div> <!-- Important for reCAPTCHA -->
-        <div id="otpSection" style="display: none;">
-            <input type="text" id="otp" placeholder="Enter OTP">
-            <button onclick="verifyOTP()">Verify OTP</button>
-        </div>
-        <button id="sendOtpBtn" onclick="sendOTP()">Send OTP</button>
-    </div>
-    
-    <!-- FirebaseUI Auth Container (Optional if using FirebaseUI) -->
-    <div id="firebaseui-auth-container"></div>
+    <!-- FirebaseUI Auth Container -->
+    <div id="firebaseui-auth-container" style="display: none;"></div>
+    <div id="loader" style="display:none;">Loading...</div>
 
     <!-- Personal Note Section -->
     <div class="user-form" id="personalNote" style="display: none;">
@@ -74,8 +46,70 @@
         <button onclick="signOutUser()">Sign Out</button>
     </div>
 
-    <!-- External Script -->
-    <script type="module" src="script.js"></script>
+    <!-- Firebase Auth and FirebaseUI Config -->
+    <script type="text/javascript">
+        // Firebase configuration
+        const firebaseConfig = {
+        apiKey: "AIzaSyC2YGi_HPjp6edncQMAnSI6XHaRrUWus6o",
+        authDomain: "coffeethoughts-41651.firebaseapp.com",
+        projectId: "coffeethoughts-41651",
+        storageBucket: "coffeethoughts-41651.appspot.com",
+        messagingSenderId: "342424038908",
+        appId: "1:342424038908:web:60bea2fba592d922e79679",
+        measurementId: "G-Y02MZF303B"
+        };
+
+      
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+
+      // FirebaseUI configuration
+      const uiConfig = {
+        callbacks: {
+          signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+            document.getElementById('firebaseui-auth-container').style.display = 'none';
+            document.getElementById('personalNote').style.display = 'block';
+            document.getElementById('noteContent').textContent = "Welcome, " + authResult.user.displayName || "user";
+            return false;
+          },
+          uiShown: function() {
+            
+            document.getElementById('loader').style.display = 'none';
+          }
+        },
+        signInFlow: 'popup',
+        signInOptions: [
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+          firebase.auth.EmailAuthProvider.PROVIDER_ID,
+          firebase.auth.PhoneAuthProvider.PROVIDER_ID
+        ],
+        tosUrl: 'your-tos-url',
+        privacyPolicyUrl: 'your-privacy-policy-url'
+      };
+
+      // Initialize the FirebaseUI Widget using Firebase
+      const ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+      function showFirebaseUI() {
+        document.getElementById('firebaseui-auth-container').style.display = 'block';
+        document.getElementById('backBtn').style.display = 'block';
+        ui.start('#firebaseui-auth-container', uiConfig);
+      }
+
+      function hideFirebaseUI() {
+        document.getElementById('firebaseui-auth-container').style.display = 'none';
+        document.getElementById('backBtn').style.display = 'none';
+      }
+
+      function signOutUser() {
+        auth.signOut().then(() => {
+          document.getElementById('personalNote').style.display = 'none';
+          document.getElementById('firebaseui-auth-container').style.display = 'block';
+        });
+      }
+    </script>
 
 </body>
 </html>
