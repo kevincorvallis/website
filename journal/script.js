@@ -12,6 +12,7 @@ const firebaseConfig = {
     appId: "1:342424038908:web:60bea2fba592d922e79679"
 };
 
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); // Initialize Firebase Auth
@@ -19,10 +20,10 @@ const db = getFirestore(app); // Initialize Firestore
 
 auth.languageCode = 'it'; // Optional: Set language
 
-// Function to initialize reCAPTCHA
-function onCaptchaVerify() {
+// Ensure reCAPTCHA is initialized when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
     if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth,'recaptcha-container', {
+        window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
             size: 'invisible', // Invisible reCAPTCHA
             callback: (response) => {
                 console.log("reCAPTCHA solved");
@@ -35,11 +36,6 @@ function onCaptchaVerify() {
             window.recaptchaWidgetId = widgetId;
         });
     }
-}
-
-// Ensure reCAPTCHA is initialized when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    onCaptchaVerify();
 });
 
 // Function to handle sending OTP
@@ -103,14 +99,37 @@ window.verifyOTP = () => {
         });
 };
 
+// Callback function to initialize reCAPTCHA
+function onloadCallback() {
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'normal',  // 'invisible' can also be used for invisible reCAPTCHA
+        'callback': function(response) {
+            // reCAPTCHA solved, allow the user to proceed
+            console.log('reCAPTCHA solved:', response);
+        },
+        'expired-callback': function() {
+            // Response expired. Ask the user to solve reCAPTCHA again.
+            alert('reCAPTCHA expired. Please solve the reCAPTCHA again.');
+        }
+    });
+
+    // Render the reCAPTCHA
+    window.recaptchaVerifier.render().then(function(widgetId) {
+        window.recaptchaWidgetId = widgetId;
+    });
+}
+
+
+
 // Helper function to get phone number from user input
 const getPhoneNumberFromUserInput = () => {
     const phoneNumberInput = document.getElementById('phoneNumber').value.trim();
     if (!phoneNumberInput) {
-        return null; // Return null if no valid input
+        return null;
     }
-    return `+1${phoneNumberInput}`; // Append the country code for US numbers (adjust as necessary)
+    return phoneNumberInput; // Assume full international format, or format as per country code
 };
+
 
 // Function to fetch personal note from Firestore
 window.fetchPersonalNote = async (phoneNumber) => {
