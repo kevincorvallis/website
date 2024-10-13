@@ -71,8 +71,13 @@
             document.getElementById('firebaseui-auth-container').style.display = 'none';
             document.getElementById('personalNote').style.display = 'block';
             document.getElementById('noteContent').textContent = "Welcome, " + authResult.user.displayName || "user";
+
+            // Redirect to dashboard.html
+            window.location.href = 'public/dashboard.html';  // Redirect after successful sign-in
+
             return false;
           },
+          
           uiShown: function() {
             
             document.getElementById('loader').style.display = 'none';
