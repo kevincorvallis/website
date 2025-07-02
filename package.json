@@ -12,9 +12,15 @@
   "description": "An on-going personal project.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.0.3"
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["/node_modules/", "backend/lambda/test.js"]
+  }
 }
