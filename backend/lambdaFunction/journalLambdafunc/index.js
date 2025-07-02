@@ -122,7 +122,7 @@ exports.handler = async (event, context) => {
             return;
         }
         
-        console.log('connected as id ' + connection.threadId + "\n");
+        console.log('connected as id ' + conn.threadId + "\n");
         });
 
     
