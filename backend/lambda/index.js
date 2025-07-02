@@ -97,7 +97,7 @@ let conn;
   
 
 // This is the main handler function that will be executed when an HTTP request is received.
-exports.handler = async (event, context) => {
+const handler = async (event, context) => {
     console.log('Request event: ', event);
     let response;
     switch(true) {
@@ -263,5 +263,5 @@ async function addUser(event) {
 
 // ========There will be more functions for the other API endpoints here. ========
 
-// Export the handler function so that it can be used by the Lambda function
-exports.handler = handler;
+// Export the handler and utility function
+module.exports = { handler, buildResponse };
