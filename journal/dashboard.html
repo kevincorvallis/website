@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+    <script src="dashboard.js" defer></script>
+</head>
+<body>
+    <div class="dashboard">
+        <h1 id="welcome">Journal Dashboard</h1>
+        <button id="sign-out">Sign Out</button>
+        <div class="user-form">
+            <input type="text" id="entry-title" placeholder="Entry title" />
+            <textarea id="entry-text" placeholder="Write your entry..."></textarea>
+            <button id="save-entry">Save Entry</button>
+        </div>
+        <h2>Your Entries</h2>
+        <ul id="entries"></ul>
+    </div>
+</body>
+</html>

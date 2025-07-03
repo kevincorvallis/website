@@ -1,9 +1,5 @@
-// Import the AWS SDK
-const AWS = require('aws-sdk');
-// Update the configuration to specify the region
-AWS.config.update({region: 'us-west-1'});
-// Create a new RDSDataService object
-const mysql = new AWS.RDSDataService();
+// Connect to the MySQL database using the mysql library
+const mysql = require('mysql');
 // Define the names of the tables, database, and host
 
 /*
@@ -111,7 +107,7 @@ exports.handler = async (event, context) => {
             break;
         // If the request is for getting all journal entries, call the getEntries() function
         case event.httpMethod === 'GET' && event.path === entriesPath:
-            response = await getEntries();
+            response = await getEntries(event);
             break;
         // If the request is for adding a journal entry, call the addEntry() function
         case event.httpMethod === 'POST' && event.path === entryPath:
@@ -139,13 +135,18 @@ exports.handler = async (event, context) => {
 
 // Helper function to build an HTTP response
 function buildResponse(statusCode, body) {
+    let data = body;
     return {
         statusCode: statusCode,
         headers: {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Credentials': true,
         },
-        body: JSON.stringify(body)
-    }
+        body: JSON.stringify(data),
+    };
 }
 
 // Function to get a random prompt
@@ -166,16 +167,16 @@ async function getPrompt() {
 }
 
 // Function to get all journal entries
-async function getEntries() {
+async function getEntries(event) {
     try {
-        // Create a SQL query to get all entries from the journal_entries table
-        const sql = 'SELECT * FROM ' + mysqlEntries;
-        // Use the connection to the MySQL database to run the query
-        const result = await conn.query({
-            sql: sql
-        });
-        // Return the result of the query
-        return buildResponse(200, result);
+        let sql = 'SELECT * FROM ' + mysqlEntries;
+        const params = [];
+        if (event.queryStringParameters && event.queryStringParameters.user_id) {
+            sql += ' WHERE user_id = ?';
+            params.push(event.queryStringParameters.user_id);
+        }
+        const [rows] = await conn.query(sql, params);
+        return buildResponse(200, rows);
     } catch (error) {
         console.error('Error getting journal entries: ', error);
         return buildResponse(500, { message: 'Error getting journal entries.' });
@@ -262,6 +263,3 @@ async function addUser(event) {
   
 
 // ========There will be more functions for the other API endpoints here. ========
-
-// Export the handler function so that it can be used by the Lambda function
-exports.handler = handler;
