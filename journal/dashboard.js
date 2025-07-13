@@ -73,6 +73,39 @@ function updateStats(uid, newEntry) {
   return stats;
 }
 
+// Recalculate statistics from a given list of entries
+function recalcStats(uid, entries) {
+  const stats = {
+    totalEntries: entries.length,
+    totalWords: 0,
+    currentStreak: 0,
+    lastEntryDate: null,
+    firstEntryDate: null,
+  };
+
+  if (entries.length > 0) {
+    stats.totalWords = entries.reduce((sum, e) => sum + e.text.split(' ').length, 0);
+    stats.firstEntryDate = new Date(entries[0].date).toDateString();
+    stats.lastEntryDate = new Date(entries[entries.length - 1].date).toDateString();
+
+    let streak = 1;
+    for (let i = entries.length - 1; i > 0; i--) {
+      const current = new Date(entries[i].date);
+      const prev = new Date(entries[i - 1].date);
+      const diffDays = Math.floor((current - prev) / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    stats.currentStreak = streak;
+  }
+
+  localStorage.setItem(getStatsKey(uid), JSON.stringify(stats));
+  return stats;
+}
+
 function displayStats(uid) {
   const stats = getStats(uid);
   document.getElementById('entryCount').textContent = stats.totalEntries;
@@ -103,15 +136,16 @@ function displayEntries(entries) {
       <h3>${entry.title}</h3>
       <p>${entry.text}</p>
       <div class="entry-meta">
-        <small>${new Date(entry.date).toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
+        <small>${new Date(entry.date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
           day: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
         })}</small>
         <span class="word-count">${wordCount} words</span>
+        <button class="delete-btn" onclick="deleteEntry('${entry.id}')">Delete</button>
       </div>
     `;
     container.appendChild(div);
@@ -139,6 +173,20 @@ function saveEntry(uid, title, text) {
   const stats = updateStats(uid, newEntry);
   displayStats(uid);
   displayEntries(entries);
+}
+
+// Delete an entry and update statistics
+function deleteEntry(id) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const entries = JSON.parse(localStorage.getItem(getEntriesKey(user.uid))) || [];
+  const filtered = entries.filter(e => e.id !== id);
+  localStorage.setItem(getEntriesKey(user.uid), JSON.stringify(filtered));
+
+  recalcStats(user.uid, filtered);
+  displayStats(user.uid);
+  displayEntries(filtered);
 }
 
 // Profile functions
