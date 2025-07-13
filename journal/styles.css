@@ -223,3 +223,32 @@ h1 {
     opacity: 1;
     visibility: visible;
 }
+
+#journalContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+}
+
+#journalContainer textarea {
+    resize: vertical;
+}
+
+#entries .entry {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 15px;
+}
+
+#entries .entry h3 {
+    margin-bottom: 8px;
+}
+
+#entries .entry small {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: #eee;
+}
