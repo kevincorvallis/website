@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Living day by day</title>
+    <title>Day by Day - Your Personal Journal</title>
     <!-- Google Fonts for better typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -18,98 +18,307 @@
 
 </head>
 <body>
-    <div class="container">
+    <!-- Welcome Screen -->
+    <div class="container" id="welcomeScreen">
         <h1>Day by Day</h1>
+        <p class="subtitle">Your personal space for reflection and growth</p>
         <div class="buttons">
-            <!-- Phone Number Sign-In Button -->
-            <button id="phoneSignInBtn" onclick="showFirebaseUI()">Sign in</button>
-            <button id="firstTime">About me</button>
-            <button id="returningUser">I've been here</button>
+            <button id="signInBtn" onclick="showSignIn()">Get Started</button>
         </div>
     </div>
 
-    <!-- Back Button -->
-    <div class="back-icon" id="backBtn" style="display: none;" onclick="hideFirebaseUI()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 11V13H8L13.5 18.5L12.08 19.92L4.16 12L12.08 4.08L13.5 5.5L8 11H20Z" fill="currentColor"></path>
-        </svg>
+    <!-- Sign In Container -->
+    <div class="container" id="signInContainer" style="display: none;">
+        <div class="back-icon" onclick="showWelcome()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 11V13H8L13.5 18.5L12.08 19.92L4.16 12L12.08 4.08L13.5 5.5L8 11H20Z" fill="currentColor"></path>
+            </svg>
+        </div>
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Sign in to continue your journey</p>
+        <div id="recaptcha-container"></div>
+        <div id="firebaseui-auth-container"></div>
+        <div id="loader" style="display:none;">
+            <div class="spinner"></div>
+            <p>Setting up your journal...</p>
+        </div>
+        <div class="auth-note">
+            <p>Choose your preferred sign-in method: Google, Phone, or Email</p>
+            <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Phone authentication available after Firebase setup</p>
+        </div>
     </div>
 
-    <!-- FirebaseUI Auth Container -->
-    <div id="firebaseui-auth-container" style="display: none;"></div>
-    <div id="loader" style="display:none;">Loading...</div>
-
-    <!-- Personal Note Section -->
-    <div class="user-form" id="personalNote" style="display: none;">
-        <h2>Your Personal Note</h2>
-        <p id="noteContent"></p>
-        <button onclick="signOutUser()">Sign Out</button>
+    <!-- Profile Setup for First-Time Users -->
+    <div class="container profile-setup" id="profileSetup" style="display: none;">
+        <h2>Let's get to know you better</h2>
+        <p class="subtitle">Help us personalize your journaling experience</p>
+        
+        <form id="profileForm" class="profile-form">
+            <div class="form-group">
+                <label for="displayName">What would you like to be called?</label>
+                <input type="text" id="displayName" name="displayName" placeholder="Your preferred name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="age">Your age (optional)</label>
+                <select id="age" name="age">
+                    <option value="">Prefer not to say</option>
+                    <option value="18-25">18-25</option>
+                    <option value="26-35">26-35</option>
+                    <option value="36-45">36-45</option>
+                    <option value="46-55">46-55</option>
+                    <option value="56-65">56-65</option>
+                    <option value="65+">65+</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="journalGoal">What brings you to journaling?</label>
+                <select id="journalGoal" name="journalGoal" required>
+                    <option value="">Select your main goal</option>
+                    <option value="self-reflection">Self-reflection and mindfulness</option>
+                    <option value="goal-tracking">Goal tracking and productivity</option>
+                    <option value="emotional-wellness">Emotional wellness and stress relief</option>
+                    <option value="creative-expression">Creative expression and writing</option>
+                    <option value="memory-keeping">Memory keeping and life documentation</option>
+                    <option value="habit-building">Habit building and personal growth</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="writingFrequency">How often do you plan to write?</label>
+                <select id="writingFrequency" name="writingFrequency" required>
+                    <option value="">Select frequency</option>
+                    <option value="daily">Daily</option>
+                    <option value="few-times-week">A few times a week</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="when-inspired">When inspired</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="favoriteTime">When do you prefer to write?</label>
+                <select id="favoriteTime" name="favoriteTime">
+                    <option value="">No preference</option>
+                    <option value="morning">Morning (6AM - 12PM)</option>
+                    <option value="afternoon">Afternoon (12PM - 6PM)</option>
+                    <option value="evening">Evening (6PM - 10PM)</option>
+                    <option value="night">Night (10PM - 6AM)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="inspiration">What inspires you most?</label>
+                <textarea id="inspiration" name="inspiration" placeholder="Share what motivates you, your interests, or what you'd like to explore in your journal..." rows="3"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="primary-btn">Complete Setup</button>
+                <button type="button" class="secondary-btn" onclick="skipProfile()">Skip for now</button>
+            </div>
+        </form>
     </div>
 
-    <!-- Firebase Auth and FirebaseUI Config -->
+    <!-- Firebase Auth and Application Logic -->
     <script type="text/javascript">
         // Firebase configuration
         const firebaseConfig = {
-        apiKey: "AIzaSyC2YGi_HPjp6edncQMAnSI6XHaRrUWus6o",
-        authDomain: "coffeethoughts-41651.firebaseapp.com",
-        projectId: "coffeethoughts-41651",
-        storageBucket: "coffeethoughts-41651.appspot.com",
-        messagingSenderId: "342424038908",
-        appId: "1:342424038908:web:60bea2fba592d922e79679",
-        measurementId: "G-Y02MZF303B"
+            apiKey: "AIzaSyC2YGi_HPjp6edncQMAnSI6XHaRrUWus6o",
+            authDomain: "coffeethoughts-41651.firebaseapp.com",
+            projectId: "coffeethoughts-41651",
+            storageBucket: "coffeethoughts-41651.appspot.com",
+            messagingSenderId: "342424038908",
+            appId: "1:342424038908:web:60bea2fba592d922e79679",
+            measurementId: "G-Y02MZF303B"
         };
 
-      
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
-      // FirebaseUI configuration
-      const uiConfig = {
-        callbacks: {
-          signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-            localStorage.setItem('journalUserName', authResult.user.displayName || authResult.user.email);
-            localStorage.setItem('journalUserUid', authResult.user.uid);
-            window.location.href = 'dashboard.html';
-            return false;
-          },
-          
-          uiShown: function() {
+        // Set up auth domain for testing
+        auth.settings.appVerificationDisabledForTesting = false;
+
+        // Check if user profile exists
+        function hasUserProfile(uid) {
+            return localStorage.getItem(`user_profile_${uid}`) !== null;
+        }
+
+        // Save user profile
+        function saveUserProfile(uid, profileData) {
+            localStorage.setItem(`user_profile_${uid}`, JSON.stringify(profileData));
+        }
+
+        // Get user profile
+        function getUserProfile(uid) {
+            const profile = localStorage.getItem(`user_profile_${uid}`);
+            return profile ? JSON.parse(profile) : null;
+        }
+
+        // FirebaseUI configuration
+        const uiConfig = {
+            callbacks: {
+                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+                    const user = authResult.user;
+                    
+                    // Check if this is a first-time user
+                    if (!hasUserProfile(user.uid)) {
+                        // Show profile setup for first-time users
+                        showProfileSetup(user);
+                        return false;
+                    } else {
+                        // Redirect existing users to dashboard
+                        window.location.href = 'dashboard.html';
+                        return false;
+                    }
+                },
+                
+                uiShown: function() {
+                    document.getElementById('loader').style.display = 'none';
+                }
+            },
+            signInFlow: 'popup',
+            signInOptions: [
+                {
+                    provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                    customParameters: {
+                        prompt: 'select_account'
+                    }
+                },
+                firebase.auth.EmailAuthProvider.PROVIDER_ID
+                // Phone auth temporarily disabled - uncomment below after Firebase console setup
+                {
+                    provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+                    recaptchaParameters: {
+                        type: 'image',
+                        size: 'normal',
+                        badge: 'bottomleft'
+                    },
+                    defaultCountry: 'US'
+                }
+            ],
+            tosUrl: 'terms/index.html',
+            privacyPolicyUrl: 'privacy/index.html'
+        };
+
+        // Initialize the FirebaseUI Widget using Firebase
+        const ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+        // Navigation functions
+        function showWelcome() {
+            document.getElementById('welcomeScreen').style.display = 'block';
+            document.getElementById('signInContainer').style.display = 'none';
+            document.getElementById('profileSetup').style.display = 'none';
+        }
+
+        function showSignIn() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('signInContainer').style.display = 'block';
+            document.getElementById('profileSetup').style.display = 'none';
             
-            document.getElementById('loader').style.display = 'none';
-          }
-        },
-        signInFlow: 'popup',
-        signInOptions: [
-          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-          firebase.auth.EmailAuthProvider.PROVIDER_ID,
-          firebase.auth.PhoneAuthProvider.PROVIDER_ID
-        ],
-        tosUrl: 'your-tos-url',
-        privacyPolicyUrl: 'your-privacy-policy-url'
-      };
+            // Start FirebaseUI
+            ui.start('#firebaseui-auth-container', uiConfig);
+        }
 
-      // Initialize the FirebaseUI Widget using Firebase
-      const ui = new firebaseui.auth.AuthUI(firebase.auth());
+        function showProfileSetup(user) {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('signInContainer').style.display = 'none';
+            document.getElementById('profileSetup').style.display = 'block';
+            
+            // Pre-fill display name if available
+            if (user.displayName) {
+                document.getElementById('displayName').value = user.displayName;
+            }
+        }
 
-      function showFirebaseUI() {
-        document.getElementById('firebaseui-auth-container').style.display = 'block';
-        document.getElementById('backBtn').style.display = 'block';
-        ui.start('#firebaseui-auth-container', uiConfig);
-      }
-
-      function hideFirebaseUI() {
-        document.getElementById('firebaseui-auth-container').style.display = 'none';
-        document.getElementById('backBtn').style.display = 'none';
-      }
-
-      function signOutUser() {
-        auth.signOut().then(() => {
-          document.getElementById('personalNote').style.display = 'none';
-          document.getElementById('firebaseui-auth-container').style.display = 'block';
+        // Profile form submission
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            // Collect form data
+            const profileData = {
+                displayName: document.getElementById('displayName').value,
+                age: document.getElementById('age').value,
+                journalGoal: document.getElementById('journalGoal').value,
+                writingFrequency: document.getElementById('writingFrequency').value,
+                favoriteTime: document.getElementById('favoriteTime').value,
+                inspiration: document.getElementById('inspiration').value,
+                createdAt: new Date().toISOString(),
+                uid: user.uid,
+                email: user.email
+            };
+            
+            // Save profile
+            saveUserProfile(user.uid, profileData);
+            
+            // Show success message and redirect
+            showSuccessMessage(() => {
+                window.location.href = 'dashboard.html';
+            });
         });
-      }
+
+        // Skip profile setup
+        function skipProfile() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            // Save minimal profile
+            const profileData = {
+                displayName: user.displayName || user.email.split('@')[0],
+                age: '',
+                journalGoal: '',
+                writingFrequency: '',
+                favoriteTime: '',
+                inspiration: '',
+                createdAt: new Date().toISOString(),
+                uid: user.uid,
+                email: user.email,
+                skipped: true
+            };
+            
+            saveUserProfile(user.uid, profileData);
+            window.location.href = 'dashboard.html';
+        }
+
+        // Success message
+        function showSuccessMessage(callback) {
+            const profileSetup = document.getElementById('profileSetup');
+            profileSetup.innerHTML = `
+                <div class="success-message">
+                    <div class="success-icon">✓</div>
+                    <h2>Welcome to Day by Day!</h2>
+                    <p>Your profile has been created successfully.</p>
+                    <p>Let's start your journaling journey...</p>
+                </div>
+            `;
+            
+            setTimeout(callback, 2000);
+        }
+
+        // Check authentication state on page load
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in
+                if (hasUserProfile(user.uid)) {
+                    // Existing user - redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // New user - show profile setup
+                    showProfileSetup(user);
+                }
+            }
+        });
+
+        function signOutUser() {
+            auth.signOut().then(() => {
+                showWelcome();
+            });
+        }
     </script>
 
 </body>
