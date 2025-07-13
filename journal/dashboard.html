@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Journal</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="container" id="journalContainer">
+    <h1 id="welcome">Welcome</h1>
+    <form id="entryForm">
+      <input type="text" id="entryTitle" placeholder="Title" required>
+      <textarea id="entryText" rows="5" placeholder="Write your thoughts..." required></textarea>
+      <button type="submit">Save Entry</button>
+    </form>
+    <div id="entries"></div>
+    <button onclick="signOutUser()">Sign Out</button>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

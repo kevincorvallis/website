@@ -68,13 +68,9 @@
       const uiConfig = {
         callbacks: {
           signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-            document.getElementById('firebaseui-auth-container').style.display = 'none';
-            document.getElementById('personalNote').style.display = 'block';
-            document.getElementById('noteContent').textContent = "Welcome, " + authResult.user.displayName || "user";
-
-            // Redirect to dashboard.html
-            window.location.href = 'public/dashboard.html';  // Redirect after successful sign-in
-
+            localStorage.setItem('journalUserName', authResult.user.displayName || authResult.user.email);
+            localStorage.setItem('journalUserUid', authResult.user.uid);
+            window.location.href = 'dashboard.html';
             return false;
           },
           
