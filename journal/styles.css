@@ -710,6 +710,17 @@ h2 {
     text-decoration: underline;
 }
 
+#entries .edit-btn {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+}
+
+#entries .edit-btn:hover {
+    text-decoration: underline;
+}
+
 #entries .entry h3 {
     margin-bottom: 8px;
 }

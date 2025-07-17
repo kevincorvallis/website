@@ -1,7 +1,15 @@
 /* Dashboard specific styles */
 
+:root {
+    --bg-gradient: linear-gradient(135deg, #6C5B7B, #C06C84, #F67280);
+    --text-color: #fff;
+    --card-bg: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(255, 255, 255, 0.8);
+}
+
 body {
-    background: linear-gradient(135deg, #6C5B7B, #C06C84, #F67280);
+    background: var(--bg-gradient);
+    color: var(--text-color);
     min-height: 100vh;
     padding: 0;
     margin: 0;
@@ -12,7 +20,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    color: #fff;
+    color: var(--text-color);
 }
 
 /* Header */
@@ -22,7 +30,7 @@ body {
     align-items: center;
     margin-bottom: 30px;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
     border-radius: 20px;
     backdrop-filter: blur(10px);
 }
@@ -55,7 +63,7 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: #fff;
+    color: var(--text-color);
 }
 
 .icon-btn:hover {
@@ -72,7 +80,7 @@ body {
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
     padding: 25px;
     border-radius: 15px;
     text-align: center;
@@ -87,7 +95,7 @@ body {
 .stat-card h3 {
     font-size: 2.5em;
     margin-bottom: 10px;
-    color: #fff;
+    color: var(--text-color);
     font-weight: 700;
 }
 
@@ -99,7 +107,7 @@ body {
 
 /* Entry Form */
 .entry-form-container {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
     padding: 30px;
     border-radius: 20px;
     margin-bottom: 30px;
@@ -118,8 +126,8 @@ body {
     padding: 15px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background: var(--card-bg);
+    color: var(--text-color);
     font-size: 16px;
     margin-bottom: 15px;
     transition: all 0.3s ease;
@@ -165,7 +173,7 @@ body {
     flex: 1;
     padding: 15px 25px;
     background: transparent;
-    color: #fff;
+    color: var(--text-color);
     border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 30px;
     font-weight: 500;
@@ -175,13 +183,64 @@ body {
 }
 
 .secondary-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
     border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Light theme overrides */
+body.light-theme {
+    --bg-gradient: linear-gradient(135deg, #f9f9f9, #e0e0e0, #cccccc);
+    --text-color: #333;
+    --card-bg: rgba(0, 0, 0, 0.05);
+    --border-color: rgba(0, 0, 0, 0.6);
+}
+
+body.light-theme .dashboard-header,
+body.light-theme .stat-card,
+body.light-theme .entry-form-container,
+body.light-theme .entries-container,
+body.light-theme .modal-content {
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+body.light-theme .entry {
+    border-left-color: var(--border-color);
+}
+
+body.light-theme .primary-btn {
+    background: #6C5B7B;
+    color: #fff;
+}
+
+body.light-theme .secondary-btn {
+    color: var(--text-color);
+    border-color: rgba(0,0,0,0.5);
+}
+
+body.light-theme .entry h3,
+body.light-theme .stat-card h3,
+body.light-theme h2 {
+    color: var(--text-color);
+}
+
+body.light-theme .entry p,
+body.light-theme .personalized-message,
+body.light-theme .entry small {
+    color: var(--text-color);
+}
+
+body.light-theme .edit-btn {
+    color: #388e3c;
+}
+
+body.light-theme .delete-btn {
+    color: #d32f2f;
 }
 
 /* Entries Container */
 .entries-container {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
     padding: 30px;
     border-radius: 20px;
     backdrop-filter: blur(10px);
@@ -195,14 +254,15 @@ body {
 
 .entries-grid {
     display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
 }
 
 .entry {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
     padding: 25px;
     border-radius: 15px;
-    border-left: 4px solid rgba(255, 255, 255, 0.8);
+    border-left: 4px solid var(--border-color);
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
 }
@@ -215,7 +275,7 @@ body {
 .entry h3 {
     margin-bottom: 15px;
     font-size: 1.4em;
-    color: #fff;
+    color: var(--text-color);
     font-weight: 600;
 }
 
@@ -244,6 +304,31 @@ body {
     color: rgba(255, 255, 255, 0.6);
 }
 
+.edit-btn,
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.2s ease;
+}
+
+.edit-btn {
+    color: #4CAF50;
+}
+
+.edit-btn:hover {
+    color: #69d069;
+}
+
+.delete-btn {
+    color: #ff6b6b;
+}
+
+.delete-btn:hover {
+    color: #ff8b8b;
+}
+
 /* Modal */
 .modal {
     position: fixed;
@@ -259,14 +344,14 @@ body {
 }
 
 .modal-content {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     max-width: 500px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
-    color: #fff;
+    color: var(--text-color);
 }
 
 .modal-header {
@@ -287,7 +372,7 @@ body {
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: #fff;
+    color: var(--text-color);
     padding: 5px;
     border-radius: 50%;
     transition: all 0.3s ease;
@@ -321,9 +406,9 @@ body {
 .profile-item span {
     display: block;
     padding: 10px 15px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
     border-radius: 8px;
-    color: #fff;
+    color: var(--text-color);
 }
 
 .empty-state {

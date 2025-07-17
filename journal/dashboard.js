@@ -11,6 +11,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+window.currentEditId = null;
 
 // User profile functions
 function getUserProfile(uid) {
@@ -145,7 +146,8 @@ function displayEntries(entries) {
           minute: '2-digit'
         })}</small>
         <span class="word-count">${wordCount} words</span>
-        <button class="delete-btn" onclick="deleteEntry('${entry.id}')">Delete</button>
+        <button class="edit-btn" onclick="editEntry('${entry.id}')" aria-label="Edit entry">Edit</button>
+        <button class="delete-btn" onclick="deleteEntry('${entry.id}')" aria-label="Delete entry">Delete</button>
       </div>
     `;
     container.appendChild(div);
@@ -187,6 +189,35 @@ function deleteEntry(id) {
   recalcStats(user.uid, filtered);
   displayStats(user.uid);
   displayEntries(filtered);
+}
+
+// Edit an entry
+function editEntry(id) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const entries = JSON.parse(localStorage.getItem(getEntriesKey(user.uid))) || [];
+  const entry = entries.find(e => e.id === id);
+  if (!entry) return;
+
+  document.getElementById('entryTitle').value = entry.title;
+  document.getElementById('entryText').value = entry.text;
+  window.currentEditId = id;
+  document.querySelector('#entryForm button[type="submit"]').textContent = 'Update Entry';
+}
+
+function updateEntry(uid, id, title, text) {
+  const entries = JSON.parse(localStorage.getItem(getEntriesKey(uid))) || [];
+  const index = entries.findIndex(e => e.id === id);
+  if (index === -1) return;
+
+  entries[index].title = title;
+  entries[index].text = text;
+  localStorage.setItem(getEntriesKey(uid), JSON.stringify(entries));
+
+  recalcStats(uid, entries);
+  displayStats(uid);
+  displayEntries(entries);
 }
 
 // Profile functions
@@ -249,6 +280,8 @@ function editProfile() {
 function clearForm() {
   document.getElementById('entryTitle').value = '';
   document.getElementById('entryText').value = '';
+  window.currentEditId = null;
+  document.querySelector('#entryForm button[type="submit"]').textContent = 'Save Entry';
 }
 
 function getPersonalizedMessage(profile) {
@@ -308,17 +341,23 @@ document.getElementById('entryForm').addEventListener('submit', e => {
   const title = document.getElementById('entryTitle').value;
   const text = document.getElementById('entryText').value;
   const user = auth.currentUser;
-  
+
   if (user && title.trim() && text.trim()) {
-    saveEntry(user.uid, title, text);
-    clearForm();
-    
-    // Show success feedback
     const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (window.currentEditId) {
+      updateEntry(user.uid, window.currentEditId, title, text);
+      window.currentEditId = null;
+      submitBtn.textContent = 'Save Entry';
+    } else {
+      saveEntry(user.uid, title, text);
+    }
+    clearForm();
+
+    // Show success feedback
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Saved!';
     submitBtn.style.background = '#4CAF50';
-    
+
     setTimeout(() => {
       submitBtn.textContent = originalText;
       submitBtn.style.background = '';
@@ -337,4 +376,27 @@ document.getElementById('profileModal').addEventListener('click', function(e) {
   if (e.target === this) {
     hideProfile();
   }
+});
+
+// Theme handling
+function applyTheme(theme) {
+  if (theme === 'light') {
+    document.body.classList.add('light-theme');
+    document.getElementById('themeIcon').textContent = '🌙';
+  } else {
+    document.body.classList.remove('light-theme');
+    document.getElementById('themeIcon').textContent = '☀';
+  }
+}
+
+function toggleTheme() {
+  const current = localStorage.getItem('journal_theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('journal_theme', next);
+  applyTheme(next);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('journal_theme') || 'dark';
+  applyTheme(saved);
 });
