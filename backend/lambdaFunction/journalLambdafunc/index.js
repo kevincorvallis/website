@@ -62,35 +62,64 @@ async function getConnection() {
 }
 
 // ============================================
+// VALIDATION
+// ============================================
+const MAX_TITLE_LENGTH = 255;
+const MAX_TEXT_LENGTH = 50000;
+
+function validateEntryInput(title, text) {
+  if (!title || typeof title !== 'string') {
+    return { valid: false, error: 'Title is required' };
+  }
+  if (title.length > MAX_TITLE_LENGTH) {
+    return { valid: false, error: `Title must be under ${MAX_TITLE_LENGTH} characters` };
+  }
+  if (!text || typeof text !== 'string') {
+    return { valid: false, error: 'Entry text is required' };
+  }
+  if (text.length > MAX_TEXT_LENGTH) {
+    return { valid: false, error: `Entry text must be under ${MAX_TEXT_LENGTH} characters` };
+  }
+  return { valid: true };
+}
+
+function isValidDate(dateString) {
+  if (!dateString) return true; // Optional, will use current date
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+}
+
+// ============================================
 // AUTHENTICATION
 // ============================================
-async function verifyFirebaseToken(event) {
+async function getAuthenticatedUid(event) {
+  // Try Firebase token verification first (when configured)
   const authHeader = event.headers?.Authorization || event.headers?.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
+  if (authHeader?.startsWith('Bearer ')) {
+    try {
+      initFirebase();
+      if (firebaseInitialized) {
+        const token = authHeader.split('Bearer ')[1];
+        const decoded = await admin.auth().verifyIdToken(token);
+        return decoded.uid;
+      }
+    } catch (e) {
+      console.error('Token verification failed:', e.message);
+    }
   }
 
-  const token = authHeader.split('Bearer ')[1];
-
-  try {
-    initFirebase();
-    if (firebaseInitialized) {
-      const decoded = await admin.auth().verifyIdToken(token);
-      return decoded.uid;
-    }
-  } catch (e) {
-    console.error('Token verification failed:', e.message);
+  // Fallback to query param (TEMPORARY - remove once FIREBASE_SERVICE_ACCOUNT is configured)
+  const uid = event.queryStringParameters?.firebase_uid;
+  if (uid) {
+    console.warn('Using query param auth - configure FIREBASE_SERVICE_ACCOUNT for production security');
+    return uid;
   }
 
   return null;
 }
 
-// For development/testing - get UID from query param if no valid token
+// Legacy function for backward compatibility - use getAuthenticatedUid instead
 function getFirebaseUid(event) {
-  // Try token first
-  // In production, always require token verification
-  // For now, allow query param for testing
   return event.queryStringParameters?.firebase_uid || null;
 }
 
@@ -167,8 +196,19 @@ async function createEntry(event, conn) {
 
   const { firebase_uid, title, text, date, prompt_id, client_id } = body;
 
-  if (!firebase_uid || !title || !text) {
-    return errorResponse(400, 'Missing required fields: firebase_uid, title, text');
+  if (!firebase_uid) {
+    return errorResponse(401, 'Missing firebase_uid');
+  }
+
+  // Validate input
+  const validation = validateEntryInput(title, text);
+  if (!validation.valid) {
+    return errorResponse(400, validation.error);
+  }
+
+  // Validate date format
+  if (!isValidDate(date)) {
+    return errorResponse(400, 'Invalid date format');
   }
 
   try {
@@ -205,8 +245,8 @@ async function createEntry(event, conn) {
 // PUT /entry/{id} - Update an entry
 async function updateEntry(event, conn) {
   const entryId = event.pathParameters?.id;
-  if (!entryId) {
-    return errorResponse(400, 'Missing entry ID');
+  if (!entryId || isNaN(parseInt(entryId))) {
+    return errorResponse(400, 'Invalid entry ID');
   }
 
   let body;
@@ -220,6 +260,14 @@ async function updateEntry(event, conn) {
 
   if (!firebase_uid) {
     return errorResponse(401, 'Missing firebase_uid');
+  }
+
+  // Validate input if provided
+  if (title !== undefined && (typeof title !== 'string' || title.length > MAX_TITLE_LENGTH)) {
+    return errorResponse(400, `Title must be a string under ${MAX_TITLE_LENGTH} characters`);
+  }
+  if (text !== undefined && (typeof text !== 'string' || text.length > MAX_TEXT_LENGTH)) {
+    return errorResponse(400, `Text must be a string under ${MAX_TEXT_LENGTH} characters`);
   }
 
   try {
@@ -308,6 +356,9 @@ async function deleteEntry(event, conn) {
 
 // POST /sync - Bulk sync for offline support
 async function syncEntries(event, conn) {
+  // Capture sync start time FIRST to avoid missing concurrent updates
+  const syncStartTime = Date.now();
+
   let body;
   try {
     body = JSON.parse(event.body);
@@ -387,7 +438,7 @@ async function syncEntries(event, conn) {
       results,
       entries: serverEntries.filter(e => !e.is_deleted),
       deletedIds: serverEntries.filter(e => e.is_deleted).map(e => e.entry_id),
-      syncTime: Date.now()
+      syncTime: syncStartTime  // Use start time to avoid missing concurrent updates
     });
   } catch (error) {
     console.error('Error syncing:', error);
