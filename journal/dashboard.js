@@ -1,4 +1,9 @@
-// dashboard.js
+// dashboard.js - Day by Day Journal App
+// With cloud sync and offline support
+
+// ============================================
+// CONFIGURATION
+// ============================================
 const firebaseConfig = {
   apiKey: "AIzaSyC2YGi_HPjp6edncQMAnSI6XHaRrUWus6o",
   authDomain: "coffeethoughts-41651.firebaseapp.com",
@@ -9,10 +14,326 @@ const firebaseConfig = {
   measurementId: "G-Y02MZF303B"
 };
 
+const API_BASE_URL = 'https://0a65j03yja.execute-api.us-west-2.amazonaws.com/prod/journalLambdafunc';
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// User profile functions
+// ============================================
+// API SERVICE
+// ============================================
+class JournalAPI {
+  constructor() {
+    this.baseUrl = API_BASE_URL;
+  }
+
+  async getAuthToken() {
+    const user = firebase.auth().currentUser;
+    if (!user) throw new Error('Not authenticated');
+    return user.getIdToken();
+  }
+
+  async request(endpoint, options = {}) {
+    const user = firebase.auth().currentUser;
+    if (!user) throw new Error('Not authenticated');
+
+    const url = `${this.baseUrl}${endpoint}`;
+
+    try {
+      const token = await this.getAuthToken();
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          ...options.headers
+        }
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Request failed' }));
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
+    }
+  }
+
+  async getEntries(uid, since = null) {
+    let url = `/entries?firebase_uid=${uid}`;
+    if (since) url += `&since=${since}`;
+    return this.request(url);
+  }
+
+  async createEntry(entry) {
+    return this.request('/entry', {
+      method: 'POST',
+      body: JSON.stringify(entry)
+    });
+  }
+
+  async updateEntry(entryId, entry) {
+    return this.request(`/entry/${entryId}`, {
+      method: 'PUT',
+      body: JSON.stringify(entry)
+    });
+  }
+
+  async deleteEntry(entryId, uid) {
+    return this.request(`/entry/${entryId}?firebase_uid=${uid}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async sync(uid, entries, lastSyncTime) {
+    return this.request('/sync', {
+      method: 'POST',
+      body: JSON.stringify({
+        firebase_uid: uid,
+        entries,
+        lastSyncTime
+      })
+    });
+  }
+}
+
+const api = new JournalAPI();
+
+// ============================================
+// SYNC MANAGER (Offline Support)
+// ============================================
+class SyncManager {
+  constructor(uid) {
+    this.uid = uid;
+    this.pendingKey = `pending_sync_${uid}`;
+    this.lastSyncKey = `last_sync_${uid}`;
+    this.isSyncing = false;
+  }
+
+  // Get pending changes queue
+  getPendingChanges() {
+    const pending = localStorage.getItem(this.pendingKey);
+    return pending ? JSON.parse(pending) : [];
+  }
+
+  // Save pending changes
+  savePendingChanges(changes) {
+    localStorage.setItem(this.pendingKey, JSON.stringify(changes));
+  }
+
+  // Add a change to the pending queue
+  queueChange(action, data) {
+    const pending = this.getPendingChanges();
+    pending.push({
+      action,
+      data,
+      timestamp: Date.now(),
+      id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    });
+    this.savePendingChanges(pending);
+    this.updateSyncStatus('pending');
+  }
+
+  // Clear pending changes
+  clearPendingChanges() {
+    localStorage.removeItem(this.pendingKey);
+  }
+
+  // Get last sync time
+  getLastSyncTime() {
+    return parseInt(localStorage.getItem(this.lastSyncKey) || '0');
+  }
+
+  // Set last sync time
+  setLastSyncTime(time) {
+    localStorage.setItem(this.lastSyncKey, time.toString());
+  }
+
+  // Check online status
+  isOnline() {
+    return navigator.onLine;
+  }
+
+  // Update sync status indicator
+  updateSyncStatus(status) {
+    const indicator = document.getElementById('syncStatus');
+    if (!indicator) return;
+
+    const pending = this.getPendingChanges();
+
+    switch (status) {
+      case 'syncing':
+        indicator.innerHTML = '<span class="sync-indicator syncing">Syncing...</span>';
+        break;
+      case 'synced':
+        indicator.innerHTML = '<span class="sync-indicator synced">Synced</span>';
+        break;
+      case 'offline':
+        indicator.innerHTML = '<span class="sync-indicator offline">Offline</span>';
+        break;
+      case 'pending':
+        indicator.innerHTML = `<span class="sync-indicator pending">${pending.length} pending</span>`;
+        break;
+      case 'error':
+        indicator.innerHTML = '<span class="sync-indicator error">Sync error</span>';
+        break;
+    }
+  }
+
+  // Process pending changes queue
+  async processQueue() {
+    if (!this.isOnline() || this.isSyncing) return;
+
+    const pending = this.getPendingChanges();
+    if (pending.length === 0) return;
+
+    this.isSyncing = true;
+    this.updateSyncStatus('syncing');
+
+    const entries = pending.map(p => ({
+      action: p.action,
+      ...p.data
+    }));
+
+    try {
+      const result = await api.sync(this.uid, entries, this.getLastSyncTime());
+
+      // Update local entries with server data
+      const localEntries = result.entries.map(e => ({
+        id: e.client_id || e.entry_id.toString(),
+        entry_id: e.entry_id,
+        title: e.title,
+        text: e.text,
+        date: e.date,
+        synced: true
+      }));
+
+      localStorage.setItem(getEntriesKey(this.uid), JSON.stringify(localEntries));
+
+      // Clear pending and update sync time
+      this.clearPendingChanges();
+      this.setLastSyncTime(result.syncTime);
+      this.updateSyncStatus('synced');
+
+      // Recalculate stats and refresh display
+      recalcStats(this.uid, localEntries);
+      displayStats(this.uid);
+      displayEntries(localEntries);
+
+      return result;
+    } catch (error) {
+      console.error('Queue processing failed:', error);
+      this.updateSyncStatus('error');
+      throw error;
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+
+  // Full sync with server
+  async fullSync() {
+    if (!this.isOnline()) {
+      this.updateSyncStatus('offline');
+      return null;
+    }
+
+    this.isSyncing = true;
+    this.updateSyncStatus('syncing');
+
+    try {
+      // First process any pending changes
+      const pending = this.getPendingChanges();
+      const entries = pending.map(p => ({
+        action: p.action,
+        ...p.data
+      }));
+
+      const result = await api.sync(this.uid, entries, this.getLastSyncTime());
+
+      // Transform server entries to local format
+      const localEntries = result.entries.map(e => ({
+        id: e.client_id || e.entry_id.toString(),
+        entry_id: e.entry_id,
+        title: e.title,
+        text: e.text,
+        date: e.date,
+        synced: true
+      }));
+
+      // Save to localStorage
+      localStorage.setItem(getEntriesKey(this.uid), JSON.stringify(localEntries));
+
+      // Clear pending and update sync time
+      this.clearPendingChanges();
+      this.setLastSyncTime(result.syncTime);
+      this.updateSyncStatus('synced');
+
+      return localEntries;
+    } catch (error) {
+      console.error('Full sync failed:', error);
+      this.updateSyncStatus('error');
+      return null;
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+}
+
+let syncManager = null;
+
+// ============================================
+// SAMPLE ENTRIES (for new users)
+// ============================================
+const SAMPLE_ENTRIES = [
+  {
+    title: "Welcome to Day by Day",
+    text: "This is your personal journaling space. Write about your day, your thoughts, or whatever's on your mind. Your entries sync across all your devices, so you can journal from anywhere.",
+    daysAgo: 0
+  },
+  {
+    title: "Getting Started",
+    text: "Try writing about one thing you're grateful for today. Small moments count! Regular journaling can help with self-reflection, stress relief, and tracking your personal growth.",
+    daysAgo: 1
+  }
+];
+
+async function seedSampleEntries(uid) {
+  const seededKey = `seeded_${uid}`;
+  if (localStorage.getItem(seededKey)) return;
+
+  console.log('Seeding sample entries for new user');
+
+  const entries = [];
+  for (const sample of SAMPLE_ENTRIES) {
+    const date = new Date();
+    date.setDate(date.getDate() - sample.daysAgo);
+
+    const entry = {
+      firebase_uid: uid,
+      title: sample.title,
+      text: sample.text,
+      date: date.toISOString(),
+      client_id: `sample_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    };
+
+    try {
+      await api.createEntry(entry);
+      entries.push(entry);
+    } catch (error) {
+      console.error('Failed to seed entry:', error);
+    }
+  }
+
+  localStorage.setItem(seededKey, 'true');
+  return entries;
+}
+
+// ============================================
+// LOCAL STORAGE HELPERS
+// ============================================
 function getUserProfile(uid) {
   const profile = localStorage.getItem(`user_profile_${uid}`);
   return profile ? JSON.parse(profile) : null;
@@ -30,7 +351,9 @@ function getStatsKey(uid) {
   return `journal_stats_${uid}`;
 }
 
-// Stats functions
+// ============================================
+// STATS FUNCTIONS
+// ============================================
 function getStats(uid) {
   const stats = localStorage.getItem(getStatsKey(uid));
   return stats ? JSON.parse(stats) : {
@@ -45,20 +368,20 @@ function getStats(uid) {
 function updateStats(uid, newEntry) {
   const stats = getStats(uid);
   const today = new Date().toDateString();
-  
+
   stats.totalEntries++;
-  stats.totalWords += newEntry.text.split(' ').length;
-  
+  stats.totalWords += newEntry.text.split(/\s+/).filter(w => w).length;
+
   if (!stats.firstEntryDate) {
     stats.firstEntryDate = today;
   }
-  
+
   // Update streak
   if (stats.lastEntryDate) {
     const lastDate = new Date(stats.lastEntryDate);
     const currentDate = new Date(today);
     const dayDiff = Math.floor((currentDate - lastDate) / (1000 * 60 * 60 * 24));
-    
+
     if (dayDiff === 1) {
       stats.currentStreak++;
     } else if (dayDiff > 1) {
@@ -67,13 +390,12 @@ function updateStats(uid, newEntry) {
   } else {
     stats.currentStreak = 1;
   }
-  
+
   stats.lastEntryDate = today;
   localStorage.setItem(getStatsKey(uid), JSON.stringify(stats));
   return stats;
 }
 
-// Recalculate statistics from a given list of entries
 function recalcStats(uid, entries) {
   const stats = {
     totalEntries: entries.length,
@@ -84,18 +406,22 @@ function recalcStats(uid, entries) {
   };
 
   if (entries.length > 0) {
-    stats.totalWords = entries.reduce((sum, e) => sum + e.text.split(' ').length, 0);
-    stats.firstEntryDate = new Date(entries[0].date).toDateString();
-    stats.lastEntryDate = new Date(entries[entries.length - 1].date).toDateString();
+    // Sort entries by date
+    const sorted = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
 
+    stats.totalWords = sorted.reduce((sum, e) => sum + e.text.split(/\s+/).filter(w => w).length, 0);
+    stats.firstEntryDate = new Date(sorted[0].date).toDateString();
+    stats.lastEntryDate = new Date(sorted[sorted.length - 1].date).toDateString();
+
+    // Calculate streak
     let streak = 1;
-    for (let i = entries.length - 1; i > 0; i--) {
-      const current = new Date(entries[i].date);
-      const prev = new Date(entries[i - 1].date);
-      const diffDays = Math.floor((current - prev) / (1000 * 60 * 60 * 24));
+    for (let i = sorted.length - 1; i > 0; i--) {
+      const current = new Date(sorted[i].date).toDateString();
+      const prev = new Date(sorted[i - 1].date).toDateString();
+      const diffDays = Math.floor((new Date(current) - new Date(prev)) / (1000 * 60 * 60 * 24));
       if (diffDays === 1) {
         streak++;
-      } else {
+      } else if (diffDays > 1) {
         break;
       }
     }
@@ -113,10 +439,12 @@ function displayStats(uid) {
   document.getElementById('streakCount').textContent = stats.currentStreak;
 }
 
-// Entry functions
+// ============================================
+// ENTRY DISPLAY FUNCTIONS
+// ============================================
 function displayEntries(entries) {
   const container = document.getElementById('entries');
-  
+
   if (entries.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
@@ -126,15 +454,16 @@ function displayEntries(entries) {
     `;
     return;
   }
-  
+
   container.innerHTML = '';
   entries.slice().reverse().forEach(entry => {
-    const wordCount = entry.text.split(' ').length;
+    const wordCount = entry.text.split(/\s+/).filter(w => w).length;
+    const syncIcon = entry.synced ? '' : '<span class="unsynced-badge" title="Not synced">*</span>';
     const div = document.createElement('div');
     div.className = 'entry';
     div.innerHTML = `
-      <h3>${entry.title}</h3>
-      <p>${entry.text}</p>
+      <h3>${escapeHtml(entry.title)} ${syncIcon}</h3>
+      <p>${escapeHtml(entry.text)}</p>
       <div class="entry-meta">
         <small>${new Date(entry.date).toLocaleDateString('en-US', {
           weekday: 'long',
@@ -152,80 +481,150 @@ function displayEntries(entries) {
   });
 }
 
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function loadEntries(uid) {
   const entries = JSON.parse(localStorage.getItem(getEntriesKey(uid))) || [];
   displayEntries(entries);
 }
 
-function saveEntry(uid, title, text) {
-  const entries = JSON.parse(localStorage.getItem(getEntriesKey(uid))) || [];
-  const newEntry = { 
-    title, 
-    text, 
+// ============================================
+// ENTRY CRUD OPERATIONS
+// ============================================
+async function saveEntry(uid, title, text) {
+  const clientId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const newEntry = {
+    id: clientId,
+    title,
+    text,
     date: new Date().toISOString(),
-    id: Date.now().toString()
+    synced: false
   };
-  
+
+  // Save locally first (optimistic update)
+  const entries = JSON.parse(localStorage.getItem(getEntriesKey(uid))) || [];
   entries.push(newEntry);
   localStorage.setItem(getEntriesKey(uid), JSON.stringify(entries));
-  
-  // Update stats
-  const stats = updateStats(uid, newEntry);
+
+  // Update UI immediately
+  updateStats(uid, newEntry);
   displayStats(uid);
   displayEntries(entries);
+
+  // Sync to server
+  if (syncManager && syncManager.isOnline()) {
+    try {
+      const result = await api.createEntry({
+        firebase_uid: uid,
+        title,
+        text,
+        date: newEntry.date,
+        client_id: clientId
+      });
+
+      // Update local entry with server ID
+      const updated = entries.map(e =>
+        e.id === clientId
+          ? { ...e, entry_id: result.entry.entry_id, synced: true }
+          : e
+      );
+      localStorage.setItem(getEntriesKey(uid), JSON.stringify(updated));
+      displayEntries(updated);
+      syncManager.updateSyncStatus('synced');
+    } catch (error) {
+      console.error('Failed to sync entry:', error);
+      // Queue for later sync
+      syncManager.queueChange('create', {
+        client_id: clientId,
+        title,
+        text,
+        date: newEntry.date
+      });
+    }
+  } else if (syncManager) {
+    // Offline - queue for later
+    syncManager.queueChange('create', {
+      client_id: clientId,
+      title,
+      text,
+      date: newEntry.date
+    });
+  }
 }
 
-// Delete an entry and update statistics
-function deleteEntry(id) {
+async function deleteEntry(id) {
   const user = auth.currentUser;
   if (!user) return;
 
   const entries = JSON.parse(localStorage.getItem(getEntriesKey(user.uid))) || [];
+  const entryToDelete = entries.find(e => e.id === id);
   const filtered = entries.filter(e => e.id !== id);
-  localStorage.setItem(getEntriesKey(user.uid), JSON.stringify(filtered));
 
+  // Update locally first
+  localStorage.setItem(getEntriesKey(user.uid), JSON.stringify(filtered));
   recalcStats(user.uid, filtered);
   displayStats(user.uid);
   displayEntries(filtered);
+
+  // Sync deletion to server
+  if (syncManager && entryToDelete?.entry_id) {
+    if (syncManager.isOnline()) {
+      try {
+        await api.deleteEntry(entryToDelete.entry_id, user.uid);
+        syncManager.updateSyncStatus('synced');
+      } catch (error) {
+        console.error('Failed to delete on server:', error);
+        syncManager.queueChange('delete', { entry_id: entryToDelete.entry_id });
+      }
+    } else {
+      syncManager.queueChange('delete', { entry_id: entryToDelete.entry_id });
+    }
+  }
 }
 
-// Profile functions
+// ============================================
+// PROFILE FUNCTIONS
+// ============================================
 function showProfile() {
   const user = auth.currentUser;
   if (!user) return;
-  
+
   const profile = getUserProfile(user.uid);
   const profileContent = document.getElementById('profileContent');
-  
+
   if (profile) {
     profileContent.innerHTML = `
       <div class="profile-item">
         <label>Display Name:</label>
-        <span>${profile.displayName || 'Not set'}</span>
+        <span>${escapeHtml(profile.displayName || 'Not set')}</span>
       </div>
       <div class="profile-item">
         <label>Email:</label>
-        <span>${user.email}</span>
+        <span>${escapeHtml(user.email)}</span>
       </div>
       <div class="profile-item">
         <label>Age Group:</label>
-        <span>${profile.age || 'Not specified'}</span>
+        <span>${escapeHtml(profile.age || 'Not specified')}</span>
       </div>
       <div class="profile-item">
         <label>Journaling Goal:</label>
-        <span>${profile.journalGoal || 'Not specified'}</span>
+        <span>${escapeHtml(profile.journalGoal || 'Not specified')}</span>
       </div>
       <div class="profile-item">
         <label>Writing Frequency:</label>
-        <span>${profile.writingFrequency || 'Not specified'}</span>
+        <span>${escapeHtml(profile.writingFrequency || 'Not specified')}</span>
       </div>
       <div class="profile-item">
         <label>Preferred Writing Time:</label>
-        <span>${profile.favoriteTime || 'Not specified'}</span>
+        <span>${escapeHtml(profile.favoriteTime || 'Not specified')}</span>
       </div>
       <div class="profile-item">
         <label>Inspiration:</label>
-        <span>${profile.inspiration || 'Not specified'}</span>
+        <span>${escapeHtml(profile.inspiration || 'Not specified')}</span>
       </div>
       <div class="profile-item">
         <label>Member Since:</label>
@@ -233,7 +632,7 @@ function showProfile() {
       </div>
     `;
   }
-  
+
   document.getElementById('profileModal').style.display = 'flex';
 }
 
@@ -242,7 +641,6 @@ function hideProfile() {
 }
 
 function editProfile() {
-  // For now, redirect to a profile edit page or show inline editing
   alert('Profile editing feature coming soon!');
 }
 
@@ -260,10 +658,10 @@ function getPersonalizedMessage(profile) {
     'memory-keeping': 'What moments from today are worth remembering?',
     'habit-building': 'What positive habits are you building today?'
   };
-  
+
   const timeOfDay = new Date().getHours();
   let greeting = '';
-  
+
   if (timeOfDay < 12) {
     greeting = 'Good morning';
   } else if (timeOfDay < 17) {
@@ -271,29 +669,68 @@ function getPersonalizedMessage(profile) {
   } else {
     greeting = 'Good evening';
   }
-  
+
   const goalMessage = messages[profile?.journalGoal] || 'What\'s on your mind today?';
-  
+
   return `${greeting}, ${profile?.displayName || 'there'}! ${goalMessage}`;
 }
 
-// Authentication and initialization
-auth.onAuthStateChanged(user => {
+// ============================================
+// INITIALIZATION
+// ============================================
+auth.onAuthStateChanged(async user => {
   if (!user) {
     window.location.href = 'index.html';
     return;
   }
-  
+
+  // Initialize sync manager
+  syncManager = new SyncManager(user.uid);
+
   const profile = getUserProfile(user.uid);
-  
+
   // Update welcome message
   document.getElementById('welcome').textContent = `Welcome back, ${profile?.displayName || user.displayName || user.email.split('@')[0]}!`;
-  
+
   // Set personalized message
   const personalizedMessage = getPersonalizedMessage(profile);
   document.getElementById('personalizedMessage').textContent = personalizedMessage;
-  
-  // Load user data
+
+  // Initialize sync status
+  if (syncManager.isOnline()) {
+    syncManager.updateSyncStatus('syncing');
+  } else {
+    syncManager.updateSyncStatus('offline');
+  }
+
+  // Check if user needs sample entries (new user)
+  const localEntries = JSON.parse(localStorage.getItem(getEntriesKey(user.uid))) || [];
+  const seededKey = `seeded_${user.uid}`;
+
+  if (localEntries.length === 0 && !localStorage.getItem(seededKey) && syncManager.isOnline()) {
+    try {
+      // Try to fetch existing entries from server first
+      const result = await api.getEntries(user.uid);
+      if (result.entries.length === 0) {
+        // No entries on server, seed sample entries
+        await seedSampleEntries(user.uid);
+      }
+    } catch (error) {
+      console.error('Failed to check/seed entries:', error);
+    }
+  }
+
+  // Perform initial sync
+  try {
+    const syncedEntries = await syncManager.fullSync();
+    if (syncedEntries) {
+      recalcStats(user.uid, syncedEntries);
+    }
+  } catch (error) {
+    console.error('Initial sync failed, using local data:', error);
+  }
+
+  // Load and display entries
   loadEntries(user.uid);
   displayStats(user.uid);
 });
@@ -302,23 +739,27 @@ function signOutUser() {
   auth.signOut();
 }
 
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
 // Form submission
 document.getElementById('entryForm').addEventListener('submit', e => {
   e.preventDefault();
   const title = document.getElementById('entryTitle').value;
   const text = document.getElementById('entryText').value;
   const user = auth.currentUser;
-  
+
   if (user && title.trim() && text.trim()) {
     saveEntry(user.uid, title, text);
     clearForm();
-    
+
     // Show success feedback
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Saved!';
     submitBtn.style.background = '#4CAF50';
-    
+
     setTimeout(() => {
       submitBtn.textContent = originalText;
       submitBtn.style.background = '';
@@ -338,3 +779,34 @@ document.getElementById('profileModal').addEventListener('click', function(e) {
     hideProfile();
   }
 });
+
+// Online/offline event listeners
+window.addEventListener('online', async () => {
+  console.log('Back online - syncing...');
+  if (syncManager) {
+    try {
+      await syncManager.processQueue();
+      await syncManager.fullSync();
+      loadEntries(auth.currentUser?.uid);
+    } catch (error) {
+      console.error('Reconnection sync failed:', error);
+    }
+  }
+});
+
+window.addEventListener('offline', () => {
+  console.log('Gone offline - changes will be saved locally');
+  if (syncManager) {
+    syncManager.updateSyncStatus('offline');
+  }
+});
+
+// Periodic sync (every 5 minutes if online)
+setInterval(async () => {
+  if (syncManager && syncManager.isOnline() && !syncManager.isSyncing) {
+    const pending = syncManager.getPendingChanges();
+    if (pending.length > 0) {
+      await syncManager.processQueue();
+    }
+  }
+}, 5 * 60 * 1000);
