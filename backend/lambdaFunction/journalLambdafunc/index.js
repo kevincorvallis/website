@@ -1,186 +1,516 @@
-const mysql = require('mysql');
-const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
-let AWS = require('aws-sdk');
-// Define the names of the tables, database, and host
+const mysql = require('mysql2/promise');
+const AWS = require('aws-sdk');
+const admin = require('firebase-admin');
 
-/*
-Table Name: journal_entries 
-
-Description:
-A table representing individual journal entries made by users in the system.
-
-Columns:
-  - entry_id: an auto-incrementing integer used as a primary key
-  - user_id: an integer used to identify the user who created the entry
-  - date: a date field to store the date the entry was created
-  - title: a string field to store the title of the journal entry
-  - text: a text field to store the contents of the journal entry
-  - prompt_id: an integer field used to associate the entry with a specific prompt from the prompts table. 
-               This field is optional and can be left as NULL if the entry is not associated with a prompt.
-  - created_at: a timestamp field to store the date and time the entry was created
-  - updated_at: a timestamp field to store the date and time the entry was last updated
- */
-
-
-
-const mysqlEntries = 'journal_entries';
-
-/*
-Table Name: prompts
-
-Description: 
-A table used to store prompts for journal entries. Each prompt has a prompt text, a unique ID, and the ID of the user who created it.
-
-Columns:
- - prompt_id: An auto-incrementing integer used as the primary key for the table.
- - prompt: A text field used to store the text of the prompt.
- - user_id: An integer field used to identify the user who created the prompt.
- - created_at: A timestamp field used to store the date and time the prompt was created.
-*/
-
-const mysqlPrompts= 'prompts';
-
-/**
-Table Name: users
-
-Description:
-A table used to stores information about the users of the journaling application.
-Columns: 
- - user_id: an auto-incrementing integer used as a primary key to uniquely identify each user
- - username: a string field to store the username of the user
- - password: a string field to store the hashed password of the user
- - email: a string field to store the email address of the user
- - created_at: a timestamp field to store the date and time the user account was created
- - updated_at: a timestamp field to store the date and time the user account was last updated
- - first_name:  a string field to store the first name of the user
- - last_name: a string field to store the last name of the user
- - gender: a string field to store the gender of the user
- */
-
-const mysqlUsers = 'users';
-
+// ============================================
+// CONFIGURATION
+// ============================================
 const mysqlDatabase = 'journaldb';
 
-
-// Define the paths for the different API endpoints
-const healthPath = '/journalLambdafunc/health';
-const promptPath = '/journalLambdafunc/prompt';
-const promptsPath = '/journalLambdafunc/prompts';
-const entryPath = '/journalLambdafunc/entry';
-const entriesPath = '/journalLambdafunc/entries'; 
-const userPath = '/journalLambdafunc/user';
-const defaultPath = '/journalLambdafunc/default';
-
-
-
-let conn;
-
-
-exports.handler = async (event, context) => {        
-    console.log("Starting query ...\n");
-    
-    var signer = new AWS.RDS.Signer({
-        region: 'us-west-1', // example: us-east-2
-        hostname: 'journalproxy.proxy-cwzjhkgs6o1v.us-west-1.rds.amazonaws.com',
-        port: 3306,
-        username: 'klee'
-    });
-
-    let token = signer.getAuthToken({
-        username: 'klee'
-    });
-
-    console.log ("IAM Token obtained\n");
-
-    let connectionConfig = {
-        host: process.env.RDS_HOSTNAME,
-        user: process.env.RDS_USERNAME,
-        database: mysqlDatabase,
-        ssl: { rejectUnauthorized: false},
-        password: token,
-        authSwitchHandler: function ({pluginName, pluginData}, cb) {
-            console.log("Setting new auth handler.");
-        }
-      };
-
-    // Adding the mysql_clear_password handler
-    connectionConfig.authSwitchHandler = (data, cb) => {
-        if (data.pluginName === 'mysql_clear_password') {
-          // See https://dev.mysql.com/doc/internals/en/clear-text-authentication.html
-          console.log("pluginName: "+data.pluginName);
-          let password = token + '\0';
-          let buffer = Buffer.from(password);
-          cb(null, password);
-        }
-    };
-    
-    conn = mysql.createConnection(connectionConfig);
-		
-    conn.connect(function(err) {
-        if (err) {
-            console.log('error connecting: ' + err.stack);
-            return;
-        }
-        
-        console.log('connected as id ' + conn.threadId + "\n");
-        });
-
-    
-    let response;
-
-    switch(true) {
-      case event.httpMethod === 'GET' && event.path === healthPath:
-        response = buildResponse(200, {message: '200 HEALTH IS GOOD'});
-        break;
-        
-      // If the request is for getting a random prompt, call the getPrompt() function
-      case event.httpMethod === 'GET' && event.path === promptsPath:
-        console.log('=========Invoking GETTING PROMPT !\n');
-        response = await getPrompt();
-        break;      
-          
-      default:
-        response = buildResponse(404, {message: 'DEFAULT : 404 Not found'});
-        break;
-    }
-    return response
-
-}
-// Function to get a random prompt
-async function getPrompt() {
-    try {
-        // Create a SQL query to get a random prompt from the prompts table
-        const sql = 'SELECT prompt FROM ' + mysqlPrompts + ' ORDER BY RAND() LIMIT 1';
-        // Use the connection to the MySQL database to run the query
-        console.log('Querying database...', conn);
-        const result = await conn.query({
-            sql: sql
-        });
-        console.log('Result:', result);
-        // Return the result of the query
-        return buildResponse(200, result);
-    } catch (error) {
-        console.error('Error getting random prompt: ', error);
-        return buildResponse(500, { message: 'Error getting random prompt.' });
-    }
-}
-
-// Helper function to build an HTTP response
-function buildResponse(statusCode, body) {
-    console.log('=========Inside buildResponse function!\n');
-
-    let data = body;
-    let res = {
-        statusCode: statusCode,
-        headers: {
-            'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
-              "Access-Control-Allow-Headers" : "Content-Type",
-        },
-        body: JSON.stringify(data),
-
-    };
-
-    return res;
+// API Paths
+const PATHS = {
+  health: '/journalLambdafunc/health',
+  prompts: '/journalLambdafunc/prompts',
+  prompt: '/journalLambdafunc/prompt',
+  entries: '/journalLambdafunc/entries',
+  entry: '/journalLambdafunc/entry',
+  sync: '/journalLambdafunc/sync',
+  user: '/journalLambdafunc/user'
 };
 
+// Initialize Firebase Admin (only once)
+let firebaseInitialized = false;
+function initFirebase() {
+  if (!firebaseInitialized && process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+      firebaseInitialized = true;
+    } catch (e) {
+      console.log('Firebase init skipped (no service account):', e.message);
+    }
+  }
+}
+
+// ============================================
+// DATABASE CONNECTION
+// ============================================
+async function getConnection() {
+  const signer = new AWS.RDS.Signer({
+    region: process.env.AWS_REGION || 'us-west-1',
+    hostname: process.env.RDS_HOSTNAME || 'journalproxy.proxy-cwzjhkgs6o1v.us-west-1.rds.amazonaws.com',
+    port: 3306,
+    username: process.env.RDS_USERNAME || 'klee'
+  });
+
+  const token = signer.getAuthToken({
+    username: process.env.RDS_USERNAME || 'klee'
+  });
+
+  return mysql.createConnection({
+    host: process.env.RDS_HOSTNAME || 'journalproxy.proxy-cwzjhkgs6o1v.us-west-1.rds.amazonaws.com',
+    user: process.env.RDS_USERNAME || 'klee',
+    database: mysqlDatabase,
+    password: token,
+    ssl: { rejectUnauthorized: false },
+    authPlugins: {
+      mysql_clear_password: () => () => Buffer.from(token + '\0')
+    }
+  });
+}
+
+// ============================================
+// AUTHENTICATION
+// ============================================
+async function verifyFirebaseToken(event) {
+  const authHeader = event.headers?.Authorization || event.headers?.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.split('Bearer ')[1];
+
+  try {
+    initFirebase();
+    if (firebaseInitialized) {
+      const decoded = await admin.auth().verifyIdToken(token);
+      return decoded.uid;
+    }
+  } catch (e) {
+    console.error('Token verification failed:', e.message);
+  }
+
+  return null;
+}
+
+// For development/testing - get UID from query param if no valid token
+function getFirebaseUid(event) {
+  // Try token first
+  // In production, always require token verification
+  // For now, allow query param for testing
+  return event.queryStringParameters?.firebase_uid || null;
+}
+
+// ============================================
+// RESPONSE HELPERS
+// ============================================
+function buildResponse(statusCode, body) {
+  return {
+    statusCode,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
+    },
+    body: JSON.stringify(body)
+  };
+}
+
+function errorResponse(statusCode, message) {
+  return buildResponse(statusCode, { error: message });
+}
+
+// ============================================
+// ENTRY HANDLERS
+// ============================================
+
+// GET /entries - List all entries for a user
+async function getEntries(event, conn) {
+  const firebase_uid = getFirebaseUid(event);
+  if (!firebase_uid) {
+    return errorResponse(401, 'Missing firebase_uid');
+  }
+
+  const since = event.queryStringParameters?.since;
+
+  try {
+    let sql = `
+      SELECT entry_id, firebase_uid, date, title, text, prompt_id, client_id,
+             created_at, updated_at, is_deleted
+      FROM journal_entries
+      WHERE firebase_uid = ? AND is_deleted = 0
+    `;
+    const params = [firebase_uid];
+
+    if (since) {
+      sql += ' AND updated_at > ?';
+      params.push(new Date(parseInt(since)));
+    }
+
+    sql += ' ORDER BY date ASC';
+
+    const [rows] = await conn.execute(sql, params);
+
+    return buildResponse(200, {
+      entries: rows,
+      count: rows.length,
+      syncTime: Date.now()
+    });
+  } catch (error) {
+    console.error('Error getting entries:', error);
+    return errorResponse(500, 'Failed to get entries');
+  }
+}
+
+// POST /entry - Create a new entry
+async function createEntry(event, conn) {
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { firebase_uid, title, text, date, prompt_id, client_id } = body;
+
+  if (!firebase_uid || !title || !text) {
+    return errorResponse(400, 'Missing required fields: firebase_uid, title, text');
+  }
+
+  try {
+    const sql = `
+      INSERT INTO journal_entries (firebase_uid, date, title, text, prompt_id, client_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const entryDate = date ? new Date(date) : new Date();
+    const [result] = await conn.execute(sql, [
+      firebase_uid,
+      entryDate,
+      title,
+      text,
+      prompt_id || null,
+      client_id || null
+    ]);
+
+    // Fetch the created entry
+    const [rows] = await conn.execute(
+      'SELECT * FROM journal_entries WHERE entry_id = ?',
+      [result.insertId]
+    );
+
+    return buildResponse(201, {
+      message: 'Entry created',
+      entry: rows[0]
+    });
+  } catch (error) {
+    console.error('Error creating entry:', error);
+    return errorResponse(500, 'Failed to create entry');
+  }
+}
+
+// PUT /entry/{id} - Update an entry
+async function updateEntry(event, conn) {
+  const entryId = event.pathParameters?.id;
+  if (!entryId) {
+    return errorResponse(400, 'Missing entry ID');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { firebase_uid, title, text } = body;
+
+  if (!firebase_uid) {
+    return errorResponse(401, 'Missing firebase_uid');
+  }
+
+  try {
+    // Verify ownership
+    const [existing] = await conn.execute(
+      'SELECT * FROM journal_entries WHERE entry_id = ? AND firebase_uid = ?',
+      [entryId, firebase_uid]
+    );
+
+    if (existing.length === 0) {
+      return errorResponse(404, 'Entry not found or not authorized');
+    }
+
+    // Update
+    const updates = [];
+    const params = [];
+
+    if (title !== undefined) {
+      updates.push('title = ?');
+      params.push(title);
+    }
+    if (text !== undefined) {
+      updates.push('text = ?');
+      params.push(text);
+    }
+
+    if (updates.length === 0) {
+      return errorResponse(400, 'No fields to update');
+    }
+
+    params.push(entryId, firebase_uid);
+
+    await conn.execute(
+      `UPDATE journal_entries SET ${updates.join(', ')} WHERE entry_id = ? AND firebase_uid = ?`,
+      params
+    );
+
+    // Fetch updated entry
+    const [rows] = await conn.execute(
+      'SELECT * FROM journal_entries WHERE entry_id = ?',
+      [entryId]
+    );
+
+    return buildResponse(200, {
+      message: 'Entry updated',
+      entry: rows[0]
+    });
+  } catch (error) {
+    console.error('Error updating entry:', error);
+    return errorResponse(500, 'Failed to update entry');
+  }
+}
+
+// DELETE /entry/{id} - Soft delete an entry
+async function deleteEntry(event, conn) {
+  const entryId = event.pathParameters?.id;
+  const firebase_uid = getFirebaseUid(event);
+
+  if (!entryId) {
+    return errorResponse(400, 'Missing entry ID');
+  }
+  if (!firebase_uid) {
+    return errorResponse(401, 'Missing firebase_uid');
+  }
+
+  try {
+    // Verify ownership and soft delete
+    const [result] = await conn.execute(
+      'UPDATE journal_entries SET is_deleted = 1 WHERE entry_id = ? AND firebase_uid = ?',
+      [entryId, firebase_uid]
+    );
+
+    if (result.affectedRows === 0) {
+      return errorResponse(404, 'Entry not found or not authorized');
+    }
+
+    return buildResponse(200, {
+      message: 'Entry deleted',
+      entry_id: parseInt(entryId)
+    });
+  } catch (error) {
+    console.error('Error deleting entry:', error);
+    return errorResponse(500, 'Failed to delete entry');
+  }
+}
+
+// POST /sync - Bulk sync for offline support
+async function syncEntries(event, conn) {
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { firebase_uid, entries = [], lastSyncTime = 0 } = body;
+
+  if (!firebase_uid) {
+    return errorResponse(401, 'Missing firebase_uid');
+  }
+
+  try {
+    const results = {
+      created: [],
+      updated: [],
+      conflicts: []
+    };
+
+    // Process incoming entries
+    for (const entry of entries) {
+      if (entry.action === 'create') {
+        // Check if client_id already exists (avoid duplicates)
+        if (entry.client_id) {
+          const [existing] = await conn.execute(
+            'SELECT entry_id FROM journal_entries WHERE firebase_uid = ? AND client_id = ?',
+            [firebase_uid, entry.client_id]
+          );
+          if (existing.length > 0) {
+            results.updated.push({ client_id: entry.client_id, entry_id: existing[0].entry_id });
+            continue;
+          }
+        }
+
+        // Create new entry
+        const [result] = await conn.execute(
+          `INSERT INTO journal_entries (firebase_uid, date, title, text, prompt_id, client_id)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [firebase_uid, new Date(entry.date), entry.title, entry.text, entry.prompt_id || null, entry.client_id || null]
+        );
+        results.created.push({ client_id: entry.client_id, entry_id: result.insertId });
+
+      } else if (entry.action === 'update' && entry.entry_id) {
+        await conn.execute(
+          'UPDATE journal_entries SET title = ?, text = ? WHERE entry_id = ? AND firebase_uid = ?',
+          [entry.title, entry.text, entry.entry_id, firebase_uid]
+        );
+        results.updated.push({ entry_id: entry.entry_id });
+
+      } else if (entry.action === 'delete' && entry.entry_id) {
+        await conn.execute(
+          'UPDATE journal_entries SET is_deleted = 1 WHERE entry_id = ? AND firebase_uid = ?',
+          [entry.entry_id, firebase_uid]
+        );
+      }
+    }
+
+    // Get all entries updated since lastSyncTime
+    let sql = `
+      SELECT entry_id, firebase_uid, date, title, text, prompt_id, client_id,
+             created_at, updated_at, is_deleted
+      FROM journal_entries
+      WHERE firebase_uid = ?
+    `;
+    const params = [firebase_uid];
+
+    if (lastSyncTime > 0) {
+      sql += ' AND updated_at > ?';
+      params.push(new Date(lastSyncTime));
+    }
+
+    const [serverEntries] = await conn.execute(sql, params);
+
+    return buildResponse(200, {
+      message: 'Sync complete',
+      results,
+      entries: serverEntries.filter(e => !e.is_deleted),
+      deletedIds: serverEntries.filter(e => e.is_deleted).map(e => e.entry_id),
+      syncTime: Date.now()
+    });
+  } catch (error) {
+    console.error('Error syncing:', error);
+    return errorResponse(500, 'Sync failed');
+  }
+}
+
+// ============================================
+// PROMPT HANDLERS
+// ============================================
+
+// GET /prompts - Get a random prompt
+async function getPrompt(conn) {
+  try {
+    const [rows] = await conn.execute(
+      'SELECT prompt_id, prompt FROM prompts ORDER BY RAND() LIMIT 1'
+    );
+
+    if (rows.length === 0) {
+      return buildResponse(200, { prompt: 'What is on your mind today?' });
+    }
+
+    return buildResponse(200, rows[0]);
+  } catch (error) {
+    console.error('Error getting prompt:', error);
+    return errorResponse(500, 'Failed to get prompt');
+  }
+}
+
+// POST /prompt - Add a new prompt
+async function addPrompt(event, conn) {
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { prompt, firebase_uid } = body;
+
+  if (!prompt) {
+    return errorResponse(400, 'Missing prompt text');
+  }
+
+  try {
+    const [result] = await conn.execute(
+      'INSERT INTO prompts (prompt, firebase_uid) VALUES (?, ?)',
+      [prompt, firebase_uid || null]
+    );
+
+    return buildResponse(201, {
+      message: 'Prompt added',
+      prompt_id: result.insertId
+    });
+  } catch (error) {
+    console.error('Error adding prompt:', error);
+    return errorResponse(500, 'Failed to add prompt');
+  }
+}
+
+// ============================================
+// MAIN HANDLER
+// ============================================
+exports.handler = async (event, context) => {
+  console.log('Request:', event.httpMethod, event.path);
+
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return buildResponse(200, {});
+  }
+
+  let conn;
+  try {
+    conn = await getConnection();
+
+    const method = event.httpMethod;
+    const path = event.path;
+
+    // Route handling
+    switch (true) {
+      // Health check
+      case method === 'GET' && path === PATHS.health:
+        return buildResponse(200, { status: 'healthy', timestamp: new Date().toISOString() });
+
+      // Prompts
+      case method === 'GET' && path === PATHS.prompts:
+        return await getPrompt(conn);
+
+      case method === 'POST' && path === PATHS.prompt:
+        return await addPrompt(event, conn);
+
+      // Entries - List
+      case method === 'GET' && path === PATHS.entries:
+        return await getEntries(event, conn);
+
+      // Entries - Create
+      case method === 'POST' && path === PATHS.entry:
+        return await createEntry(event, conn);
+
+      // Entries - Update (path: /entry/{id})
+      case method === 'PUT' && path.startsWith(PATHS.entry + '/'):
+        event.pathParameters = { id: path.split('/').pop() };
+        return await updateEntry(event, conn);
+
+      // Entries - Delete (path: /entry/{id})
+      case method === 'DELETE' && path.startsWith(PATHS.entry + '/'):
+        event.pathParameters = { id: path.split('/').pop() };
+        return await deleteEntry(event, conn);
+
+      // Sync
+      case method === 'POST' && path === PATHS.sync:
+        return await syncEntries(event, conn);
+
+      // Not found
+      default:
+        return errorResponse(404, `Route not found: ${method} ${path}`);
+    }
+  } catch (error) {
+    console.error('Handler error:', error);
+    return errorResponse(500, 'Internal server error');
+  } finally {
+    if (conn) {
+      await conn.end();
+    }
+  }
+};
