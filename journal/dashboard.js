@@ -115,8 +115,7 @@ class SyncManager {
 
   // Get pending changes queue
   getPendingChanges() {
-    const pending = localStorage.getItem(this.pendingKey);
-    return pending ? JSON.parse(pending) : [];
+    return safeParseJSON(this.pendingKey, []);
   }
 
   // Save pending changes
@@ -283,6 +282,7 @@ class SyncManager {
 }
 
 let syncManager = null;
+let syncIntervalId = null;
 
 // ============================================
 // SAMPLE ENTRIES (for new users)
@@ -332,11 +332,49 @@ async function seedSampleEntries(uid) {
 }
 
 // ============================================
+// VALIDATION CONSTANTS
+// ============================================
+const MAX_TITLE_LENGTH = 255;
+const MAX_TEXT_LENGTH = 50000;
+
+function validateEntry(title, text) {
+  if (!title?.trim()) {
+    return { valid: false, error: 'Title is required' };
+  }
+  if (!text?.trim()) {
+    return { valid: false, error: 'Entry text is required' };
+  }
+  if (title.length > MAX_TITLE_LENGTH) {
+    return { valid: false, error: `Title must be under ${MAX_TITLE_LENGTH} characters` };
+  }
+  if (text.length > MAX_TEXT_LENGTH) {
+    return { valid: false, error: `Entry must be under ${MAX_TEXT_LENGTH.toLocaleString()} characters` };
+  }
+  return { valid: true };
+}
+
+// ============================================
 // LOCAL STORAGE HELPERS
 // ============================================
+
+// Safe JSON parser with backup on corruption
+function safeParseJSON(key, defaultValue = null) {
+  try {
+    const data = localStorage.getItem(key);
+    if (!data) return defaultValue;
+    return JSON.parse(data);
+  } catch (e) {
+    console.error(`Failed to parse localStorage key "${key}":`, e);
+    // Backup corrupted data before returning default
+    const backupKey = `${key}_backup_${Date.now()}`;
+    localStorage.setItem(backupKey, localStorage.getItem(key));
+    console.warn(`Corrupted data backed up to "${backupKey}"`);
+    return defaultValue;
+  }
+}
+
 function getUserProfile(uid) {
-  const profile = localStorage.getItem(`user_profile_${uid}`);
-  return profile ? JSON.parse(profile) : null;
+  return safeParseJSON(`user_profile_${uid}`, null);
 }
 
 function updateUserProfile(uid, profileData) {
@@ -355,14 +393,13 @@ function getStatsKey(uid) {
 // STATS FUNCTIONS
 // ============================================
 function getStats(uid) {
-  const stats = localStorage.getItem(getStatsKey(uid));
-  return stats ? JSON.parse(stats) : {
+  return safeParseJSON(getStatsKey(uid), {
     totalEntries: 0,
     totalWords: 0,
     currentStreak: 0,
     lastEntryDate: null,
     firstEntryDate: null
-  };
+  });
 }
 
 function updateStats(uid, newEntry) {
@@ -405,23 +442,45 @@ function recalcStats(uid, entries) {
     firstEntryDate: null,
   };
 
-  if (entries.length > 0) {
-    // Sort entries by date
-    const sorted = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
+  if (entries.length === 0) {
+    localStorage.setItem(getStatsKey(uid), JSON.stringify(stats));
+    return stats;
+  }
 
-    stats.totalWords = sorted.reduce((sum, e) => sum + e.text.split(/\s+/).filter(w => w).length, 0);
-    stats.firstEntryDate = new Date(sorted[0].date).toDateString();
-    stats.lastEntryDate = new Date(sorted[sorted.length - 1].date).toDateString();
+  // Sort entries by date
+  const sorted = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // Calculate streak
+  stats.totalWords = sorted.reduce((sum, e) => sum + e.text.split(/\s+/).filter(w => w).length, 0);
+  stats.firstEntryDate = new Date(sorted[0].date).toDateString();
+  stats.lastEntryDate = new Date(sorted[sorted.length - 1].date).toDateString();
+
+  // Calculate streak - must check if last entry is recent enough
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const lastEntryDay = new Date(sorted[sorted.length - 1].date);
+  lastEntryDay.setHours(0, 0, 0, 0);
+
+  const daysSinceLastEntry = Math.floor((today - lastEntryDay) / (1000 * 60 * 60 * 24));
+
+  // Streak only counts if last entry was today or yesterday
+  if (daysSinceLastEntry > 1) {
+    stats.currentStreak = 0;
+  } else {
     let streak = 1;
     for (let i = sorted.length - 1; i > 0; i--) {
-      const current = new Date(sorted[i].date).toDateString();
-      const prev = new Date(sorted[i - 1].date).toDateString();
-      const diffDays = Math.floor((new Date(current) - new Date(prev)) / (1000 * 60 * 60 * 24));
-      if (diffDays === 1) {
+      const current = new Date(sorted[i].date);
+      current.setHours(0, 0, 0, 0);
+      const prev = new Date(sorted[i - 1].date);
+      prev.setHours(0, 0, 0, 0);
+      const diffDays = Math.floor((current - prev) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        // Same day, don't increment streak
+        continue;
+      } else if (diffDays === 1) {
         streak++;
-      } else if (diffDays > 1) {
+      } else {
         break;
       }
     }
@@ -488,7 +547,7 @@ function escapeHtml(text) {
 }
 
 function loadEntries(uid) {
-  const entries = JSON.parse(localStorage.getItem(getEntriesKey(uid))) || [];
+  const entries = safeParseJSON(getEntriesKey(uid), []);
   displayEntries(entries);
 }
 
@@ -506,7 +565,7 @@ async function saveEntry(uid, title, text) {
   };
 
   // Save locally first (optimistic update)
-  const entries = JSON.parse(localStorage.getItem(getEntriesKey(uid))) || [];
+  const entries = safeParseJSON(getEntriesKey(uid), []);
   entries.push(newEntry);
   localStorage.setItem(getEntriesKey(uid), JSON.stringify(entries));
 
@@ -560,7 +619,7 @@ async function deleteEntry(id) {
   const user = auth.currentUser;
   if (!user) return;
 
-  const entries = JSON.parse(localStorage.getItem(getEntriesKey(user.uid))) || [];
+  const entries = safeParseJSON(getEntriesKey(user.uid), []);
   const entryToDelete = entries.find(e => e.id === id);
   const filtered = entries.filter(e => e.id !== id);
 
@@ -679,6 +738,12 @@ function getPersonalizedMessage(profile) {
 // INITIALIZATION
 // ============================================
 auth.onAuthStateChanged(async user => {
+  // Clear any existing sync interval to prevent memory leak
+  if (syncIntervalId) {
+    clearInterval(syncIntervalId);
+    syncIntervalId = null;
+  }
+
   if (!user) {
     window.location.href = 'index.html';
     return;
@@ -704,7 +769,7 @@ auth.onAuthStateChanged(async user => {
   }
 
   // Check if user needs sample entries (new user)
-  const localEntries = JSON.parse(localStorage.getItem(getEntriesKey(user.uid))) || [];
+  const localEntries = safeParseJSON(getEntriesKey(user.uid), []);
   const seededKey = `seeded_${user.uid}`;
 
   if (localEntries.length === 0 && !localStorage.getItem(seededKey) && syncManager.isOnline()) {
@@ -733,6 +798,16 @@ auth.onAuthStateChanged(async user => {
   // Load and display entries
   loadEntries(user.uid);
   displayStats(user.uid);
+
+  // Set up periodic sync (every 5 minutes if online)
+  syncIntervalId = setInterval(async () => {
+    if (syncManager && syncManager.isOnline() && !syncManager.isSyncing) {
+      const pending = syncManager.getPendingChanges();
+      if (pending.length > 0) {
+        await syncManager.processQueue();
+      }
+    }
+  }, 5 * 60 * 1000);
 });
 
 function signOutUser() {
@@ -749,22 +824,37 @@ document.getElementById('entryForm').addEventListener('submit', e => {
   const title = document.getElementById('entryTitle').value;
   const text = document.getElementById('entryText').value;
   const user = auth.currentUser;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
 
-  if (user && title.trim() && text.trim()) {
-    saveEntry(user.uid, title, text);
-    clearForm();
+  if (!user) return;
 
-    // Show success feedback
-    const submitBtn = e.target.querySelector('button[type="submit"]');
+  // Validate input
+  const validation = validateEntry(title, text);
+  if (!validation.valid) {
+    // Show error feedback
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Saved!';
-    submitBtn.style.background = '#4CAF50';
+    submitBtn.textContent = validation.error;
+    submitBtn.style.background = '#f44336';
 
     setTimeout(() => {
       submitBtn.textContent = originalText;
       submitBtn.style.background = '';
-    }, 2000);
+    }, 3000);
+    return;
   }
+
+  saveEntry(user.uid, title, text);
+  clearForm();
+
+  // Show success feedback
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Saved!';
+  submitBtn.style.background = '#4CAF50';
+
+  setTimeout(() => {
+    submitBtn.textContent = originalText;
+    submitBtn.style.background = '';
+  }, 2000);
 });
 
 // Auto-resize textarea
@@ -800,13 +890,3 @@ window.addEventListener('offline', () => {
     syncManager.updateSyncStatus('offline');
   }
 });
-
-// Periodic sync (every 5 minutes if online)
-setInterval(async () => {
-  if (syncManager && syncManager.isOnline() && !syncManager.isSyncing) {
-    const pending = syncManager.getPendingChanges();
-    if (pending.length > 0) {
-      await syncManager.processQueue();
-    }
-  }
-}, 5 * 60 * 1000);
