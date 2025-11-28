@@ -15,8 +15,8 @@
 
 </head>
 <body>
-    <!-- Welcome Screen -->
-    <div class="container" id="welcomeScreen">
+    <!-- Welcome Screen (hidden - users go directly to login) -->
+    <div class="container" id="welcomeScreen" style="display: none;">
         <h1>Day by Day</h1>
         <p class="subtitle">Your personal space for reflection and growth</p>
         <div class="buttons">
@@ -25,12 +25,7 @@
     </div>
 
     <!-- Sign In Container -->
-    <div class="container" id="signInContainer" style="display: none;">
-        <div class="back-icon" onclick="showWelcome()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 11V13H8L13.5 18.5L12.08 19.92L4.16 12L12.08 4.08L13.5 5.5L8 11H20Z" fill="currentColor"></path>
-            </svg>
-        </div>
+    <div class="container" id="signInContainer">
         <h2>Welcome Back</h2>
         <p class="subtitle">Sign in to continue your journey</p>
 
@@ -69,7 +64,7 @@
                 <div class="form-group">
                     <input type="text" id="verificationCode" placeholder="Enter verification code" required>
                 </div>
-                <button type="button" class="primary-btn" onclick="confirmSignUp()">Verify</button>
+                <button type="button" class="primary-btn" onclick="handleConfirmSignUp()">Verify</button>
                 <p class="auth-switch"><a href="#" onclick="resendCode()">Resend code</a></p>
             </div>
 
@@ -236,12 +231,6 @@
         }
 
         // Navigation functions
-        function showWelcome() {
-            document.getElementById('welcomeScreen').style.display = 'block';
-            document.getElementById('signInContainer').style.display = 'none';
-            document.getElementById('profileSetup').style.display = 'none';
-        }
-
         function showSignIn() {
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('signInContainer').style.display = 'block';
@@ -356,7 +345,7 @@
             }
         }
 
-        async function confirmSignUp() {
+        async function handleConfirmSignUp() {
             const code = document.getElementById('verificationCode').value;
 
             if (!code || !pendingEmail) {
@@ -546,8 +535,9 @@
                     showProfileSetup(currentUser);
                 }
             } catch (error) {
-                // Not signed in - stay on welcome/sign in page
+                // Not signed in - show sign in form directly
                 console.log('Not authenticated:', error.message);
+                showSignIn();
             }
         }
 
@@ -555,7 +545,7 @@
             try {
                 await signOut();
                 currentUser = null;
-                showWelcome();
+                showSignIn();
             } catch (error) {
                 console.error('Sign out error:', error);
             }

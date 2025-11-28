@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh pr create:*)",
+      "Bash(aws lambda get-function-configuration:*)",
+      "Bash(aws sts get-caller-identity:*)",
+      "Bash(aws apigateway get-rest-apis:*)",
+      "Bash(aws cognito-idp list-user-pools:*)",
+      "Bash(aws apigateway get-resources:*)",
+      "Bash(aws rds describe-db-instances:*)",
+      "Bash(aws rds:*)",
+      "Bash(aws apigateway get-stages:*)",
+      "Bash(aws apigateway create-resource:*)",
+      "Bash(aws cognito-idp:*)",
+      "Bash(aws lambda update-function-configuration:*)",
+      "Bash(zip:*)",
+      "Bash(aws lambda update-function-code:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
