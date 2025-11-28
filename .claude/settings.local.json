@@ -17,7 +17,12 @@
       "Bash(aws cognito-idp:*)",
       "Bash(aws lambda update-function-configuration:*)",
       "Bash(zip:*)",
-      "Bash(aws lambda update-function-code:*)"
+      "Bash(aws lambda update-function-code:*)",
+      "WebSearch",
+      "WebFetch(domain:www.jsdelivr.com)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:cdn.amplify.aws)"
     ],
     "deny": [],
     "ask": []

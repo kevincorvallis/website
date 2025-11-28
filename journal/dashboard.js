@@ -1,6 +1,10 @@
 // dashboard.js - Day by Day Journal App
 // With cloud sync and offline support (Cognito Auth)
 
+// Import AWS Amplify v6 from esm.sh CDN
+import { Amplify } from 'https://esm.sh/aws-amplify@6';
+import { getCurrentUser, fetchAuthSession, signOut } from 'https://esm.sh/aws-amplify@6/auth';
+
 // ============================================
 // CONFIGURATION
 // ============================================
@@ -12,10 +16,6 @@ const cognitoConfig = {
 };
 
 const API_BASE_URL = 'https://1t1byyi4x6.execute-api.us-west-1.amazonaws.com/default/journalLambdafunc';
-
-// Initialize Amplify
-const { Amplify } = aws_amplify;
-const { getCurrentUser, fetchAuthSession, signOut } = aws_amplify.auth;
 
 Amplify.configure({
   Auth: {
@@ -929,3 +929,11 @@ window.addEventListener('offline', () => {
     syncManager.updateSyncStatus('offline');
   }
 });
+
+// Expose functions to window for onclick handlers (ES modules have their own scope)
+window.showProfile = showProfile;
+window.hideProfile = hideProfile;
+window.editProfile = editProfile;
+window.signOutUser = signOutUser;
+window.clearForm = clearForm;
+window.deleteEntry = deleteEntry;

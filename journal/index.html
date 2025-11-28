@@ -10,8 +10,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
 
-    <!-- AWS Amplify for Cognito Authentication -->
-    <script src="https://cdn.jsdelivr.net/npm/aws-amplify@6/dist/aws-amplify.min.js"></script>
+    <!-- AWS Amplify for Cognito Authentication (loaded as ES module) -->
 
 </head>
 <body>
@@ -169,7 +168,11 @@
     </div>
 
     <!-- Cognito Auth and Application Logic -->
-    <script type="text/javascript">
+    <script type="module">
+        // Import AWS Amplify v6 from esm.sh CDN
+        import { Amplify } from 'https://esm.sh/aws-amplify@6';
+        import { signIn, signUp, confirmSignUp, resendSignUpCode, signOut, getCurrentUser, fetchAuthSession, signInWithRedirect } from 'https://esm.sh/aws-amplify@6/auth';
+
         // Cognito Configuration
         const cognitoConfig = {
             userPoolId: 'us-west-1_81HBZnH92',
@@ -177,10 +180,6 @@
             region: 'us-west-1',
             domain: 'daybyday-journal.auth.us-west-1.amazoncognito.com'
         };
-
-        // Initialize Amplify
-        const { Amplify } = aws_amplify;
-        const { signIn, signUp, confirmSignUp, resendSignUpCode, signOut, getCurrentUser, fetchAuthSession, signInWithRedirect } = aws_amplify.auth;
 
         Amplify.configure({
             Auth: {
@@ -553,6 +552,17 @@
 
         // Initialize on page load
         checkAuthState();
+
+        // Expose functions to window for onclick handlers (ES modules have their own scope)
+        window.showSignIn = showSignIn;
+        window.showSignInForm = showSignInForm;
+        window.showSignUpForm = showSignUpForm;
+        window.signInWithEmail = signInWithEmail;
+        window.signUpWithEmail = signUpWithEmail;
+        window.handleConfirmSignUp = handleConfirmSignUp;
+        window.resendCode = resendCode;
+        window.signInWithGoogle = signInWithGoogle;
+        window.skipProfile = skipProfile;
     </script>
 
 </body>

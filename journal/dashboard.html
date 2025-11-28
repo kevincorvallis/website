@@ -6,7 +6,7 @@
   <title>Day by Day - Your Journal</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="dashboard.css">
-  <script src="https://cdn.jsdelivr.net/npm/aws-amplify@6/dist/aws-amplify.min.js"></script>
+  <!-- AWS Amplify loaded via ES modules in dashboard.js -->
 </head>
 <body>
   <div class="dashboard-container">
@@ -84,6 +84,6 @@
     </div>
   </div>
 
-  <script src="dashboard.js"></script>
+  <script type="module" src="dashboard.js"></script>
 </body>
 </html>
