@@ -1,23 +1,42 @@
 // dashboard.js - Day by Day Journal App
-// With cloud sync and offline support
+// With cloud sync and offline support (Cognito Auth)
 
 // ============================================
 // CONFIGURATION
 // ============================================
-const firebaseConfig = {
-  apiKey: "AIzaSyC2YGi_HPjp6edncQMAnSI6XHaRrUWus6o",
-  authDomain: "coffeethoughts-41651.firebaseapp.com",
-  projectId: "coffeethoughts-41651",
-  storageBucket: "coffeethoughts-41651.appspot.com",
-  messagingSenderId: "342424038908",
-  appId: "1:342424038908:web:60bea2fba592d922e79679",
-  measurementId: "G-Y02MZF303B"
+const cognitoConfig = {
+  userPoolId: 'us-west-1_81HBZnH92',
+  userPoolClientId: '7t77oqaipn9hldtdpesvde3eka',
+  region: 'us-west-1',
+  domain: 'daybyday-journal.auth.us-west-1.amazoncognito.com'
 };
 
-const API_BASE_URL = 'https://0a65j03yja.execute-api.us-west-2.amazonaws.com/prod/journalLambdafunc';
+const API_BASE_URL = 'https://1t1byyi4x6.execute-api.us-west-1.amazonaws.com/default/journalLambdafunc';
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+// Initialize Amplify
+const { Amplify } = aws_amplify;
+const { getCurrentUser, fetchAuthSession, signOut } = aws_amplify.auth;
+
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId: cognitoConfig.userPoolId,
+      userPoolClientId: cognitoConfig.userPoolClientId,
+      loginWith: {
+        oauth: {
+          domain: cognitoConfig.domain,
+          scopes: ['openid', 'email', 'profile'],
+          redirectSignIn: [window.location.origin + '/journal/dashboard.html'],
+          redirectSignOut: [window.location.origin + '/journal/index.html'],
+          responseType: 'code'
+        }
+      }
+    }
+  }
+});
+
+// Current user state
+let currentUser = null;
 
 // ============================================
 // API SERVICE
@@ -28,14 +47,18 @@ class JournalAPI {
   }
 
   async getAuthToken() {
-    const user = firebase.auth().currentUser;
-    if (!user) throw new Error('Not authenticated');
-    return user.getIdToken();
+    try {
+      const session = await fetchAuthSession();
+      const token = session.tokens?.idToken?.toString();
+      if (!token) throw new Error('No token available');
+      return token;
+    } catch (error) {
+      throw new Error('Not authenticated');
+    }
   }
 
   async request(endpoint, options = {}) {
-    const user = firebase.auth().currentUser;
-    if (!user) throw new Error('Not authenticated');
+    if (!currentUser) throw new Error('Not authenticated');
 
     const url = `${this.baseUrl}${endpoint}`;
 
@@ -62,9 +85,9 @@ class JournalAPI {
     }
   }
 
-  async getEntries(uid, since = null) {
-    let url = `/entries?firebase_uid=${uid}`;
-    if (since) url += `&since=${since}`;
+  async getEntries(since = null) {
+    let url = '/entries';
+    if (since) url += `?since=${since}`;
     return this.request(url);
   }
 
@@ -82,17 +105,16 @@ class JournalAPI {
     });
   }
 
-  async deleteEntry(entryId, uid) {
-    return this.request(`/entry/${entryId}?firebase_uid=${uid}`, {
+  async deleteEntry(entryId) {
+    return this.request(`/entry/${entryId}`, {
       method: 'DELETE'
     });
   }
 
-  async sync(uid, entries, lastSyncTime) {
+  async sync(entries, lastSyncTime) {
     return this.request('/sync', {
       method: 'POST',
       body: JSON.stringify({
-        firebase_uid: uid,
         entries,
         lastSyncTime
       })
@@ -198,7 +220,7 @@ class SyncManager {
     }));
 
     try {
-      const result = await api.sync(this.uid, entries, this.getLastSyncTime());
+      const result = await api.sync(entries, this.getLastSyncTime());
 
       // Update local entries with server data
       const localEntries = result.entries.map(e => ({
@@ -250,7 +272,7 @@ class SyncManager {
         ...p.data
       }));
 
-      const result = await api.sync(this.uid, entries, this.getLastSyncTime());
+      const result = await api.sync(entries, this.getLastSyncTime());
 
       // Transform server entries to local format
       const localEntries = result.entries.map(e => ({
@@ -312,7 +334,6 @@ async function seedSampleEntries(uid) {
     date.setDate(date.getDate() - sample.daysAgo);
 
     const entry = {
-      firebase_uid: uid,
       title: sample.title,
       text: sample.text,
       date: date.toISOString(),
@@ -578,7 +599,6 @@ async function saveEntry(uid, title, text) {
   if (syncManager && syncManager.isOnline()) {
     try {
       const result = await api.createEntry({
-        firebase_uid: uid,
         title,
         text,
         date: newEntry.date,
@@ -616,24 +636,23 @@ async function saveEntry(uid, title, text) {
 }
 
 async function deleteEntry(id) {
-  const user = auth.currentUser;
-  if (!user) return;
+  if (!currentUser) return;
 
-  const entries = safeParseJSON(getEntriesKey(user.uid), []);
+  const entries = safeParseJSON(getEntriesKey(currentUser.uid), []);
   const entryToDelete = entries.find(e => e.id === id);
   const filtered = entries.filter(e => e.id !== id);
 
   // Update locally first
-  localStorage.setItem(getEntriesKey(user.uid), JSON.stringify(filtered));
-  recalcStats(user.uid, filtered);
-  displayStats(user.uid);
+  localStorage.setItem(getEntriesKey(currentUser.uid), JSON.stringify(filtered));
+  recalcStats(currentUser.uid, filtered);
+  displayStats(currentUser.uid);
   displayEntries(filtered);
 
   // Sync deletion to server
   if (syncManager && entryToDelete?.entry_id) {
     if (syncManager.isOnline()) {
       try {
-        await api.deleteEntry(entryToDelete.entry_id, user.uid);
+        await api.deleteEntry(entryToDelete.entry_id);
         syncManager.updateSyncStatus('synced');
       } catch (error) {
         console.error('Failed to delete on server:', error);
@@ -649,10 +668,9 @@ async function deleteEntry(id) {
 // PROFILE FUNCTIONS
 // ============================================
 function showProfile() {
-  const user = auth.currentUser;
-  if (!user) return;
+  if (!currentUser) return;
 
-  const profile = getUserProfile(user.uid);
+  const profile = getUserProfile(currentUser.uid);
   const profileContent = document.getElementById('profileContent');
 
   if (profile) {
@@ -663,7 +681,7 @@ function showProfile() {
       </div>
       <div class="profile-item">
         <label>Email:</label>
-        <span>${escapeHtml(user.email)}</span>
+        <span>${escapeHtml(currentUser.email || profile.email || 'Not set')}</span>
       </div>
       <div class="profile-item">
         <label>Age Group:</label>
@@ -737,25 +755,38 @@ function getPersonalizedMessage(profile) {
 // ============================================
 // INITIALIZATION
 // ============================================
-auth.onAuthStateChanged(async user => {
+async function initializeDashboard() {
   // Clear any existing sync interval to prevent memory leak
   if (syncIntervalId) {
     clearInterval(syncIntervalId);
     syncIntervalId = null;
   }
 
-  if (!user) {
+  try {
+    // Check if user is authenticated
+    const user = await getCurrentUser();
+    const session = await fetchAuthSession();
+    const userId = session.tokens?.idToken?.payload?.sub || user.userId;
+
+    currentUser = {
+      uid: userId,
+      email: session.tokens?.idToken?.payload?.email || user.username,
+      username: user.username
+    };
+  } catch (error) {
+    console.log('Not authenticated, redirecting to login:', error.message);
     window.location.href = 'index.html';
     return;
   }
 
   // Initialize sync manager
-  syncManager = new SyncManager(user.uid);
+  syncManager = new SyncManager(currentUser.uid);
 
-  const profile = getUserProfile(user.uid);
+  const profile = getUserProfile(currentUser.uid);
 
   // Update welcome message
-  document.getElementById('welcome').textContent = `Welcome back, ${profile?.displayName || user.displayName || user.email.split('@')[0]}!`;
+  const displayName = profile?.displayName || currentUser.email?.split('@')[0] || 'there';
+  document.getElementById('welcome').textContent = `Welcome back, ${displayName}!`;
 
   // Set personalized message
   const personalizedMessage = getPersonalizedMessage(profile);
@@ -769,16 +800,16 @@ auth.onAuthStateChanged(async user => {
   }
 
   // Check if user needs sample entries (new user)
-  const localEntries = safeParseJSON(getEntriesKey(user.uid), []);
-  const seededKey = `seeded_${user.uid}`;
+  const localEntries = safeParseJSON(getEntriesKey(currentUser.uid), []);
+  const seededKey = `seeded_${currentUser.uid}`;
 
   if (localEntries.length === 0 && !localStorage.getItem(seededKey) && syncManager.isOnline()) {
     try {
       // Try to fetch existing entries from server first
-      const result = await api.getEntries(user.uid);
+      const result = await api.getEntries();
       if (result.entries.length === 0) {
         // No entries on server, seed sample entries
-        await seedSampleEntries(user.uid);
+        await seedSampleEntries(currentUser.uid);
       }
     } catch (error) {
       console.error('Failed to check/seed entries:', error);
@@ -789,15 +820,15 @@ auth.onAuthStateChanged(async user => {
   try {
     const syncedEntries = await syncManager.fullSync();
     if (syncedEntries) {
-      recalcStats(user.uid, syncedEntries);
+      recalcStats(currentUser.uid, syncedEntries);
     }
   } catch (error) {
     console.error('Initial sync failed, using local data:', error);
   }
 
   // Load and display entries
-  loadEntries(user.uid);
-  displayStats(user.uid);
+  loadEntries(currentUser.uid);
+  displayStats(currentUser.uid);
 
   // Set up periodic sync (every 5 minutes if online)
   syncIntervalId = setInterval(async () => {
@@ -808,11 +839,20 @@ auth.onAuthStateChanged(async user => {
       }
     }
   }, 5 * 60 * 1000);
-});
-
-function signOutUser() {
-  auth.signOut();
 }
+
+async function signOutUser() {
+  try {
+    await signOut();
+    currentUser = null;
+    window.location.href = 'index.html';
+  } catch (error) {
+    console.error('Sign out error:', error);
+  }
+}
+
+// Initialize on page load
+initializeDashboard();
 
 // ============================================
 // EVENT LISTENERS
@@ -823,10 +863,9 @@ document.getElementById('entryForm').addEventListener('submit', e => {
   e.preventDefault();
   const title = document.getElementById('entryTitle').value;
   const text = document.getElementById('entryText').value;
-  const user = auth.currentUser;
   const submitBtn = e.target.querySelector('button[type="submit"]');
 
-  if (!user) return;
+  if (!currentUser) return;
 
   // Validate input
   const validation = validateEntry(title, text);
@@ -843,7 +882,7 @@ document.getElementById('entryForm').addEventListener('submit', e => {
     return;
   }
 
-  saveEntry(user.uid, title, text);
+  saveEntry(currentUser.uid, title, text);
   clearForm();
 
   // Show success feedback
@@ -873,11 +912,11 @@ document.getElementById('profileModal').addEventListener('click', function(e) {
 // Online/offline event listeners
 window.addEventListener('online', async () => {
   console.log('Back online - syncing...');
-  if (syncManager) {
+  if (syncManager && currentUser) {
     try {
       await syncManager.processQueue();
       await syncManager.fullSync();
-      loadEntries(auth.currentUser?.uid);
+      loadEntries(currentUser.uid);
     } catch (error) {
       console.error('Reconnection sync failed:', error);
     }

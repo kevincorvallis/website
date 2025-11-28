@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const AWS = require('aws-sdk');
-const admin = require('firebase-admin');
+const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
 
 // ============================================
 // CONFIGURATION
@@ -18,20 +19,45 @@ const PATHS = {
   user: '/journalLambdafunc/user'
 };
 
-// Initialize Firebase Admin (only once)
-let firebaseInitialized = false;
-function initFirebase() {
-  if (!firebaseInitialized && process.env.FIREBASE_SERVICE_ACCOUNT) {
-    try {
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-      });
-      firebaseInitialized = true;
-    } catch (e) {
-      console.log('Firebase init skipped (no service account):', e.message);
+// Cognito Configuration
+const COGNITO_REGION = process.env.COGNITO_REGION || 'us-west-1';
+const COGNITO_USER_POOL_ID = process.env.COGNITO_USER_POOL_ID || 'us-west-1_81HBZnH92';
+const COGNITO_ISSUER = `https://cognito-idp.${COGNITO_REGION}.amazonaws.com/${COGNITO_USER_POOL_ID}`;
+
+// Initialize JWKS client for Cognito token verification
+const client = jwksClient({
+  jwksUri: `${COGNITO_ISSUER}/.well-known/jwks.json`,
+  cache: true,
+  cacheMaxEntries: 5,
+  cacheMaxAge: 600000 // 10 minutes
+});
+
+// Get signing key from Cognito JWKS
+function getKey(header, callback) {
+  client.getSigningKey(header.kid, (err, key) => {
+    if (err) {
+      callback(err);
+      return;
     }
-  }
+    const signingKey = key.getPublicKey();
+    callback(null, signingKey);
+  });
+}
+
+// Verify Cognito JWT token
+function verifyCognitoToken(token) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, getKey, {
+      issuer: COGNITO_ISSUER,
+      algorithms: ['RS256']
+    }, (err, decoded) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(decoded);
+      }
+    });
+  });
 }
 
 // ============================================
@@ -93,34 +119,21 @@ function isValidDate(dateString) {
 // AUTHENTICATION
 // ============================================
 async function getAuthenticatedUid(event) {
-  // Try Firebase token verification first (when configured)
+  // Require Cognito JWT token verification - no fallbacks
   const authHeader = event.headers?.Authorization || event.headers?.authorization;
-  if (authHeader?.startsWith('Bearer ')) {
-    try {
-      initFirebase();
-      if (firebaseInitialized) {
-        const token = authHeader.split('Bearer ')[1];
-        const decoded = await admin.auth().verifyIdToken(token);
-        return decoded.uid;
-      }
-    } catch (e) {
-      console.error('Token verification failed:', e.message);
-    }
+  if (!authHeader?.startsWith('Bearer ')) {
+    return null;
   }
 
-  // Fallback to query param (TEMPORARY - remove once FIREBASE_SERVICE_ACCOUNT is configured)
-  const uid = event.queryStringParameters?.firebase_uid;
-  if (uid) {
-    console.warn('Using query param auth - configure FIREBASE_SERVICE_ACCOUNT for production security');
-    return uid;
+  try {
+    const token = authHeader.split('Bearer ')[1];
+    const decoded = await verifyCognitoToken(token);
+    // Use Cognito 'sub' (subject) as the user ID
+    return decoded.sub;
+  } catch (e) {
+    console.error('Cognito token verification failed:', e.message);
+    return null;
   }
-
-  return null;
-}
-
-// Legacy function for backward compatibility - use getAuthenticatedUid instead
-function getFirebaseUid(event) {
-  return event.queryStringParameters?.firebase_uid || null;
 }
 
 // ============================================
@@ -149,9 +162,9 @@ function errorResponse(statusCode, message) {
 
 // GET /entries - List all entries for a user
 async function getEntries(event, conn) {
-  const firebase_uid = getFirebaseUid(event);
-  if (!firebase_uid) {
-    return errorResponse(401, 'Missing firebase_uid');
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
   }
 
   const since = event.queryStringParameters?.since;
@@ -163,7 +176,7 @@ async function getEntries(event, conn) {
       FROM journal_entries
       WHERE firebase_uid = ? AND is_deleted = 0
     `;
-    const params = [firebase_uid];
+    const params = [uid];
 
     if (since) {
       sql += ' AND updated_at > ?';
@@ -187,6 +200,11 @@ async function getEntries(event, conn) {
 
 // POST /entry - Create a new entry
 async function createEntry(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
   let body;
   try {
     body = JSON.parse(event.body);
@@ -194,11 +212,7 @@ async function createEntry(event, conn) {
     return errorResponse(400, 'Invalid JSON body');
   }
 
-  const { firebase_uid, title, text, date, prompt_id, client_id } = body;
-
-  if (!firebase_uid) {
-    return errorResponse(401, 'Missing firebase_uid');
-  }
+  const { title, text, date, prompt_id, client_id } = body;
 
   // Validate input
   const validation = validateEntryInput(title, text);
@@ -218,7 +232,7 @@ async function createEntry(event, conn) {
     `;
     const entryDate = date ? new Date(date) : new Date();
     const [result] = await conn.execute(sql, [
-      firebase_uid,
+      uid,
       entryDate,
       title,
       text,
@@ -244,6 +258,11 @@ async function createEntry(event, conn) {
 
 // PUT /entry/{id} - Update an entry
 async function updateEntry(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
   const entryId = event.pathParameters?.id;
   if (!entryId || isNaN(parseInt(entryId))) {
     return errorResponse(400, 'Invalid entry ID');
@@ -256,11 +275,7 @@ async function updateEntry(event, conn) {
     return errorResponse(400, 'Invalid JSON body');
   }
 
-  const { firebase_uid, title, text } = body;
-
-  if (!firebase_uid) {
-    return errorResponse(401, 'Missing firebase_uid');
-  }
+  const { title, text } = body;
 
   // Validate input if provided
   if (title !== undefined && (typeof title !== 'string' || title.length > MAX_TITLE_LENGTH)) {
@@ -274,7 +289,7 @@ async function updateEntry(event, conn) {
     // Verify ownership
     const [existing] = await conn.execute(
       'SELECT * FROM journal_entries WHERE entry_id = ? AND firebase_uid = ?',
-      [entryId, firebase_uid]
+      [entryId, uid]
     );
 
     if (existing.length === 0) {
@@ -298,7 +313,7 @@ async function updateEntry(event, conn) {
       return errorResponse(400, 'No fields to update');
     }
 
-    params.push(entryId, firebase_uid);
+    params.push(entryId, uid);
 
     await conn.execute(
       `UPDATE journal_entries SET ${updates.join(', ')} WHERE entry_id = ? AND firebase_uid = ?`,
@@ -323,21 +338,21 @@ async function updateEntry(event, conn) {
 
 // DELETE /entry/{id} - Soft delete an entry
 async function deleteEntry(event, conn) {
-  const entryId = event.pathParameters?.id;
-  const firebase_uid = getFirebaseUid(event);
-
-  if (!entryId) {
-    return errorResponse(400, 'Missing entry ID');
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
   }
-  if (!firebase_uid) {
-    return errorResponse(401, 'Missing firebase_uid');
+
+  const entryId = event.pathParameters?.id;
+  if (!entryId || isNaN(parseInt(entryId))) {
+    return errorResponse(400, 'Invalid entry ID');
   }
 
   try {
     // Verify ownership and soft delete
     const [result] = await conn.execute(
       'UPDATE journal_entries SET is_deleted = 1 WHERE entry_id = ? AND firebase_uid = ?',
-      [entryId, firebase_uid]
+      [entryId, uid]
     );
 
     if (result.affectedRows === 0) {
@@ -356,6 +371,11 @@ async function deleteEntry(event, conn) {
 
 // POST /sync - Bulk sync for offline support
 async function syncEntries(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
   // Capture sync start time FIRST to avoid missing concurrent updates
   const syncStartTime = Date.now();
 
@@ -366,11 +386,7 @@ async function syncEntries(event, conn) {
     return errorResponse(400, 'Invalid JSON body');
   }
 
-  const { firebase_uid, entries = [], lastSyncTime = 0 } = body;
-
-  if (!firebase_uid) {
-    return errorResponse(401, 'Missing firebase_uid');
-  }
+  const { entries = [], lastSyncTime = 0 } = body;
 
   try {
     const results = {
@@ -386,7 +402,7 @@ async function syncEntries(event, conn) {
         if (entry.client_id) {
           const [existing] = await conn.execute(
             'SELECT entry_id FROM journal_entries WHERE firebase_uid = ? AND client_id = ?',
-            [firebase_uid, entry.client_id]
+            [uid, entry.client_id]
           );
           if (existing.length > 0) {
             results.updated.push({ client_id: entry.client_id, entry_id: existing[0].entry_id });
@@ -398,21 +414,21 @@ async function syncEntries(event, conn) {
         const [result] = await conn.execute(
           `INSERT INTO journal_entries (firebase_uid, date, title, text, prompt_id, client_id)
            VALUES (?, ?, ?, ?, ?, ?)`,
-          [firebase_uid, new Date(entry.date), entry.title, entry.text, entry.prompt_id || null, entry.client_id || null]
+          [uid, new Date(entry.date), entry.title, entry.text, entry.prompt_id || null, entry.client_id || null]
         );
         results.created.push({ client_id: entry.client_id, entry_id: result.insertId });
 
       } else if (entry.action === 'update' && entry.entry_id) {
         await conn.execute(
           'UPDATE journal_entries SET title = ?, text = ? WHERE entry_id = ? AND firebase_uid = ?',
-          [entry.title, entry.text, entry.entry_id, firebase_uid]
+          [entry.title, entry.text, entry.entry_id, uid]
         );
         results.updated.push({ entry_id: entry.entry_id });
 
       } else if (entry.action === 'delete' && entry.entry_id) {
         await conn.execute(
           'UPDATE journal_entries SET is_deleted = 1 WHERE entry_id = ? AND firebase_uid = ?',
-          [entry.entry_id, firebase_uid]
+          [entry.entry_id, uid]
         );
       }
     }
@@ -424,7 +440,7 @@ async function syncEntries(event, conn) {
       FROM journal_entries
       WHERE firebase_uid = ?
     `;
-    const params = [firebase_uid];
+    const params = [uid];
 
     if (lastSyncTime > 0) {
       sql += ' AND updated_at > ?';
@@ -470,6 +486,11 @@ async function getPrompt(conn) {
 
 // POST /prompt - Add a new prompt
 async function addPrompt(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
   let body;
   try {
     body = JSON.parse(event.body);
@@ -477,7 +498,7 @@ async function addPrompt(event, conn) {
     return errorResponse(400, 'Invalid JSON body');
   }
 
-  const { prompt, firebase_uid } = body;
+  const { prompt } = body;
 
   if (!prompt) {
     return errorResponse(400, 'Missing prompt text');
@@ -486,7 +507,7 @@ async function addPrompt(event, conn) {
   try {
     const [result] = await conn.execute(
       'INSERT INTO prompts (prompt, firebase_uid) VALUES (?, ?)',
-      [prompt, firebase_uid || null]
+      [prompt, uid]
     );
 
     return buildResponse(201, {

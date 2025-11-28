@@ -6,15 +6,12 @@
     <title>Day by Day - Your Personal Journal</title>
     <!-- Google Fonts for better typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
 
-    <!-- Add Firebase JS SDK and FirebaseUI libraries -->
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
+    <!-- AWS Amplify for Cognito Authentication -->
+    <script src="https://cdn.jsdelivr.net/npm/aws-amplify@6/dist/aws-amplify.min.js"></script>
 
 </head>
 <body>
@@ -36,15 +33,70 @@
         </div>
         <h2>Welcome Back</h2>
         <p class="subtitle">Sign in to continue your journey</p>
-        <div id="recaptcha-container"></div>
-        <div id="firebaseui-auth-container"></div>
+
+        <!-- Auth Forms Container -->
+        <div id="authFormsContainer">
+            <!-- Sign In Form -->
+            <div id="signInForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="signInEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signInPassword" placeholder="Password" required>
+                </div>
+                <button type="button" class="primary-btn" onclick="signInWithEmail()">Sign In</button>
+                <p class="auth-switch">Don't have an account? <a href="#" onclick="showSignUpForm()">Sign Up</a></p>
+            </div>
+
+            <!-- Sign Up Form (hidden by default) -->
+            <div id="signUpForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <input type="email" id="signUpEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signUpPassword" placeholder="Password (min 8 chars)" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signUpPasswordConfirm" placeholder="Confirm Password" required>
+                </div>
+                <button type="button" class="primary-btn" onclick="signUpWithEmail()">Create Account</button>
+                <p class="auth-switch">Already have an account? <a href="#" onclick="showSignInForm()">Sign In</a></p>
+            </div>
+
+            <!-- Verification Form (hidden by default) -->
+            <div id="verificationForm" class="auth-form" style="display: none;">
+                <p>We sent a verification code to your email</p>
+                <div class="form-group">
+                    <input type="text" id="verificationCode" placeholder="Enter verification code" required>
+                </div>
+                <button type="button" class="primary-btn" onclick="confirmSignUp()">Verify</button>
+                <p class="auth-switch"><a href="#" onclick="resendCode()">Resend code</a></p>
+            </div>
+
+            <!-- Divider -->
+            <div class="auth-divider">
+                <span>or</span>
+            </div>
+
+            <!-- Google Sign In -->
+            <button type="button" class="google-btn" onclick="signInWithGoogle()">
+                <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                    <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+                    <path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                    <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                </svg>
+                Continue with Google
+            </button>
+        </div>
+
         <div id="loader" style="display:none;">
             <div class="spinner"></div>
             <p>Setting up your journal...</p>
         </div>
+        <div id="authError" class="auth-error" style="display: none;"></div>
         <div class="auth-note">
-            <p>Choose your preferred sign-in method: Google, Phone, or Email</p>
-            <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Phone authentication available after Firebase setup</p>
+            <p>Sign in with your email or Google account</p>
         </div>
     </div>
 
@@ -121,25 +173,41 @@
         </form>
     </div>
 
-    <!-- Firebase Auth and Application Logic -->
+    <!-- Cognito Auth and Application Logic -->
     <script type="text/javascript">
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC2YGi_HPjp6edncQMAnSI6XHaRrUWus6o",
-            authDomain: "coffeethoughts-41651.firebaseapp.com",
-            projectId: "coffeethoughts-41651",
-            storageBucket: "coffeethoughts-41651.appspot.com",
-            messagingSenderId: "342424038908",
-            appId: "1:342424038908:web:60bea2fba592d922e79679",
-            measurementId: "G-Y02MZF303B"
+        // Cognito Configuration
+        const cognitoConfig = {
+            userPoolId: 'us-west-1_81HBZnH92',
+            userPoolClientId: '7t77oqaipn9hldtdpesvde3eka',
+            region: 'us-west-1',
+            domain: 'daybyday-journal.auth.us-west-1.amazoncognito.com'
         };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+        // Initialize Amplify
+        const { Amplify } = aws_amplify;
+        const { signIn, signUp, confirmSignUp, resendSignUpCode, signOut, getCurrentUser, fetchAuthSession, signInWithRedirect } = aws_amplify.auth;
 
-        // Set up auth domain for testing
-        auth.settings.appVerificationDisabledForTesting = false;
+        Amplify.configure({
+            Auth: {
+                Cognito: {
+                    userPoolId: cognitoConfig.userPoolId,
+                    userPoolClientId: cognitoConfig.userPoolClientId,
+                    loginWith: {
+                        oauth: {
+                            domain: cognitoConfig.domain,
+                            scopes: ['openid', 'email', 'profile'],
+                            redirectSignIn: [window.location.origin + '/journal/dashboard.html'],
+                            redirectSignOut: [window.location.origin + '/journal/index.html'],
+                            responseType: 'code'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Current user state
+        let currentUser = null;
+        let pendingEmail = null;
 
         // Check if user profile exists
         function hasUserProfile(uid) {
@@ -157,54 +225,15 @@
             return profile ? JSON.parse(profile) : null;
         }
 
-        // FirebaseUI configuration
-        const uiConfig = {
-            callbacks: {
-                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-                    const user = authResult.user;
-                    
-                    // Check if this is a first-time user
-                    if (!hasUserProfile(user.uid)) {
-                        // Show profile setup for first-time users
-                        showProfileSetup(user);
-                        return false;
-                    } else {
-                        // Redirect existing users to dashboard
-                        window.location.href = 'dashboard.html';
-                        return false;
-                    }
-                },
-                
-                uiShown: function() {
-                    document.getElementById('loader').style.display = 'none';
-                }
-            },
-            signInFlow: 'popup',
-            signInOptions: [
-                {
-                    provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                    customParameters: {
-                        prompt: 'select_account'
-                    }
-                },
-                firebase.auth.EmailAuthProvider.PROVIDER_ID
-                // Phone auth temporarily disabled - uncomment below after Firebase console setup
-                // {
-                //     provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-                //     recaptchaParameters: {
-                //         type: 'image',
-                //         size: 'normal',
-                //         badge: 'bottomleft'
-                //     },
-                //     defaultCountry: 'US'
-                // }
-            ],
-            tosUrl: 'terms/index.html',
-            privacyPolicyUrl: 'privacy/index.html'
-        };
-
-        // Initialize the FirebaseUI Widget using Firebase
-        const ui = new firebaseui.auth.AuthUI(firebase.auth());
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('authError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
 
         // Navigation functions
         function showWelcome() {
@@ -217,29 +246,212 @@
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('signInContainer').style.display = 'block';
             document.getElementById('profileSetup').style.display = 'none';
-            
-            // Start FirebaseUI
-            ui.start('#firebaseui-auth-container', uiConfig);
+            showSignInForm();
+        }
+
+        function showSignInForm() {
+            document.getElementById('signInForm').style.display = 'block';
+            document.getElementById('signUpForm').style.display = 'none';
+            document.getElementById('verificationForm').style.display = 'none';
+        }
+
+        function showSignUpForm() {
+            document.getElementById('signInForm').style.display = 'none';
+            document.getElementById('signUpForm').style.display = 'block';
+            document.getElementById('verificationForm').style.display = 'none';
+        }
+
+        function showVerificationForm() {
+            document.getElementById('signInForm').style.display = 'none';
+            document.getElementById('signUpForm').style.display = 'none';
+            document.getElementById('verificationForm').style.display = 'block';
         }
 
         function showProfileSetup(user) {
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('signInContainer').style.display = 'none';
             document.getElementById('profileSetup').style.display = 'block';
-            
-            // Pre-fill display name if available
-            if (user.displayName) {
-                document.getElementById('displayName').value = user.displayName;
+
+            // Pre-fill display name if available from attributes
+            if (user.username) {
+                const emailPart = user.username.includes('@') ? user.username.split('@')[0] : user.username;
+                document.getElementById('displayName').value = emailPart;
+            }
+        }
+
+        // Auth functions
+        async function signInWithEmail() {
+            const email = document.getElementById('signInEmail').value;
+            const password = document.getElementById('signInPassword').value;
+
+            if (!email || !password) {
+                showError('Please enter email and password');
+                return;
+            }
+
+            try {
+                document.getElementById('loader').style.display = 'block';
+                const result = await signIn({ username: email, password });
+
+                // Amplify v6 returns nextStep instead of isSignedIn
+                if (result.isSignedIn || result.nextStep?.signInStep === 'DONE') {
+                    await handleSuccessfulAuth();
+                }
+            } catch (error) {
+                console.error('Sign in error:', error);
+                if (error.name === 'UserNotConfirmedException') {
+                    pendingEmail = email;
+                    showVerificationForm();
+                    showError('Please verify your email first');
+                } else {
+                    showError(error.message || 'Sign in failed');
+                }
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        async function signUpWithEmail() {
+            const email = document.getElementById('signUpEmail').value;
+            const password = document.getElementById('signUpPassword').value;
+            const confirmPassword = document.getElementById('signUpPasswordConfirm').value;
+
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+
+            if (password.length < 8) {
+                showError('Password must be at least 8 characters');
+                return;
+            }
+
+            try {
+                document.getElementById('loader').style.display = 'block';
+                const result = await signUp({
+                    username: email,
+                    password,
+                    options: {
+                        userAttributes: {
+                            email
+                        }
+                    }
+                });
+
+                pendingEmail = email;
+
+                if (result.nextStep.signUpStep === 'CONFIRM_SIGN_UP') {
+                    showVerificationForm();
+                }
+            } catch (error) {
+                console.error('Sign up error:', error);
+                showError(error.message || 'Sign up failed');
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        async function confirmSignUp() {
+            const code = document.getElementById('verificationCode').value;
+
+            if (!code || !pendingEmail) {
+                showError('Please enter the verification code');
+                return;
+            }
+
+            try {
+                document.getElementById('loader').style.display = 'block';
+                await confirmSignUp({
+                    username: pendingEmail,
+                    confirmationCode: code
+                });
+
+                // Auto sign in after confirmation
+                showSignInForm();
+                document.getElementById('signInEmail').value = pendingEmail;
+                showError('Email verified! Please sign in.');
+            } catch (error) {
+                console.error('Confirmation error:', error);
+                showError(error.message || 'Verification failed');
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        async function resendCode() {
+            if (!pendingEmail) {
+                showError('Please enter your email first');
+                return;
+            }
+
+            try {
+                await resendSignUpCode({ username: pendingEmail });
+                showError('Verification code resent!');
+            } catch (error) {
+                console.error('Resend error:', error);
+                showError(error.message || 'Failed to resend code');
+            }
+        }
+
+        async function signInWithGoogle() {
+            try {
+                document.getElementById('loader').style.display = 'block';
+                await signInWithRedirect({ provider: 'Google' });
+            } catch (error) {
+                console.error('Google sign in error:', error);
+                showError(error.message || 'Google sign in failed');
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        async function handleSuccessfulAuth() {
+            try {
+                const user = await getCurrentUser();
+                const session = await fetchAuthSession();
+                const userId = session.tokens?.idToken?.payload?.sub || user.userId;
+
+                currentUser = {
+                    uid: userId,
+                    email: session.tokens?.idToken?.payload?.email || user.username,
+                    username: user.username
+                };
+
+                // Check if this is a first-time user
+                if (!hasUserProfile(currentUser.uid)) {
+                    showProfileSetup(currentUser);
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                console.error('Error getting user:', error);
+                showError('Authentication error');
             }
         }
 
         // Profile form submission
-        document.getElementById('profileForm').addEventListener('submit', function(e) {
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const user = auth.currentUser;
-            if (!user) return;
-            
+
+            if (!currentUser) {
+                try {
+                    const user = await getCurrentUser();
+                    const session = await fetchAuthSession();
+                    currentUser = {
+                        uid: session.tokens?.idToken?.payload?.sub || user.userId,
+                        email: session.tokens?.idToken?.payload?.email || user.username,
+                        username: user.username
+                    };
+                } catch (error) {
+                    showError('Please sign in first');
+                    return;
+                }
+            }
+
             // Collect form data
             const profileData = {
                 displayName: document.getElementById('displayName').value,
@@ -249,13 +461,13 @@
                 favoriteTime: document.getElementById('favoriteTime').value,
                 inspiration: document.getElementById('inspiration').value,
                 createdAt: new Date().toISOString(),
-                uid: user.uid,
-                email: user.email
+                uid: currentUser.uid,
+                email: currentUser.email
             };
-            
+
             // Save profile
-            saveUserProfile(user.uid, profileData);
-            
+            saveUserProfile(currentUser.uid, profileData);
+
             // Show success message and redirect
             showSuccessMessage(() => {
                 window.location.href = 'dashboard.html';
@@ -263,25 +475,37 @@
         });
 
         // Skip profile setup
-        function skipProfile() {
-            const user = auth.currentUser;
-            if (!user) return;
-            
+        async function skipProfile() {
+            if (!currentUser) {
+                try {
+                    const user = await getCurrentUser();
+                    const session = await fetchAuthSession();
+                    currentUser = {
+                        uid: session.tokens?.idToken?.payload?.sub || user.userId,
+                        email: session.tokens?.idToken?.payload?.email || user.username,
+                        username: user.username
+                    };
+                } catch (error) {
+                    showError('Please sign in first');
+                    return;
+                }
+            }
+
             // Save minimal profile
             const profileData = {
-                displayName: user.displayName || user.email.split('@')[0],
+                displayName: currentUser.email?.split('@')[0] || 'User',
                 age: '',
                 journalGoal: '',
                 writingFrequency: '',
                 favoriteTime: '',
                 inspiration: '',
                 createdAt: new Date().toISOString(),
-                uid: user.uid,
-                email: user.email,
+                uid: currentUser.uid,
+                email: currentUser.email,
                 skipped: true
             };
-            
-            saveUserProfile(user.uid, profileData);
+
+            saveUserProfile(currentUser.uid, profileData);
             window.location.href = 'dashboard.html';
         }
 
@@ -296,29 +520,49 @@
                     <p>Let's start your journaling journey...</p>
                 </div>
             `;
-            
+
             setTimeout(callback, 2000);
         }
 
         // Check authentication state on page load
-        auth.onAuthStateChanged(user => {
-            if (user) {
+        async function checkAuthState() {
+            try {
+                const user = await getCurrentUser();
+                const session = await fetchAuthSession();
+                const userId = session.tokens?.idToken?.payload?.sub || user.userId;
+
+                currentUser = {
+                    uid: userId,
+                    email: session.tokens?.idToken?.payload?.email || user.username,
+                    username: user.username
+                };
+
                 // User is signed in
-                if (hasUserProfile(user.uid)) {
+                if (hasUserProfile(currentUser.uid)) {
                     // Existing user - redirect to dashboard
                     window.location.href = 'dashboard.html';
                 } else {
                     // New user - show profile setup
-                    showProfileSetup(user);
+                    showProfileSetup(currentUser);
                 }
+            } catch (error) {
+                // Not signed in - stay on welcome/sign in page
+                console.log('Not authenticated:', error.message);
             }
-        });
-
-        function signOutUser() {
-            auth.signOut().then(() => {
-                showWelcome();
-            });
         }
+
+        async function signOutUser() {
+            try {
+                await signOut();
+                currentUser = null;
+                showWelcome();
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+
+        // Initialize on page load
+        checkAuthState();
     </script>
 
 </body>

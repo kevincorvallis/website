@@ -1,7 +1,7 @@
 {
   "name": "journal-lambda",
-  "version": "2.0.0",
-  "description": "Journal App Lambda - CRUD API for journal entries",
+  "version": "3.0.0",
+  "description": "Journal App Lambda - CRUD API for journal entries with Cognito auth",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -10,7 +10,8 @@
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.0.0",
     "aws-sdk": "^2.1323.0",
-    "firebase-admin": "^12.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "jwks-rsa": "^3.1.0",
     "mysql2": "^3.1.2"
   }
 }

@@ -123,7 +123,115 @@ h2 {
     margin: 0;
 }
 
-/* Firebase UI customizations */
+/* Auth Forms */
+.auth-form {
+    margin: 20px 0;
+}
+
+.auth-form .form-group {
+    margin-bottom: 15px;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.auth-form input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.auth-switch {
+    margin-top: 15px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.auth-switch a {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.auth-switch a:hover {
+    text-decoration: none;
+}
+
+/* Auth Divider */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 25px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.auth-divider span {
+    padding: 0 15px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+/* Google Button */
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.google-btn:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.google-btn svg {
+    flex-shrink: 0;
+}
+
+/* Auth Error */
+.auth-error {
+    background: rgba(244, 67, 54, 0.2);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid rgba(244, 67, 54, 0.4);
+}
+
+/* Firebase UI customizations (legacy - kept for compatibility) */
 .firebaseui-container {
     max-width: 100%;
     background: rgba(255, 255, 255, 0.1) !important;
