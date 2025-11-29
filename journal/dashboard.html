@@ -84,6 +84,13 @@
     </div>
   </div>
 
+  <!-- Placeholder functions while module loads -->
+  <script>
+    window.showProfile = window.hideProfile = window.editProfile =
+    window.signOutUser = window.clearForm = window.deleteEntry = function() {
+      console.log('Please wait, loading...');
+    };
+  </script>
   <script type="module" src="dashboard.js"></script>
 </body>
 </html>

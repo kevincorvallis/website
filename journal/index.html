@@ -23,8 +23,15 @@
         </div>
     </div>
 
+    <!-- Loading Screen (shown while module loads) -->
+    <div class="container" id="loadingScreen">
+        <h2>Day by Day</h2>
+        <p class="subtitle">Loading...</p>
+        <div class="spinner"></div>
+    </div>
+
     <!-- Sign In Container -->
-    <div class="container" id="signInContainer">
+    <div class="container" id="signInContainer" style="display: none;">
         <h2>Welcome Back</h2>
         <p class="subtitle">Sign in to continue your journey</p>
 
@@ -167,6 +174,16 @@
         </form>
     </div>
 
+    <!-- Placeholder functions while module loads -->
+    <script>
+        // These will be replaced by the module once it loads
+        window.signInWithEmail = window.signUpWithEmail = window.signInWithGoogle =
+        window.handleConfirmSignUp = window.resendCode = window.skipProfile =
+        window.showSignIn = window.showSignInForm = window.showSignUpForm = function() {
+            console.log('Please wait, loading...');
+        };
+    </script>
+
     <!-- Cognito Auth and Application Logic -->
     <script type="module">
         // Import AWS Amplify v6 from esm.sh CDN
@@ -231,6 +248,7 @@
 
         // Navigation functions
         function showSignIn() {
+            document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('signInContainer').style.display = 'block';
             document.getElementById('profileSetup').style.display = 'none';
@@ -256,6 +274,7 @@
         }
 
         function showProfileSetup(user) {
+            document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('signInContainer').style.display = 'none';
             document.getElementById('profileSetup').style.display = 'block';
