@@ -3,7 +3,9 @@
 
 // Import AWS Amplify v6 from esm.sh CDN
 import { Amplify } from 'https://esm.sh/aws-amplify@6';
-import { getCurrentUser, fetchAuthSession, signOut } from 'https://esm.sh/aws-amplify@6/auth';
+// Note: signInWithRedirect import is needed to register the OAuth callback listener
+import { getCurrentUser, fetchAuthSession, signOut, signInWithRedirect } from 'https://esm.sh/aws-amplify@6/auth';
+import { Hub } from 'https://esm.sh/aws-amplify@6/utils';
 
 // ============================================
 // CONFIGURATION
@@ -28,7 +30,8 @@ Amplify.configure({
           scopes: ['openid', 'email', 'profile'],
           redirectSignIn: [window.location.origin + '/journal/dashboard.html'],
           redirectSignOut: [window.location.origin + '/journal/index.html'],
-          responseType: 'code'
+          responseType: 'code',
+          providers: ['Google']
         }
       }
     }
@@ -751,6 +754,24 @@ function getPersonalizedMessage(profile) {
 
   return `${greeting}, ${profile?.displayName || 'there'}! ${goalMessage}`;
 }
+
+// ============================================
+// OAUTH CALLBACK HANDLING
+// ============================================
+// Listen for OAuth redirect completion
+Hub.listen('auth', ({ payload }) => {
+  switch (payload.event) {
+    case 'signInWithRedirect':
+      console.log('OAuth sign-in completed successfully');
+      // Re-initialize dashboard after OAuth completes
+      initializeDashboard();
+      break;
+    case 'signInWithRedirect_failure':
+      console.error('OAuth sign-in failed:', payload.data);
+      window.location.href = 'index.html';
+      break;
+  }
+});
 
 // ============================================
 // INITIALIZATION
