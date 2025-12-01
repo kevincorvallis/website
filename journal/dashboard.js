@@ -19,6 +19,16 @@ const cognitoConfig = {
 
 const API_BASE_URL = 'https://1t1byyi4x6.execute-api.us-west-1.amazonaws.com/default/journalLambdafunc';
 
+// Determine the correct redirect URL based on current environment
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const currentOrigin = window.location.origin;
+const redirectSignIn = isLocalhost
+  ? 'http://localhost/journal/dashboard.html'
+  : `${currentOrigin}/journal/dashboard.html`;
+const redirectSignOut = isLocalhost
+  ? 'http://localhost/journal/index.html'
+  : `${currentOrigin}/journal/index.html`;
+
 Amplify.configure({
   Auth: {
     Cognito: {
@@ -28,8 +38,8 @@ Amplify.configure({
         oauth: {
           domain: cognitoConfig.domain,
           scopes: ['openid', 'email', 'profile'],
-          redirectSignIn: [window.location.origin + '/journal/dashboard.html'],
-          redirectSignOut: [window.location.origin + '/journal/index.html'],
+          redirectSignIn: [redirectSignIn],
+          redirectSignOut: [redirectSignOut],
           responseType: 'code',
           providers: ['Google']
         }
