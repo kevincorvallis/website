@@ -47,7 +47,12 @@
       "Bash(export FN=\"journalLambdafunc\":*)",
       "Bash(export ARN=\"arn:aws:execute-api:us-west-1:965819273626:1t1byyi4x6/*/GET/journalLambdafunc/entries\")",
       "Bash(aws lambda list-aliases:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(aws s3 cp:*)",
+      "Bash(aws s3 ls:*)",
+      "Bash(aws cloudfront list-distributions:*)",
+      "Bash(aws s3 sync:*)",
+      "Bash(aws cloudfront create-invalidation:*)"
     ],
     "deny": [],
     "ask": []

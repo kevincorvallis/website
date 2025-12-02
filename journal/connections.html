@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day by Day - Connections</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="connections.css">
+</head>
+<body>
+  <div class="connections-container">
+    <!-- Header -->
+    <header class="connections-header">
+      <div class="header-content">
+        <a href="dashboard.html" class="back-link">&larr; Back to Journal</a>
+        <h1>Connections</h1>
+        <p class="subtitle">Connect with friends and family</p>
+      </div>
+      <div class="header-actions">
+        <button onclick="signOutUser()" class="icon-btn" title="Sign out">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.59L17 17L22 12L17 7ZM4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <h2>Find People</h2>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search by name or email..." autocomplete="off">
+        <button id="searchBtn" class="primary-btn">Search</button>
+      </div>
+      <div id="searchResults" class="search-results"></div>
+      <div class="invite-section">
+        <p>Can't find someone?</p>
+        <button id="inviteBtn" class="secondary-btn">Invite by Email</button>
+      </div>
+    </div>
+
+    <!-- Pending Requests Section -->
+    <div class="pending-section">
+      <h2>Pending Requests <span id="pendingCount" class="badge">0</span></h2>
+      <div id="pendingList" class="connections-list">
+        <p class="empty-state">No pending requests</p>
+      </div>
+    </div>
+
+    <!-- My Connections Section -->
+    <div class="my-connections-section">
+      <h2>My Connections <span id="connectionsCount" class="badge">0</span></h2>
+      <div id="connectionsList" class="connections-list">
+        <p class="empty-state">No connections yet. Search for people above!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Placeholder functions while module loads -->
+  <script>
+    window.signOutUser = function() {
+      console.log('Please wait, loading...');
+    };
+  </script>
+  <script type="module" src="connections.js"></script>
+</body>
+</html>

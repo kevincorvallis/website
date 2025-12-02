@@ -15,7 +15,13 @@ const PATHS = {
   entries: '/journalLambdafunc/entries',
   entry: '/journalLambdafunc/entry',
   sync: '/journalLambdafunc/sync',
-  user: '/journalLambdafunc/user'
+  user: '/journalLambdafunc/user',
+  // User & Connections
+  usersSearch: '/journalLambdafunc/users/search',
+  usersProfile: '/journalLambdafunc/users/profile',
+  connections: '/journalLambdafunc/connections',
+  connectionsPending: '/journalLambdafunc/connections/pending',
+  connectionsRequest: '/journalLambdafunc/connections/request'
 };
 
 // Cognito Configuration
@@ -511,6 +517,386 @@ async function addPrompt(event, conn) {
 }
 
 // ============================================
+// USER HANDLERS
+// ============================================
+
+// Ensure user exists in users table (upsert)
+async function ensureUser(conn, uid, email, displayName) {
+  try {
+    await conn.execute(
+      `INSERT INTO users (firebase_uid, email, username)
+       VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         email = COALESCE(VALUES(email), email),
+         username = COALESCE(VALUES(username), username)`,
+      [uid, email || null, displayName || null]
+    );
+  } catch (error) {
+    console.error('Error ensuring user:', error);
+  }
+}
+
+// GET /users/search - Search users by display name
+async function searchUsers(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const query = event.queryStringParameters?.q;
+  if (!query || query.length < 2) {
+    return errorResponse(400, 'Search query must be at least 2 characters');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      `SELECT user_id, firebase_uid, username, email
+       FROM users
+       WHERE firebase_uid != ?
+         AND (username LIKE ? OR email LIKE ?)
+       LIMIT 20`,
+      [uid, `%${query}%`, `%${query}%`]
+    );
+
+    // Return sanitized results (no sensitive data)
+    const users = rows.map(u => ({
+      user_id: u.user_id,
+      uid: u.firebase_uid,
+      displayName: u.username || u.email?.split('@')[0] || 'User'
+    }));
+
+    return buildResponse(200, { users });
+  } catch (error) {
+    console.error('Error searching users:', error);
+    return errorResponse(500, 'Failed to search users');
+  }
+}
+
+// GET /users/profile - Get current user's profile
+async function getUserProfile(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      'SELECT user_id, firebase_uid, username, email, first_name, last_name, created_at FROM users WHERE firebase_uid = ?',
+      [uid]
+    );
+
+    if (rows.length === 0) {
+      return buildResponse(200, { profile: null });
+    }
+
+    return buildResponse(200, { profile: rows[0] });
+  } catch (error) {
+    console.error('Error getting profile:', error);
+    return errorResponse(500, 'Failed to get profile');
+  }
+}
+
+// PUT /users/profile - Update display name
+async function updateUserProfile(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { displayName, email } = body;
+
+  if (displayName && (typeof displayName !== 'string' || displayName.length > 100)) {
+    return errorResponse(400, 'Display name must be under 100 characters');
+  }
+
+  try {
+    await ensureUser(conn, uid, email, displayName);
+
+    const [rows] = await conn.execute(
+      'SELECT user_id, firebase_uid, username, email FROM users WHERE firebase_uid = ?',
+      [uid]
+    );
+
+    return buildResponse(200, {
+      message: 'Profile updated',
+      profile: rows[0]
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return errorResponse(500, 'Failed to update profile');
+  }
+}
+
+// ============================================
+// CONNECTION HANDLERS
+// ============================================
+
+// POST /connections/request - Send connection request
+async function requestConnection(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { targetUid } = body;
+  if (!targetUid) {
+    return errorResponse(400, 'Target user ID required');
+  }
+
+  if (targetUid === uid) {
+    return errorResponse(400, 'Cannot connect with yourself');
+  }
+
+  try {
+    // Check if target user exists
+    const [targetUser] = await conn.execute(
+      'SELECT firebase_uid FROM users WHERE firebase_uid = ?',
+      [targetUid]
+    );
+
+    if (targetUser.length === 0) {
+      return errorResponse(404, 'User not found');
+    }
+
+    // Check for existing connection (either direction)
+    const [existing] = await conn.execute(
+      `SELECT connection_id, status, requester_uid FROM connections
+       WHERE (requester_uid = ? AND target_uid = ?)
+          OR (requester_uid = ? AND target_uid = ?)`,
+      [uid, targetUid, targetUid, uid]
+    );
+
+    if (existing.length > 0) {
+      const existingConn = existing[0];
+      if (existingConn.status === 'accepted') {
+        return errorResponse(400, 'Already connected');
+      }
+      if (existingConn.status === 'pending') {
+        // If they sent us a request, auto-accept
+        if (existingConn.requester_uid === targetUid) {
+          await conn.execute(
+            'UPDATE connections SET status = "accepted" WHERE connection_id = ?',
+            [existingConn.connection_id]
+          );
+          return buildResponse(200, { message: 'Connection accepted', status: 'accepted' });
+        }
+        return errorResponse(400, 'Connection request already pending');
+      }
+      if (existingConn.status === 'blocked') {
+        return errorResponse(403, 'Cannot connect with this user');
+      }
+    }
+
+    // Create new connection request
+    const [result] = await conn.execute(
+      'INSERT INTO connections (requester_uid, target_uid, status) VALUES (?, ?, "pending")',
+      [uid, targetUid]
+    );
+
+    return buildResponse(201, {
+      message: 'Connection request sent',
+      connection_id: result.insertId
+    });
+  } catch (error) {
+    console.error('Error requesting connection:', error);
+    return errorResponse(500, 'Failed to send connection request');
+  }
+}
+
+// GET /connections - List accepted connections
+async function getConnections(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      `SELECT c.connection_id, c.created_at,
+              CASE WHEN c.requester_uid = ? THEN c.target_uid ELSE c.requester_uid END as connected_uid
+       FROM connections c
+       WHERE (c.requester_uid = ? OR c.target_uid = ?) AND c.status = 'accepted'`,
+      [uid, uid, uid]
+    );
+
+    // Get user details for each connection
+    const connections = [];
+    for (const row of rows) {
+      const [userRows] = await conn.execute(
+        'SELECT user_id, username, email FROM users WHERE firebase_uid = ?',
+        [row.connected_uid]
+      );
+      if (userRows.length > 0) {
+        connections.push({
+          connection_id: row.connection_id,
+          uid: row.connected_uid,
+          displayName: userRows[0].username || userRows[0].email?.split('@')[0] || 'User',
+          connected_at: row.created_at
+        });
+      }
+    }
+
+    return buildResponse(200, { connections });
+  } catch (error) {
+    console.error('Error getting connections:', error);
+    return errorResponse(500, 'Failed to get connections');
+  }
+}
+
+// GET /connections/pending - List pending incoming requests
+async function getPendingConnections(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      `SELECT c.connection_id, c.requester_uid, c.created_at
+       FROM connections c
+       WHERE c.target_uid = ? AND c.status = 'pending'
+       ORDER BY c.created_at DESC`,
+      [uid]
+    );
+
+    // Get user details for each requester
+    const pending = [];
+    for (const row of rows) {
+      const [userRows] = await conn.execute(
+        'SELECT user_id, username, email FROM users WHERE firebase_uid = ?',
+        [row.requester_uid]
+      );
+      if (userRows.length > 0) {
+        pending.push({
+          connection_id: row.connection_id,
+          uid: row.requester_uid,
+          displayName: userRows[0].username || userRows[0].email?.split('@')[0] || 'User',
+          requested_at: row.created_at
+        });
+      }
+    }
+
+    return buildResponse(200, { pending, count: pending.length });
+  } catch (error) {
+    console.error('Error getting pending connections:', error);
+    return errorResponse(500, 'Failed to get pending connections');
+  }
+}
+
+// POST /connections/{id}/accept - Accept connection request
+async function acceptConnection(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const connectionId = event.pathParameters?.id;
+  if (!connectionId) {
+    return errorResponse(400, 'Connection ID required');
+  }
+
+  try {
+    // Verify this is a pending request to the current user
+    const [rows] = await conn.execute(
+      'SELECT * FROM connections WHERE connection_id = ? AND target_uid = ? AND status = "pending"',
+      [connectionId, uid]
+    );
+
+    if (rows.length === 0) {
+      return errorResponse(404, 'Connection request not found');
+    }
+
+    await conn.execute(
+      'UPDATE connections SET status = "accepted" WHERE connection_id = ?',
+      [connectionId]
+    );
+
+    return buildResponse(200, { message: 'Connection accepted' });
+  } catch (error) {
+    console.error('Error accepting connection:', error);
+    return errorResponse(500, 'Failed to accept connection');
+  }
+}
+
+// POST /connections/{id}/decline - Decline connection request
+async function declineConnection(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const connectionId = event.pathParameters?.id;
+  if (!connectionId) {
+    return errorResponse(400, 'Connection ID required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      'SELECT * FROM connections WHERE connection_id = ? AND target_uid = ? AND status = "pending"',
+      [connectionId, uid]
+    );
+
+    if (rows.length === 0) {
+      return errorResponse(404, 'Connection request not found');
+    }
+
+    await conn.execute(
+      'UPDATE connections SET status = "declined" WHERE connection_id = ?',
+      [connectionId]
+    );
+
+    return buildResponse(200, { message: 'Connection declined' });
+  } catch (error) {
+    console.error('Error declining connection:', error);
+    return errorResponse(500, 'Failed to decline connection');
+  }
+}
+
+// DELETE /connections/{id} - Remove connection
+async function removeConnection(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const connectionId = event.pathParameters?.id;
+  if (!connectionId) {
+    return errorResponse(400, 'Connection ID required');
+  }
+
+  try {
+    // Verify user is part of this connection
+    const [result] = await conn.execute(
+      'DELETE FROM connections WHERE connection_id = ? AND (requester_uid = ? OR target_uid = ?)',
+      [connectionId, uid, uid]
+    );
+
+    if (result.affectedRows === 0) {
+      return errorResponse(404, 'Connection not found');
+    }
+
+    return buildResponse(200, { message: 'Connection removed' });
+  } catch (error) {
+    console.error('Error removing connection:', error);
+    return errorResponse(500, 'Failed to remove connection');
+  }
+}
+
+// ============================================
 // SCHEMA INITIALIZATION
 // ============================================
 async function initializeSchema(conn) {
@@ -550,6 +936,18 @@ async function initializeSchema(conn) {
       firebase_uid VARCHAR(128) NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       INDEX idx_prompt_user (firebase_uid)
+    );
+
+    CREATE TABLE IF NOT EXISTS connections (
+      connection_id INT AUTO_INCREMENT PRIMARY KEY,
+      requester_uid VARCHAR(128) NOT NULL,
+      target_uid VARCHAR(128) NOT NULL,
+      status ENUM('pending', 'accepted', 'declined', 'blocked') DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      UNIQUE KEY unique_connection (requester_uid, target_uid),
+      INDEX idx_target (target_uid, status),
+      INDEX idx_requester (requester_uid, status)
     );
   `;
 
@@ -640,6 +1038,38 @@ exports.handler = async (event, context) => {
       // Sync
       case method === 'POST' && path === PATHS.sync:
         return await syncEntries(event, conn);
+
+      // User endpoints
+      case method === 'GET' && path === PATHS.usersSearch:
+        return await searchUsers(event, conn);
+
+      case method === 'GET' && path === PATHS.usersProfile:
+        return await getUserProfile(event, conn);
+
+      case method === 'PUT' && path === PATHS.usersProfile:
+        return await updateUserProfile(event, conn);
+
+      // Connection endpoints
+      case method === 'GET' && path === PATHS.connections:
+        return await getConnections(event, conn);
+
+      case method === 'GET' && path === PATHS.connectionsPending:
+        return await getPendingConnections(event, conn);
+
+      case method === 'POST' && path === PATHS.connectionsRequest:
+        return await requestConnection(event, conn);
+
+      case method === 'POST' && path.match(/\/journalLambdafunc\/connections\/\d+\/accept$/):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await acceptConnection(event, conn);
+
+      case method === 'POST' && path.match(/\/journalLambdafunc\/connections\/\d+\/decline$/):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await declineConnection(event, conn);
+
+      case method === 'DELETE' && path.match(/\/journalLambdafunc\/connections\/\d+$/):
+        event.pathParameters = { id: path.split('/').pop() };
+        return await removeConnection(event, conn);
 
       // Not found
       default:

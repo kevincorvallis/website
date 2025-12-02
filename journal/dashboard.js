@@ -873,6 +873,9 @@ async function initializeDashboard() {
   loadEntries(currentUser.uid);
   displayStats(currentUser.uid);
 
+  // Fetch pending connections count for badge
+  fetchPendingConnectionsCount();
+
   // Set up periodic sync (every 5 minutes if online)
   syncIntervalId = setInterval(async () => {
     if (syncManager && syncManager.isOnline() && !syncManager.isSyncing) {
@@ -882,6 +885,27 @@ async function initializeDashboard() {
       }
     }
   }, 5 * 60 * 1000);
+}
+
+async function fetchPendingConnectionsCount() {
+  try {
+    const token = await api.getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/connections/pending`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const badge = document.getElementById('pendingBadge');
+      if (badge && data.count > 0) {
+        badge.textContent = data.count;
+        badge.style.display = 'flex';
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch pending connections:', error);
+  }
 }
 
 async function signOutUser() {

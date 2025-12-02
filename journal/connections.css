@@ -1,0 +1,313 @@
+/* connections.css - Styles for Connections Page */
+
+.connections-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* Header */
+.connections-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.header-content h1 {
+  margin: 10px 0 5px 0;
+  font-size: 2rem;
+  color: #333;
+}
+
+.back-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  color: #333;
+}
+
+.subtitle {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  color: #666;
+  transition: background 0.2s;
+}
+
+.icon-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Search Section */
+.search-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.search-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.search-box {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #4a90a4;
+}
+
+.search-results {
+  margin-top: 16px;
+}
+
+.invite-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.invite-section p {
+  margin: 0;
+  color: #666;
+}
+
+/* Buttons */
+.primary-btn {
+  background: #4a90a4;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.primary-btn:hover {
+  background: #3d7a8c;
+}
+
+.primary-btn:disabled {
+  background: #9dc5d1;
+  cursor: not-allowed;
+}
+
+.secondary-btn {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondary-btn:hover {
+  background: #eee;
+}
+
+/* Sections */
+.pending-section,
+.my-connections-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.pending-section h2,
+.my-connections-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Badge */
+.badge {
+  background: #4a90a4;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: normal;
+}
+
+/* Connection Cards */
+.connections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-card,
+.connection-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.user-card:hover,
+.connection-card:hover {
+  background: #f0f0f0;
+}
+
+.connection-card.pending {
+  background: #fff8e6;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 1rem;
+}
+
+.request-time,
+.connected-time {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons .primary-btn,
+.action-buttons .secondary-btn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.connect-btn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.remove-btn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  color: #c53030;
+  border-color: #c53030;
+}
+
+.remove-btn:hover {
+  background: #fff5f5;
+}
+
+/* Empty States & Messages */
+.empty-state {
+  color: #888;
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
+.hint {
+  color: #888;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 10px;
+}
+
+.loading {
+  color: #666;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-message {
+  color: #c53030;
+  background: #fff5f5;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.success-message {
+  color: #2f855a;
+  background: #f0fff4;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .connections-container {
+    padding: 16px;
+  }
+
+  .search-box {
+    flex-direction: column;
+  }
+
+  .connection-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .action-buttons {
+    width: 100%;
+  }
+
+  .action-buttons button {
+    flex: 1;
+  }
+
+  .invite-section {
+    flex-direction: column;
+    text-align: center;
+  }
+}
