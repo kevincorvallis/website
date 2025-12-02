@@ -41,7 +41,13 @@
       "Bash(aws lambda invoke:*)",
       "Bash(aws lambda add-permission:*)",
       "Bash(aws lambda get-policy:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(jq:*)",
+      "Bash(echo:*)",
+      "Bash(export FN=\"journalLambdafunc\":*)",
+      "Bash(export ARN=\"arn:aws:execute-api:us-west-1:965819273626:1t1byyi4x6/*/GET/journalLambdafunc/entries\")",
+      "Bash(aws lambda list-aliases:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

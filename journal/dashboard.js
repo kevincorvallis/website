@@ -762,7 +762,13 @@ function getPersonalizedMessage(profile) {
 
   const goalMessage = messages[profile?.journalGoal] || 'What\'s on your mind today?';
 
-  return `${greeting}, ${profile?.displayName || 'there'}! ${goalMessage}`;
+  // Use Google name if available, fallback to profile displayName
+  const name = profile?.displayName ||
+               currentUser?.givenName ||
+               currentUser?.name?.split(' ')[0] ||
+               'there';
+
+  return `${greeting}, ${name}! ${goalMessage}`;
 }
 
 // ============================================
@@ -802,7 +808,9 @@ async function initializeDashboard() {
     currentUser = {
       uid: userId,
       email: session.tokens?.idToken?.payload?.email || user.username,
-      username: user.username
+      username: user.username,
+      name: session.tokens?.idToken?.payload?.name,
+      givenName: session.tokens?.idToken?.payload?.given_name
     };
   } catch (error) {
     console.log('Not authenticated, redirecting to login:', error.message);
@@ -815,8 +823,12 @@ async function initializeDashboard() {
 
   const profile = getUserProfile(currentUser.uid);
 
-  // Update welcome message
-  const displayName = profile?.displayName || currentUser.email?.split('@')[0] || 'there';
+  // Update welcome message - prefer Google name over email prefix
+  const displayName = profile?.displayName ||
+                      currentUser.givenName ||
+                      currentUser.name?.split(' ')[0] ||
+                      currentUser.email?.split('@')[0] ||
+                      'there';
   document.getElementById('welcome').textContent = `Welcome back, ${displayName}!`;
 
   // Set personalized message
