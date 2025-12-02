@@ -1,5 +1,4 @@
 const mysql = require('mysql2/promise');
-const AWS = require('aws-sdk');
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
 
@@ -64,26 +63,11 @@ function verifyCognitoToken(token) {
 // DATABASE CONNECTION
 // ============================================
 async function getConnection() {
-  const signer = new AWS.RDS.Signer({
-    region: process.env.AWS_REGION || 'us-west-1',
-    hostname: process.env.RDS_HOSTNAME || 'journalproxy.proxy-cwzjhkgs6o1v.us-west-1.rds.amazonaws.com',
-    port: 3306,
-    username: process.env.RDS_USERNAME || 'klee'
-  });
-
-  const token = signer.getAuthToken({
-    username: process.env.RDS_USERNAME || 'klee'
-  });
-
   return mysql.createConnection({
-    host: process.env.RDS_HOSTNAME || 'journalproxy.proxy-cwzjhkgs6o1v.us-west-1.rds.amazonaws.com',
-    user: process.env.RDS_USERNAME || 'klee',
-    database: mysqlDatabase,
-    password: token,
-    ssl: { rejectUnauthorized: false },
-    authPlugins: {
-      mysql_clear_password: () => () => Buffer.from(token + '\0')
-    }
+    host: process.env.RDS_HOSTNAME,
+    user: process.env.RDS_USERNAME,
+    password: process.env.RDS_PASSWORD,
+    database: mysqlDatabase
   });
 }
 
@@ -521,6 +505,80 @@ async function addPrompt(event, conn) {
 }
 
 // ============================================
+// SCHEMA INITIALIZATION
+// ============================================
+async function initializeSchema(conn) {
+  const schema = `
+    CREATE TABLE IF NOT EXISTS users (
+      user_id INT AUTO_INCREMENT PRIMARY KEY,
+      firebase_uid VARCHAR(128) UNIQUE,
+      username VARCHAR(100),
+      email VARCHAR(255),
+      first_name VARCHAR(100),
+      last_name VARCHAR(100),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_firebase_uid (firebase_uid)
+    );
+
+    CREATE TABLE IF NOT EXISTS journal_entries (
+      entry_id INT AUTO_INCREMENT PRIMARY KEY,
+      firebase_uid VARCHAR(128) NOT NULL,
+      date DATETIME NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      text TEXT NOT NULL,
+      prompt_id INT NULL,
+      client_id VARCHAR(50) NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      is_deleted TINYINT(1) DEFAULT 0,
+      INDEX idx_user_entries (firebase_uid, date),
+      INDEX idx_sync (firebase_uid, updated_at),
+      INDEX idx_client_id (firebase_uid, client_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS prompts (
+      prompt_id INT AUTO_INCREMENT PRIMARY KEY,
+      prompt TEXT NOT NULL,
+      user_id INT NULL,
+      firebase_uid VARCHAR(128) NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_prompt_user (firebase_uid)
+    );
+  `;
+
+  // Execute each statement
+  const statements = schema.split(';').filter(s => s.trim());
+  for (const stmt of statements) {
+    if (stmt.trim()) {
+      await conn.execute(stmt);
+    }
+  }
+
+  // Check if prompts table is empty, if so add sample prompts
+  const [rows] = await conn.execute('SELECT COUNT(*) as count FROM prompts');
+  if (rows[0].count === 0) {
+    const samplePrompts = [
+      'What are three things you are grateful for today?',
+      'Describe a challenge you faced recently and how you handled it.',
+      'What is one thing you learned today?',
+      'Write about a person who has positively influenced your life.',
+      'What are your goals for this week?',
+      'Describe your perfect day.',
+      'What advice would you give to your younger self?',
+      'Write about a moment that made you smile today.',
+      'What habits do you want to develop?',
+      'Reflect on a recent accomplishment, no matter how small.'
+    ];
+    for (const prompt of samplePrompts) {
+      await conn.execute('INSERT INTO prompts (prompt) VALUES (?)', [prompt]);
+    }
+  }
+
+  return buildResponse(200, { message: 'Schema initialized successfully' });
+}
+
+// ============================================
 // MAIN HANDLER
 // ============================================
 exports.handler = async (event, context) => {
@@ -540,6 +598,10 @@ exports.handler = async (event, context) => {
 
     // Route handling
     switch (true) {
+      // Schema initialization (one-time setup)
+      case method === 'POST' && path === '/journalLambdafunc/init-schema':
+        return await initializeSchema(conn);
+
       // Health check
       case method === 'GET' && path === PATHS.health:
         return buildResponse(200, { status: 'healthy', timestamp: new Date().toISOString() });

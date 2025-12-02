@@ -66,12 +66,44 @@
 
             <!-- Verification Form (hidden by default) -->
             <div id="verificationForm" class="auth-form" style="display: none;">
-                <p>We sent a verification code to your email</p>
-                <div class="form-group">
-                    <input type="text" id="verificationCode" placeholder="Enter verification code" required>
+                <div class="verification-header">
+                    <div class="verification-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 8L10.89 13.26C11.2187 13.4793 11.6049 13.5963 12 13.5963C12.3951 13.5963 12.7813 13.4793 13.11 13.26L21 8M5 19H19C19.5304 19 20.0391 18.7893 20.4142 18.4142C20.7893 18.0391 21 17.5304 21 17V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V17C3 17.5304 3.21071 18.0391 3.58579 18.4142C3.96086 18.7893 4.46957 19 5 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Check your email</h3>
+                    <p class="verification-email">We sent a code to <strong id="verificationEmailDisplay"></strong></p>
                 </div>
-                <button type="button" class="primary-btn" onclick="handleConfirmSignUp()">Verify</button>
-                <p class="auth-switch"><a href="#" onclick="resendCode()">Resend code</a></p>
+                <div class="code-input-container">
+                    <input type="text" maxlength="1" class="code-digit" data-index="0" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+                    <input type="text" maxlength="1" class="code-digit" data-index="1" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit" data-index="2" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit" data-index="3" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit" data-index="4" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit" data-index="5" inputmode="numeric" pattern="[0-9]">
+                </div>
+                <input type="hidden" id="verificationCode">
+                <button type="button" class="primary-btn" id="verifyBtn" onclick="handleConfirmSignUp()" disabled>Verify Email</button>
+                <div class="resend-section">
+                    <p id="resendText">Didn't receive the code? <a href="#" id="resendLink" onclick="resendCode()">Resend</a></p>
+                    <p id="resendTimer" style="display: none;">Resend code in <span id="timerCount">60</span>s</p>
+                </div>
+            </div>
+
+            <!-- Verification Success (hidden by default) -->
+            <div id="verificationSuccess" class="auth-form" style="display: none;">
+                <div class="verification-success">
+                    <div class="success-checkmark">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#4CAF50" stroke-width="2"/>
+                            <path d="M8 12L11 15L16 9" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Email Verified!</h3>
+                    <p>Your account has been verified successfully.</p>
+                    <p class="redirect-text">Redirecting to sign in...</p>
+                </div>
             </div>
 
             <!-- Divider -->
@@ -198,6 +230,16 @@
             domain: 'daybyday-journal.auth.us-west-1.amazoncognito.com'
         };
 
+        // Determine the correct redirect URL based on current environment
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const currentOrigin = window.location.origin;
+        const redirectSignIn = isLocalhost
+            ? 'http://localhost/journal/dashboard.html'
+            : `${currentOrigin}/journal/dashboard.html`;
+        const redirectSignOut = isLocalhost
+            ? 'http://localhost/journal/index.html'
+            : `${currentOrigin}/journal/index.html`;
+
         Amplify.configure({
             Auth: {
                 Cognito: {
@@ -207,8 +249,8 @@
                         oauth: {
                             domain: cognitoConfig.domain,
                             scopes: ['openid', 'email', 'profile'],
-                            redirectSignIn: [window.location.origin + '/journal/dashboard.html'],
-                            redirectSignOut: [window.location.origin + '/journal/index.html'],
+                            redirectSignIn: [redirectSignIn],
+                            redirectSignOut: [redirectSignOut],
                             responseType: 'code',
                             providers: ['Google']
                         }
@@ -272,6 +314,125 @@
             document.getElementById('signInForm').style.display = 'none';
             document.getElementById('signUpForm').style.display = 'none';
             document.getElementById('verificationForm').style.display = 'block';
+            document.getElementById('verificationSuccess').style.display = 'none';
+
+            // Display the email the code was sent to
+            if (pendingEmail) {
+                document.getElementById('verificationEmailDisplay').textContent = pendingEmail;
+            }
+
+            // Clear and focus first input
+            const codeInputs = document.querySelectorAll('.code-digit');
+            codeInputs.forEach(input => input.value = '');
+            codeInputs[0].focus();
+            document.getElementById('verifyBtn').disabled = true;
+
+            // Reset resend timer display
+            document.getElementById('resendText').style.display = 'block';
+            document.getElementById('resendTimer').style.display = 'none';
+        }
+
+        // Setup code input handlers
+        function setupCodeInputs() {
+            const codeInputs = document.querySelectorAll('.code-digit');
+
+            codeInputs.forEach((input, index) => {
+                // Handle input
+                input.addEventListener('input', (e) => {
+                    const value = e.target.value;
+
+                    // Only allow numbers
+                    if (!/^\d*$/.test(value)) {
+                        e.target.value = '';
+                        return;
+                    }
+
+                    // Auto-advance to next input
+                    if (value && index < 5) {
+                        codeInputs[index + 1].focus();
+                    }
+
+                    // Update hidden input and check if complete
+                    updateVerificationCode();
+                });
+
+                // Handle backspace
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                });
+
+                // Handle paste
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+
+                    pastedData.split('').forEach((char, i) => {
+                        if (codeInputs[i]) {
+                            codeInputs[i].value = char;
+                        }
+                    });
+
+                    // Focus appropriate input
+                    const nextIndex = Math.min(pastedData.length, 5);
+                    codeInputs[nextIndex].focus();
+
+                    updateVerificationCode();
+                });
+            });
+        }
+
+        function updateVerificationCode() {
+            const codeInputs = document.querySelectorAll('.code-digit');
+            const code = Array.from(codeInputs).map(input => input.value).join('');
+            document.getElementById('verificationCode').value = code;
+
+            // Enable/disable verify button
+            const verifyBtn = document.getElementById('verifyBtn');
+            verifyBtn.disabled = code.length !== 6;
+
+            // Auto-submit when complete
+            if (code.length === 6) {
+                handleConfirmSignUp();
+            }
+        }
+
+        let resendTimerId = null;
+
+        function startResendTimer() {
+            document.getElementById('resendText').style.display = 'none';
+            document.getElementById('resendTimer').style.display = 'block';
+
+            let seconds = 60;
+            document.getElementById('timerCount').textContent = seconds;
+
+            if (resendTimerId) clearInterval(resendTimerId);
+
+            resendTimerId = setInterval(() => {
+                seconds--;
+                document.getElementById('timerCount').textContent = seconds;
+
+                if (seconds <= 0) {
+                    clearInterval(resendTimerId);
+                    document.getElementById('resendText').style.display = 'block';
+                    document.getElementById('resendTimer').style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function showVerificationSuccess() {
+            document.getElementById('verificationForm').style.display = 'none';
+            document.getElementById('verificationSuccess').style.display = 'block';
+
+            // Redirect to sign in after animation
+            setTimeout(() => {
+                showSignInForm();
+                document.getElementById('verificationSuccess').style.display = 'none';
+                if (pendingEmail) {
+                    document.getElementById('signInEmail').value = pendingEmail;
+                }
+            }, 2000);
         }
 
         function showProfileSetup(user) {
@@ -280,11 +441,13 @@
             document.getElementById('signInContainer').style.display = 'none';
             document.getElementById('profileSetup').style.display = 'block';
 
-            // Pre-fill display name if available from attributes
-            if (user.username) {
-                const emailPart = user.username.includes('@') ? user.username.split('@')[0] : user.username;
-                document.getElementById('displayName').value = emailPart;
-            }
+            // Pre-fill display name: prioritize Google name > given_name > email prefix
+            const displayName = user.name ||
+                               user.givenName ||
+                               (user.email?.split('@')[0]) ||
+                               (user.username?.includes('@') ? user.username.split('@')[0] : user.username) ||
+                               '';
+            document.getElementById('displayName').value = displayName;
         }
 
         // Auth functions
@@ -367,27 +530,42 @@
         async function handleConfirmSignUp() {
             const code = document.getElementById('verificationCode').value;
 
-            if (!code || !pendingEmail) {
-                showError('Please enter the verification code');
+            if (!code || code.length !== 6 || !pendingEmail) {
+                showError('Please enter the 6-digit verification code');
                 return;
             }
 
             try {
-                document.getElementById('loader').style.display = 'block';
+                document.getElementById('verifyBtn').disabled = true;
+                document.getElementById('verifyBtn').textContent = 'Verifying...';
+
                 await confirmSignUp({
                     username: pendingEmail,
                     confirmationCode: code
                 });
 
-                // Auto sign in after confirmation
-                showSignInForm();
-                document.getElementById('signInEmail').value = pendingEmail;
-                showError('Email verified! Please sign in.');
+                // Show success animation then redirect
+                showVerificationSuccess();
             } catch (error) {
                 console.error('Confirmation error:', error);
-                showError(error.message || 'Verification failed');
+
+                // Clear inputs on error
+                const codeInputs = document.querySelectorAll('.code-digit');
+                codeInputs.forEach(input => input.value = '');
+                codeInputs[0].focus();
+                document.getElementById('verificationCode').value = '';
+
+                // Show specific error messages
+                if (error.name === 'CodeMismatchException') {
+                    showError('Invalid code. Please check and try again.');
+                } else if (error.name === 'ExpiredCodeException') {
+                    showError('Code expired. Please request a new one.');
+                } else {
+                    showError(error.message || 'Verification failed');
+                }
             } finally {
-                document.getElementById('loader').style.display = 'none';
+                document.getElementById('verifyBtn').disabled = false;
+                document.getElementById('verifyBtn').textContent = 'Verify Email';
             }
         }
 
@@ -399,7 +577,17 @@
 
             try {
                 await resendSignUpCode({ username: pendingEmail });
-                showError('Verification code resent!');
+
+                // Start cooldown timer
+                startResendTimer();
+
+                // Clear existing code inputs
+                const codeInputs = document.querySelectorAll('.code-digit');
+                codeInputs.forEach(input => input.value = '');
+                codeInputs[0].focus();
+                document.getElementById('verificationCode').value = '';
+                document.getElementById('verifyBtn').disabled = true;
+
             } catch (error) {
                 console.error('Resend error:', error);
                 showError(error.message || 'Failed to resend code');
@@ -426,7 +614,9 @@
                 currentUser = {
                     uid: userId,
                     email: session.tokens?.idToken?.payload?.email || user.username,
-                    username: user.username
+                    username: user.username,
+                    name: session.tokens?.idToken?.payload?.name,
+                    givenName: session.tokens?.idToken?.payload?.given_name
                 };
 
                 // Check if this is a first-time user
@@ -452,7 +642,9 @@
                     currentUser = {
                         uid: session.tokens?.idToken?.payload?.sub || user.userId,
                         email: session.tokens?.idToken?.payload?.email || user.username,
-                        username: user.username
+                        username: user.username,
+                        name: session.tokens?.idToken?.payload?.name,
+                        givenName: session.tokens?.idToken?.payload?.given_name
                     };
                 } catch (error) {
                     showError('Please sign in first');
@@ -491,7 +683,9 @@
                     currentUser = {
                         uid: session.tokens?.idToken?.payload?.sub || user.userId,
                         email: session.tokens?.idToken?.payload?.email || user.username,
-                        username: user.username
+                        username: user.username,
+                        name: session.tokens?.idToken?.payload?.name,
+                        givenName: session.tokens?.idToken?.payload?.given_name
                     };
                 } catch (error) {
                     showError('Please sign in first');
@@ -499,9 +693,9 @@
                 }
             }
 
-            // Save minimal profile
+            // Save minimal profile - use Google name if available
             const profileData = {
-                displayName: currentUser.email?.split('@')[0] || 'User',
+                displayName: currentUser.name || currentUser.givenName || currentUser.email?.split('@')[0] || 'User',
                 age: '',
                 journalGoal: '',
                 writingFrequency: '',
@@ -542,7 +736,9 @@
                 currentUser = {
                     uid: userId,
                     email: session.tokens?.idToken?.payload?.email || user.username,
-                    username: user.username
+                    username: user.username,
+                    name: session.tokens?.idToken?.payload?.name,
+                    givenName: session.tokens?.idToken?.payload?.given_name
                 };
 
                 // User is signed in
@@ -571,6 +767,7 @@
         }
 
         // Initialize on page load
+        setupCodeInputs();
         checkAuthState();
 
         // Expose functions to window for onclick handlers (ES modules have their own scope)
