@@ -231,6 +231,142 @@ h2 {
     border: 1px solid rgba(244, 67, 54, 0.4);
 }
 
+/* Verification Form Styles */
+.verification-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.verification-icon {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 15px;
+}
+
+.verification-header h3 {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.verification-email {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.verification-email strong {
+    color: #fff;
+}
+
+/* 6-Digit Code Input */
+.code-input-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 25px 0;
+}
+
+.code-digit {
+    width: 48px;
+    height: 56px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: all 0.2s ease;
+    caret-color: #fff;
+}
+
+.code-digit:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.code-digit::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Resend Section */
+.resend-section {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.resend-section a {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.resend-section a:hover {
+    text-decoration: none;
+}
+
+#resendTimer {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#timerCount {
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Verification Success */
+.verification-success {
+    text-align: center;
+    padding: 20px 0;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.success-checkmark {
+    margin-bottom: 20px;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.success-checkmark svg {
+    filter: drop-shadow(0 4px 8px rgba(76, 175, 80, 0.3));
+}
+
+.verification-success h3 {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.verification-success p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 8px;
+}
+
+.redirect-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6) !important;
+    margin-top: 15px !important;
+}
+
+/* Mobile responsiveness for code inputs */
+@media screen and (max-width: 400px) {
+    .code-input-container {
+        gap: 6px;
+    }
+
+    .code-digit {
+        width: 40px;
+        height: 48px;
+        font-size: 20px;
+        border-radius: 10px;
+    }
+}
+
 /* Firebase UI customizations (legacy - kept for compatibility) */
 .firebaseui-container {
     max-width: 100%;
