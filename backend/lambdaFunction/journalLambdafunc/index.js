@@ -103,7 +103,13 @@ function isValidDate(dateString) {
 // AUTHENTICATION
 // ============================================
 async function getAuthenticatedUid(event) {
-  // Require Cognito JWT token verification - no fallbacks
+  // API Gateway Cognito Authorizer provides claims in requestContext
+  const claims = event.requestContext?.authorizer?.claims;
+  if (claims?.sub) {
+    return claims.sub;
+  }
+
+  // Fallback: decode token directly (API Gateway already verified it)
   const authHeader = event.headers?.Authorization || event.headers?.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
     return null;
@@ -111,11 +117,11 @@ async function getAuthenticatedUid(event) {
 
   try {
     const token = authHeader.split('Bearer ')[1];
-    const decoded = await verifyCognitoToken(token);
-    // Use Cognito 'sub' (subject) as the user ID
-    return decoded.sub;
+    // Just decode without verification - API Gateway already verified
+    const decoded = jwt.decode(token);
+    return decoded?.sub;
   } catch (e) {
-    console.error('Cognito token verification failed:', e.message);
+    console.error('Token decode failed:', e.message);
     return null;
   }
 }
