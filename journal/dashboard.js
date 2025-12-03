@@ -50,6 +50,9 @@ Amplify.configure({
 
 // Current user state
 let currentUser = null;
+let quillEditor = null;
+let autoSaveTimeout = null;
+let draftKey = null;
 
 // ============================================
 // API SERVICE
@@ -372,13 +375,10 @@ const MAX_TITLE_LENGTH = 255;
 const MAX_TEXT_LENGTH = 50000;
 
 function validateEntry(title, text) {
-  if (!title?.trim()) {
-    return { valid: false, error: 'Title is required' };
-  }
   if (!text?.trim()) {
-    return { valid: false, error: 'Entry text is required' };
+    return { valid: false, error: 'Please write something first' };
   }
-  if (title.length > MAX_TITLE_LENGTH) {
+  if (title && title.length > MAX_TITLE_LENGTH) {
     return { valid: false, error: `Title must be under ${MAX_TITLE_LENGTH} characters` };
   }
   if (text.length > MAX_TEXT_LENGTH) {
@@ -736,7 +736,215 @@ function editProfile() {
 
 function clearForm() {
   document.getElementById('entryTitle').value = '';
-  document.getElementById('entryText').value = '';
+  if (quillEditor) {
+    quillEditor.setContents([]);
+  } else {
+    const textArea = document.getElementById('entryText');
+    if (textArea) textArea.value = '';
+  }
+  // Clear draft
+  if (draftKey) {
+    localStorage.removeItem(draftKey);
+  }
+  updateAutosaveIndicator('');
+}
+
+// ============================================
+// QUILL EDITOR INITIALIZATION
+// ============================================
+function initializeQuillEditor() {
+  if (typeof Quill === 'undefined') {
+    console.log('Quill not loaded, using textarea fallback');
+    return;
+  }
+
+  // Check if editor element exists
+  const editorEl = document.getElementById('editor');
+  if (!editorEl) return;
+
+  quillEditor = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'Write your thoughts, feelings, or experiences...',
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+        ['clean']
+      ]
+    }
+  });
+
+  // Auto-save on content change (debounced)
+  quillEditor.on('text-change', () => {
+    triggerAutoSave();
+  });
+
+  // Load draft if exists
+  loadDraft();
+}
+
+// ============================================
+// AUTO-SAVE FUNCTIONALITY
+// ============================================
+function triggerAutoSave() {
+  if (!currentUser) return;
+
+  // Clear existing timeout
+  if (autoSaveTimeout) {
+    clearTimeout(autoSaveTimeout);
+  }
+
+  updateAutosaveIndicator('saving');
+
+  // Debounce: save after 1 second of inactivity
+  autoSaveTimeout = setTimeout(() => {
+    saveDraft();
+    updateAutosaveIndicator('saved');
+  }, 1000);
+}
+
+function saveDraft() {
+  if (!currentUser || !draftKey) return;
+
+  const title = document.getElementById('entryTitle')?.value || '';
+  const content = quillEditor ? quillEditor.root.innerHTML : (document.getElementById('entryText')?.value || '');
+
+  if (title || content !== '<p><br></p>') {
+    localStorage.setItem(draftKey, JSON.stringify({
+      title,
+      content,
+      savedAt: Date.now()
+    }));
+  }
+}
+
+function loadDraft() {
+  if (!draftKey) return;
+
+  const draft = safeParseJSON(draftKey, null);
+  if (draft) {
+    document.getElementById('entryTitle').value = draft.title || '';
+    if (quillEditor && draft.content) {
+      quillEditor.root.innerHTML = draft.content;
+    }
+    updateAutosaveIndicator('Draft restored');
+    setTimeout(() => updateAutosaveIndicator(''), 2000);
+  }
+}
+
+function updateAutosaveIndicator(status) {
+  const indicator = document.getElementById('autosaveIndicator');
+  if (!indicator) return;
+
+  indicator.className = 'autosave-indicator';
+
+  switch (status) {
+    case 'saving':
+      indicator.textContent = 'Saving...';
+      indicator.classList.add('saving');
+      break;
+    case 'saved':
+      indicator.textContent = 'Draft saved';
+      indicator.classList.add('saved');
+      break;
+    default:
+      indicator.textContent = status;
+  }
+}
+
+// ============================================
+// TOAST NOTIFICATIONS
+// ============================================
+function showToast(message, type = 'info', duration = 3000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+// ============================================
+// SCROLL TO FORM (FAB ACTION)
+// ============================================
+function scrollToForm() {
+  const formContainer = document.getElementById('entryFormContainer');
+  if (formContainer) {
+    formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Focus on title input after scroll
+    setTimeout(() => {
+      document.getElementById('entryTitle')?.focus();
+    }, 300);
+  }
+}
+
+// ============================================
+// SWIPE GESTURES FOR ENTRIES
+// ============================================
+function initializeSwipeGestures() {
+  if (typeof Hammer === 'undefined') {
+    console.log('Hammer.js not loaded, skipping swipe gestures');
+    return;
+  }
+
+  // Observer to add swipe to new entries
+  const entriesContainer = document.getElementById('entries');
+  if (!entriesContainer) return;
+
+  const observer = new MutationObserver(() => {
+    setupEntrySwipes();
+  });
+
+  observer.observe(entriesContainer, { childList: true });
+  setupEntrySwipes();
+}
+
+function setupEntrySwipes() {
+  const entries = document.querySelectorAll('.entry:not([data-swipe-initialized])');
+
+  entries.forEach(entry => {
+    entry.setAttribute('data-swipe-initialized', 'true');
+
+    // Add swipe action indicator
+    const swipeAction = document.createElement('div');
+    swipeAction.className = 'swipe-action';
+    swipeAction.textContent = 'Delete';
+    entry.appendChild(swipeAction);
+
+    const hammer = new Hammer(entry);
+    hammer.on('swipeleft', () => {
+      entry.classList.add('swiping');
+      // Show delete confirmation
+      const deleteBtn = entry.querySelector('.delete-btn');
+      if (deleteBtn) {
+        deleteBtn.style.background = '#f44336';
+        deleteBtn.focus();
+      }
+    });
+
+    hammer.on('swiperight', () => {
+      entry.classList.remove('swiping');
+      const deleteBtn = entry.querySelector('.delete-btn');
+      if (deleteBtn) {
+        deleteBtn.style.background = '';
+      }
+    });
+
+    // Tap to dismiss swipe state
+    entry.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('delete-btn')) {
+        entry.classList.remove('swiping');
+      }
+    });
+  });
 }
 
 function getPersonalizedMessage(profile) {
@@ -821,6 +1029,15 @@ async function initializeDashboard() {
   // Initialize sync manager
   syncManager = new SyncManager(currentUser.uid);
 
+  // Initialize draft key
+  draftKey = `draft_${currentUser.uid}`;
+
+  // Initialize Quill editor
+  initializeQuillEditor();
+
+  // Initialize swipe gestures
+  initializeSwipeGestures();
+
   const profile = getUserProfile(currentUser.uid);
 
   // Update welcome message - prefer Google name over email prefix
@@ -897,10 +1114,17 @@ async function fetchPendingConnectionsCount() {
     });
     if (response.ok) {
       const data = await response.json();
+      // Update header badge
       const badge = document.getElementById('pendingBadge');
       if (badge && data.count > 0) {
         badge.textContent = data.count;
         badge.style.display = 'flex';
+      }
+      // Update bottom nav badge
+      const navBadge = document.getElementById('navPendingBadge');
+      if (navBadge && data.count > 0) {
+        navBadge.textContent = data.count;
+        navBadge.style.display = 'flex';
       }
     }
   } catch (error) {
@@ -929,45 +1153,46 @@ initializeDashboard();
 document.getElementById('entryForm').addEventListener('submit', e => {
   e.preventDefault();
   const title = document.getElementById('entryTitle').value;
-  const text = document.getElementById('entryText').value;
+  // Get content from Quill or fallback to textarea
+  let text = '';
+  if (quillEditor) {
+    text = quillEditor.getText().trim(); // Get plain text for validation/storage
+  } else {
+    const textArea = document.getElementById('entryText');
+    text = textArea ? textArea.value : '';
+  }
   const submitBtn = e.target.querySelector('button[type="submit"]');
 
   if (!currentUser) return;
 
-  // Validate input
-  const validation = validateEntry(title, text);
-  if (!validation.valid) {
-    // Show error feedback
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = validation.error;
-    submitBtn.style.background = '#f44336';
+  // For entries without title, use first line of text or date
+  const finalTitle = title.trim() || text.split('\n')[0].substring(0, 50) || new Date().toLocaleDateString();
 
-    setTimeout(() => {
-      submitBtn.textContent = originalText;
-      submitBtn.style.background = '';
-    }, 3000);
+  // Validate input
+  const validation = validateEntry(finalTitle, text);
+  if (!validation.valid) {
+    showToast(validation.error, 'error');
     return;
   }
 
-  saveEntry(currentUser.uid, title, text);
+  saveEntry(currentUser.uid, finalTitle, text);
   clearForm();
 
   // Show success feedback
-  const originalText = submitBtn.textContent;
-  submitBtn.textContent = 'Saved!';
-  submitBtn.style.background = '#4CAF50';
-
-  setTimeout(() => {
-    submitBtn.textContent = originalText;
-    submitBtn.style.background = '';
-  }, 2000);
+  showToast('Entry saved!', 'success');
 });
 
-// Auto-resize textarea
-document.getElementById('entryText').addEventListener('input', function() {
-  this.style.height = 'auto';
-  this.style.height = (this.scrollHeight) + 'px';
-});
+// Auto-resize textarea (only if it exists - may be replaced by Quill)
+const entryTextArea = document.getElementById('entryText');
+if (entryTextArea) {
+  entryTextArea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+}
+
+// Title input auto-save trigger
+document.getElementById('entryTitle')?.addEventListener('input', triggerAutoSave);
 
 // Click outside modal to close
 document.getElementById('profileModal').addEventListener('click', function(e) {
@@ -1004,3 +1229,5 @@ window.editProfile = editProfile;
 window.signOutUser = signOutUser;
 window.clearForm = clearForm;
 window.deleteEntry = deleteEntry;
+window.scrollToForm = scrollToForm;
+window.showToast = showToast;

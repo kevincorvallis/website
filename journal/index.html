@@ -263,6 +263,24 @@
         let currentUser = null;
         let pendingEmail = null;
 
+        // Preserve invite token in sessionStorage during auth flow
+        function preserveInviteToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const inviteToken = urlParams.get('invite');
+            if (inviteToken) {
+                sessionStorage.setItem('pendingInviteToken', inviteToken);
+            }
+        }
+        preserveInviteToken();
+
+        // Get redirect URL based on pending invite
+        function getRedirectUrl() {
+            const pendingInvite = sessionStorage.getItem('pendingInviteToken');
+            return pendingInvite
+                ? `connections.html?invite=${pendingInvite}`
+                : 'dashboard.html';
+        }
+
         // Check if user profile exists
         function hasUserProfile(uid) {
             return localStorage.getItem(`user_profile_${uid}`) !== null;
@@ -623,7 +641,7 @@
                 if (!hasUserProfile(currentUser.uid)) {
                     showProfileSetup(currentUser);
                 } else {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = getRedirectUrl();
                 }
             } catch (error) {
                 console.error('Error getting user:', error);
@@ -670,7 +688,7 @@
 
             // Show success message and redirect
             showSuccessMessage(() => {
-                window.location.href = 'dashboard.html';
+                window.location.href = getRedirectUrl();
             });
         });
 
@@ -708,7 +726,7 @@
             };
 
             saveUserProfile(currentUser.uid, profileData);
-            window.location.href = 'dashboard.html';
+            window.location.href = getRedirectUrl();
         }
 
         // Success message
@@ -743,8 +761,8 @@
 
                 // User is signed in
                 if (hasUserProfile(currentUser.uid)) {
-                    // Existing user - redirect to dashboard
-                    window.location.href = 'dashboard.html';
+                    // Existing user - redirect (to connections if invite, else dashboard)
+                    window.location.href = getRedirectUrl();
                 } else {
                     // New user - show profile setup
                     showProfileSetup(currentUser);

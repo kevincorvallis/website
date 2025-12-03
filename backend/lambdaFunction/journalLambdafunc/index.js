@@ -1,6 +1,7 @@
 const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
+const crypto = require('crypto');
 
 // ============================================
 // CONFIGURATION
@@ -21,7 +22,11 @@ const PATHS = {
   usersProfile: '/journalLambdafunc/users/profile',
   connections: '/journalLambdafunc/connections',
   connectionsPending: '/journalLambdafunc/connections/pending',
-  connectionsRequest: '/journalLambdafunc/connections/request'
+  connectionsRequest: '/journalLambdafunc/connections/request',
+  // Invite links
+  inviteCreate: '/journalLambdafunc/invite/create',
+  inviteInfo: '/journalLambdafunc/invite',
+  inviteRedeem: '/journalLambdafunc/invite/redeem'
 };
 
 // Cognito Configuration
@@ -897,6 +902,152 @@ async function removeConnection(event, conn) {
 }
 
 // ============================================
+// INVITE LINK HANDLERS
+// ============================================
+
+// POST /invite/create - Generate invite link for current user
+async function createInviteLink(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    // Check if user already has an invite link
+    const [existing] = await conn.execute(
+      'SELECT invite_token FROM invite_links WHERE creator_uid = ?',
+      [uid]
+    );
+
+    if (existing.length > 0) {
+      return buildResponse(200, {
+        inviteToken: existing[0].invite_token,
+        inviteUrl: `https://klee.page/journal/?invite=${existing[0].invite_token}`
+      });
+    }
+
+    // Generate new token (256-bit entropy, URL-safe)
+    const token = crypto.randomBytes(32).toString('base64url');
+
+    await conn.execute(
+      'INSERT INTO invite_links (invite_token, creator_uid) VALUES (?, ?)',
+      [token, uid]
+    );
+
+    return buildResponse(201, {
+      inviteToken: token,
+      inviteUrl: `https://klee.page/journal/?invite=${token}`
+    });
+  } catch (error) {
+    console.error('Error creating invite link:', error);
+    return errorResponse(500, 'Failed to create invite link');
+  }
+}
+
+// GET /invite?token=TOKEN - Get invite info (public endpoint)
+async function getInviteInfo(event, conn) {
+  const token = event.queryStringParameters?.token;
+  if (!token) {
+    return errorResponse(400, 'Invite token required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      `SELECT i.creator_uid, u.username, u.email
+       FROM invite_links i
+       JOIN users u ON i.creator_uid = u.firebase_uid
+       WHERE i.invite_token = ?`,
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return errorResponse(404, 'Invalid invite link');
+    }
+
+    const creator = rows[0];
+    return buildResponse(200, {
+      valid: true,
+      creatorName: creator.username || creator.email?.split('@')[0] || 'A friend'
+    });
+  } catch (error) {
+    console.error('Error getting invite info:', error);
+    return errorResponse(500, 'Failed to get invite info');
+  }
+}
+
+// POST /invite/redeem - Redeem invite link and create connection
+async function redeemInvite(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { token } = body;
+  if (!token) {
+    return errorResponse(400, 'Invite token required');
+  }
+
+  try {
+    // Get invite link and creator
+    const [inviteRows] = await conn.execute(
+      'SELECT creator_uid FROM invite_links WHERE invite_token = ?',
+      [token]
+    );
+
+    if (inviteRows.length === 0) {
+      return errorResponse(404, 'Invalid invite link');
+    }
+
+    const creatorUid = inviteRows[0].creator_uid;
+
+    // Cannot connect with yourself
+    if (creatorUid === uid) {
+      return errorResponse(400, 'Cannot use your own invite link');
+    }
+
+    // Check for existing connection (either direction)
+    const [existing] = await conn.execute(
+      `SELECT connection_id, status FROM connections
+       WHERE (requester_uid = ? AND target_uid = ?)
+          OR (requester_uid = ? AND target_uid = ?)`,
+      [uid, creatorUid, creatorUid, uid]
+    );
+
+    if (existing.length > 0) {
+      if (existing[0].status === 'accepted') {
+        return buildResponse(200, { message: 'Already connected', alreadyConnected: true });
+      }
+      if (existing[0].status === 'pending') {
+        // Accept the pending request
+        await conn.execute(
+          'UPDATE connections SET status = "accepted" WHERE connection_id = ?',
+          [existing[0].connection_id]
+        );
+        return buildResponse(200, { message: 'Connection accepted', connected: true });
+      }
+    }
+
+    // Create new accepted connection (auto-accept since using invite link)
+    await conn.execute(
+      'INSERT INTO connections (requester_uid, target_uid, status) VALUES (?, ?, "accepted")',
+      [creatorUid, uid]
+    );
+
+    return buildResponse(201, { message: 'Connected successfully', connected: true });
+  } catch (error) {
+    console.error('Error redeeming invite:', error);
+    return errorResponse(500, 'Failed to redeem invite');
+  }
+}
+
+// ============================================
 // SCHEMA INITIALIZATION
 // ============================================
 async function initializeSchema(conn) {
@@ -948,6 +1099,15 @@ async function initializeSchema(conn) {
       UNIQUE KEY unique_connection (requester_uid, target_uid),
       INDEX idx_target (target_uid, status),
       INDEX idx_requester (requester_uid, status)
+    );
+
+    CREATE TABLE IF NOT EXISTS invite_links (
+      invite_id INT AUTO_INCREMENT PRIMARY KEY,
+      invite_token VARCHAR(64) UNIQUE NOT NULL,
+      creator_uid VARCHAR(128) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_token (invite_token),
+      INDEX idx_creator (creator_uid)
     );
   `;
 
@@ -1070,6 +1230,16 @@ exports.handler = async (event, context) => {
       case method === 'DELETE' && path.match(/\/journalLambdafunc\/connections\/\d+$/):
         event.pathParameters = { id: path.split('/').pop() };
         return await removeConnection(event, conn);
+
+      // Invite link endpoints
+      case method === 'POST' && path === PATHS.inviteCreate:
+        return await createInviteLink(event, conn);
+
+      case method === 'GET' && path === PATHS.inviteInfo:
+        return await getInviteInfo(event, conn);
+
+      case method === 'POST' && path === PATHS.inviteRedeem:
+        return await redeemInvite(event, conn);
 
       // Not found
       default:

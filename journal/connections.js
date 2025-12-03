@@ -136,6 +136,17 @@ async function updateProfile(displayName, email) {
   });
 }
 
+async function generateInviteLink() {
+  return apiRequest('/invite/create', { method: 'POST' });
+}
+
+async function redeemInviteToken(token) {
+  return apiRequest('/invite/redeem', {
+    method: 'POST',
+    body: JSON.stringify({ token })
+  });
+}
+
 // ============================================
 // UI FUNCTIONS
 // ============================================
@@ -312,6 +323,66 @@ function handleInvite() {
   window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
 }
 
+async function loadInviteLink() {
+  const linkInput = document.getElementById('inviteLinkInput');
+  try {
+    const result = await generateInviteLink();
+    linkInput.value = result.inviteUrl;
+  } catch (error) {
+    linkInput.value = 'Failed to generate link';
+    console.error('Error generating invite link:', error);
+  }
+}
+
+function setupCopyButton() {
+  document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+    const linkInput = document.getElementById('inviteLinkInput');
+    const feedback = document.getElementById('copyFeedback');
+
+    if (!linkInput.value || linkInput.value.startsWith('Failed')) return;
+
+    try {
+      await navigator.clipboard.writeText(linkInput.value);
+      feedback.style.display = 'block';
+      setTimeout(() => { feedback.style.display = 'none'; }, 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      linkInput.select();
+      document.execCommand('copy');
+      feedback.style.display = 'block';
+      setTimeout(() => { feedback.style.display = 'none'; }, 2000);
+    }
+  });
+}
+
+async function checkAndRedeemInvite() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const inviteToken = urlParams.get('invite');
+
+  if (!inviteToken) return;
+
+  try {
+    const result = await redeemInviteToken(inviteToken);
+
+    // Remove token from URL without reload
+    const url = new URL(window.location);
+    url.searchParams.delete('invite');
+    window.history.replaceState({}, '', url);
+
+    // Clear the sessionStorage token now that it's been used
+    sessionStorage.removeItem('pendingInviteToken');
+
+    if (result.connected) {
+      showMessage(document.getElementById('connectionsList'), 'You are now connected!', false);
+      await loadConnections();
+    } else if (result.alreadyConnected) {
+      showMessage(document.getElementById('connectionsList'), 'You are already connected with this person', false);
+    }
+  } catch (error) {
+    console.error('Failed to redeem invite:', error);
+  }
+}
+
 // ============================================
 // INITIALIZATION
 // ============================================
@@ -335,8 +406,15 @@ async function initialize() {
     // Load data
     await Promise.all([
       loadPendingConnections(),
-      loadConnections()
+      loadConnections(),
+      loadInviteLink()
     ]);
+
+    // Setup copy button
+    setupCopyButton();
+
+    // Check for invite token in URL and redeem it
+    await checkAndRedeemInvite();
   } catch (error) {
     console.log('Not authenticated, redirecting to login:', error.message);
     window.location.href = 'index.html';
