@@ -53,6 +53,7 @@ let currentUser = null;
 let quillEditor = null;
 let autoSaveTimeout = null;
 let draftKey = null;
+let isInitializing = false; // Prevent double initialization on OAuth redirect
 
 // ============================================
 // API SERVICE
@@ -1636,6 +1637,13 @@ Hub.listen('auth', ({ payload }) => {
 // INITIALIZATION
 // ============================================
 async function initializeDashboard() {
+  // Prevent double initialization (can happen during OAuth redirect)
+  if (isInitializing) {
+    console.log('Dashboard initialization already in progress, skipping...');
+    return;
+  }
+  isInitializing = true;
+
   // Clear any existing sync interval to prevent memory leak
   if (syncIntervalId) {
     clearInterval(syncIntervalId);
@@ -1657,6 +1665,7 @@ async function initializeDashboard() {
     };
   } catch (error) {
     console.log('Not authenticated, redirecting to login:', error.message);
+    isInitializing = false; // Reset flag before redirect
     window.location.href = 'index.html';
     return;
   }

@@ -459,7 +459,7 @@
 
         // Current user state
         let currentUser = null;
-        let pendingEmail = null;
+        let pendingEmail = sessionStorage.getItem('pendingVerificationEmail') || null;
 
         // Preserve invite token in sessionStorage during auth flow
         function preserveInviteToken() {
@@ -518,12 +518,18 @@
             document.getElementById('signInForm').style.display = 'block';
             document.getElementById('signUpForm').style.display = 'none';
             document.getElementById('verificationForm').style.display = 'none';
+            // Restore divider and Google button
+            document.querySelector('.auth-divider').style.display = '';
+            document.querySelector('.google-btn').style.display = '';
         }
 
         function showSignUpForm() {
             document.getElementById('signInForm').style.display = 'none';
             document.getElementById('signUpForm').style.display = 'block';
             document.getElementById('verificationForm').style.display = 'none';
+            // Restore divider and Google button
+            document.querySelector('.auth-divider').style.display = '';
+            document.querySelector('.google-btn').style.display = '';
         }
 
         function showVerificationForm() {
@@ -531,6 +537,10 @@
             document.getElementById('signUpForm').style.display = 'none';
             document.getElementById('verificationForm').style.display = 'block';
             document.getElementById('verificationSuccess').style.display = 'none';
+
+            // Hide divider and Google button during verification
+            document.querySelector('.auth-divider').style.display = 'none';
+            document.querySelector('.google-btn').style.display = 'none';
 
             // Display the email the code was sent to
             if (pendingEmail) {
@@ -841,6 +851,7 @@
             }
 
             try {
+                document.getElementById('authFormsContainer').style.display = 'none';
                 document.getElementById('loader').style.display = 'block';
                 const result = await signIn({ username: email, password });
 
@@ -852,6 +863,7 @@
                 console.error('Sign in error:', error);
                 if (error.name === 'UserNotConfirmedException') {
                     pendingEmail = email;
+                    sessionStorage.setItem('pendingVerificationEmail', email);
                     showVerificationForm();
                     showError('Please verify your email first');
                 } else {
@@ -859,6 +871,7 @@
                 }
             } finally {
                 document.getElementById('loader').style.display = 'none';
+                document.getElementById('authFormsContainer').style.display = 'block';
             }
         }
 
@@ -883,6 +896,7 @@
             }
 
             try {
+                document.getElementById('authFormsContainer').style.display = 'none';
                 document.getElementById('loader').style.display = 'block';
                 const result = await signUp({
                     username: email,
@@ -895,6 +909,7 @@
                 });
 
                 pendingEmail = email;
+                sessionStorage.setItem('pendingVerificationEmail', email);
 
                 if (result.nextStep.signUpStep === 'CONFIRM_SIGN_UP') {
                     showVerificationForm();
@@ -904,6 +919,7 @@
                 showError(error.message || 'Sign up failed');
             } finally {
                 document.getElementById('loader').style.display = 'none';
+                document.getElementById('authFormsContainer').style.display = 'block';
             }
         }
 
@@ -923,6 +939,9 @@
                     username: pendingEmail,
                     confirmationCode: code
                 });
+
+                // Clear pending email from storage
+                sessionStorage.removeItem('pendingVerificationEmail');
 
                 // Show success animation then redirect
                 showVerificationSuccess();
@@ -976,12 +995,18 @@
 
         async function signInWithGoogle() {
             try {
+                // Hide forms and show redirect message
+                document.getElementById('authFormsContainer').style.display = 'none';
                 document.getElementById('loader').style.display = 'block';
+                document.querySelector('#loader p').textContent = 'Redirecting to Google...';
                 await signInWithRedirect({ provider: 'Google' });
+                // Note: signInWithRedirect navigates away, code below won't execute
             } catch (error) {
                 console.error('Google sign in error:', error);
                 showError(error.message || 'Google sign in failed');
                 document.getElementById('loader').style.display = 'none';
+                document.getElementById('authFormsContainer').style.display = 'block';
+                document.querySelector('#loader p').textContent = 'Setting up your journal...';
             }
         }
 
@@ -1090,6 +1115,11 @@
                 // Not signed in - show sign in form directly
                 console.log('Not authenticated:', error.message);
                 showSignIn();
+
+                // Check if there's a pending verification email (user refreshed during verification)
+                if (pendingEmail) {
+                    showVerificationForm();
+                }
             }
         }
 
