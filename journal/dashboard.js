@@ -637,6 +637,9 @@ async function saveEntry(uid, title, text) {
       localStorage.setItem(getEntriesKey(uid), JSON.stringify(updated));
       displayEntries(updated);
       syncManager.updateSyncStatus('synced');
+
+      // Return the server entry_id for sharing
+      return result.entry.entry_id;
     } catch (error) {
       console.error('Failed to sync entry:', error);
       // Queue for later sync
@@ -646,6 +649,7 @@ async function saveEntry(uid, title, text) {
         text,
         date: newEntry.date
       });
+      return null;
     }
   } else if (syncManager) {
     // Offline - queue for later
@@ -656,6 +660,7 @@ async function saveEntry(uid, title, text) {
       date: newEntry.date
     });
   }
+  return null;
 }
 
 async function deleteEntry(id) {
@@ -894,6 +899,125 @@ async function verifyPhoneCode() {
     console.error('Error verifying:', error);
     showToast(error.message || 'Invalid code', 'error');
   }
+}
+
+// ============================================
+// FRIENDS SECTION
+// ============================================
+let friendsList = [];
+let selectedFriendsForNewEntry = new Set();
+
+async function loadFriends() {
+  const container = document.getElementById('friendsList');
+  if (!container || !currentUser) return;
+
+  try {
+    const token = await api.getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/connections`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+
+    friendsList = data.connections || [];
+
+    if (friendsList.length === 0) {
+      container.innerHTML = `
+        <div class="no-friends">
+          <p>No friends yet. Invite someone to share your journal with!</p>
+          <a href="connections.html" class="invite-btn">Invite Friends</a>
+        </div>
+      `;
+      return;
+    }
+
+    // Render friends as clickable cards
+    container.innerHTML = friendsList.map(friend => `
+      <div class="friend-card" data-uid="${friend.uid}" onclick="toggleFriendForShare('${friend.uid}')">
+        <div class="friend-avatar">${getInitials(friend.displayName)}</div>
+        <span class="friend-name">${escapeHtml(friend.displayName)}</span>
+        ${friend.phone_verified ? '<span class="friend-status verified">SMS</span>' : ''}
+      </div>
+    `).join('') + `
+      <a href="connections.html" class="add-friend-card">
+        <div class="friend-avatar">+</div>
+        <span class="friend-name">Add</span>
+      </a>
+    `;
+  } catch (error) {
+    console.error('Error loading friends:', error);
+    container.innerHTML = '<div class="friends-loading">Failed to load friends</div>';
+  }
+}
+
+function getInitials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+}
+
+function toggleFriendForShare(uid) {
+  const card = document.querySelector(`.friend-card[data-uid="${uid}"]`);
+  if (!card) return;
+
+  if (selectedFriendsForNewEntry.has(uid)) {
+    selectedFriendsForNewEntry.delete(uid);
+    card.classList.remove('selected');
+  } else {
+    selectedFriendsForNewEntry.add(uid);
+    card.classList.add('selected');
+  }
+
+  updateShareIndicator();
+}
+
+function updateShareIndicator() {
+  let indicator = document.getElementById('shareWithIndicator');
+  const form = document.getElementById('entryForm');
+
+  if (selectedFriendsForNewEntry.size === 0) {
+    if (indicator) indicator.remove();
+    return;
+  }
+
+  // Get friend names
+  const selectedFriends = friendsList.filter(f => selectedFriendsForNewEntry.has(f.uid));
+
+  if (!indicator) {
+    indicator = document.createElement('div');
+    indicator.id = 'shareWithIndicator';
+    indicator.className = 'share-with-indicator';
+    form.insertBefore(indicator, form.firstChild);
+  }
+
+  indicator.innerHTML = `
+    <span>Share with:</span>
+    <div class="selected-friends">
+      ${selectedFriends.map(f => `
+        <span class="friend-chip">
+          ${escapeHtml(f.displayName)}
+          <span class="remove" onclick="event.stopPropagation(); deselectFriend('${f.uid}')">&times;</span>
+        </span>
+      `).join('')}
+    </div>
+  `;
+}
+
+function deselectFriend(uid) {
+  selectedFriendsForNewEntry.delete(uid);
+  const card = document.querySelector(`.friend-card[data-uid="${uid}"]`);
+  if (card) card.classList.remove('selected');
+  updateShareIndicator();
+}
+
+function clearFriendSelections() {
+  selectedFriendsForNewEntry.clear();
+  document.querySelectorAll('.friend-card.selected').forEach(c => c.classList.remove('selected'));
+  updateShareIndicator();
 }
 
 // ============================================
@@ -1382,6 +1506,9 @@ async function initializeDashboard() {
   // Fetch pending connections count for badge
   fetchPendingConnectionsCount();
 
+  // Load friends section
+  loadFriends();
+
   // Load entries shared with me
   loadSharedWithMe();
 
@@ -1442,7 +1569,7 @@ initializeDashboard();
 // ============================================
 
 // Form submission
-document.getElementById('entryForm').addEventListener('submit', e => {
+document.getElementById('entryForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const title = document.getElementById('entryTitle').value;
   // Get content from Quill or fallback to textarea
@@ -1467,11 +1594,39 @@ document.getElementById('entryForm').addEventListener('submit', e => {
     return;
   }
 
-  saveEntry(currentUser.uid, finalTitle, text);
+  const entryId = await saveEntry(currentUser.uid, finalTitle, text);
   clearForm();
 
-  // Show success feedback
-  showToast('Entry saved!', 'success');
+  // Share with selected friends if any
+  if (selectedFriendsForNewEntry.size > 0 && entryId) {
+    try {
+      const token = await api.getAuthToken();
+      const response = await fetch(`${API_BASE_URL}/entry/${entryId}/share-with`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ connectionUids: Array.from(selectedFriendsForNewEntry) })
+      });
+
+      if (response.ok) {
+        const friendNames = friendsList
+          .filter(f => selectedFriendsForNewEntry.has(f.uid))
+          .map(f => f.displayName)
+          .join(', ');
+        showToast(`Entry saved & shared with ${friendNames}!`, 'success');
+      } else {
+        showToast('Entry saved, but sharing failed', 'error');
+      }
+    } catch (error) {
+      console.error('Error sharing with friends:', error);
+      showToast('Entry saved, but sharing failed', 'error');
+    }
+    clearFriendSelections();
+  } else {
+    showToast('Entry saved!', 'success');
+  }
 });
 
 // Auto-resize textarea (only if it exists - may be replaced by Quill)
@@ -1533,3 +1688,7 @@ window.hideShareModal = hideShareModal;
 window.confirmShare = confirmShare;
 // Shared entries
 window.viewSharedEntry = viewSharedEntry;
+// Friends section
+window.toggleFriendForShare = toggleFriendForShare;
+window.deselectFriend = deselectFriend;
+window.clearFriendSelections = clearFriendSelections;

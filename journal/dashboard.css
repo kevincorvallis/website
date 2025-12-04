@@ -1155,3 +1155,217 @@ body::-webkit-scrollbar {
   color: rgba(255, 255, 255, 0.9) !important;
   font-weight: 500;
 }
+
+/* ============================================
+   FRIENDS SECTION
+   ============================================ */
+.friends-section {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.friends-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.friends-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.manage-link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.manage-link:hover {
+  text-decoration: underline;
+}
+
+.friends-list {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.friends-list::-webkit-scrollbar {
+  display: none;
+}
+
+.friends-loading {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 12px;
+}
+
+.friend-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  min-width: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.friend-card:hover {
+  background: var(--bg-input);
+  transform: translateY(-2px);
+}
+
+.friend-card.selected {
+  border-color: var(--accent-primary);
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.friend-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), #5856d6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+}
+
+.friend-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: center;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-status {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.friend-status.verified {
+  color: var(--success);
+}
+
+.no-friends {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  width: 100%;
+}
+
+.no-friends p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.no-friends .invite-btn {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-lg);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.no-friends .invite-btn:hover {
+  background: var(--accent-secondary);
+}
+
+/* Add friend card in the list */
+.add-friend-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  min-width: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  border: 2px dashed var(--border-color);
+}
+
+.add-friend-card:hover {
+  border-color: var(--accent-primary);
+  background: rgba(0, 122, 255, 0.05);
+}
+
+.add-friend-card .friend-avatar {
+  background: var(--bg-input);
+  color: var(--text-muted);
+}
+
+.add-friend-card .friend-name {
+  color: var(--text-secondary);
+}
+
+/* Share indicator on entry form */
+.share-with-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(0, 122, 255, 0.1);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.share-with-indicator .selected-friends {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.share-with-indicator .friend-chip {
+  background: var(--accent-primary);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.share-with-indicator .friend-chip .remove {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.share-with-indicator .friend-chip .remove:hover {
+  opacity: 1;
+}
