@@ -154,6 +154,27 @@ async function getAuthenticatedUid(event) {
   }
 }
 
+// Get Cognito username from JWT (different from sub for federated users like Google)
+function getCognitoUsername(event) {
+  const claims = event.requestContext?.authorizer?.claims;
+  if (claims?.['cognito:username']) {
+    return claims['cognito:username'];
+  }
+
+  const authHeader = event.headers?.Authorization || event.headers?.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    return null;
+  }
+
+  try {
+    const token = authHeader.split('Bearer ')[1];
+    const decoded = jwt.decode(token);
+    return decoded?.['cognito:username'] || decoded?.sub;
+  } catch (e) {
+    return null;
+  }
+}
+
 // ============================================
 // RESPONSE HELPERS
 // ============================================
@@ -1141,7 +1162,7 @@ async function getSharedEntry(event, conn) {
     const [rows] = await conn.execute(
       `SELECT se.share_id, se.entry_id, se.owner_uid, se.view_count,
               je.title, je.text, je.date, je.prompt_id,
-              u.first_name, u.username
+              u.first_name, u.username, u.email
        FROM shared_entries se
        JOIN journal_entries je ON se.entry_id = je.entry_id
        LEFT JOIN users u ON se.owner_uid = u.firebase_uid
@@ -1155,7 +1176,14 @@ async function getSharedEntry(event, conn) {
 
     const sharedEntry = rows[0];
     const ownerUid = sharedEntry.owner_uid;
-    const authorName = sharedEntry.first_name || sharedEntry.username || 'A Day by Day user';
+    // Use first_name, or email (before @), or fallback - avoid showing Google_xxx usernames
+    let authorName = sharedEntry.first_name;
+    if (!authorName && sharedEntry.email) {
+      authorName = sharedEntry.email.split('@')[0];
+    }
+    if (!authorName || authorName.startsWith('Google_')) {
+      authorName = 'A Day by Day user';
+    }
 
     // Check if viewer is authenticated and is a friend
     let viewerUid = null;
@@ -1868,15 +1896,19 @@ async function deleteAccount(event, conn) {
     );
 
     // 8. Delete user from Cognito
-    try {
-      const deleteCommand = new AdminDeleteUserCommand({
-        UserPoolId: COGNITO_USER_POOL_ID,
-        Username: uid
-      });
-      await cognitoClient.send(deleteCommand);
-    } catch (cognitoError) {
-      console.error('Error deleting Cognito user:', cognitoError);
-      // Continue even if Cognito deletion fails - data is already deleted
+    // Use cognito:username (not sub) - this is different for Google federated users
+    const cognitoUsername = getCognitoUsername(event);
+    if (cognitoUsername) {
+      try {
+        const deleteCommand = new AdminDeleteUserCommand({
+          UserPoolId: COGNITO_USER_POOL_ID,
+          Username: cognitoUsername
+        });
+        await cognitoClient.send(deleteCommand);
+      } catch (cognitoError) {
+        console.error('Error deleting Cognito user:', cognitoError);
+        // Continue even if Cognito deletion fails - data is already deleted
+      }
     }
 
     return buildResponse(200, {
