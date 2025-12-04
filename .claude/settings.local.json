@@ -55,7 +55,9 @@
       "Bash(aws cloudfront create-invalidation:*)",
       "Bash(xargs:*)",
       "Bash(npm install:*)",
-      "Bash(pip3 install:*)"
+      "Bash(pip3 install:*)",
+      "Bash(node -e:*)",
+      "Bash(unzip:*)"
     ],
     "deny": [],
     "ask": []

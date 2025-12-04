@@ -1876,15 +1876,15 @@ exports.handler = async (event, context) => {
       case method === 'POST' && path === PATHS.connectionsRequest:
         return await requestConnection(event, conn);
 
-      case method === 'POST' && path.match(/\/journalLambdafunc\/connections\/\d+\/accept$/):
+      case method === 'POST' && /\/journalLambdafunc\/connections\/\d+\/accept$/.test(path):
         event.pathParameters = { id: path.split('/')[3] };
         return await acceptConnection(event, conn);
 
-      case method === 'POST' && path.match(/\/journalLambdafunc\/connections\/\d+\/decline$/):
+      case method === 'POST' && /\/journalLambdafunc\/connections\/\d+\/decline$/.test(path):
         event.pathParameters = { id: path.split('/')[3] };
         return await declineConnection(event, conn);
 
-      case method === 'DELETE' && path.match(/\/journalLambdafunc\/connections\/\d+$/):
+      case method === 'DELETE' && /\/journalLambdafunc\/connections\/\d+$/.test(path):
         event.pathParameters = { id: path.split('/').pop() };
         return await removeConnection(event, conn);
 
@@ -1899,7 +1899,7 @@ exports.handler = async (event, context) => {
         return await redeemInvite(event, conn);
 
       // Shared entry endpoints
-      case method === 'POST' && path.match(/\/journalLambdafunc\/entry\/\d+\/share$/):
+      case method === 'POST' && /\/journalLambdafunc\/entry\/\d+\/share$/.test(path):
         event.pathParameters = { id: path.split('/')[3] };
         return await shareEntry(event, conn);
 
@@ -1922,14 +1922,14 @@ exports.handler = async (event, context) => {
         return await verifyPhone(event, conn);
 
       // Share with connections endpoints
-      case method === 'POST' && path.match(/\/journalLambdafunc\/entry\/\d+\/share-with$/):
+      case method === 'POST' && /\/journalLambdafunc\/entry\/\d+\/share-with$/.test(path):
         event.pathParameters = { id: path.split('/')[3] };
         return await shareEntryWithConnections(event, conn);
 
       case method === 'GET' && path === PATHS.entriesSharedWithMe:
         return await getEntriesSharedWithMe(event, conn);
 
-      case method === 'PUT' && path.match(/\/journalLambdafunc\/entry-share\/\d+\/read$/):
+      case method === 'PUT' && /\/journalLambdafunc\/entry-share\/\d+\/read$/.test(path):
         event.pathParameters = { id: path.split('/')[3] };
         return await markSharedEntryRead(event, conn);
 
