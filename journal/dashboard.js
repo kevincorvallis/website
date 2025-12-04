@@ -230,16 +230,34 @@ class SyncManager {
     this.isSyncing = true;
     this.updateSyncStatus('syncing');
 
+    // Get current local entries BEFORE sync to preserve unsynced ones
+    const currentLocalEntries = safeParseJSON(getEntriesKey(this.uid), []);
+    const unsyncedLocalEntries = currentLocalEntries.filter(e => !e.synced);
+
     const entries = pending.map(p => ({
       action: p.action,
       ...p.data
     }));
 
+    // Also add any unsynced local entries that aren't already in pending queue
+    for (const unsyncedEntry of unsyncedLocalEntries) {
+      const alreadyPending = entries.some(e => e.client_id === unsyncedEntry.id);
+      if (!alreadyPending) {
+        entries.push({
+          action: 'create',
+          client_id: unsyncedEntry.id,
+          title: unsyncedEntry.title,
+          text: unsyncedEntry.text,
+          date: unsyncedEntry.date
+        });
+      }
+    }
+
     try {
       const result = await api.sync(entries, this.getLastSyncTime());
 
-      // Update local entries with server data
-      const localEntries = result.entries.map(e => ({
+      // Transform server entries to local format
+      const serverEntries = result.entries.map(e => ({
         id: e.client_id || e.entry_id.toString(),
         entry_id: e.entry_id,
         title: e.title,
@@ -248,7 +266,25 @@ class SyncManager {
         synced: true
       }));
 
-      localStorage.setItem(getEntriesKey(this.uid), JSON.stringify(localEntries));
+      // Create a map of server entries for quick lookup
+      const serverEntryMap = new Map();
+      serverEntries.forEach(e => {
+        serverEntryMap.set(e.id, e);
+        if (e.entry_id) serverEntryMap.set(e.entry_id.toString(), e);
+      });
+
+      // Merge: keep unsynced local entries that weren't synced in this batch
+      const mergedEntries = [...serverEntries];
+      for (const unsyncedEntry of unsyncedLocalEntries) {
+        const wasSynced = serverEntryMap.has(unsyncedEntry.id) ||
+                          (unsyncedEntry.entry_id && serverEntryMap.has(unsyncedEntry.entry_id.toString()));
+        if (!wasSynced) {
+          console.log('Preserving unsynced entry:', unsyncedEntry.id);
+          mergedEntries.push(unsyncedEntry);
+        }
+      }
+
+      localStorage.setItem(getEntriesKey(this.uid), JSON.stringify(mergedEntries));
 
       // Clear pending and update sync time
       this.clearPendingChanges();
@@ -256,9 +292,9 @@ class SyncManager {
       this.updateSyncStatus('synced');
 
       // Recalculate stats and refresh display
-      recalcStats(this.uid, localEntries);
+      recalcStats(this.uid, mergedEntries);
       displayStats(this.uid);
-      displayEntries(localEntries);
+      displayEntries(mergedEntries);
 
       return result;
     } catch (error) {
@@ -281,6 +317,10 @@ class SyncManager {
     this.updateSyncStatus('syncing');
 
     try {
+      // Get current local entries BEFORE sync to preserve unsynced ones
+      const currentLocalEntries = safeParseJSON(getEntriesKey(this.uid), []);
+      const unsyncedLocalEntries = currentLocalEntries.filter(e => !e.synced);
+
       // First process any pending changes
       const pending = this.getPendingChanges();
       const entries = pending.map(p => ({
@@ -288,10 +328,24 @@ class SyncManager {
         ...p.data
       }));
 
+      // Also add any unsynced local entries that aren't already in pending queue
+      for (const unsyncedEntry of unsyncedLocalEntries) {
+        const alreadyPending = entries.some(e => e.client_id === unsyncedEntry.id);
+        if (!alreadyPending) {
+          entries.push({
+            action: 'create',
+            client_id: unsyncedEntry.id,
+            title: unsyncedEntry.title,
+            text: unsyncedEntry.text,
+            date: unsyncedEntry.date
+          });
+        }
+      }
+
       const result = await api.sync(entries, this.getLastSyncTime());
 
       // Transform server entries to local format
-      const localEntries = result.entries.map(e => ({
+      const serverEntries = result.entries.map(e => ({
         id: e.client_id || e.entry_id.toString(),
         entry_id: e.entry_id,
         title: e.title,
@@ -300,15 +354,35 @@ class SyncManager {
         synced: true
       }));
 
-      // Save to localStorage
-      localStorage.setItem(getEntriesKey(this.uid), JSON.stringify(localEntries));
+      // Create a map of server entries by client_id and entry_id for quick lookup
+      const serverEntryMap = new Map();
+      serverEntries.forEach(e => {
+        serverEntryMap.set(e.id, e);
+        if (e.entry_id) serverEntryMap.set(e.entry_id.toString(), e);
+      });
+
+      // Merge: keep unsynced local entries that weren't synced in this batch
+      const mergedEntries = [...serverEntries];
+      for (const unsyncedEntry of unsyncedLocalEntries) {
+        // Check if this entry was synced (exists in server response)
+        const wasSynced = serverEntryMap.has(unsyncedEntry.id) ||
+                          (unsyncedEntry.entry_id && serverEntryMap.has(unsyncedEntry.entry_id.toString()));
+        if (!wasSynced) {
+          // Entry wasn't synced yet, keep it locally
+          console.log('Preserving unsynced entry:', unsyncedEntry.id);
+          mergedEntries.push(unsyncedEntry);
+        }
+      }
+
+      // Save merged entries to localStorage
+      localStorage.setItem(getEntriesKey(this.uid), JSON.stringify(mergedEntries));
 
       // Clear pending and update sync time
       this.clearPendingChanges();
       this.setLastSyncTime(result.syncTime);
       this.updateSyncStatus('synced');
 
-      return localEntries;
+      return mergedEntries;
     } catch (error) {
       console.error('Full sync failed:', error);
       this.updateSyncStatus('error');
