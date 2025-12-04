@@ -3,9 +3,13 @@ const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
 const crypto = require('crypto');
 const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
+const { CognitoIdentityProviderClient, AdminDeleteUserCommand } = require('@aws-sdk/client-cognito-identity-provider');
 
 // Initialize SNS client for SMS
 const snsClient = new SNSClient({ region: 'us-west-1' });
+
+// Initialize Cognito client for account deletion
+const cognitoClient = new CognitoIdentityProviderClient({ region: 'us-west-1' });
 
 // ============================================
 // CONFIGURATION
@@ -37,7 +41,9 @@ const PATHS = {
   usersPhone: '/journalLambdafunc/users/phone',
   usersPhoneVerify: '/journalLambdafunc/users/phone/verify',
   // Share with connections
-  entriesSharedWithMe: '/journalLambdafunc/entries/shared-with-me'
+  entriesSharedWithMe: '/journalLambdafunc/entries/shared-with-me',
+  // Account management
+  account: '/journalLambdafunc/account'
 };
 
 // Cognito Configuration
@@ -1093,7 +1099,7 @@ async function shareEntry(event, conn) {
 
     if (existing.length > 0) {
       // Return existing share link
-      const shareUrl = `https://klee.page/journal/shared.html?token=${existing[0].share_token}`;
+      const shareUrl = `https://www.klee.page/journal/shared.html?token=${existing[0].share_token}`;
       return buildResponse(200, {
         shareToken: existing[0].share_token,
         shareUrl: shareUrl,
@@ -1110,7 +1116,7 @@ async function shareEntry(event, conn) {
       [shareToken, entryId, uid]
     );
 
-    const shareUrl = `https://klee.page/journal/shared.html?token=${shareToken}`;
+    const shareUrl = `https://www.klee.page/journal/shared.html?token=${shareToken}`;
 
     return buildResponse(201, {
       shareToken: shareToken,
@@ -1213,12 +1219,23 @@ async function getSharedEntry(event, conn) {
         is_preview: false
       });
     } else {
-      // Preview mode - show first ~100 characters
+      // Preview mode - show first ~150 characters of plain text
       const fullText = sharedEntry.text || '';
+      // Strip HTML tags and decode entities for clean preview
+      const plainText = fullText
+        .replace(/<[^>]*>/g, ' ')  // Replace HTML tags with space
+        .replace(/&nbsp;/g, ' ')   // Replace &nbsp; with space
+        .replace(/&amp;/g, '&')    // Decode &amp;
+        .replace(/&lt;/g, '<')     // Decode &lt;
+        .replace(/&gt;/g, '>')     // Decode &gt;
+        .replace(/&quot;/g, '"')   // Decode &quot;
+        .replace(/&#39;/g, "'")    // Decode &#39;
+        .replace(/\s+/g, ' ')      // Collapse multiple spaces
+        .trim();
       const previewLength = 150;
-      const previewText = fullText.length > previewLength
-        ? fullText.substring(0, previewLength) + '...'
-        : fullText;
+      const previewText = plainText.length > previewLength
+        ? plainText.substring(0, previewLength) + '...'
+        : plainText;
 
       return buildResponse(200, {
         entry: {
@@ -1796,6 +1813,82 @@ async function runMigrations(conn) {
 }
 
 // ============================================
+// ACCOUNT DELETION
+// ============================================
+
+// DELETE /account - Permanently delete user account and all data
+async function deleteAccount(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    // Delete all user data in correct order to avoid foreign key issues
+    // 1. Delete entry shares (both owned and received)
+    await conn.execute(
+      'DELETE FROM entry_shares WHERE owner_uid = ? OR shared_with_uid = ?',
+      [uid, uid]
+    );
+
+    // 2. Delete shared entry links
+    await conn.execute(
+      'DELETE FROM shared_entries WHERE owner_uid = ?',
+      [uid]
+    );
+
+    // 3. Delete invite links
+    await conn.execute(
+      'DELETE FROM invite_links WHERE creator_uid = ?',
+      [uid]
+    );
+
+    // 4. Delete connections (both as requester and target)
+    await conn.execute(
+      'DELETE FROM connections WHERE requester_uid = ? OR target_uid = ?',
+      [uid, uid]
+    );
+
+    // 5. Delete journal entries (hard delete, not soft)
+    await conn.execute(
+      'DELETE FROM journal_entries WHERE firebase_uid = ?',
+      [uid]
+    );
+
+    // 6. Delete custom prompts
+    await conn.execute(
+      'DELETE FROM prompts WHERE firebase_uid = ?',
+      [uid]
+    );
+
+    // 7. Delete user record
+    await conn.execute(
+      'DELETE FROM users WHERE firebase_uid = ?',
+      [uid]
+    );
+
+    // 8. Delete user from Cognito
+    try {
+      const deleteCommand = new AdminDeleteUserCommand({
+        UserPoolId: COGNITO_USER_POOL_ID,
+        Username: uid
+      });
+      await cognitoClient.send(deleteCommand);
+    } catch (cognitoError) {
+      console.error('Error deleting Cognito user:', cognitoError);
+      // Continue even if Cognito deletion fails - data is already deleted
+    }
+
+    return buildResponse(200, {
+      message: 'Account deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    return errorResponse(500, 'Failed to delete account');
+  }
+}
+
+// ============================================
 // MAIN HANDLER
 // ============================================
 exports.handler = async (event, context) => {
@@ -1932,6 +2025,10 @@ exports.handler = async (event, context) => {
       case method === 'PUT' && /\/journalLambdafunc\/entry-share\/\d+\/read$/.test(path):
         event.pathParameters = { id: path.split('/')[3] };
         return await markSharedEntryRead(event, conn);
+
+      // Account deletion
+      case method === 'DELETE' && path === PATHS.account:
+        return await deleteAccount(event, conn);
 
       // Not found
       default:

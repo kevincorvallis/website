@@ -1316,6 +1316,59 @@ function editProfile() {
   alert('Profile editing feature coming soon!');
 }
 
+// ============================================
+// ACCOUNT DELETION
+// ============================================
+function showDeleteAccountModal() {
+  hideProfile();
+  document.getElementById('deleteAccountModal').style.display = 'flex';
+}
+
+function hideDeleteAccountModal() {
+  document.getElementById('deleteAccountModal').style.display = 'none';
+}
+
+async function deleteAccount() {
+  if (!currentUser) return;
+
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Deleting...';
+
+  try {
+    const token = await api.getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/account`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to delete account');
+    }
+
+    // Clear local data
+    localStorage.clear();
+
+    // Sign out
+    await signOut();
+
+    // Redirect to home
+    showToast('Account deleted successfully', 'success');
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 1500);
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    showToast('Failed to delete account: ' + error.message, 'error');
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Delete My Account';
+  }
+}
+
 function clearForm() {
   document.getElementById('entryTitle').value = '';
   if (quillEditor) {
@@ -1817,6 +1870,12 @@ document.getElementById('profileModal').addEventListener('click', function(e) {
   }
 });
 
+document.getElementById('deleteAccountModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    hideDeleteAccountModal();
+  }
+});
+
 // Online/offline event listeners
 window.addEventListener('online', async () => {
   console.log('Back online - syncing...');
@@ -1842,6 +1901,9 @@ window.addEventListener('offline', () => {
 window.showProfile = showProfile;
 window.hideProfile = hideProfile;
 window.editProfile = editProfile;
+window.showDeleteAccountModal = showDeleteAccountModal;
+window.hideDeleteAccountModal = hideDeleteAccountModal;
+window.deleteAccount = deleteAccount;
 window.signOutUser = signOutUser;
 window.clearForm = clearForm;
 window.deleteEntry = deleteEntry;
