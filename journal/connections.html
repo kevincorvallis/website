@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Day by Day - Connections</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="dashboard.css">
   <link rel="stylesheet" href="connections.css">
 </head>
 <body>
@@ -15,13 +16,6 @@
         <a href="dashboard.html" class="back-link">&larr; Back to Journal</a>
         <h1>Connections</h1>
         <p class="subtitle">Connect with friends and family</p>
-      </div>
-      <div class="header-actions">
-        <button onclick="signOutUser()" class="icon-btn" title="Sign out">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.59L17 17L22 12L17 7ZM4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z" fill="currentColor"/>
-          </svg>
-        </button>
       </div>
     </header>
 
@@ -66,6 +60,41 @@
       </div>
     </div>
   </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 21H5C4.45 21 4 20.55 4 20V11L12 3L20 11V20C20 20.55 19.55 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 21V14H15V21" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <span>Home</span>
+    </a>
+    <a href="journalPrompts.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="17" r="1" fill="currentColor"/>
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <span>Prompts</span>
+    </a>
+    <a href="connections.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 11C17.66 11 18.99 9.66 18.99 8C18.99 6.34 17.66 5 16 5C14.34 5 13 6.34 13 8C13 9.66 14.34 11 16 11Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M8 11C9.66 11 10.99 9.66 10.99 8C10.99 6.34 9.66 5 8 5C6.34 5 5 6.34 5 8C5 9.66 6.34 11 8 11Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M8 13C5.67 13 1 14.17 1 16.5V19H15V16.5C15 14.17 10.33 13 8 13Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M16 13C18.33 13 23 14.17 23 16.5V19H17V16.5" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <span>Connect</span>
+    </a>
+    <button class="nav-item" onclick="signOutUser()">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.59L17 17L22 12L17 7Z" stroke="currentColor" stroke-width="0" fill="currentColor"/>
+        <path d="M4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z" stroke="currentColor" stroke-width="0" fill="currentColor"/>
+      </svg>
+      <span>Logout</span>
+    </button>
+  </nav>
 
   <!-- Placeholder functions while module loads -->
   <script>
