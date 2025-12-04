@@ -52,7 +52,10 @@
       "Bash(aws s3 ls:*)",
       "Bash(aws cloudfront list-distributions:*)",
       "Bash(aws s3 sync:*)",
-      "Bash(aws cloudfront create-invalidation:*)"
+      "Bash(aws cloudfront create-invalidation:*)",
+      "Bash(xargs:*)",
+      "Bash(npm install:*)",
+      "Bash(pip3 install:*)"
     ],
     "deny": [],
     "ask": []

@@ -554,6 +554,7 @@ function displayEntries(entries) {
     const syncIcon = entry.synced ? '' : '<span class="unsynced-badge" title="Not synced">*</span>';
     const div = document.createElement('div');
     div.className = 'entry';
+    const entryId = entry.entry_id || entry.id;
     div.innerHTML = `
       <h3>${escapeHtml(entry.title)} ${syncIcon}</h3>
       <p>${escapeHtml(entry.text)}</p>
@@ -567,7 +568,16 @@ function displayEntries(entries) {
           minute: '2-digit'
         })}</small>
         <span class="word-count">${wordCount} words</span>
-        <button class="delete-btn" onclick="deleteEntry('${entry.id}')">Delete</button>
+        <div class="entry-actions">
+          ${entry.synced && entry.entry_id ? `<button class="share-btn" onclick="shareEntry(${entry.entry_id})" title="Share entry">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+          </button>` : ''}
+          <button class="delete-btn" onclick="deleteEntry('${entry.id}')">Delete</button>
+        </div>
       </div>
     `;
     container.appendChild(div);
@@ -677,6 +687,282 @@ async function deleteEntry(id) {
   }
 }
 
+let currentShareEntryId = null;
+let selectedConnections = new Set();
+
+async function shareEntry(entryId) {
+  if (!currentUser) return;
+
+  currentShareEntryId = entryId;
+  selectedConnections.clear();
+
+  // Load connections and show modal
+  try {
+    const token = await api.getAuthToken();
+    const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
+    const response = await fetch(`${baseUrl}/journalLambdafunc/connections`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error);
+
+    const connectionsList = document.getElementById('connectionsList');
+
+    if (!data.connections || data.connections.length === 0) {
+      connectionsList.innerHTML = `
+        <p style="text-align: center; color: var(--text-secondary);">
+          No connections yet. <a href="connections.html">Add friends</a> to share entries with them.
+        </p>
+      `;
+    } else {
+      connectionsList.innerHTML = data.connections.map(conn => `
+        <div class="connection-option" onclick="toggleConnection('${conn.uid}')">
+          <input type="checkbox" id="conn-${conn.uid}" ${selectedConnections.has(conn.uid) ? 'checked' : ''}>
+          <span class="connection-name">${escapeHtml(conn.first_name || conn.username || 'Friend')}</span>
+          <span class="phone-status ${conn.phone_verified ? 'verified' : ''}">${conn.phone_verified ? 'SMS enabled' : ''}</span>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('shareModal').style.display = 'flex';
+  } catch (error) {
+    console.error('Error loading connections:', error);
+    showToast('Failed to load connections', 'error');
+  }
+}
+
+function toggleConnection(uid) {
+  if (selectedConnections.has(uid)) {
+    selectedConnections.delete(uid);
+  } else {
+    selectedConnections.add(uid);
+  }
+  const checkbox = document.getElementById(`conn-${uid}`);
+  if (checkbox) checkbox.checked = selectedConnections.has(uid);
+
+  const option = checkbox?.closest('.connection-option');
+  if (option) option.classList.toggle('selected', selectedConnections.has(uid));
+}
+
+function hideShareModal() {
+  document.getElementById('shareModal').style.display = 'none';
+  currentShareEntryId = null;
+  selectedConnections.clear();
+}
+
+async function confirmShare() {
+  if (!currentShareEntryId || selectedConnections.size === 0) {
+    showToast('Select at least one friend to share with', 'error');
+    return;
+  }
+
+  try {
+    showToast('Sharing entry...', 'info');
+
+    const token = await api.getAuthToken();
+    const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
+    const response = await fetch(`${baseUrl}/journalLambdafunc/entry/${currentShareEntryId}/share-with`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ connectionUids: Array.from(selectedConnections) })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error);
+
+    hideShareModal();
+    showToast('Entry shared! They\'ll get notified.', 'success');
+  } catch (error) {
+    console.error('Error sharing entry:', error);
+    showToast('Failed to share entry', 'error');
+  }
+}
+
+// ============================================
+// PHONE VERIFICATION
+// ============================================
+async function loadPhoneStatus() {
+  if (!currentUser) return;
+
+  try {
+    const token = await api.getAuthToken();
+    const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
+    const response = await fetch(`${baseUrl}/journalLambdafunc/users/phone`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const data = await response.json();
+    const phoneStatus = document.getElementById('phoneStatus');
+    const phoneForm = document.getElementById('phoneForm');
+    const verifyForm = document.getElementById('verifyForm');
+
+    if (data.verified) {
+      phoneStatus.innerHTML = `
+        <div class="verified">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
+          Verified: ${data.phoneNumber}
+        </div>
+      `;
+      phoneForm.style.display = 'none';
+      verifyForm.style.display = 'none';
+    } else if (data.phoneNumber) {
+      phoneStatus.innerHTML = `<p>Verification code sent to ${data.phoneNumber}</p>`;
+      phoneForm.style.display = 'none';
+      verifyForm.style.display = 'flex';
+    } else {
+      phoneStatus.innerHTML = '';
+      phoneForm.style.display = 'flex';
+      verifyForm.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Error loading phone status:', error);
+  }
+}
+
+async function sendPhoneCode() {
+  const phoneInput = document.getElementById('phoneInput');
+  const phone = phoneInput.value.replace(/\D/g, '');
+
+  if (phone.length < 10) {
+    showToast('Enter a valid phone number', 'error');
+    return;
+  }
+
+  try {
+    showToast('Sending verification code...', 'info');
+    const token = await api.getAuthToken();
+    const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
+
+    const response = await fetch(`${baseUrl}/journalLambdafunc/users/phone`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ phoneNumber: phone })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error);
+
+    showToast('Verification code sent!', 'success');
+    document.getElementById('phoneForm').style.display = 'none';
+    document.getElementById('verifyForm').style.display = 'flex';
+    document.getElementById('phoneStatus').innerHTML = `<p>Code sent to ${data.phoneNumber}</p>`;
+  } catch (error) {
+    console.error('Error sending code:', error);
+    showToast(error.message || 'Failed to send code', 'error');
+  }
+}
+
+async function verifyPhoneCode() {
+  const code = document.getElementById('verifyCodeInput').value;
+
+  if (code.length !== 6) {
+    showToast('Enter the 6-digit code', 'error');
+    return;
+  }
+
+  try {
+    showToast('Verifying...', 'info');
+    const token = await api.getAuthToken();
+    const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
+
+    const response = await fetch(`${baseUrl}/journalLambdafunc/users/phone/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ code })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error);
+
+    showToast('Phone verified!', 'success');
+    loadPhoneStatus();
+  } catch (error) {
+    console.error('Error verifying:', error);
+    showToast(error.message || 'Invalid code', 'error');
+  }
+}
+
+// ============================================
+// SHARED WITH ME
+// ============================================
+async function loadSharedWithMe() {
+  if (!currentUser) return;
+
+  try {
+    const token = await api.getAuthToken();
+    const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
+    const response = await fetch(`${baseUrl}/journalLambdafunc/entries/shared-with-me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error);
+
+    const section = document.getElementById('sharedWithMeSection');
+    const container = document.getElementById('sharedEntries');
+    const badge = document.getElementById('sharedUnreadBadge');
+
+    if (data.entries && data.entries.length > 0) {
+      section.style.display = 'block';
+
+      if (data.unreadCount > 0) {
+        badge.textContent = data.unreadCount;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+
+      container.innerHTML = data.entries.map(entry => `
+        <div class="shared-entry ${entry.is_read ? '' : 'unread'}" onclick="viewSharedEntry(${entry.share_id}, ${entry.entry_id})">
+          <div class="shared-by">
+            Shared by <strong>${escapeHtml(entry.sharedBy)}</strong>
+            <span>• ${new Date(entry.shared_at).toLocaleDateString()}</span>
+          </div>
+          ${entry.prompt ? `<div class="entry-prompt">${escapeHtml(entry.prompt)}</div>` : ''}
+          <h3>${escapeHtml(entry.title)}</h3>
+          <p>${escapeHtml(entry.text).substring(0, 150)}${entry.text.length > 150 ? '...' : ''}</p>
+        </div>
+      `).join('');
+    } else {
+      section.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Error loading shared entries:', error);
+  }
+}
+
+async function viewSharedEntry(shareId, entryId) {
+  // Mark as read
+  try {
+    const token = await api.getAuthToken();
+    const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
+    await fetch(`${baseUrl}/journalLambdafunc/entry-share/${shareId}/read`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    // Reload to update unread count
+    loadSharedWithMe();
+  } catch (error) {
+    console.error('Error marking as read:', error);
+  }
+}
+
 // ============================================
 // PROFILE FUNCTIONS
 // ============================================
@@ -724,6 +1010,9 @@ function showProfile() {
   }
 
   document.getElementById('profileModal').style.display = 'flex';
+
+  // Load phone verification status
+  loadPhoneStatus();
 }
 
 function hideProfile() {
@@ -1093,6 +1382,9 @@ async function initializeDashboard() {
   // Fetch pending connections count for badge
   fetchPendingConnectionsCount();
 
+  // Load entries shared with me
+  loadSharedWithMe();
+
   // Set up periodic sync (every 5 minutes if online)
   syncIntervalId = setInterval(async () => {
     if (syncManager && syncManager.isOnline() && !syncManager.isSyncing) {
@@ -1229,5 +1521,15 @@ window.editProfile = editProfile;
 window.signOutUser = signOutUser;
 window.clearForm = clearForm;
 window.deleteEntry = deleteEntry;
+window.shareEntry = shareEntry;
 window.scrollToForm = scrollToForm;
 window.showToast = showToast;
+// Phone verification
+window.sendPhoneCode = sendPhoneCode;
+window.verifyPhoneCode = verifyPhoneCode;
+// Share modal
+window.toggleConnection = toggleConnection;
+window.hideShareModal = hideShareModal;
+window.confirmShare = confirmShare;
+// Shared entries
+window.viewSharedEntry = viewSharedEntry;

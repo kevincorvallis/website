@@ -2,6 +2,10 @@ const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
 const crypto = require('crypto');
+const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
+
+// Initialize SNS client for SMS
+const snsClient = new SNSClient({ region: 'us-west-1' });
 
 // ============================================
 // CONFIGURATION
@@ -26,7 +30,14 @@ const PATHS = {
   // Invite links
   inviteCreate: '/journalLambdafunc/invite/create',
   inviteInfo: '/journalLambdafunc/invite',
-  inviteRedeem: '/journalLambdafunc/invite/redeem'
+  inviteRedeem: '/journalLambdafunc/invite/redeem',
+  // Shared entries
+  sharedEntry: '/journalLambdafunc/shared',
+  // Phone verification
+  usersPhone: '/journalLambdafunc/users/phone',
+  usersPhoneVerify: '/journalLambdafunc/users/phone/verify',
+  // Share with connections
+  entriesSharedWithMe: '/journalLambdafunc/entries/shared-with-me'
 };
 
 // Cognito Configuration
@@ -1048,6 +1059,533 @@ async function redeemInvite(event, conn) {
 }
 
 // ============================================
+// SHARED ENTRY HANDLERS
+// ============================================
+
+// POST /entry/{id}/share - Create a shareable link for an entry
+async function shareEntry(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const entryId = event.pathParameters?.id;
+  if (!entryId || isNaN(parseInt(entryId))) {
+    return errorResponse(400, 'Invalid entry ID');
+  }
+
+  try {
+    // Verify ownership
+    const [entry] = await conn.execute(
+      'SELECT entry_id, title FROM journal_entries WHERE entry_id = ? AND firebase_uid = ? AND is_deleted = 0',
+      [entryId, uid]
+    );
+
+    if (entry.length === 0) {
+      return errorResponse(404, 'Entry not found or not authorized');
+    }
+
+    // Check if share already exists for this entry
+    const [existing] = await conn.execute(
+      'SELECT share_token FROM shared_entries WHERE entry_id = ? AND owner_uid = ?',
+      [entryId, uid]
+    );
+
+    if (existing.length > 0) {
+      // Return existing share link
+      const shareUrl = `https://klee.page/journal/shared.html?token=${existing[0].share_token}`;
+      return buildResponse(200, {
+        shareToken: existing[0].share_token,
+        shareUrl: shareUrl,
+        message: 'Share link already exists'
+      });
+    }
+
+    // Generate new share token
+    const shareToken = crypto.randomBytes(32).toString('base64url');
+
+    // Create share record
+    await conn.execute(
+      'INSERT INTO shared_entries (share_token, entry_id, owner_uid) VALUES (?, ?, ?)',
+      [shareToken, entryId, uid]
+    );
+
+    const shareUrl = `https://klee.page/journal/shared.html?token=${shareToken}`;
+
+    return buildResponse(201, {
+      shareToken: shareToken,
+      shareUrl: shareUrl,
+      message: 'Share link created'
+    });
+  } catch (error) {
+    console.error('Error sharing entry:', error);
+    return errorResponse(500, 'Failed to create share link');
+  }
+}
+
+// GET /shared/{token} - View a shared entry (public - no auth required)
+async function getSharedEntry(event, conn) {
+  const token = event.pathParameters?.token || event.queryStringParameters?.token;
+  if (!token) {
+    return errorResponse(400, 'Share token required');
+  }
+
+  try {
+    // Get share info and entry
+    const [rows] = await conn.execute(
+      `SELECT se.share_id, se.entry_id, se.owner_uid, se.view_count,
+              je.title, je.text, je.date, je.prompt_id,
+              u.first_name, u.username
+       FROM shared_entries se
+       JOIN journal_entries je ON se.entry_id = je.entry_id
+       LEFT JOIN users u ON se.owner_uid = u.firebase_uid
+       WHERE se.share_token = ? AND je.is_deleted = 0`,
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return errorResponse(404, 'Shared entry not found or has been deleted');
+    }
+
+    const sharedEntry = rows[0];
+
+    // Increment view count
+    await conn.execute(
+      'UPDATE shared_entries SET view_count = view_count + 1 WHERE share_id = ?',
+      [sharedEntry.share_id]
+    );
+
+    // Get prompt text if there's a prompt_id
+    let promptText = null;
+    if (sharedEntry.prompt_id) {
+      const [promptRows] = await conn.execute(
+        'SELECT prompt FROM prompts WHERE prompt_id = ?',
+        [sharedEntry.prompt_id]
+      );
+      if (promptRows.length > 0) {
+        promptText = promptRows[0].prompt;
+      }
+    }
+
+    return buildResponse(200, {
+      entry: {
+        title: sharedEntry.title,
+        text: sharedEntry.text,
+        date: sharedEntry.date,
+        prompt: promptText
+      },
+      author: {
+        name: sharedEntry.first_name || sharedEntry.username || 'A Day by Day user'
+      },
+      viewCount: sharedEntry.view_count + 1
+    });
+  } catch (error) {
+    console.error('Error getting shared entry:', error);
+    return errorResponse(500, 'Failed to get shared entry');
+  }
+}
+
+// DELETE /shared/{token} - Remove a share link (owner only)
+async function deleteSharedEntry(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const token = event.pathParameters?.token;
+  if (!token) {
+    return errorResponse(400, 'Share token required');
+  }
+
+  try {
+    const [result] = await conn.execute(
+      'DELETE FROM shared_entries WHERE share_token = ? AND owner_uid = ?',
+      [token, uid]
+    );
+
+    if (result.affectedRows === 0) {
+      return errorResponse(404, 'Share link not found or not authorized');
+    }
+
+    return buildResponse(200, { message: 'Share link removed' });
+  } catch (error) {
+    console.error('Error deleting share link:', error);
+    return errorResponse(500, 'Failed to delete share link');
+  }
+}
+
+// ============================================
+// PHONE VERIFICATION HANDLERS
+// ============================================
+
+// Helper function to send SMS via AWS SNS
+async function sendSMS(phoneNumber, message) {
+  const params = {
+    Message: message,
+    PhoneNumber: phoneNumber,
+    MessageAttributes: {
+      'AWS.SNS.SMS.SMSType': {
+        DataType: 'String',
+        StringValue: 'Transactional'
+      }
+    }
+  };
+
+  try {
+    await snsClient.send(new PublishCommand(params));
+    return true;
+  } catch (error) {
+    console.error('SMS send error:', error);
+    return false;
+  }
+}
+
+// POST /users/phone - Save phone number and send verification code
+async function sendPhoneVerification(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { phoneNumber } = body;
+  if (!phoneNumber) {
+    return errorResponse(400, 'Phone number required');
+  }
+
+  // Normalize phone number (ensure it starts with +1 for US)
+  let normalizedPhone = phoneNumber.replace(/\D/g, '');
+  if (normalizedPhone.length === 10) {
+    normalizedPhone = '+1' + normalizedPhone;
+  } else if (!normalizedPhone.startsWith('+')) {
+    normalizedPhone = '+' + normalizedPhone;
+  }
+
+  // Generate 6-digit verification code
+  const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+  try {
+    // Update user with phone and verification code
+    await conn.execute(
+      `UPDATE users
+       SET phone_number = ?,
+           phone_verification_code = ?,
+           phone_verification_expires = ?,
+           phone_verified = 0
+       WHERE firebase_uid = ?`,
+      [normalizedPhone, verificationCode, expiresAt, uid]
+    );
+
+    // Send SMS
+    const message = `Your Day by Day verification code is: ${verificationCode}. It expires in 10 minutes.`;
+    const sent = await sendSMS(normalizedPhone, message);
+
+    if (!sent) {
+      return errorResponse(500, 'Failed to send verification SMS');
+    }
+
+    return buildResponse(200, {
+      message: 'Verification code sent',
+      phoneNumber: normalizedPhone.slice(0, -4) + '****' // Masked
+    });
+  } catch (error) {
+    console.error('Error sending phone verification:', error);
+    return errorResponse(500, 'Failed to send verification');
+  }
+}
+
+// POST /users/phone/verify - Verify the OTP code
+async function verifyPhone(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { code } = body;
+  if (!code || code.length !== 6) {
+    return errorResponse(400, 'Invalid verification code');
+  }
+
+  try {
+    // Check verification code
+    const [rows] = await conn.execute(
+      `SELECT phone_verification_code, phone_verification_expires, phone_number
+       FROM users WHERE firebase_uid = ?`,
+      [uid]
+    );
+
+    if (rows.length === 0) {
+      return errorResponse(404, 'User not found');
+    }
+
+    const user = rows[0];
+
+    if (!user.phone_verification_code) {
+      return errorResponse(400, 'No verification pending');
+    }
+
+    if (new Date() > new Date(user.phone_verification_expires)) {
+      return errorResponse(400, 'Verification code expired');
+    }
+
+    if (user.phone_verification_code !== code) {
+      return errorResponse(400, 'Invalid verification code');
+    }
+
+    // Mark phone as verified
+    await conn.execute(
+      `UPDATE users
+       SET phone_verified = 1,
+           phone_verification_code = NULL,
+           phone_verification_expires = NULL
+       WHERE firebase_uid = ?`,
+      [uid]
+    );
+
+    return buildResponse(200, {
+      message: 'Phone verified successfully',
+      phoneNumber: user.phone_number
+    });
+  } catch (error) {
+    console.error('Error verifying phone:', error);
+    return errorResponse(500, 'Failed to verify phone');
+  }
+}
+
+// ============================================
+// SHARE WITH CONNECTIONS HANDLERS
+// ============================================
+
+// POST /entry/{id}/share-with - Share entry with specific connections
+async function shareEntryWithConnections(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const entryId = event.pathParameters?.id;
+  if (!entryId || isNaN(parseInt(entryId))) {
+    return errorResponse(400, 'Invalid entry ID');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { connectionUids } = body; // Array of UIDs to share with
+  if (!connectionUids || !Array.isArray(connectionUids) || connectionUids.length === 0) {
+    return errorResponse(400, 'Connection UIDs required');
+  }
+
+  try {
+    // Verify entry ownership
+    const [entry] = await conn.execute(
+      'SELECT entry_id, title FROM journal_entries WHERE entry_id = ? AND firebase_uid = ? AND is_deleted = 0',
+      [entryId, uid]
+    );
+
+    if (entry.length === 0) {
+      return errorResponse(404, 'Entry not found or not authorized');
+    }
+
+    // Verify all are valid connections
+    const placeholders = connectionUids.map(() => '?').join(',');
+    const [connections] = await conn.execute(
+      `SELECT target_uid FROM connections
+       WHERE requester_uid = ? AND target_uid IN (${placeholders}) AND status = 'accepted'
+       UNION
+       SELECT requester_uid FROM connections
+       WHERE target_uid = ? AND requester_uid IN (${placeholders}) AND status = 'accepted'`,
+      [uid, ...connectionUids, uid, ...connectionUids]
+    );
+
+    const validUids = new Set(connections.map(c => c.target_uid || c.requester_uid));
+    const invalidUids = connectionUids.filter(u => !validUids.has(u));
+
+    if (invalidUids.length > 0) {
+      return errorResponse(400, `Not connected with: ${invalidUids.join(', ')}`);
+    }
+
+    // Get owner's name for notifications
+    const [ownerRows] = await conn.execute(
+      'SELECT first_name, username FROM users WHERE firebase_uid = ?',
+      [uid]
+    );
+    const ownerName = ownerRows[0]?.first_name || ownerRows[0]?.username || 'Someone';
+
+    // Share with each connection
+    const results = [];
+    for (const targetUid of connectionUids) {
+      try {
+        // Insert share record (ignore if already shared)
+        await conn.execute(
+          `INSERT IGNORE INTO entry_shares (entry_id, owner_uid, shared_with_uid)
+           VALUES (?, ?, ?)`,
+          [entryId, uid, targetUid]
+        );
+
+        // Get target user's phone for SMS notification
+        const [targetUser] = await conn.execute(
+          'SELECT phone_number, phone_verified, first_name FROM users WHERE firebase_uid = ?',
+          [targetUid]
+        );
+
+        if (targetUser.length > 0 && targetUser[0].phone_verified && targetUser[0].phone_number) {
+          // Send SMS notification
+          const message = `${ownerName} shared a journal entry with you on Day by Day: "${entry[0].title}". Open the app to read it!`;
+          await sendSMS(targetUser[0].phone_number, message);
+
+          // Mark as notified
+          await conn.execute(
+            'UPDATE entry_shares SET notified = 1 WHERE entry_id = ? AND shared_with_uid = ?',
+            [entryId, targetUid]
+          );
+        }
+
+        results.push({ uid: targetUid, shared: true });
+      } catch (err) {
+        results.push({ uid: targetUid, shared: false, error: err.message });
+      }
+    }
+
+    return buildResponse(200, {
+      message: 'Entry shared successfully',
+      results
+    });
+  } catch (error) {
+    console.error('Error sharing entry with connections:', error);
+    return errorResponse(500, 'Failed to share entry');
+  }
+}
+
+// GET /entries/shared-with-me - Get entries shared with current user
+async function getEntriesSharedWithMe(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [entries] = await conn.execute(
+      `SELECT es.share_id, es.entry_id, es.shared_at, es.is_read,
+              je.title, je.text, je.date, je.prompt_id,
+              u.first_name, u.username, u.firebase_uid as owner_uid
+       FROM entry_shares es
+       JOIN journal_entries je ON es.entry_id = je.entry_id
+       JOIN users u ON es.owner_uid = u.firebase_uid
+       WHERE es.shared_with_uid = ? AND je.is_deleted = 0
+       ORDER BY es.shared_at DESC
+       LIMIT 50`,
+      [uid]
+    );
+
+    // Get prompts for entries that have them
+    const entriesWithPrompts = await Promise.all(entries.map(async (entry) => {
+      let promptText = null;
+      if (entry.prompt_id) {
+        const [promptRows] = await conn.execute(
+          'SELECT prompt FROM prompts WHERE prompt_id = ?',
+          [entry.prompt_id]
+        );
+        if (promptRows.length > 0) {
+          promptText = promptRows[0].prompt;
+        }
+      }
+      return {
+        ...entry,
+        prompt: promptText,
+        sharedBy: entry.first_name || entry.username || 'A friend'
+      };
+    }));
+
+    // Count unread
+    const unreadCount = entries.filter(e => !e.is_read).length;
+
+    return buildResponse(200, {
+      entries: entriesWithPrompts,
+      unreadCount
+    });
+  } catch (error) {
+    console.error('Error getting shared entries:', error);
+    return errorResponse(500, 'Failed to get shared entries');
+  }
+}
+
+// PUT /entry-share/{id}/read - Mark shared entry as read
+async function markSharedEntryRead(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const shareId = event.pathParameters?.id;
+  if (!shareId) {
+    return errorResponse(400, 'Share ID required');
+  }
+
+  try {
+    const [result] = await conn.execute(
+      'UPDATE entry_shares SET is_read = 1 WHERE share_id = ? AND shared_with_uid = ?',
+      [shareId, uid]
+    );
+
+    if (result.affectedRows === 0) {
+      return errorResponse(404, 'Shared entry not found');
+    }
+
+    return buildResponse(200, { message: 'Marked as read' });
+  } catch (error) {
+    console.error('Error marking shared entry as read:', error);
+    return errorResponse(500, 'Failed to mark as read');
+  }
+}
+
+// GET /users/phone - Get current phone verification status
+async function getPhoneStatus(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      'SELECT phone_number, phone_verified FROM users WHERE firebase_uid = ?',
+      [uid]
+    );
+
+    if (rows.length === 0) {
+      return buildResponse(200, { phoneNumber: null, verified: false });
+    }
+
+    const user = rows[0];
+    return buildResponse(200, {
+      phoneNumber: user.phone_number ? user.phone_number.slice(0, -4) + '****' : null,
+      verified: !!user.phone_verified
+    });
+  } catch (error) {
+    console.error('Error getting phone status:', error);
+    return errorResponse(500, 'Failed to get phone status');
+  }
+}
+
+// ============================================
 // SCHEMA INITIALIZATION
 // ============================================
 async function initializeSchema(conn) {
@@ -1059,9 +1597,14 @@ async function initializeSchema(conn) {
       email VARCHAR(255),
       first_name VARCHAR(100),
       last_name VARCHAR(100),
+      phone_number VARCHAR(20),
+      phone_verified TINYINT(1) DEFAULT 0,
+      phone_verification_code VARCHAR(6),
+      phone_verification_expires DATETIME,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_firebase_uid (firebase_uid)
+      INDEX idx_firebase_uid (firebase_uid),
+      INDEX idx_phone (phone_number)
     );
 
     CREATE TABLE IF NOT EXISTS journal_entries (
@@ -1109,6 +1652,33 @@ async function initializeSchema(conn) {
       INDEX idx_token (invite_token),
       INDEX idx_creator (creator_uid)
     );
+
+    CREATE TABLE IF NOT EXISTS shared_entries (
+      share_id INT AUTO_INCREMENT PRIMARY KEY,
+      share_token VARCHAR(64) UNIQUE NOT NULL,
+      entry_id INT NOT NULL,
+      owner_uid VARCHAR(128) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      expires_at DATETIME NULL,
+      view_count INT DEFAULT 0,
+      INDEX idx_share_token (share_token),
+      INDEX idx_entry (entry_id),
+      INDEX idx_owner (owner_uid)
+    );
+
+    CREATE TABLE IF NOT EXISTS entry_shares (
+      share_id INT AUTO_INCREMENT PRIMARY KEY,
+      entry_id INT NOT NULL,
+      owner_uid VARCHAR(128) NOT NULL,
+      shared_with_uid VARCHAR(128) NOT NULL,
+      shared_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      is_read TINYINT(1) DEFAULT 0,
+      notified TINYINT(1) DEFAULT 0,
+      UNIQUE KEY unique_share (entry_id, shared_with_uid),
+      INDEX idx_shared_with (shared_with_uid, is_read),
+      INDEX idx_owner (owner_uid),
+      INDEX idx_entry (entry_id)
+    );
   `;
 
   // Execute each statement
@@ -1142,6 +1712,33 @@ async function initializeSchema(conn) {
   return buildResponse(200, { message: 'Schema initialized successfully' });
 }
 
+// Run migrations to add new columns to existing tables
+async function runMigrations(conn) {
+  const migrations = [
+    // Add phone columns to users table
+    "ALTER TABLE users ADD COLUMN phone_number VARCHAR(20)",
+    "ALTER TABLE users ADD COLUMN phone_verified TINYINT(1) DEFAULT 0",
+    "ALTER TABLE users ADD COLUMN phone_verification_code VARCHAR(6)",
+    "ALTER TABLE users ADD COLUMN phone_verification_expires DATETIME"
+  ];
+
+  const results = [];
+  for (const sql of migrations) {
+    try {
+      await conn.execute(sql);
+      results.push({ sql: sql.substring(0, 50), success: true });
+    } catch (error) {
+      if (error.code === 'ER_DUP_FIELDNAME') {
+        results.push({ sql: sql.substring(0, 50), success: true, note: 'Column already exists' });
+      } else {
+        results.push({ sql: sql.substring(0, 50), success: false, error: error.message });
+      }
+    }
+  }
+
+  return buildResponse(200, { message: 'Migrations complete', results });
+}
+
 // ============================================
 // MAIN HANDLER
 // ============================================
@@ -1165,6 +1762,10 @@ exports.handler = async (event, context) => {
       // Schema initialization (one-time setup)
       case method === 'POST' && path === '/journalLambdafunc/init-schema':
         return await initializeSchema(conn);
+
+      // Run migrations (add new columns to existing tables)
+      case method === 'POST' && path === '/journalLambdafunc/run-migrations':
+        return await runMigrations(conn);
 
       // Health check
       case method === 'GET' && path === PATHS.health:
@@ -1240,6 +1841,41 @@ exports.handler = async (event, context) => {
 
       case method === 'POST' && path === PATHS.inviteRedeem:
         return await redeemInvite(event, conn);
+
+      // Shared entry endpoints
+      case method === 'POST' && path.match(/\/journalLambdafunc\/entry\/\d+\/share$/):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await shareEntry(event, conn);
+
+      case method === 'GET' && path.startsWith(PATHS.sharedEntry + '/'):
+        event.pathParameters = { token: path.split('/').pop() };
+        return await getSharedEntry(event, conn);
+
+      case method === 'DELETE' && path.startsWith(PATHS.sharedEntry + '/'):
+        event.pathParameters = { token: path.split('/').pop() };
+        return await deleteSharedEntry(event, conn);
+
+      // Phone verification endpoints
+      case method === 'GET' && path === PATHS.usersPhone:
+        return await getPhoneStatus(event, conn);
+
+      case method === 'POST' && path === PATHS.usersPhone:
+        return await sendPhoneVerification(event, conn);
+
+      case method === 'POST' && path === PATHS.usersPhoneVerify:
+        return await verifyPhone(event, conn);
+
+      // Share with connections endpoints
+      case method === 'POST' && path.match(/\/journalLambdafunc\/entry\/\d+\/share-with$/):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await shareEntryWithConnections(event, conn);
+
+      case method === 'GET' && path === PATHS.entriesSharedWithMe:
+        return await getEntriesSharedWithMe(event, conn);
+
+      case method === 'PUT' && path.match(/\/journalLambdafunc\/entry-share\/\d+\/read$/):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await markSharedEntryRead(event, conn);
 
       // Not found
       default:

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Shared Entry - Day by Day</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      align-items: flex-start;
+      padding-top: 60px;
+    }
+
+    .shared-container {
+      max-width: 600px;
+      width: 100%;
+      text-align: left;
+      padding: 40px;
+    }
+
+    .shared-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .shared-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .shared-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    .author-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .prompt-box {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .prompt-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .prompt-text {
+      font-size: 15px;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+
+    .entry-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .entry-date {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .entry-content {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text-primary);
+    }
+
+    .entry-content p {
+      margin-bottom: 16px;
+    }
+
+    .entry-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .cta-section {
+      margin-top: 48px;
+      text-align: center;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .cta-section h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .cta-section p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--accent-blue);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .cta-btn:hover {
+      background: #0066d6;
+      transform: translateY(-1px);
+    }
+
+    .loading-state,
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-state svg {
+      width: 48px;
+      height: 48px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .error-state h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .error-state p {
+      color: var(--text-secondary);
+    }
+
+    .view-count {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container shared-container">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading shared entry...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 7V13M12 16V17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h2>Entry Not Found</h2>
+      <p id="errorMessage">This shared entry may have been removed or the link is invalid.</p>
+    </div>
+
+    <!-- Entry Content -->
+    <div id="entryContent" style="display: none;">
+      <div class="shared-header">
+        <h1>Day by Day</h1>
+        <div class="shared-meta">
+          <div class="author-avatar" id="authorInitial">?</div>
+          <span>Shared by <strong id="authorName">Someone</strong></span>
+        </div>
+      </div>
+
+      <div id="promptSection" class="prompt-box" style="display: none;">
+        <div class="prompt-label">Writing Prompt</div>
+        <div class="prompt-text" id="promptText"></div>
+      </div>
+
+      <h2 class="entry-title" id="entryTitle"></h2>
+      <div class="entry-date" id="entryDate"></div>
+      <div class="entry-content" id="entryText"></div>
+
+      <div class="view-count" id="viewCount"></div>
+
+      <div class="cta-section">
+        <h3>Start Your Own Journal</h3>
+        <p>Capture your thoughts, track your journey, and connect with friends.</p>
+        <a href="index.html" class="cta-btn">Get Started Free</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://1t1byyi4x6.execute-api.us-west-1.amazonaws.com/prod';
+
+    async function loadSharedEntry() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (!token) {
+        showError('No share token provided');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/journalLambdafunc/shared/${token}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          showError(data.error || 'Failed to load entry');
+          return;
+        }
+
+        displayEntry(data);
+      } catch (error) {
+        console.error('Error loading shared entry:', error);
+        showError('Failed to load shared entry');
+      }
+    }
+
+    function displayEntry(data) {
+      const { entry, author, viewCount } = data;
+
+      // Hide loading, show content
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('entryContent').style.display = 'block';
+
+      // Author info
+      const authorName = author.name || 'A Day by Day user';
+      document.getElementById('authorName').textContent = authorName;
+      document.getElementById('authorInitial').textContent = authorName.charAt(0).toUpperCase();
+
+      // Prompt (if any)
+      if (entry.prompt) {
+        document.getElementById('promptSection').style.display = 'block';
+        document.getElementById('promptText').textContent = entry.prompt;
+      }
+
+      // Entry content
+      document.getElementById('entryTitle').textContent = entry.title || 'Untitled Entry';
+
+      // Format date
+      const entryDate = new Date(entry.date);
+      const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('entryDate').textContent = entryDate.toLocaleDateString('en-US', dateOptions);
+
+      // Entry text - handle HTML content from Quill
+      const textContainer = document.getElementById('entryText');
+      if (entry.text.includes('<')) {
+        // HTML content from Quill
+        textContainer.innerHTML = entry.text;
+      } else {
+        // Plain text - convert newlines to paragraphs
+        textContainer.innerHTML = entry.text
+          .split('\n\n')
+          .filter(p => p.trim())
+          .map(p => `<p>${p}</p>`)
+          .join('');
+      }
+
+      // View count
+      if (viewCount > 1) {
+        document.getElementById('viewCount').textContent = `Viewed ${viewCount} times`;
+      }
+
+      // Update page title
+      document.title = `${entry.title || 'Shared Entry'} - Day by Day`;
+    }
+
+    function showError(message) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      document.getElementById('errorMessage').textContent = message;
+    }
+
+    // Load on page ready
+    loadSharedEntry();
+  </script>
+</body>
+</html>

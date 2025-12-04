@@ -565,6 +565,34 @@ body::-webkit-scrollbar {
   background: rgba(244, 67, 54, 0.2);
 }
 
+.entry-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.share-btn {
+  background: rgba(0, 122, 255, 0.1);
+  border: none;
+  color: var(--accent);
+  padding: 8px 12px;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.share-btn:hover, .share-btn:active {
+  background: rgba(0, 122, 255, 0.2);
+}
+
+.share-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* ============================================
    FLOATING ACTION BUTTON (FAB)
    ============================================ */
@@ -919,6 +947,168 @@ body::-webkit-scrollbar {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* ============================================
+   PHONE VERIFICATION
+   ============================================ */
+.phone-verification-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.phone-verification-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.phone-verification-section .section-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+#phoneStatus .verified {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--success);
+  font-weight: 500;
+}
+
+#phoneStatus .verified svg {
+  width: 20px;
+  height: 20px;
+}
+
+#phoneForm, #verifyForm {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+#phoneForm input, #verifyForm input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+#verifyForm input {
+  text-align: center;
+  letter-spacing: 4px;
+  font-size: 1.2rem;
+}
+
+/* ============================================
+   SHARED ENTRIES SECTION
+   ============================================ */
+.shared-section {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.shared-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.unread-badge {
+  background: var(--accent-primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.shared-entry {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-top: 12px;
+  border-left: 3px solid var(--accent-primary);
+}
+
+.shared-entry.unread {
+  border-left-color: var(--accent-primary);
+  background: rgba(0, 122, 255, 0.05);
+}
+
+.shared-entry .shared-by {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shared-entry .shared-by strong {
+  color: var(--text-primary);
+}
+
+/* ============================================
+   SHARE WITH CONNECTIONS MODAL
+   ============================================ */
+.share-desc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.connections-select {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.connection-option {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.connection-option:hover {
+  background: var(--bg-secondary);
+}
+
+.connection-option.selected {
+  border-color: var(--accent-primary);
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.connection-option input[type="checkbox"] {
+  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent-primary);
+}
+
+.connection-option .connection-name {
+  font-weight: 500;
+}
+
+.connection-option .phone-status {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.connection-option .phone-status.verified {
+  color: var(--success);
 }
 
 /* ============================================

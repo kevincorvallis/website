@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.0.0",
+    "@aws-sdk/client-sns": "^3.943.0",
     "aws-sdk": "^2.1323.0",
     "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^3.1.0",

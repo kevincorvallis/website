@@ -70,6 +70,15 @@
       </form>
     </div>
 
+    <!-- Shared With Me Section -->
+    <div class="entries-container shared-section" id="sharedWithMeSection" style="display: none;">
+      <h2>
+        <span>Shared with You</span>
+        <span class="unread-badge" id="sharedUnreadBadge" style="display: none;">0</span>
+      </h2>
+      <div id="sharedEntries" class="entries-grid"></div>
+    </div>
+
     <!-- Journal Entries -->
     <div class="entries-container">
       <h2>Your Journal</h2>
@@ -129,9 +138,43 @@
       </div>
       <div class="modal-body">
         <div id="profileContent"></div>
+
+        <!-- Phone Verification Section -->
+        <div class="phone-verification-section">
+          <h3>Phone Notifications</h3>
+          <p class="section-desc">Verify your phone to get notified when friends share journals with you.</p>
+          <div id="phoneStatus"></div>
+          <div id="phoneForm" style="display: none;">
+            <input type="tel" id="phoneInput" placeholder="(555) 123-4567" maxlength="14">
+            <button onclick="sendPhoneCode()" class="primary-btn" id="sendCodeBtn">Send Code</button>
+          </div>
+          <div id="verifyForm" style="display: none;">
+            <input type="text" id="verifyCodeInput" placeholder="6-digit code" maxlength="6" pattern="[0-9]*" inputmode="numeric">
+            <button onclick="verifyPhoneCode()" class="primary-btn">Verify</button>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button onclick="editProfile()" class="primary-btn">Edit Profile</button>
           <button onclick="hideProfile()" class="secondary-btn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share With Connections Modal -->
+  <div id="shareModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Share with Friends</h2>
+        <button class="close-btn" onclick="hideShareModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="share-desc">Select friends to share this entry with. They'll get a notification!</p>
+        <div id="connectionsList" class="connections-select"></div>
+        <div class="modal-actions">
+          <button onclick="confirmShare()" class="primary-btn" id="confirmShareBtn">Share</button>
+          <button onclick="hideShareModal()" class="secondary-btn">Cancel</button>
         </div>
       </div>
     </div>
