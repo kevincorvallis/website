@@ -818,8 +818,8 @@ async function getShareLink(entryId) {
 
     if (!response.ok) throw new Error(data.error);
 
-    // Build the share URL
-    const shareUrl = `${window.location.origin}/journal/shared.html?token=${data.share_token}`;
+    // Use the shareUrl from backend, or build it from shareToken
+    const shareUrl = data.shareUrl || `${window.location.origin}/journal/shared.html?token=${data.shareToken}`;
 
     // Show modal with copy functionality
     showShareLinkModal(shareUrl);
