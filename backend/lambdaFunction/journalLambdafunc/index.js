@@ -1123,7 +1123,7 @@ async function shareEntry(event, conn) {
   }
 }
 
-// GET /shared/{token} - View a shared entry (public - no auth required)
+// GET /shared/{token} - View a shared entry (preview for non-friends, full for friends)
 async function getSharedEntry(event, conn) {
   const token = event.pathParameters?.token || event.queryStringParameters?.token;
   if (!token) {
@@ -1148,6 +1148,35 @@ async function getSharedEntry(event, conn) {
     }
 
     const sharedEntry = rows[0];
+    const ownerUid = sharedEntry.owner_uid;
+    const authorName = sharedEntry.first_name || sharedEntry.username || 'A Day by Day user';
+
+    // Check if viewer is authenticated and is a friend
+    let viewerUid = null;
+    let isFriend = false;
+
+    try {
+      viewerUid = await getAuthenticatedUid(event);
+    } catch (e) {
+      // Not authenticated - that's fine, they'll get preview
+    }
+
+    if (viewerUid) {
+      // Check if viewer is the owner (always full access to own entries)
+      if (viewerUid === ownerUid) {
+        isFriend = true;
+      } else {
+        // Check if they're connected
+        const [connections] = await conn.execute(
+          `SELECT 1 FROM connections
+           WHERE ((requester_uid = ? AND target_uid = ?) OR (requester_uid = ? AND target_uid = ?))
+           AND status = 'accepted'
+           LIMIT 1`,
+          [viewerUid, ownerUid, ownerUid, viewerUid]
+        );
+        isFriend = connections.length > 0;
+      }
+    }
 
     // Increment view count
     await conn.execute(
@@ -1167,18 +1196,45 @@ async function getSharedEntry(event, conn) {
       }
     }
 
-    return buildResponse(200, {
-      entry: {
-        title: sharedEntry.title,
-        text: sharedEntry.text,
-        date: sharedEntry.date,
-        prompt: promptText
-      },
-      author: {
-        name: sharedEntry.first_name || sharedEntry.username || 'A Day by Day user'
-      },
-      viewCount: sharedEntry.view_count + 1
-    });
+    // Return full content for friends, preview for others
+    if (isFriend) {
+      return buildResponse(200, {
+        entry: {
+          title: sharedEntry.title,
+          text: sharedEntry.text,
+          date: sharedEntry.date,
+          prompt: promptText
+        },
+        author: {
+          name: authorName,
+          uid: ownerUid
+        },
+        viewCount: sharedEntry.view_count + 1,
+        is_preview: false
+      });
+    } else {
+      // Preview mode - show first ~100 characters
+      const fullText = sharedEntry.text || '';
+      const previewLength = 150;
+      const previewText = fullText.length > previewLength
+        ? fullText.substring(0, previewLength) + '...'
+        : fullText;
+
+      return buildResponse(200, {
+        entry: {
+          title: sharedEntry.title,
+          preview_text: previewText,
+          date: sharedEntry.date
+        },
+        author: {
+          name: authorName,
+          uid: ownerUid
+        },
+        viewCount: sharedEntry.view_count + 1,
+        is_preview: true,
+        is_authenticated: !!viewerUid
+      });
+    }
   } catch (error) {
     console.error('Error getting shared entry:', error);
     return errorResponse(500, 'Failed to get shared entry');

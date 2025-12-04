@@ -569,11 +569,17 @@ function displayEntries(entries) {
         })}</small>
         <span class="word-count">${wordCount} words</span>
         <div class="entry-actions">
-          ${entry.synced && entry.entry_id ? `<button class="share-btn" onclick="shareEntry(${entry.entry_id})" title="Share entry">
+          ${entry.synced && entry.entry_id ? `<button class="share-btn" onclick="shareEntry(${entry.entry_id})" title="Share with friends">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
               <polyline points="16 6 12 2 8 6"/>
               <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+          </button>
+          <button class="link-btn" onclick="getShareLink(${entry.entry_id})" title="Get share link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
             </svg>
           </button>` : ''}
           <button class="delete-btn" onclick="deleteEntry('${entry.id}')">Delete</button>
@@ -786,6 +792,95 @@ async function confirmShare() {
   } catch (error) {
     console.error('Error sharing entry:', error);
     showToast('Failed to share entry', 'error');
+  }
+}
+
+// ============================================
+// PUBLIC SHARE LINK
+// ============================================
+async function getShareLink(entryId) {
+  if (!currentUser) return;
+
+  try {
+    showToast('Creating share link...', 'info');
+
+    const token = await api.getAuthToken();
+    const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
+    const response = await fetch(`${baseUrl}/journalLambdafunc/entry/${entryId}/share`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error);
+
+    // Build the share URL
+    const shareUrl = `${window.location.origin}/journal/shared.html?token=${data.share_token}`;
+
+    // Show modal with copy functionality
+    showShareLinkModal(shareUrl);
+  } catch (error) {
+    console.error('Error getting share link:', error);
+    showToast('Failed to create share link', 'error');
+  }
+}
+
+function showShareLinkModal(url) {
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('shareLinkModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'shareLinkModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Share Link</h2>
+          <button class="close-btn" onclick="hideShareLinkModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="share-desc">Anyone with this link can see a preview. Friends can read the full entry.</p>
+          <div class="share-link-container">
+            <input type="text" id="shareLinkInput" readonly>
+            <button onclick="copyShareLink()" class="primary-btn" id="copyLinkBtn">Copy</button>
+          </div>
+          <div class="modal-actions">
+            <button onclick="hideShareLinkModal()" class="secondary-btn">Close</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  document.getElementById('shareLinkInput').value = url;
+  modal.style.display = 'flex';
+}
+
+function hideShareLinkModal() {
+  const modal = document.getElementById('shareLinkModal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function copyShareLink() {
+  const input = document.getElementById('shareLinkInput');
+  const btn = document.getElementById('copyLinkBtn');
+
+  try {
+    await navigator.clipboard.writeText(input.value);
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    showToast('Link copied to clipboard!', 'success');
+  } catch (err) {
+    // Fallback for older browsers
+    input.select();
+    document.execCommand('copy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
   }
 }
 
@@ -1686,6 +1781,10 @@ window.verifyPhoneCode = verifyPhoneCode;
 window.toggleConnection = toggleConnection;
 window.hideShareModal = hideShareModal;
 window.confirmShare = confirmShare;
+// Public share link
+window.getShareLink = getShareLink;
+window.hideShareLinkModal = hideShareLinkModal;
+window.copyShareLink = copyShareLink;
 // Shared entries
 window.viewSharedEntry = viewSharedEntry;
 // Friends section

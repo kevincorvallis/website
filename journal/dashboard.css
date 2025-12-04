@@ -593,6 +593,56 @@ body::-webkit-scrollbar {
   height: 16px;
 }
 
+.link-btn {
+  background: rgba(124, 92, 255, 0.1);
+  border: none;
+  color: var(--accent-primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.link-btn:hover, .link-btn:active {
+  background: rgba(124, 92, 255, 0.2);
+}
+
+.link-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Share Link Modal */
+.share-link-container {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.share-link-container input {
+  flex: 1;
+  padding: 12px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.share-link-container input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.share-link-container .primary-btn {
+  flex: none;
+  padding: 12px 20px;
+  min-width: 80px;
+}
+
 /* ============================================
    FLOATING ACTION BUTTON (FAB)
    ============================================ */

@@ -2,157 +2,267 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0f">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Shared Entry - Day by Day</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    body {
-      align-items: flex-start;
-      padding-top: 60px;
-    }
 
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="dashboard.css">
+
+  <style>
     .shared-container {
-      max-width: 600px;
-      width: 100%;
-      text-align: left;
-      padding: 40px;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .shared-header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--bg-card);
     }
 
     .shared-header h1 {
-      font-size: 24px;
+      font-size: 1.5rem;
       font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .shared-meta {
+      margin-bottom: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+    }
+
+    .shared-header h1 svg {
+      color: var(--accent-primary);
+    }
+
+    .shared-header p {
       color: var(--text-secondary);
-      font-size: 15px;
+      font-size: 0.9rem;
+    }
+
+    .entry-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .entry-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .author-avatar {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: var(--accent-blue);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      color: #fff;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 1rem;
     }
 
-    .prompt-box {
-      background: var(--bg-secondary);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 24px;
-      border-left: 3px solid var(--accent-blue);
-    }
-
-    .prompt-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-    }
-
-    .prompt-text {
-      font-size: 15px;
-      color: var(--text-tertiary);
-      font-style: italic;
-    }
-
-    .entry-title {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 16px;
+    .author-name {
+      font-weight: 600;
       color: var(--text-primary);
     }
 
     .entry-date {
-      font-size: 14px;
       color: var(--text-secondary);
-      margin-bottom: 24px;
+      font-size: 0.85rem;
+    }
+
+    .entry-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
     }
 
     .entry-content {
-      font-size: 17px;
+      font-size: 1.05rem;
       line-height: 1.7;
       color: var(--text-primary);
     }
 
     .entry-content p {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
-    .entry-content p:last-child {
-      margin-bottom: 0;
+    .entry-prompt {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--accent-primary);
     }
 
-    .cta-section {
-      margin-top: 48px;
-      text-align: center;
-      padding-top: 32px;
-      border-top: 1px solid var(--border-color);
+    .entry-prompt-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent-primary);
+      margin-bottom: 4px;
     }
 
-    .cta-section h3 {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .cta-section p {
+    .entry-prompt-text {
+      font-style: italic;
       color: var(--text-secondary);
-      font-size: 15px;
+      font-size: 0.95rem;
+    }
+
+    /* Preview mode styles */
+    .preview-overlay {
+      position: relative;
+    }
+
+    .preview-text {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text-primary);
+    }
+
+    .preview-fade {
+      position: relative;
+    }
+
+    .preview-fade::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(transparent, var(--bg-card));
+      pointer-events: none;
+    }
+
+    .preview-cta {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      text-align: center;
+      margin-top: -20px;
+      position: relative;
+    }
+
+    .preview-cta h3 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .preview-cta p {
+      color: rgba(255,255,255,0.85);
       margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .cta-btn {
-      display: inline-block;
-      background: var(--accent-blue);
-      color: white;
-      padding: 14px 28px;
-      border-radius: 12px;
-      text-decoration: none;
+      padding: 14px 24px;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
       font-weight: 600;
-      font-size: 16px;
+      cursor: pointer;
       transition: all 0.2s ease;
+      text-decoration: none;
+      text-align: center;
     }
 
-    .cta-btn:hover {
-      background: #0066d6;
-      transform: translateY(-1px);
+    .cta-btn.primary {
+      background: #fff;
+      color: var(--accent-primary);
+      border: none;
     }
 
+    .cta-btn.primary:hover {
+      transform: scale(1.02);
+    }
+
+    .cta-btn.secondary {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .cta-btn.secondary:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Full entry CTA */
+    .full-cta {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    .full-cta h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .full-cta p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    .full-cta .cta-btn {
+      background: var(--accent-primary);
+      color: #fff;
+      display: inline-block;
+    }
+
+    .view-count {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-top: 16px;
+    }
+
+    /* Loading & Error states */
     .loading-state,
     .error-state {
       text-align: center;
       padding: 60px 20px;
     }
 
-    .loading-spinner {
+    .loading-state .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid var(--border-color);
-      border-top-color: var(--accent-blue);
+      border: 3px solid var(--bg-card);
+      border-top-color: var(--accent-primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
+      margin: 0 auto 16px;
     }
 
     @keyframes spin {
@@ -160,161 +270,321 @@
     }
 
     .error-state svg {
-      width: 48px;
-      height: 48px;
-      color: var(--text-secondary);
+      color: var(--error);
       margin-bottom: 16px;
     }
 
     .error-state h2 {
-      font-size: 20px;
+      font-size: 1.25rem;
       margin-bottom: 8px;
     }
 
     .error-state p {
       color: var(--text-secondary);
+      margin-bottom: 20px;
     }
 
-    .view-count {
-      font-size: 13px;
-      color: var(--text-secondary);
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      margin-top: 20px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    .shared-footer {
+      margin-top: auto;
+      padding: 20px;
       text-align: center;
-      margin-top: 24px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .shared-footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <div class="container shared-container">
-    <!-- Loading State -->
-    <div id="loadingState" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Loading shared entry...</p>
-    </div>
+  <div class="shared-container">
+    <!-- Header -->
+    <header class="shared-header">
+      <h1>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        Shared Journal Entry
+      </h1>
+      <p>Someone shared a personal moment with you</p>
+    </header>
 
-    <!-- Error State -->
-    <div id="errorState" class="error-state" style="display: none;">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-        <path d="M12 7V13M12 16V17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-      <h2>Entry Not Found</h2>
-      <p id="errorMessage">This shared entry may have been removed or the link is invalid.</p>
-    </div>
-
-    <!-- Entry Content -->
-    <div id="entryContent" style="display: none;">
-      <div class="shared-header">
-        <h1>Day by Day</h1>
-        <div class="shared-meta">
-          <div class="author-avatar" id="authorInitial">?</div>
-          <span>Shared by <strong id="authorName">Someone</strong></span>
-        </div>
+    <!-- Main Content -->
+    <main id="mainContent">
+      <div class="loading-state" id="loadingState">
+        <div class="spinner"></div>
+        <p>Loading shared entry...</p>
       </div>
+    </main>
 
-      <div id="promptSection" class="prompt-box" style="display: none;">
-        <div class="prompt-label">Writing Prompt</div>
-        <div class="prompt-text" id="promptText"></div>
-      </div>
-
-      <h2 class="entry-title" id="entryTitle"></h2>
-      <div class="entry-date" id="entryDate"></div>
-      <div class="entry-content" id="entryText"></div>
-
-      <div class="view-count" id="viewCount"></div>
-
-      <div class="cta-section">
-        <h3>Start Your Own Journal</h3>
-        <p>Capture your thoughts, track your journey, and connect with friends.</p>
-        <a href="index.html" class="cta-btn">Get Started Free</a>
-      </div>
-    </div>
+    <!-- Footer -->
+    <footer class="shared-footer">
+      <p>Powered by <a href="index.html">Day by Day</a> - Your personal journaling app</p>
+    </footer>
   </div>
 
-  <script>
-    const API_BASE = 'https://1t1byyi4x6.execute-api.us-west-1.amazonaws.com/prod';
+  <script type="module">
+    import { Amplify } from 'https://esm.sh/aws-amplify@6';
+    import { fetchAuthSession, getCurrentUser } from 'https://esm.sh/aws-amplify@6/auth';
 
-    async function loadSharedEntry() {
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get('token');
+    // Configure Amplify
+    const cognitoConfig = {
+      userPoolId: 'us-west-1_81HBZnH92',
+      userPoolClientId: '7t77oqaipn9hldtdpesvde3eka',
+      region: 'us-west-1'
+    };
 
-      if (!token) {
-        showError('No share token provided');
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_BASE}/journalLambdafunc/shared/${token}`);
-        const data = await response.json();
-
-        if (!response.ok) {
-          showError(data.error || 'Failed to load entry');
-          return;
+    Amplify.configure({
+      Auth: {
+        Cognito: {
+          userPoolId: cognitoConfig.userPoolId,
+          userPoolClientId: cognitoConfig.userPoolClientId
         }
+      }
+    });
 
-        displayEntry(data);
-      } catch (error) {
-        console.error('Error loading shared entry:', error);
-        showError('Failed to load shared entry');
+    const API_BASE = 'https://odlchtzevl.execute-api.us-west-1.amazonaws.com/default/journalLambdafunc';
+    const mainContent = document.getElementById('mainContent');
+
+    // Get token from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareToken = urlParams.get('token');
+
+    if (!shareToken) {
+      showError('Invalid Share Link', 'This link appears to be broken or incomplete.');
+    } else {
+      loadSharedEntry();
+    }
+
+    async function getAuthToken() {
+      try {
+        await getCurrentUser();
+        const session = await fetchAuthSession();
+        return session.tokens?.idToken?.toString();
+      } catch {
+        return null;
       }
     }
 
-    function displayEntry(data) {
-      const { entry, author, viewCount } = data;
+    async function loadSharedEntry() {
+      try {
+        const authToken = await getAuthToken();
+        const headers = { 'Content-Type': 'application/json' };
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
 
-      // Hide loading, show content
-      document.getElementById('loadingState').style.display = 'none';
-      document.getElementById('entryContent').style.display = 'block';
+        const response = await fetch(`${API_BASE}/shared/${shareToken}`, { headers });
 
-      // Author info
-      const authorName = author.name || 'A Day by Day user';
-      document.getElementById('authorName').textContent = authorName;
-      document.getElementById('authorInitial').textContent = authorName.charAt(0).toUpperCase();
+        if (!response.ok) {
+          if (response.status === 404) {
+            showError('Entry Not Found', 'This shared entry may have been deleted or the link has expired.');
+          } else {
+            throw new Error('Failed to load entry');
+          }
+          return;
+        }
 
-      // Prompt (if any)
+        const data = await response.json();
+
+        if (data.is_preview) {
+          showPreview(data);
+        } else {
+          showFullEntry(data);
+        }
+      } catch (error) {
+        console.error('Error loading shared entry:', error);
+        showError('Something went wrong', 'We couldn\'t load this entry. Please try again later.');
+      }
+    }
+
+    function showFullEntry(data) {
+      const entry = data.entry;
+      const author = data.author;
+      const date = new Date(entry.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const initials = getInitials(author.name);
+
+      let promptHtml = '';
       if (entry.prompt) {
-        document.getElementById('promptSection').style.display = 'block';
-        document.getElementById('promptText').textContent = entry.prompt;
+        promptHtml = `
+          <div class="entry-prompt">
+            <div class="entry-prompt-label">Writing Prompt</div>
+            <div class="entry-prompt-text">${escapeHtml(entry.prompt)}</div>
+          </div>
+        `;
       }
 
-      // Entry content
-      document.getElementById('entryTitle').textContent = entry.title || 'Untitled Entry';
-
-      // Format date
-      const entryDate = new Date(entry.date);
-      const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('entryDate').textContent = entryDate.toLocaleDateString('en-US', dateOptions);
-
-      // Entry text - handle HTML content from Quill
-      const textContainer = document.getElementById('entryText');
+      // Handle HTML content from Quill or plain text
+      let contentHtml;
       if (entry.text.includes('<')) {
-        // HTML content from Quill
-        textContainer.innerHTML = entry.text;
+        contentHtml = entry.text;
       } else {
-        // Plain text - convert newlines to paragraphs
-        textContainer.innerHTML = entry.text
+        contentHtml = entry.text
           .split('\n\n')
           .filter(p => p.trim())
-          .map(p => `<p>${p}</p>`)
+          .map(p => `<p>${escapeHtml(p)}</p>`)
           .join('');
       }
 
-      // View count
-      if (viewCount > 1) {
-        document.getElementById('viewCount').textContent = `Viewed ${viewCount} times`;
-      }
+      mainContent.innerHTML = `
+        <div class="entry-card">
+          <div class="entry-meta">
+            <div class="author-info">
+              <div class="author-avatar">${initials}</div>
+              <div>
+                <div class="author-name">${escapeHtml(author.name)}</div>
+                <div class="entry-date">${date}</div>
+              </div>
+            </div>
+          </div>
+          ${entry.title ? `<h2 class="entry-title">${escapeHtml(entry.title)}</h2>` : ''}
+          <div class="entry-content">${contentHtml}</div>
+          ${promptHtml}
+          ${data.viewCount > 1 ? `<div class="view-count">Viewed ${data.viewCount} times</div>` : ''}
+          <div class="full-cta">
+            <h3>Start Your Own Journal</h3>
+            <p>Capture your thoughts and share meaningful moments</p>
+            <a href="index.html" class="cta-btn">Get Started Free</a>
+          </div>
+        </div>
+        <a href="dashboard.html" class="back-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Go to my journal
+        </a>
+      `;
 
       // Update page title
       document.title = `${entry.title || 'Shared Entry'} - Day by Day`;
     }
 
-    function showError(message) {
-      document.getElementById('loadingState').style.display = 'none';
-      document.getElementById('errorState').style.display = 'block';
-      document.getElementById('errorMessage').textContent = message;
+    function showPreview(data) {
+      const entry = data.entry;
+      const author = data.author;
+      const date = new Date(entry.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const initials = getInitials(author.name);
+      const isAuthenticated = data.is_authenticated;
+
+      // Build CTA based on auth state
+      let ctaContent;
+      if (isAuthenticated) {
+        // Logged in but not friends
+        ctaContent = `
+          <h3>Connect to read more</h3>
+          <p>You need to be friends with ${escapeHtml(author.name)} to read the full entry.</p>
+          <div class="cta-buttons">
+            <a href="connections.html" class="cta-btn primary">
+              Find & Connect
+            </a>
+            <a href="dashboard.html" class="cta-btn secondary">
+              Go to My Journal
+            </a>
+          </div>
+        `;
+      } else {
+        // Not logged in
+        ctaContent = `
+          <h3>Sign up to read the full entry</h3>
+          <p>Create a free account and connect with ${escapeHtml(author.name)} to unlock the complete journal entry.</p>
+          <div class="cta-buttons">
+            <a href="index.html" class="cta-btn primary">
+              Sign Up Free
+            </a>
+            <a href="index.html" class="cta-btn secondary">
+              Already have an account? Sign In
+            </a>
+          </div>
+        `;
+      }
+
+      mainContent.innerHTML = `
+        <div class="entry-card">
+          <div class="entry-meta">
+            <div class="author-info">
+              <div class="author-avatar">${initials}</div>
+              <div>
+                <div class="author-name">${escapeHtml(author.name)}</div>
+                <div class="entry-date">${date}</div>
+              </div>
+            </div>
+          </div>
+          ${entry.title ? `<h2 class="entry-title">${escapeHtml(entry.title)}</h2>` : ''}
+          <div class="preview-overlay">
+            <div class="preview-fade">
+              <div class="preview-text">${escapeHtml(entry.preview_text)}</div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-cta">
+          ${ctaContent}
+        </div>
+      `;
+
+      // Update page title
+      document.title = `${entry.title || 'Shared Entry'} - Day by Day`;
     }
 
-    // Load on page ready
-    loadSharedEntry();
+    function showError(title, message) {
+      mainContent.innerHTML = `
+        <div class="error-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4M12 16h.01"/>
+          </svg>
+          <h2>${title}</h2>
+          <p>${message}</p>
+          <a href="index.html" class="cta-btn primary" style="display: inline-block; background: var(--accent-primary); color: #fff; padding: 12px 24px; border-radius: 8px;">
+            Go to Day by Day
+          </a>
+        </div>
+      `;
+    }
+
+    function getInitials(name) {
+      if (!name) return '?';
+      return name.split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
   </script>
 </body>
 </html>

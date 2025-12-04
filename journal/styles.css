@@ -1073,6 +1073,10 @@ h2 {
 .onboarding-step.active {
     display: flex;
     opacity: 1;
+}
+
+/* First step gets a smooth fade-in on initial load only */
+.onboarding-step[data-step="1"].active:not(.slide-in-left):not(.slide-in-right) {
     animation: fadeInStep 0.4s ease-out forwards;
 }
 
