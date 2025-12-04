@@ -1011,49 +1011,6 @@
             }
         }
 
-        // Profile form submission
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            if (!currentUser) {
-                try {
-                    const user = await getCurrentUser();
-                    const session = await fetchAuthSession();
-                    currentUser = {
-                        uid: session.tokens?.idToken?.payload?.sub || user.userId,
-                        email: session.tokens?.idToken?.payload?.email || user.username,
-                        username: user.username,
-                        name: session.tokens?.idToken?.payload?.name,
-                        givenName: session.tokens?.idToken?.payload?.given_name
-                    };
-                } catch (error) {
-                    showError('Please sign in first');
-                    return;
-                }
-            }
-
-            // Collect form data
-            const profileData = {
-                displayName: document.getElementById('displayName').value,
-                age: document.getElementById('age').value,
-                journalGoal: document.getElementById('journalGoal').value,
-                writingFrequency: document.getElementById('writingFrequency').value,
-                favoriteTime: document.getElementById('favoriteTime').value,
-                inspiration: document.getElementById('inspiration').value,
-                createdAt: new Date().toISOString(),
-                uid: currentUser.uid,
-                email: currentUser.email
-            };
-
-            // Save profile
-            saveUserProfile(currentUser.uid, profileData);
-
-            // Show success message and redirect
-            showSuccessMessage(() => {
-                window.location.href = getRedirectUrl();
-            });
-        });
-
         // Skip profile setup
         async function skipProfile() {
             if (!currentUser) {
