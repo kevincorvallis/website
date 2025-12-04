@@ -133,77 +133,274 @@
         </div>
     </div>
 
-    <!-- Profile Setup for First-Time Users -->
-    <div class="container profile-setup" id="profileSetup" style="display: none;">
-        <h2>Let's get to know you better</h2>
-        <p class="subtitle">Help us personalize your journaling experience</p>
-        
-        <form id="profileForm" class="profile-form">
-            <div class="form-group">
-                <label for="displayName">What would you like to be called?</label>
-                <input type="text" id="displayName" name="displayName" placeholder="Your preferred name" required>
+    <!-- Profile Setup for First-Time Users - Apple-style Multi-step Wizard -->
+    <div class="onboarding-container" id="profileSetup" style="display: none;">
+        <!-- Progress Indicator -->
+        <div class="progress-dots">
+            <div class="dot active" data-step="1"></div>
+            <div class="dot" data-step="2"></div>
+            <div class="dot" data-step="3"></div>
+            <div class="dot" data-step="4"></div>
+        </div>
+
+        <!-- Step 1: Welcome & Name -->
+        <div class="onboarding-step active" data-step="1">
+            <div class="step-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="currentColor"/>
+                </svg>
             </div>
-            
-            <div class="form-group">
-                <label for="age">Your age (optional)</label>
-                <select id="age" name="age">
-                    <option value="">Prefer not to say</option>
-                    <option value="18-25">18-25</option>
-                    <option value="26-35">26-35</option>
-                    <option value="36-45">36-45</option>
-                    <option value="46-55">46-55</option>
-                    <option value="56-65">56-65</option>
-                    <option value="65+">65+</option>
-                </select>
+            <h1 class="step-title">Let's get to know you</h1>
+            <p class="step-subtitle">Help us personalize your journaling experience</p>
+
+            <div class="input-group">
+                <label for="displayName">What should we call you?</label>
+                <input type="text" id="displayName" placeholder="Your name" autocomplete="name" autofocus>
             </div>
-            
-            <div class="form-group">
-                <label for="journalGoal">What brings you to journaling?</label>
-                <select id="journalGoal" name="journalGoal" required>
-                    <option value="">Select your main goal</option>
-                    <option value="self-reflection">Self-reflection and mindfulness</option>
-                    <option value="goal-tracking">Goal tracking and productivity</option>
-                    <option value="emotional-wellness">Emotional wellness and stress relief</option>
-                    <option value="creative-expression">Creative expression and writing</option>
-                    <option value="memory-keeping">Memory keeping and life documentation</option>
-                    <option value="habit-building">Habit building and personal growth</option>
-                    <option value="other">Other</option>
-                </select>
+
+            <div class="step-actions">
+                <button type="button" class="continue-btn" onclick="nextStep(1)" id="step1Continue" disabled>Continue</button>
             </div>
-            
-            <div class="form-group">
-                <label for="writingFrequency">How often do you plan to write?</label>
-                <select id="writingFrequency" name="writingFrequency" required>
-                    <option value="">Select frequency</option>
-                    <option value="daily">Daily</option>
-                    <option value="few-times-week">A few times a week</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="when-inspired">When inspired</option>
-                </select>
+            <button type="button" class="skip-link" onclick="skipProfile()">Set up later</button>
+        </div>
+
+        <!-- Step 2: Journaling Goal -->
+        <div class="onboarding-step" data-step="2">
+            <div class="step-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" fill="currentColor"/>
+                </svg>
             </div>
-            
-            <div class="form-group">
-                <label for="favoriteTime">When do you prefer to write?</label>
-                <select id="favoriteTime" name="favoriteTime">
-                    <option value="">No preference</option>
-                    <option value="morning">Morning (6AM - 12PM)</option>
-                    <option value="afternoon">Afternoon (12PM - 6PM)</option>
-                    <option value="evening">Evening (6PM - 10PM)</option>
-                    <option value="night">Night (10PM - 6AM)</option>
-                </select>
+            <h1 class="step-title">What brings you here?</h1>
+            <p class="step-subtitle">Choose what resonates with you most</p>
+
+            <div class="selection-cards" id="goalCards">
+                <button type="button" class="selection-card" data-value="self-reflection">
+                    <span class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="card-label">Mindfulness</span>
+                    <span class="card-desc">Self-reflection & presence</span>
+                </button>
+                <button type="button" class="selection-card" data-value="emotional-wellness">
+                    <span class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="card-label">Wellness</span>
+                    <span class="card-desc">Emotional balance & relief</span>
+                </button>
+                <button type="button" class="selection-card" data-value="goal-tracking">
+                    <span class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l6.59-6.59L20 9l-8 8z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="card-label">Goals</span>
+                    <span class="card-desc">Tracking & productivity</span>
+                </button>
+                <button type="button" class="selection-card" data-value="creative-expression">
+                    <span class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a.996.996 0 00-1.41 0L9 12.25 11.75 15l8.96-8.96a.996.996 0 000-1.41z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="card-label">Creativity</span>
+                    <span class="card-desc">Expression & writing</span>
+                </button>
+                <button type="button" class="selection-card" data-value="memory-keeping">
+                    <span class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="card-label">Memories</span>
+                    <span class="card-desc">Life documentation</span>
+                </button>
+                <button type="button" class="selection-card" data-value="habit-building">
+                    <span class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                            <path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.92 6-4.72 7.28L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.94 2.55 2 6.81 2 12c0 3.76 2.09 7.07 5.16 8.78L6 22h5v-5l-2.28 2.28C6.92 18 5 15.21 5 12c0-4.08 3.05-7.44 7-7.93V2.05z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="card-label">Growth</span>
+                    <span class="card-desc">Habits & development</span>
+                </button>
             </div>
-            
-            <div class="form-group">
-                <label for="inspiration">What inspires you most?</label>
-                <textarea id="inspiration" name="inspiration" placeholder="Share what motivates you, your interests, or what you'd like to explore in your journal..." rows="3"></textarea>
+
+            <input type="hidden" id="journalGoal" value="">
+
+            <div class="step-actions">
+                <button type="button" class="back-btn" onclick="prevStep(2)">Back</button>
+                <button type="button" class="continue-btn" onclick="nextStep(2)" id="step2Continue" disabled>Continue</button>
             </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="primary-btn">Complete Setup</button>
-                <button type="button" class="secondary-btn" onclick="skipProfile()">Skip for now</button>
+        </div>
+
+        <!-- Step 3: Writing Frequency -->
+        <div class="onboarding-step" data-step="3">
+            <div class="step-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" fill="currentColor"/>
+                </svg>
             </div>
-        </form>
+            <h1 class="step-title">How often will you write?</h1>
+            <p class="step-subtitle">There's no wrong answer - just what feels right</p>
+
+            <div class="selection-list" id="frequencyList">
+                <button type="button" class="selection-item" data-value="daily">
+                    <span class="item-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </span>
+                    <span class="item-content">
+                        <span class="item-label">Every day</span>
+                        <span class="item-desc">Build a daily habit</span>
+                    </span>
+                    <span class="item-check">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                </button>
+                <button type="button" class="selection-item" data-value="few-times-week">
+                    <span class="item-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </span>
+                    <span class="item-content">
+                        <span class="item-label">A few times a week</span>
+                        <span class="item-desc">Regular check-ins</span>
+                    </span>
+                    <span class="item-check">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                </button>
+                <button type="button" class="selection-item" data-value="weekly">
+                    <span class="item-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </span>
+                    <span class="item-content">
+                        <span class="item-label">Once a week</span>
+                        <span class="item-desc">Weekly reflection</span>
+                    </span>
+                    <span class="item-check">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                </button>
+                <button type="button" class="selection-item" data-value="when-inspired">
+                    <span class="item-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </span>
+                    <span class="item-content">
+                        <span class="item-label">When inspiration strikes</span>
+                        <span class="item-desc">No pressure, just flow</span>
+                    </span>
+                    <span class="item-check">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+
+            <input type="hidden" id="writingFrequency" value="">
+
+            <div class="step-actions">
+                <button type="button" class="back-btn" onclick="prevStep(3)">Back</button>
+                <button type="button" class="continue-btn" onclick="nextStep(3)" id="step3Continue" disabled>Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Preferred Time -->
+        <div class="onboarding-step" data-step="4">
+            <div class="step-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h1 class="step-title">When do you write best?</h1>
+            <p class="step-subtitle">We'll personalize your experience</p>
+
+            <div class="time-cards" id="timeCards">
+                <button type="button" class="time-card" data-value="morning">
+                    <span class="time-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                            <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="time-label">Morning</span>
+                    <span class="time-range">6AM - 12PM</span>
+                </button>
+                <button type="button" class="time-card" data-value="afternoon">
+                    <span class="time-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="5" fill="currentColor"/>
+                            <path d="M12 3v2M12 19v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2M19 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="time-label">Afternoon</span>
+                    <span class="time-range">12PM - 6PM</span>
+                </button>
+                <button type="button" class="time-card" data-value="evening">
+                    <span class="time-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="time-label">Evening</span>
+                    <span class="time-range">6PM - 10PM</span>
+                </button>
+                <button type="button" class="time-card" data-value="night">
+                    <span class="time-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="time-label">Night</span>
+                    <span class="time-range">10PM - 6AM</span>
+                </button>
+            </div>
+
+            <input type="hidden" id="favoriteTime" value="">
+            <input type="hidden" id="age" value="">
+            <input type="hidden" id="inspiration" value="">
+
+            <div class="step-actions">
+                <button type="button" class="back-btn" onclick="prevStep(4)">Back</button>
+                <button type="button" class="continue-btn finish-btn" onclick="completeOnboarding()" id="step4Continue">Get Started</button>
+            </div>
+        </div>
+
+        <!-- Completion Screen -->
+        <div class="onboarding-step completion-step" data-step="complete">
+            <div class="completion-animation">
+                <div class="completion-circle">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor" class="check-path"/>
+                    </svg>
+                </div>
+            </div>
+            <h1 class="step-title completion-title">You're all set, <span id="completionName">friend</span>!</h1>
+            <p class="step-subtitle">Your journal is ready. Let's begin your journey.</p>
+            <div class="completion-loader">
+                <div class="loader-bar"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Placeholder functions while module loads -->
@@ -211,7 +408,8 @@
         // These will be replaced by the module once it loads
         window.signInWithEmail = window.signUpWithEmail = window.signInWithGoogle =
         window.handleConfirmSignUp = window.resendCode = window.skipProfile =
-        window.showSignIn = window.showSignInForm = window.showSignUpForm = function() {
+        window.showSignIn = window.showSignInForm = window.showSignUpForm =
+        window.nextStep = window.prevStep = window.completeOnboarding = function() {
             console.log('Please wait, loading...');
         };
     </script>
@@ -457,7 +655,7 @@
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('signInContainer').style.display = 'none';
-            document.getElementById('profileSetup').style.display = 'block';
+            document.getElementById('profileSetup').style.display = 'flex';
 
             // Pre-fill display name: prioritize Google name > given_name > email prefix
             const displayName = user.name ||
@@ -466,6 +664,170 @@
                                (user.username?.includes('@') ? user.username.split('@')[0] : user.username) ||
                                '';
             document.getElementById('displayName').value = displayName;
+
+            // Initialize wizard
+            initializeOnboardingWizard();
+
+            // Enable continue if name is pre-filled
+            if (displayName) {
+                document.getElementById('step1Continue').disabled = false;
+            }
+        }
+
+        // Onboarding Wizard Functions
+        let currentStep = 1;
+
+        function initializeOnboardingWizard() {
+            // Name input validation
+            const nameInput = document.getElementById('displayName');
+            nameInput.addEventListener('input', () => {
+                document.getElementById('step1Continue').disabled = !nameInput.value.trim();
+            });
+
+            // Goal cards
+            document.querySelectorAll('#goalCards .selection-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('#goalCards .selection-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    document.getElementById('journalGoal').value = card.dataset.value;
+                    document.getElementById('step2Continue').disabled = false;
+                });
+            });
+
+            // Frequency list
+            document.querySelectorAll('#frequencyList .selection-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('#frequencyList .selection-item').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                    document.getElementById('writingFrequency').value = item.dataset.value;
+                    document.getElementById('step3Continue').disabled = false;
+                });
+            });
+
+            // Time cards
+            document.querySelectorAll('#timeCards .time-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('#timeCards .time-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    document.getElementById('favoriteTime').value = card.dataset.value;
+                });
+            });
+
+            // Focus on name input
+            setTimeout(() => nameInput.focus(), 100);
+        }
+
+        function nextStep(fromStep) {
+            const currentStepEl = document.querySelector(`.onboarding-step[data-step="${fromStep}"]`);
+            const nextStepEl = document.querySelector(`.onboarding-step[data-step="${fromStep + 1}"]`);
+
+            if (!nextStepEl) return;
+
+            // Animate out
+            currentStepEl.classList.add('slide-out-left');
+
+            setTimeout(() => {
+                currentStepEl.classList.remove('active', 'slide-out-left');
+                nextStepEl.classList.add('active', 'slide-in-right');
+
+                // Update progress dots
+                document.querySelectorAll('.progress-dots .dot').forEach(dot => {
+                    const dotStep = parseInt(dot.dataset.step);
+                    dot.classList.toggle('active', dotStep === fromStep + 1);
+                    dot.classList.toggle('completed', dotStep < fromStep + 1);
+                });
+
+                setTimeout(() => {
+                    nextStepEl.classList.remove('slide-in-right');
+                }, 400);
+
+                currentStep = fromStep + 1;
+            }, 300);
+        }
+
+        function prevStep(fromStep) {
+            const currentStepEl = document.querySelector(`.onboarding-step[data-step="${fromStep}"]`);
+            const prevStepEl = document.querySelector(`.onboarding-step[data-step="${fromStep - 1}"]`);
+
+            if (!prevStepEl) return;
+
+            // Animate out
+            currentStepEl.classList.add('slide-out-right');
+
+            setTimeout(() => {
+                currentStepEl.classList.remove('active', 'slide-out-right');
+                prevStepEl.classList.add('active', 'slide-in-left');
+
+                // Update progress dots
+                document.querySelectorAll('.progress-dots .dot').forEach(dot => {
+                    const dotStep = parseInt(dot.dataset.step);
+                    dot.classList.toggle('active', dotStep === fromStep - 1);
+                    dot.classList.toggle('completed', dotStep < fromStep - 1);
+                });
+
+                setTimeout(() => {
+                    prevStepEl.classList.remove('slide-in-left');
+                }, 400);
+
+                currentStep = fromStep - 1;
+            }, 300);
+        }
+
+        async function completeOnboarding() {
+            if (!currentUser) {
+                try {
+                    const user = await getCurrentUser();
+                    const session = await fetchAuthSession();
+                    currentUser = {
+                        uid: session.tokens?.idToken?.payload?.sub || user.userId,
+                        email: session.tokens?.idToken?.payload?.email || user.username,
+                        username: user.username,
+                        name: session.tokens?.idToken?.payload?.name,
+                        givenName: session.tokens?.idToken?.payload?.given_name
+                    };
+                } catch (error) {
+                    showError('Please sign in first');
+                    return;
+                }
+            }
+
+            // Collect form data
+            const displayName = document.getElementById('displayName').value;
+            const profileData = {
+                displayName: displayName,
+                age: document.getElementById('age').value,
+                journalGoal: document.getElementById('journalGoal').value,
+                writingFrequency: document.getElementById('writingFrequency').value,
+                favoriteTime: document.getElementById('favoriteTime').value,
+                inspiration: document.getElementById('inspiration').value,
+                createdAt: new Date().toISOString(),
+                uid: currentUser.uid,
+                email: currentUser.email
+            };
+
+            // Save profile
+            saveUserProfile(currentUser.uid, profileData);
+
+            // Show completion screen
+            const step4 = document.querySelector('.onboarding-step[data-step="4"]');
+            const completionStep = document.querySelector('.onboarding-step[data-step="complete"]');
+
+            document.getElementById('completionName').textContent = displayName.split(' ')[0] || 'friend';
+
+            step4.classList.add('slide-out-left');
+
+            setTimeout(() => {
+                step4.classList.remove('active', 'slide-out-left');
+                completionStep.classList.add('active');
+
+                // Hide progress dots
+                document.querySelector('.progress-dots').style.opacity = '0';
+
+                // Redirect after animation
+                setTimeout(() => {
+                    window.location.href = getRedirectUrl();
+                }, 2500);
+            }, 300);
         }
 
         // Auth functions
@@ -798,6 +1160,9 @@
         window.resendCode = resendCode;
         window.signInWithGoogle = signInWithGoogle;
         window.skipProfile = skipProfile;
+        window.nextStep = nextStep;
+        window.prevStep = prevStep;
+        window.completeOnboarding = completeOnboarding;
     </script>
 
 </body>
