@@ -629,7 +629,25 @@
 
         const data = await response.json();
 
+        // Handle error responses with status code + error message
         if (!response.ok) {
+          const errorMsg = (data.error || '').toLowerCase();
+
+          // Already connected (409 Conflict or error message)
+          if (response.status === 409 || errorMsg.includes('already connected') || errorMsg.includes('already friends')) {
+            btn.textContent = 'Already Friends!';
+            btn.style.background = '#4CAF50';
+            setTimeout(() => window.location.reload(), 1500);
+            return;
+          }
+
+          // Request pending (400 Bad Request with specific message)
+          if (errorMsg.includes('pending') || errorMsg.includes('already sent')) {
+            btn.textContent = 'Request Pending';
+            btn.style.background = '#ff9800';
+            return;
+          }
+
           throw new Error(data.error || 'Failed to send request');
         }
 
@@ -649,21 +667,8 @@
         }
       } catch (error) {
         console.error('Error sending friend request:', error);
-
-        // Handle specific error cases
-        if (error.message.includes('Already connected')) {
-          btn.textContent = 'Already Friends!';
-          btn.style.background = '#4CAF50';
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-        } else if (error.message.includes('already pending')) {
-          btn.textContent = 'Request Pending';
-          btn.style.background = '#ff9800';
-        } else {
-          btn.textContent = 'Failed - Try Again';
-          btn.disabled = false;
-        }
+        btn.textContent = 'Failed - Try Again';
+        btn.disabled = false;
       }
     }
   </script>

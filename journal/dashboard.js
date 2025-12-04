@@ -782,7 +782,17 @@ async function shareEntry(entryId) {
   currentShareEntryId = entryId;
   selectedConnections.clear();
 
-  // Load connections and show modal
+  // Show modal immediately with loading state
+  const connectionsList = document.getElementById('connectionsList');
+  connectionsList.innerHTML = `
+    <p style="text-align: center; color: var(--text-secondary);">
+      <span class="loading-spinner" style="display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border-color); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite;"></span>
+      Loading connections...
+    </p>
+  `;
+  document.getElementById('shareModal').style.display = 'flex';
+
+  // Load connections
   try {
     const token = await api.getAuthToken();
     const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
@@ -793,8 +803,6 @@ async function shareEntry(entryId) {
     const data = await response.json();
 
     if (!response.ok) throw new Error(data.error);
-
-    const connectionsList = document.getElementById('connectionsList');
 
     if (!data.connections || data.connections.length === 0) {
       connectionsList.innerHTML = `
@@ -811,11 +819,13 @@ async function shareEntry(entryId) {
         </div>
       `).join('');
     }
-
-    document.getElementById('shareModal').style.display = 'flex';
   } catch (error) {
     console.error('Error loading connections:', error);
-    showToast('Failed to load connections', 'error');
+    connectionsList.innerHTML = `
+      <p style="text-align: center; color: var(--error);">
+        Failed to load connections. <a href="#" onclick="shareEntry('${entryId}'); return false;">Try again</a>
+      </p>
+    `;
   }
 }
 
@@ -844,9 +854,14 @@ async function confirmShare() {
     return;
   }
 
-  try {
-    showToast('Sharing entry...', 'info');
+  // Disable button to prevent duplicate requests
+  const confirmBtn = document.querySelector('#shareModal .primary-btn');
+  if (confirmBtn) {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Sharing...';
+  }
 
+  try {
     const token = await api.getAuthToken();
     const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
     const response = await fetch(`${baseUrl}/journalLambdafunc/entry/${currentShareEntryId}/share-with`, {
@@ -867,6 +882,11 @@ async function confirmShare() {
   } catch (error) {
     console.error('Error sharing entry:', error);
     showToast('Failed to share entry', 'error');
+    // Re-enable button on error
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Share';
+    }
   }
 }
 
@@ -892,6 +912,11 @@ async function getShareLink(entryId) {
     const data = await response.json();
 
     if (!response.ok) throw new Error(data.error);
+
+    // Validate response has required data
+    if (!data.shareUrl && !data.shareToken) {
+      throw new Error('Invalid response from server');
+    }
 
     // Use the shareUrl from backend, or build it from shareToken
     const shareUrl = data.shareUrl || `${window.location.origin}/journal/shared.html?token=${data.shareToken}`;
@@ -1245,15 +1270,20 @@ async function viewSharedEntry(shareId, entryId) {
   try {
     const token = await api.getAuthToken();
     const baseUrl = API_BASE_URL.replace('/journalLambdafunc', '');
-    await fetch(`${baseUrl}/journalLambdafunc/entry-share/${shareId}/read`, {
+    const response = await fetch(`${baseUrl}/journalLambdafunc/entry-share/${shareId}/read`, {
       method: 'PUT',
       headers: { 'Authorization': `Bearer ${token}` }
     });
+
+    if (!response.ok) {
+      throw new Error('Failed to mark as read');
+    }
 
     // Reload to update unread count
     loadSharedWithMe();
   } catch (error) {
     console.error('Error marking as read:', error);
+    showToast('Failed to mark entry as read', 'error');
   }
 }
 
@@ -1446,11 +1476,18 @@ function saveDraft() {
   const content = quillEditor ? quillEditor.root.innerHTML : (document.getElementById('entryText')?.value || '');
 
   if (title || content !== '<p><br></p>') {
-    localStorage.setItem(draftKey, JSON.stringify({
-      title,
-      content,
-      savedAt: Date.now()
-    }));
+    try {
+      localStorage.setItem(draftKey, JSON.stringify({
+        title,
+        content,
+        savedAt: Date.now()
+      }));
+    } catch (error) {
+      // localStorage quota exceeded or not available
+      console.error('Failed to save draft:', error);
+      showToast('Storage full - draft not saved', 'error');
+      updateAutosaveIndicator('');
+    }
   }
 }
 

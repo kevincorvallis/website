@@ -160,6 +160,32 @@ function showMessage(element, message, isError = false) {
   element.innerHTML = `<p class="${isError ? 'error-message' : 'success-message'}">${escapeHtml(message)}</p>`;
 }
 
+// Toast notification function
+function showToast(message, type = 'info') {
+  // Remove existing toast if any
+  const existingToast = document.querySelector('.connections-toast');
+  if (existingToast) existingToast.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `connections-toast toast-${type}`;
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    z-index: 10000;
+    animation: slideUp 0.3s ease;
+    background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#22c55e' : '#3b82f6'};
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
 async function handleSearch() {
   const query = document.getElementById('searchInput').value.trim();
   const resultsEl = document.getElementById('searchResults');
@@ -187,25 +213,7 @@ async function handleSearch() {
         <button class="connect-btn primary-btn" data-uid="${user.uid}">Connect</button>
       </div>
     `).join('');
-
-    // Add click handlers for connect buttons
-    resultsEl.querySelectorAll('.connect-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const targetUid = e.target.dataset.uid;
-        e.target.disabled = true;
-        e.target.textContent = 'Sending...';
-
-        try {
-          const result = await requestConnection(targetUid);
-          e.target.textContent = result.status === 'accepted' ? 'Connected!' : 'Request Sent';
-          e.target.classList.remove('primary-btn');
-          e.target.classList.add('secondary-btn');
-        } catch (error) {
-          e.target.textContent = error.message || 'Failed';
-          e.target.disabled = false;
-        }
-      });
-    });
+    // Event delegation is set up in setupEventDelegation()
   } catch (error) {
     showMessage(resultsEl, error.message || 'Search failed', true);
   }
@@ -236,32 +244,7 @@ async function loadPendingConnections() {
         </div>
       </div>
     `).join('');
-
-    // Add click handlers
-    listEl.querySelectorAll('.accept-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const id = e.target.dataset.id;
-        try {
-          await acceptConnection(id);
-          loadPendingConnections();
-          loadConnections();
-        } catch (error) {
-          alert('Failed to accept: ' + error.message);
-        }
-      });
-    });
-
-    listEl.querySelectorAll('.decline-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const id = e.target.dataset.id;
-        try {
-          await declineConnection(id);
-          loadPendingConnections();
-        } catch (error) {
-          alert('Failed to decline: ' + error.message);
-        }
-      });
-    });
+    // Event delegation is set up in setupEventDelegation()
   } catch (error) {
     showMessage(listEl, 'Failed to load pending requests', true);
   }
@@ -289,21 +272,7 @@ async function loadConnections() {
         <button class="remove-btn secondary-btn" data-id="${conn.connection_id}">Remove</button>
       </div>
     `).join('');
-
-    // Add click handlers for remove buttons
-    listEl.querySelectorAll('.remove-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        if (!confirm('Are you sure you want to remove this connection?')) return;
-
-        const id = e.target.dataset.id;
-        try {
-          await removeConnection(id);
-          loadConnections();
-        } catch (error) {
-          alert('Failed to remove: ' + error.message);
-        }
-      });
-    });
+    // Event delegation is set up in setupEventDelegation()
   } catch (error) {
     showMessage(listEl, 'Failed to load connections', true);
   }
@@ -325,21 +294,43 @@ function handleInvite() {
 
 async function loadInviteLink() {
   const linkInput = document.getElementById('inviteLinkInput');
+  const copyBtn = document.getElementById('copyLinkBtn');
+
+  linkInput.value = 'Generating...';
+  copyBtn.disabled = true;
+
   try {
     const result = await generateInviteLink();
-    linkInput.value = result.inviteUrl;
+    if (result.inviteUrl) {
+      linkInput.value = result.inviteUrl;
+      copyBtn.disabled = false;
+    } else {
+      throw new Error('Invalid response');
+    }
   } catch (error) {
-    linkInput.value = 'Failed to generate link';
     console.error('Error generating invite link:', error);
+    linkInput.value = '';
+    linkInput.placeholder = 'Click retry to generate link';
+    copyBtn.textContent = 'Retry';
+    copyBtn.disabled = false;
+    showToast('Failed to generate invite link', 'error');
   }
 }
 
 function setupCopyButton() {
-  document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+  const copyBtn = document.getElementById('copyLinkBtn');
+  copyBtn.addEventListener('click', async () => {
     const linkInput = document.getElementById('inviteLinkInput');
     const feedback = document.getElementById('copyFeedback');
 
-    if (!linkInput.value || linkInput.value.startsWith('Failed')) return;
+    // Handle retry state
+    if (copyBtn.textContent === 'Retry') {
+      copyBtn.textContent = 'Copy Link';
+      await loadInviteLink();
+      return;
+    }
+
+    if (!linkInput.value || linkInput.value === 'Generating...') return;
 
     try {
       await navigator.clipboard.writeText(linkInput.value);
@@ -384,6 +375,105 @@ async function checkAndRedeemInvite() {
 }
 
 // ============================================
+// EVENT DELEGATION (prevents duplicate listeners)
+// ============================================
+function setupEventDelegation() {
+  // Search results - connect button
+  document.getElementById('searchResults').addEventListener('click', async (e) => {
+    const btn = e.target.closest('.connect-btn');
+    if (!btn || btn.disabled) return;
+
+    const targetUid = btn.dataset.uid;
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    try {
+      const result = await requestConnection(targetUid);
+      btn.textContent = result.status === 'accepted' ? 'Connected!' : 'Request Sent';
+      btn.classList.remove('primary-btn');
+      btn.classList.add('secondary-btn');
+      showToast(result.status === 'accepted' ? 'Connected!' : 'Friend request sent', 'success');
+    } catch (error) {
+      btn.textContent = 'Connect';
+      btn.disabled = false;
+      showToast(error.message || 'Failed to send request', 'error');
+    }
+  });
+
+  // Pending list - accept/decline buttons
+  document.getElementById('pendingList').addEventListener('click', async (e) => {
+    const acceptBtn = e.target.closest('.accept-btn');
+    const declineBtn = e.target.closest('.decline-btn');
+
+    if (acceptBtn && !acceptBtn.disabled) {
+      const id = acceptBtn.dataset.id;
+      const originalText = acceptBtn.textContent;
+      acceptBtn.disabled = true;
+      acceptBtn.textContent = 'Accepting...';
+      // Disable sibling decline button too
+      const declineSibling = acceptBtn.parentElement.querySelector('.decline-btn');
+      if (declineSibling) declineSibling.disabled = true;
+
+      try {
+        await acceptConnection(id);
+        showToast('Connection accepted!', 'success');
+        loadPendingConnections();
+        loadConnections();
+      } catch (error) {
+        acceptBtn.textContent = originalText;
+        acceptBtn.disabled = false;
+        if (declineSibling) declineSibling.disabled = false;
+        showToast('Failed to accept: ' + error.message, 'error');
+      }
+    }
+
+    if (declineBtn && !declineBtn.disabled) {
+      const id = declineBtn.dataset.id;
+      const originalText = declineBtn.textContent;
+      declineBtn.disabled = true;
+      declineBtn.textContent = 'Declining...';
+      // Disable sibling accept button too
+      const acceptSibling = declineBtn.parentElement.querySelector('.accept-btn');
+      if (acceptSibling) acceptSibling.disabled = true;
+
+      try {
+        await declineConnection(id);
+        showToast('Request declined', 'info');
+        loadPendingConnections();
+      } catch (error) {
+        declineBtn.textContent = originalText;
+        declineBtn.disabled = false;
+        if (acceptSibling) acceptSibling.disabled = false;
+        showToast('Failed to decline: ' + error.message, 'error');
+      }
+    }
+  });
+
+  // Connections list - remove button
+  document.getElementById('connectionsList').addEventListener('click', async (e) => {
+    const btn = e.target.closest('.remove-btn');
+    if (!btn || btn.disabled) return;
+
+    if (!confirm('Are you sure you want to remove this connection?')) return;
+
+    const id = btn.dataset.id;
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Removing...';
+
+    try {
+      await removeConnection(id);
+      showToast('Connection removed', 'info');
+      loadConnections();
+    } catch (error) {
+      btn.textContent = originalText;
+      btn.disabled = false;
+      showToast('Failed to remove: ' + error.message, 'error');
+    }
+  });
+}
+
+// ============================================
 // INITIALIZATION
 // ============================================
 async function initialize() {
@@ -403,15 +493,18 @@ async function initialize() {
     const displayName = currentUser.givenName || currentUser.name?.split(' ')[0] || currentUser.email?.split('@')[0];
     await updateProfile(displayName, currentUser.email).catch(() => {});
 
+    // Setup event delegation (once, before loading data)
+    setupEventDelegation();
+
+    // Setup copy button
+    setupCopyButton();
+
     // Load data
     await Promise.all([
       loadPendingConnections(),
       loadConnections(),
       loadInviteLink()
     ]);
-
-    // Setup copy button
-    setupCopyButton();
 
     // Check for invite token in URL and redeem it
     await checkAndRedeemInvite();

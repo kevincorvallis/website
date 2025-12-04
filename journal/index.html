@@ -959,6 +959,9 @@
                     showError('Invalid code. Please check and try again.');
                 } else if (error.name === 'ExpiredCodeException') {
                     showError('Code expired. Please request a new one.');
+                    // Show resend button immediately (stop any running timer)
+                    document.getElementById('resendText').style.display = 'block';
+                    document.getElementById('resendTimer').style.display = 'none';
                 } else {
                     showError(error.message || 'Verification failed');
                 }
@@ -994,14 +997,25 @@
         }
 
         async function signInWithGoogle() {
+            // Hide forms and show redirect message
+            document.getElementById('authFormsContainer').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            document.querySelector('#loader p').textContent = 'Redirecting to Google...';
+
+            // Set timeout in case redirect fails silently
+            const redirectTimeout = setTimeout(() => {
+                console.error('Google redirect timeout');
+                showError('Google sign-in timed out. Please try again.');
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('authFormsContainer').style.display = 'block';
+                document.querySelector('#loader p').textContent = 'Setting up your journal...';
+            }, 10000); // 10 second timeout
+
             try {
-                // Hide forms and show redirect message
-                document.getElementById('authFormsContainer').style.display = 'none';
-                document.getElementById('loader').style.display = 'block';
-                document.querySelector('#loader p').textContent = 'Redirecting to Google...';
                 await signInWithRedirect({ provider: 'Google' });
                 // Note: signInWithRedirect navigates away, code below won't execute
             } catch (error) {
+                clearTimeout(redirectTimeout);
                 console.error('Google sign in error:', error);
                 showError(error.message || 'Google sign in failed');
                 document.getElementById('loader').style.display = 'none';
@@ -1011,6 +1025,10 @@
         }
 
         async function handleSuccessfulAuth() {
+            // Clear any pending email state from previous attempts
+            pendingEmail = null;
+            sessionStorage.removeItem('pendingVerificationEmail');
+
             try {
                 const user = await getCurrentUser();
                 const session = await fetchAuthSession();
