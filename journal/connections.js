@@ -46,6 +46,7 @@ Amplify.configure({
 
 // Current user state
 let currentUser = null;
+let searchDebounceTimer = null;
 
 // ============================================
 // API SERVICE
@@ -148,7 +149,7 @@ async function redeemInviteToken(token) {
 }
 
 // ============================================
-// UI FUNCTIONS
+// UI HELPERS
 // ============================================
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -156,153 +157,263 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-function showMessage(element, message, isError = false) {
-  element.innerHTML = `<p class="${isError ? 'error-message' : 'success-message'}">${escapeHtml(message)}</p>`;
+function getInitials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
-// Toast notification function
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ============================================
+// TOAST NOTIFICATIONS
+// ============================================
 function showToast(message, type = 'info') {
-  // Remove existing toast if any
-  const existingToast = document.querySelector('.connections-toast');
-  if (existingToast) existingToast.remove();
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
 
   const toast = document.createElement('div');
-  toast.className = `connections-toast toast-${type}`;
-  toast.textContent = message;
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 24px;
-    border-radius: 8px;
-    color: white;
-    font-size: 14px;
-    z-index: 10000;
-    animation: slideUp 0.3s ease;
-    background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#22c55e' : '#3b82f6'};
+  toast.className = `toast ${type}`;
+
+  const iconSvg = type === 'success'
+    ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    : type === 'error'
+    ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M15 9L9 15M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+    : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16V12M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+  toast.innerHTML = `
+    <span class="toast-icon">${iconSvg}</span>
+    <span class="toast-message">${escapeHtml(message)}</span>
+    <button class="toast-close" onclick="this.parentElement.remove()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
   `;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+
+  container.appendChild(toast);
+
+  // Auto remove after 4 seconds
+  setTimeout(() => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
 }
 
-async function handleSearch() {
-  const query = document.getElementById('searchInput').value.trim();
+// ============================================
+// LOADING SKELETONS
+// ============================================
+function showLoadingSkeleton(container, count = 3) {
+  container.innerHTML = `
+    <div class="loading-state">
+      ${Array(count).fill(`
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-avatar"></div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text-short"></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ============================================
+// SEARCH FUNCTIONALITY
+// ============================================
+function setupSearch() {
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearSearchBtn');
   const resultsEl = document.getElementById('searchResults');
 
-  if (query.length < 2) {
-    resultsEl.innerHTML = '<p class="hint">Enter at least 2 characters to search</p>';
-    return;
-  }
+  if (!searchInput) return;
 
-  resultsEl.innerHTML = '<p class="loading">Searching...</p>';
+  // Debounced search on input
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim();
+
+    // Show/hide clear button
+    clearBtn.style.display = query.length > 0 ? 'flex' : 'none';
+
+    // Clear existing timer
+    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+
+    if (query.length === 0) {
+      resultsEl.innerHTML = '';
+      return;
+    }
+
+    if (query.length < 2) {
+      resultsEl.innerHTML = '<p class="search-empty">Enter at least 2 characters</p>';
+      return;
+    }
+
+    // Show loading
+    resultsEl.innerHTML = '<p class="search-loading">Searching...</p>';
+
+    // Debounce search
+    searchDebounceTimer = setTimeout(() => handleSearch(query), 300);
+  });
+
+  // Clear button
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    clearBtn.style.display = 'none';
+    resultsEl.innerHTML = '';
+    searchInput.focus();
+  });
+}
+
+async function handleSearch(query) {
+  const resultsEl = document.getElementById('searchResults');
 
   try {
     const result = await searchUsers(query);
 
     if (result.users.length === 0) {
-      resultsEl.innerHTML = '<p class="empty-state">No users found</p>';
+      resultsEl.innerHTML = '<p class="search-empty">No users found</p>';
       return;
     }
 
     resultsEl.innerHTML = result.users.map(user => `
-      <div class="user-card">
+      <div class="search-result-item">
         <div class="user-info">
-          <span class="user-name">${escapeHtml(user.displayName)}</span>
+          <div class="user-avatar">${getInitials(user.displayName)}</div>
+          <div class="user-details">
+            <span class="user-name">${escapeHtml(user.displayName)}</span>
+          </div>
         </div>
-        <button class="connect-btn primary-btn" data-uid="${user.uid}">Connect</button>
+        <button class="btn btn-primary connect-btn" data-uid="${user.uid}">Connect</button>
       </div>
     `).join('');
-    // Event delegation is set up in setupEventDelegation()
   } catch (error) {
-    showMessage(resultsEl, error.message || 'Search failed', true);
+    resultsEl.innerHTML = `<p class="search-empty">${escapeHtml(error.message || 'Search failed')}</p>`;
   }
 }
 
+// ============================================
+// PENDING CONNECTIONS
+// ============================================
 async function loadPendingConnections() {
   const listEl = document.getElementById('pendingList');
   const countEl = document.getElementById('pendingCount');
+  const sectionEl = document.getElementById('pendingSection');
+
+  if (!listEl) return;
+
+  showLoadingSkeleton(listEl, 2);
 
   try {
     const result = await getPendingConnections();
     countEl.textContent = result.count;
 
+    // Hide section if no pending requests
     if (result.pending.length === 0) {
-      listEl.innerHTML = '<p class="empty-state">No pending requests</p>';
+      sectionEl.style.display = 'none';
       return;
     }
+
+    sectionEl.style.display = 'block';
 
     listEl.innerHTML = result.pending.map(req => `
       <div class="connection-card pending">
         <div class="user-info">
-          <span class="user-name">${escapeHtml(req.displayName)}</span>
-          <span class="request-time">Requested ${new Date(req.requested_at).toLocaleDateString()}</span>
+          <div class="user-avatar">${getInitials(req.displayName)}</div>
+          <div class="user-details">
+            <span class="user-name">${escapeHtml(req.displayName)}</span>
+            <span class="connection-time">Requested ${formatDate(req.requested_at)}</span>
+          </div>
         </div>
         <div class="action-buttons">
-          <button class="accept-btn primary-btn" data-id="${req.connection_id}">Accept</button>
-          <button class="decline-btn secondary-btn" data-id="${req.connection_id}">Decline</button>
+          <button class="btn btn-success accept-btn" data-id="${req.connection_id}">Accept</button>
+          <button class="btn btn-secondary decline-btn" data-id="${req.connection_id}">Decline</button>
         </div>
       </div>
     `).join('');
-    // Event delegation is set up in setupEventDelegation()
   } catch (error) {
-    showMessage(listEl, 'Failed to load pending requests', true);
+    listEl.innerHTML = '<div class="empty-state"><p>Failed to load requests</p></div>';
+    showToast('Failed to load pending requests', 'error');
   }
 }
 
+// ============================================
+// MY CONNECTIONS
+// ============================================
 async function loadConnections() {
   const listEl = document.getElementById('connectionsList');
   const countEl = document.getElementById('connectionsCount');
+
+  if (!listEl) return;
+
+  showLoadingSkeleton(listEl, 3);
 
   try {
     const result = await getConnections();
     countEl.textContent = result.connections.length;
 
     if (result.connections.length === 0) {
-      listEl.innerHTML = '<p class="empty-state">No connections yet. Search for people above!</p>';
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" opacity="0.5">
+            <path d="M17 21V19C17 16.79 15.21 15 13 15H5C2.79 15 1 16.79 1 19V21" stroke="currentColor" stroke-width="2"/>
+            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 8V14M23 11H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <p>No connections yet</p>
+          <span>Search for friends above to get started!</span>
+        </div>
+      `;
       return;
     }
 
     listEl.innerHTML = result.connections.map(conn => `
       <div class="connection-card">
         <div class="user-info">
-          <span class="user-name">${escapeHtml(conn.displayName)}</span>
-          <span class="connected-time">Connected ${new Date(conn.connected_at).toLocaleDateString()}</span>
+          <div class="user-avatar">${getInitials(conn.displayName)}</div>
+          <div class="user-details">
+            <span class="user-name">${escapeHtml(conn.displayName)}</span>
+            <span class="connection-time">Connected ${formatDate(conn.connected_at)}</span>
+          </div>
         </div>
-        <button class="remove-btn secondary-btn" data-id="${conn.connection_id}">Remove</button>
+        <button class="btn btn-danger remove-btn" data-id="${conn.connection_id}">Remove</button>
       </div>
     `).join('');
-    // Event delegation is set up in setupEventDelegation()
   } catch (error) {
-    showMessage(listEl, 'Failed to load connections', true);
+    listEl.innerHTML = '<div class="empty-state"><p>Failed to load connections</p></div>';
+    showToast('Failed to load connections', 'error');
   }
 }
 
-function handleInvite() {
-  const email = prompt('Enter email address to invite:');
-  if (!email) return;
-
-  const subject = encodeURIComponent('Join me on Day by Day Journal!');
-  const body = encodeURIComponent(
-    `Hey!\n\nI'd love to connect with you on Day by Day, a personal journaling app.\n\n` +
-    `Sign up here: ${window.location.origin}/journal/\n\n` +
-    `Once you create an account, search for me to connect!`
-  );
-
-  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-}
-
+// ============================================
+// INVITE LINK
+// ============================================
 async function loadInviteLink() {
   const linkInput = document.getElementById('inviteLinkInput');
   const copyBtn = document.getElementById('copyLinkBtn');
+  const copyBtnSpan = copyBtn?.querySelector('span');
 
-  linkInput.value = 'Generating...';
+  if (!linkInput || !copyBtn) return;
+
+  linkInput.value = '';
+  linkInput.placeholder = 'Generating...';
   copyBtn.disabled = true;
 
   try {
     const result = await generateInviteLink();
     if (result.inviteUrl) {
       linkInput.value = result.inviteUrl;
+      linkInput.placeholder = '';
       copyBtn.disabled = false;
     } else {
       throw new Error('Invalid response');
@@ -310,42 +421,51 @@ async function loadInviteLink() {
   } catch (error) {
     console.error('Error generating invite link:', error);
     linkInput.value = '';
-    linkInput.placeholder = 'Click retry to generate link';
-    copyBtn.textContent = 'Retry';
+    linkInput.placeholder = 'Failed to generate';
     copyBtn.disabled = false;
+    // Change button to retry mode
+    if (copyBtnSpan) copyBtnSpan.textContent = 'Retry';
+    copyBtn.dataset.retry = 'true';
     showToast('Failed to generate invite link', 'error');
   }
 }
 
 function setupCopyButton() {
   const copyBtn = document.getElementById('copyLinkBtn');
-  copyBtn.addEventListener('click', async () => {
-    const linkInput = document.getElementById('inviteLinkInput');
-    const feedback = document.getElementById('copyFeedback');
+  const linkInput = document.getElementById('inviteLinkInput');
+  const feedback = document.getElementById('copyFeedback');
+  const copyBtnSpan = copyBtn?.querySelector('span');
 
-    // Handle retry state
-    if (copyBtn.textContent === 'Retry') {
-      copyBtn.textContent = 'Copy Link';
+  if (!copyBtn) return;
+
+  copyBtn.addEventListener('click', async () => {
+    // Handle retry mode
+    if (copyBtn.dataset.retry === 'true') {
+      delete copyBtn.dataset.retry;
+      if (copyBtnSpan) copyBtnSpan.textContent = 'Copy';
       await loadInviteLink();
       return;
     }
 
-    if (!linkInput.value || linkInput.value === 'Generating...') return;
+    if (!linkInput.value) return;
 
     try {
       await navigator.clipboard.writeText(linkInput.value);
-      feedback.style.display = 'block';
-      setTimeout(() => { feedback.style.display = 'none'; }, 2000);
+      feedback.classList.add('show');
+      setTimeout(() => feedback.classList.remove('show'), 2000);
     } catch (err) {
       // Fallback for older browsers
       linkInput.select();
       document.execCommand('copy');
-      feedback.style.display = 'block';
-      setTimeout(() => { feedback.style.display = 'none'; }, 2000);
+      feedback.classList.add('show');
+      setTimeout(() => feedback.classList.remove('show'), 2000);
     }
   });
 }
 
+// ============================================
+// INVITE TOKEN REDEMPTION
+// ============================================
 async function checkAndRedeemInvite() {
   const urlParams = new URLSearchParams(window.location.search);
   const inviteToken = urlParams.get('invite');
@@ -364,13 +484,14 @@ async function checkAndRedeemInvite() {
     sessionStorage.removeItem('pendingInviteToken');
 
     if (result.connected) {
-      showMessage(document.getElementById('connectionsList'), 'You are now connected!', false);
+      showToast('You are now connected!', 'success');
       await loadConnections();
     } else if (result.alreadyConnected) {
-      showMessage(document.getElementById('connectionsList'), 'You are already connected with this person', false);
+      showToast('You are already connected with this person', 'info');
     }
   } catch (error) {
     console.error('Failed to redeem invite:', error);
+    showToast('Failed to process invite link', 'error');
   }
 }
 
@@ -379,19 +500,19 @@ async function checkAndRedeemInvite() {
 // ============================================
 function setupEventDelegation() {
   // Search results - connect button
-  document.getElementById('searchResults').addEventListener('click', async (e) => {
+  document.getElementById('searchResults')?.addEventListener('click', async (e) => {
     const btn = e.target.closest('.connect-btn');
     if (!btn || btn.disabled) return;
 
     const targetUid = btn.dataset.uid;
     btn.disabled = true;
-    btn.textContent = 'Sending...';
+    btn.innerHTML = '<span class="spinner"></span>';
 
     try {
       const result = await requestConnection(targetUid);
-      btn.textContent = result.status === 'accepted' ? 'Connected!' : 'Request Sent';
-      btn.classList.remove('primary-btn');
-      btn.classList.add('secondary-btn');
+      btn.textContent = result.status === 'accepted' ? 'Connected!' : 'Sent';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
       showToast(result.status === 'accepted' ? 'Connected!' : 'Friend request sent', 'success');
     } catch (error) {
       btn.textContent = 'Connect';
@@ -401,15 +522,14 @@ function setupEventDelegation() {
   });
 
   // Pending list - accept/decline buttons
-  document.getElementById('pendingList').addEventListener('click', async (e) => {
+  document.getElementById('pendingList')?.addEventListener('click', async (e) => {
     const acceptBtn = e.target.closest('.accept-btn');
     const declineBtn = e.target.closest('.decline-btn');
 
     if (acceptBtn && !acceptBtn.disabled) {
       const id = acceptBtn.dataset.id;
-      const originalText = acceptBtn.textContent;
       acceptBtn.disabled = true;
-      acceptBtn.textContent = 'Accepting...';
+      acceptBtn.innerHTML = '<span class="spinner"></span>';
       // Disable sibling decline button too
       const declineSibling = acceptBtn.parentElement.querySelector('.decline-btn');
       if (declineSibling) declineSibling.disabled = true;
@@ -420,7 +540,7 @@ function setupEventDelegation() {
         loadPendingConnections();
         loadConnections();
       } catch (error) {
-        acceptBtn.textContent = originalText;
+        acceptBtn.textContent = 'Accept';
         acceptBtn.disabled = false;
         if (declineSibling) declineSibling.disabled = false;
         showToast('Failed to accept: ' + error.message, 'error');
@@ -429,9 +549,8 @@ function setupEventDelegation() {
 
     if (declineBtn && !declineBtn.disabled) {
       const id = declineBtn.dataset.id;
-      const originalText = declineBtn.textContent;
       declineBtn.disabled = true;
-      declineBtn.textContent = 'Declining...';
+      declineBtn.innerHTML = '<span class="spinner"></span>';
       // Disable sibling accept button too
       const acceptSibling = declineBtn.parentElement.querySelector('.accept-btn');
       if (acceptSibling) acceptSibling.disabled = true;
@@ -441,7 +560,7 @@ function setupEventDelegation() {
         showToast('Request declined', 'info');
         loadPendingConnections();
       } catch (error) {
-        declineBtn.textContent = originalText;
+        declineBtn.textContent = 'Decline';
         declineBtn.disabled = false;
         if (acceptSibling) acceptSibling.disabled = false;
         showToast('Failed to decline: ' + error.message, 'error');
@@ -450,23 +569,22 @@ function setupEventDelegation() {
   });
 
   // Connections list - remove button
-  document.getElementById('connectionsList').addEventListener('click', async (e) => {
+  document.getElementById('connectionsList')?.addEventListener('click', async (e) => {
     const btn = e.target.closest('.remove-btn');
     if (!btn || btn.disabled) return;
 
     if (!confirm('Are you sure you want to remove this connection?')) return;
 
     const id = btn.dataset.id;
-    const originalText = btn.textContent;
     btn.disabled = true;
-    btn.textContent = 'Removing...';
+    btn.innerHTML = '<span class="spinner"></span>';
 
     try {
       await removeConnection(id);
       showToast('Connection removed', 'info');
       loadConnections();
     } catch (error) {
-      btn.textContent = originalText;
+      btn.textContent = 'Remove';
       btn.disabled = false;
       showToast('Failed to remove: ' + error.message, 'error');
     }
@@ -496,10 +614,13 @@ async function initialize() {
     // Setup event delegation (once, before loading data)
     setupEventDelegation();
 
+    // Setup search with debounce
+    setupSearch();
+
     // Setup copy button
     setupCopyButton();
 
-    // Load data
+    // Load data in parallel
     await Promise.all([
       loadPendingConnections(),
       loadConnections(),
@@ -523,17 +644,8 @@ async function signOutUser() {
   }
 }
 
+// Expose signOut to window for nav button
+window.signOutUser = signOutUser;
+
 // Initialize on page load
 initialize();
-
-// ============================================
-// EVENT LISTENERS
-// ============================================
-document.getElementById('searchBtn').addEventListener('click', handleSearch);
-document.getElementById('searchInput').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') handleSearch();
-});
-document.getElementById('inviteBtn').addEventListener('click', handleInvite);
-
-// Expose functions to window
-window.signOutUser = signOutUser;
