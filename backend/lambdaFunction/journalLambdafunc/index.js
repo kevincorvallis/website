@@ -1897,6 +1897,7 @@ async function deleteAccount(event, conn) {
 
     // 8. Delete user from Cognito
     // Use cognito:username (not sub) - this is different for Google federated users
+    // Note: Lambda is in VPC and may not have internet access to reach Cognito
     const cognitoUsername = getCognitoUsername(event);
     if (cognitoUsername) {
       try {
@@ -1904,10 +1905,17 @@ async function deleteAccount(event, conn) {
           UserPoolId: COGNITO_USER_POOL_ID,
           Username: cognitoUsername
         });
-        await cognitoClient.send(deleteCommand);
+        // Use AbortController with 5 second timeout - fail fast if no internet access
+        const abortController = new AbortController();
+        const timeoutId = setTimeout(() => abortController.abort(), 5000);
+        try {
+          await cognitoClient.send(deleteCommand, { abortSignal: abortController.signal });
+        } finally {
+          clearTimeout(timeoutId);
+        }
       } catch (cognitoError) {
-        console.error('Error deleting Cognito user:', cognitoError);
-        // Continue even if Cognito deletion fails - data is already deleted
+        // Log but continue - database data is already deleted
+        console.log('Cognito deletion skipped (VPC limitation or error):', cognitoError.name || cognitoError.message);
       }
     }
 

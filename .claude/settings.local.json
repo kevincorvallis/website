@@ -57,7 +57,21 @@
       "Bash(npm install:*)",
       "Bash(pip3 install:*)",
       "Bash(node -e:*)",
-      "Bash(unzip:*)"
+      "Bash(unzip:*)",
+      "Bash(aws cloudfront get-invalidation:*)",
+      "Bash(nslookup:*)",
+      "Bash(dig:*)",
+      "Bash(aws --profile personal cloudfront list-distributions:*)",
+      "Bash(aws --profile personal sts get-caller-identity:*)",
+      "Bash(aws --profile default sts get-caller-identity)",
+      "Bash(aws amplify list-apps:*)",
+      "Bash(gh run list:*)",
+      "Bash(git -c commit.gpgsign=false add:*)",
+      "Bash(git -c commit.gpgsign=false commit -m \"$(cat <<''EOF''\nFix login flow bugs and improve UX\n\n- Hide divider/Google button during email verification\n- Persist pendingEmail to sessionStorage (survives page refresh)\n- Fix loader visibility (hide forms when showing loader)\n- Fix Google sign-in redirect (show \"Redirecting to Google...\")\n- Prevent double initialization on OAuth redirect in dashboard.js\n- Clear pending email after successful verification\n- Restore verification form if user refreshes during verification\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git -c commit.gpgsign=false commit -m \"$(cat <<''EOF''\nFix 12 frontend bugs across authentication, sharing, and connections\n\n## connections.js\n- #1: Use event delegation to prevent duplicate event listeners (memory leak)\n- #6: Add button loading states for accept/decline with toast errors\n- #12: Improve invite link error handling with retry button\n\n## dashboard.js\n- #2: Disable share button during request to prevent duplicates\n- #4: Handle localStorage quota errors in saveDraft with toast\n- #7: Show loading spinner in share modal while loading connections\n- #10: Validate shareToken exists before using\n- #11: Show toast on mark-as-read failure\n\n## index.html\n- #3: Clear pendingEmail state on successful login\n- #5: Add 10s timeout for Google OAuth redirect\n- #9: Show resend button immediately on verification code expiration\n\n## shared.html\n- #8: Use status codes and case-insensitive matching for error handling\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(aws s3api get-bucket-location:*)",
+      "Bash(git -c commit.gpgsign=false commit -m \"$(cat <<''EOF''\nRevamp connections page with dark theme\n\n- Complete redesign with dark theme matching dashboard\n- Add user avatars with initials\n- Debounced search with clear button\n- Loading skeleton states for better UX\n- Improved toast notifications system\n- Button loading spinners during async operations\n- Event delegation for all dynamic content\n- Better responsive design for mobile\n- Sticky header with back navigation\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(aws amplify list-jobs:*)"
     ],
     "deny": [],
     "ask": []
