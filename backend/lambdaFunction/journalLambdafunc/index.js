@@ -206,6 +206,20 @@ async function getEntries(event, conn) {
     return errorResponse(401, 'Authentication required');
   }
 
+  // Ensure user exists in users table (important for OAuth users)
+  const authHeader = event.headers?.Authorization || event.headers?.authorization;
+  if (authHeader) {
+    try {
+      const token = authHeader.split('Bearer ')[1];
+      const decoded = jwt.decode(token);
+      const email = decoded?.email;
+      const displayName = decoded?.name || decoded?.given_name || (email ? email.split('@')[0] : null);
+      await ensureUser(conn, uid, email, displayName);
+    } catch (e) {
+      // Silently continue - user creation is best effort
+    }
+  }
+
   const since = event.queryStringParameters?.since;
 
   try {
@@ -413,6 +427,20 @@ async function syncEntries(event, conn) {
   const uid = await getAuthenticatedUid(event);
   if (!uid) {
     return errorResponse(401, 'Authentication required');
+  }
+
+  // Ensure user exists in users table (important for OAuth users)
+  const authHeader = event.headers?.Authorization || event.headers?.authorization;
+  if (authHeader) {
+    try {
+      const token = authHeader.split('Bearer ')[1];
+      const decoded = jwt.decode(token);
+      const email = decoded?.email;
+      const displayName = decoded?.name || decoded?.given_name || (email ? email.split('@')[0] : null);
+      await ensureUser(conn, uid, email, displayName);
+    } catch (e) {
+      console.log('Could not extract user details from token for ensureUser:', e.message);
+    }
   }
 
   // Capture sync start time FIRST to avoid missing concurrent updates

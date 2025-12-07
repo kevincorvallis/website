@@ -1660,7 +1660,12 @@ Hub.listen('auth', ({ payload }) => {
   switch (payload.event) {
     case 'signInWithRedirect':
       console.log('OAuth sign-in completed successfully');
-      // Re-initialize dashboard after OAuth completes
+      // Clean up URL by removing OAuth params
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+      // Reset initialization flag to allow fresh initialization
+      isInitializing = false;
+      // Initialize dashboard after OAuth completes
       initializeDashboard();
       break;
     case 'signInWithRedirect_failure':
@@ -1830,7 +1835,19 @@ async function signOutUser() {
 }
 
 // Initialize on page load
-initializeDashboard();
+// Check if we're handling an OAuth callback (code in URL means OAuth is in progress)
+const urlParams = new URLSearchParams(window.location.search);
+const isOAuthCallback = urlParams.has('code') || urlParams.has('error');
+
+if (isOAuthCallback) {
+  // OAuth callback in progress - wait for Hub event to complete auth
+  console.log('OAuth callback detected, waiting for auth completion...');
+  // Show loading state while waiting
+  document.getElementById('loadingOverlay')?.classList?.add('active');
+} else {
+  // Normal page load - initialize directly
+  initializeDashboard();
+}
 
 // ============================================
 // EVENT LISTENERS
