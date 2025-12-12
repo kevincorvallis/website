@@ -426,6 +426,7 @@
 
             <div class="step-actions">
                 <button type="button" class="back-btn" onclick="goBackFromPhone()">Back</button>
+                <button type="button" class="skip-btn" onclick="skipPhoneVerification()" style="background: transparent; color: var(--text-secondary); border: none; cursor: pointer; padding: 12px 24px;">Skip for now</button>
             </div>
         </div>
 
@@ -1097,6 +1098,12 @@
             }
         }
 
+        function skipPhoneVerification() {
+            // Skip phone verification and complete onboarding
+            console.log('Skipping phone verification');
+            completeOnboarding();
+        }
+
         // Format phone number as user types
         function setupPhoneInputFormatter() {
             const phoneInput = document.getElementById('onboardingPhone');
@@ -1500,6 +1507,7 @@
         window.verifyOnboardingPhoneCode = verifyOnboardingPhoneCode;
         window.resendOnboardingPhoneCode = resendOnboardingPhoneCode;
         window.goBackFromPhone = goBackFromPhone;
+        window.skipPhoneVerification = skipPhoneVerification;
     </script>
 
 </body>

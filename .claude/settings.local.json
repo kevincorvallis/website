@@ -14,7 +14,8 @@
       "Bash(curl:*)",
       "Bash(aws cognito-idp list-users:*)",
       "Bash(aws cognito-idp list-user-pools:*)",
-      "Bash(aws cognito-idp admin-delete-user:*)"
+      "Bash(aws cognito-idp admin-delete-user:*)",
+      "Bash(aws lambda get-function-configuration:*)"
     ],
     "deny": [],
     "ask": []
