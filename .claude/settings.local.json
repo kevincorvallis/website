@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -c commit.gpgsign=false commit -m \"Revert homepage to previous version\")"
+      "Bash(git -c commit.gpgsign=false commit -m \"Revert homepage to previous version\")",
+      "Bash(aws lambda invoke:*)",
+      "Bash(cat:*)",
+      "Bash(aws logs:*)",
+      "Bash(aws rds describe-db-instances:*)"
     ],
     "deny": [],
     "ask": []

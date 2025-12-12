@@ -1032,7 +1032,12 @@
             try {
                 const user = await getCurrentUser();
                 const session = await fetchAuthSession();
-                const userId = session.tokens?.idToken?.payload?.sub || user.userId;
+
+                // IMPORTANT: Always use the sub from idToken for consistent user ID
+                const tokenSub = session.tokens?.idToken?.payload?.sub;
+                const userId = tokenSub || user.userId;
+
+                console.log('Auth debug:', { tokenSub, userId: user.userId, finalUserId: userId });
 
                 currentUser = {
                     uid: userId,
@@ -1111,7 +1116,12 @@
             try {
                 const user = await getCurrentUser();
                 const session = await fetchAuthSession();
-                const userId = session.tokens?.idToken?.payload?.sub || user.userId;
+
+                // IMPORTANT: Always use the sub from idToken for consistent user ID
+                const tokenSub = session.tokens?.idToken?.payload?.sub;
+                const userId = tokenSub || user.userId;
+
+                console.log('Auth debug (checkAuthState):', { tokenSub, userId: user.userId, finalUserId: userId });
 
                 currentUser = {
                     uid: userId,

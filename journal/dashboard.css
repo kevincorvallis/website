@@ -923,6 +923,10 @@ body::-webkit-scrollbar {
   background: rgba(244, 67, 54, 0.9);
 }
 
+.toast.warning {
+  background: rgba(255, 152, 0, 0.9);
+}
+
 /* ============================================
    DANGER ZONE & DELETE ACCOUNT
    ============================================ */
@@ -1031,15 +1035,13 @@ body::-webkit-scrollbar {
     max-width: 720px;
     margin: 0 auto;
     padding: 24px;
-    padding-bottom: 40px;
+    padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + 100px);
   }
 
-  .bottom-nav {
-    display: none;
-  }
+  /* Keep bottom nav visible on desktop */
 
   .fab {
-    bottom: 24px;
+    bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + 16px);
     right: 24px;
   }
 

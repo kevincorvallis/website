@@ -730,6 +730,8 @@ async function saveEntry(uid, title, text) {
         text,
         date: newEntry.date
       });
+      // Show warning to user that entry is saved locally but not synced
+      showToast('Entry saved locally. Sync pending...', 'warning');
       return null;
     }
   } else if (syncManager) {
@@ -1695,8 +1697,33 @@ async function initializeDashboard() {
   try {
     // Check if user is authenticated
     const user = await getCurrentUser();
-    const session = await fetchAuthSession();
-    const userId = session.tokens?.idToken?.payload?.sub || user.userId;
+    let session = await fetchAuthSession();
+
+    // IMPORTANT: Always use the sub from idToken - it's the consistent Cognito user ID
+    // user.userId can be different (email for native users, provider ID for federated)
+    let tokenSub = session.tokens?.idToken?.payload?.sub;
+
+    // If no token sub, try forcing a session refresh
+    if (!tokenSub) {
+      console.log('No token sub found, forcing session refresh...');
+      session = await fetchAuthSession({ forceRefresh: true });
+      tokenSub = session.tokens?.idToken?.payload?.sub;
+    }
+
+    const userId = tokenSub || user.userId;
+
+    // Debug logging to help diagnose user ID mismatches
+    console.log('Auth debug:', {
+      tokenSub,
+      userId: user.userId,
+      username: user.username,
+      finalUserId: userId
+    });
+
+    // Warn if still falling back to user.userId (potential ID mismatch issue)
+    if (!tokenSub) {
+      console.warn('No token sub found even after refresh, using user.userId as fallback. This may cause sync issues.');
+    }
 
     currentUser = {
       uid: userId,
@@ -1830,6 +1857,21 @@ async function fetchPendingConnectionsCount() {
 function showLogoutModal() {
   document.getElementById('logoutModal').style.display = 'flex';
   document.getElementById('clearDataCheckbox').checked = false;
+
+  // Check for unsynced entries and pending changes
+  const warningEl = document.getElementById('logoutWarning');
+  if (warningEl && currentUser) {
+    const entries = safeParseJSON(getEntriesKey(currentUser.uid), []);
+    const unsyncedCount = entries.filter(e => !e.synced).length;
+    const pendingChanges = syncManager ? syncManager.getPendingChanges().length : 0;
+
+    if (unsyncedCount > 0 || pendingChanges > 0) {
+      warningEl.style.display = 'block';
+      warningEl.innerHTML = `<strong>Warning:</strong> You have ${unsyncedCount + pendingChanges} unsynced entries that may be lost if you clear local data.`;
+    } else {
+      warningEl.style.display = 'none';
+    }
+  }
 }
 
 function hideLogoutModal() {
