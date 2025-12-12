@@ -132,7 +132,7 @@
       <span>Connect</span>
       <span class="nav-badge" id="navPendingBadge" style="display:none;">0</span>
     </a>
-    <button class="nav-item" onclick="signOutUser()">
+    <button class="nav-item" onclick="showLogoutModal()">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.59L17 17L22 12L17 7Z" stroke="currentColor" stroke-width="0" fill="currentColor"/>
         <path d="M4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z" stroke="currentColor" stroke-width="0" fill="currentColor"/>
@@ -176,6 +176,27 @@
           <h3>Danger Zone</h3>
           <p class="danger-desc">Permanently delete your account and all data. This cannot be undone.</p>
           <button onclick="showDeleteAccountModal()" class="danger-btn">Delete Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Sign Out</h2>
+        <button class="close-btn" onclick="hideLogoutModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px;">Are you sure you want to sign out?</p>
+        <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; cursor: pointer;">
+          <input type="checkbox" id="clearDataCheckbox" style="width: 18px; height: 18px; cursor: pointer;">
+          <span>Clear local data (entries will still be saved in the cloud)</span>
+        </label>
+        <div class="modal-actions">
+          <button onclick="hideLogoutModal()" class="secondary-btn">Cancel</button>
+          <button onclick="confirmLogout()" class="primary-btn" id="confirmLogoutBtn">Sign Out</button>
         </div>
       </div>
     </div>

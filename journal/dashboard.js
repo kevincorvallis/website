@@ -1824,14 +1824,55 @@ async function fetchPendingConnectionsCount() {
   }
 }
 
-async function signOutUser() {
+// ============================================
+// LOGOUT MODAL & SIGN OUT
+// ============================================
+function showLogoutModal() {
+  document.getElementById('logoutModal').style.display = 'flex';
+  document.getElementById('clearDataCheckbox').checked = false;
+}
+
+function hideLogoutModal() {
+  document.getElementById('logoutModal').style.display = 'none';
+}
+
+async function confirmLogout() {
+  const confirmBtn = document.getElementById('confirmLogoutBtn');
+  const clearData = document.getElementById('clearDataCheckbox').checked;
+
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Signing out...';
+
   try {
+    // Clear local data if requested
+    if (clearData && currentUser) {
+      const uid = currentUser.uid;
+      localStorage.removeItem(`user_profile_${uid}`);
+      localStorage.removeItem(`journal_entries_${uid}`);
+      localStorage.removeItem(`journal_stats_${uid}`);
+      localStorage.removeItem(`draft_${uid}`);
+      localStorage.removeItem(`pending_sync_${uid}`);
+      localStorage.removeItem(`last_sync_${uid}`);
+      localStorage.removeItem(`seeded_${uid}`);
+    }
+
     await signOut();
     currentUser = null;
-    window.location.href = 'index.html';
+    showToast('Signed out successfully', 'success');
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 500);
   } catch (error) {
     console.error('Sign out error:', error);
+    showToast('Failed to sign out. Please try again.', 'error');
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Sign Out';
   }
+}
+
+// Legacy function for backwards compatibility
+async function signOutUser() {
+  showLogoutModal();
 }
 
 // Initialize on page load
@@ -1939,6 +1980,12 @@ document.getElementById('deleteAccountModal').addEventListener('click', function
   }
 });
 
+document.getElementById('logoutModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    hideLogoutModal();
+  }
+});
+
 // Online/offline event listeners
 window.addEventListener('online', async () => {
   console.log('Back online - syncing...');
@@ -1968,6 +2015,9 @@ window.showDeleteAccountModal = showDeleteAccountModal;
 window.hideDeleteAccountModal = hideDeleteAccountModal;
 window.deleteAccount = deleteAccount;
 window.signOutUser = signOutUser;
+window.showLogoutModal = showLogoutModal;
+window.hideLogoutModal = hideLogoutModal;
+window.confirmLogout = confirmLogout;
 window.clearForm = clearForm;
 window.deleteEntry = deleteEntry;
 window.shareEntry = shareEntry;
