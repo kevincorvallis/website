@@ -3,7 +3,7 @@
 .feed-page {
   min-height: 100vh;
   background: var(--bg-primary);
-  padding-bottom: 90px;
+  padding-bottom: calc(var(--bottom-nav-height, 60px) + env(safe-area-inset-bottom, 0px) + 20px);
 }
 
 .page-header {
@@ -16,6 +16,31 @@
   top: 0;
   z-index: 100;
   border-bottom: 1px solid var(--border-color);
+}
+
+.page-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.page-header .back-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.page-header .back-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--accent-primary);
 }
 
 .refresh-btn {

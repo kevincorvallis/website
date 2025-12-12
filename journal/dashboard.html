@@ -169,7 +169,14 @@
 
         <div class="modal-actions">
           <button onclick="editProfile()" class="primary-btn">Edit Profile</button>
-          <button onclick="hideProfile()" class="secondary-btn">Close</button>
+          <button onclick="showLogoutModal()" class="logout-modal-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Sign Out
+          </button>
         </div>
 
         <!-- Danger Zone -->
@@ -249,6 +256,49 @@
         <div class="modal-actions">
           <button onclick="confirmShare()" class="primary-btn" id="confirmShareBtn">Share</button>
           <button onclick="hideShareModal()" class="secondary-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Entry Confirmation Modal -->
+  <div id="deleteEntryModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Delete Entry</h2>
+        <button class="close-btn" onclick="hideDeleteEntryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px;">Are you sure you want to delete this entry?</p>
+        <p id="deleteEntryTitle" style="font-weight: 600; margin-bottom: 16px; color: var(--text-primary);"></p>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">This action cannot be undone.</p>
+        <div class="modal-actions" style="margin-top: 20px;">
+          <button onclick="hideDeleteEntryModal()" class="secondary-btn">Cancel</button>
+          <button onclick="confirmDeleteEntry()" class="danger-btn" id="confirmDeleteEntryBtn">Delete Entry</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Entry Modal -->
+  <div id="editEntryModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2>Edit Entry</h2>
+        <button class="close-btn" onclick="hideEditEntryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="editEntryTitle" style="display: block; margin-bottom: 8px; font-weight: 500;">Title</label>
+          <input type="text" id="editEntryTitle" placeholder="Entry title" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); color: var(--text-primary); font-size: 1rem;">
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="editEntryText" style="display: block; margin-bottom: 8px; font-weight: 500;">Content</label>
+          <textarea id="editEntryText" placeholder="What's on your mind?" rows="8" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); color: var(--text-primary); font-size: 1rem; resize: vertical; font-family: inherit;"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button onclick="hideEditEntryModal()" class="secondary-btn">Cancel</button>
+          <button onclick="confirmEditEntry()" class="primary-btn" id="confirmEditEntryBtn">Save Changes</button>
         </div>
       </div>
     </div>

@@ -651,6 +651,12 @@ function displayEntries(entries) {
         })}</small>
         <span class="word-count">${wordCount} words</span>
         <div class="entry-actions">
+          <button class="edit-btn" onclick="showEditEntryModal('${entry.id}')" title="Edit entry">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
           ${entry.synced && entry.entry_id ? `<button class="share-btn" onclick="shareEntry(${entry.entry_id})" title="Share with friends">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
@@ -664,7 +670,14 @@ function displayEntries(entries) {
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
             </svg>
           </button>` : ''}
-          <button class="delete-btn" onclick="deleteEntry('${entry.id}')">Delete</button>
+          <button class="delete-btn" onclick="showDeleteEntryModal('${entry.id}')" title="Delete entry">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <line x1="10" y1="11" x2="10" y2="17"/>
+              <line x1="14" y1="11" x2="14" y2="17"/>
+            </svg>
+          </button>
         </div>
       </div>
     `;
@@ -753,32 +766,184 @@ async function saveEntry(uid, title, text) {
   return null;
 }
 
-async function deleteEntry(id) {
+// ============================================
+// DELETE ENTRY WITH CONFIRMATION
+// ============================================
+let entryToDeleteId = null;
+
+function showDeleteEntryModal(id) {
   if (!currentUser) return;
 
   const entries = safeParseJSON(getEntriesKey(currentUser.uid), []);
-  const entryToDelete = entries.find(e => e.id === id);
-  const filtered = entries.filter(e => e.id !== id);
+  const entry = entries.find(e => e.id === id);
 
-  // Update locally first
-  localStorage.setItem(getEntriesKey(currentUser.uid), JSON.stringify(filtered));
-  recalcStats(currentUser.uid, filtered);
-  displayStats(currentUser.uid);
-  displayEntries(filtered);
+  if (!entry) return;
 
-  // Sync deletion to server
-  if (syncManager && entryToDelete?.entry_id) {
-    if (syncManager.isOnline()) {
-      try {
-        await api.deleteEntry(entryToDelete.entry_id);
-        syncManager.updateSyncStatus('synced');
-      } catch (error) {
-        console.error('Failed to delete on server:', error);
+  entryToDeleteId = id;
+  document.getElementById('deleteEntryTitle').textContent = `"${entry.title}"`;
+  document.getElementById('deleteEntryModal').style.display = 'flex';
+}
+
+function hideDeleteEntryModal() {
+  document.getElementById('deleteEntryModal').style.display = 'none';
+  entryToDeleteId = null;
+}
+
+async function confirmDeleteEntry() {
+  if (!currentUser || !entryToDeleteId) return;
+
+  const btn = document.getElementById('confirmDeleteEntryBtn');
+  btn.disabled = true;
+  btn.textContent = 'Deleting...';
+
+  try {
+    const entries = safeParseJSON(getEntriesKey(currentUser.uid), []);
+    const entryToDelete = entries.find(e => e.id === entryToDeleteId);
+    const filtered = entries.filter(e => e.id !== entryToDeleteId);
+
+    // Update locally first
+    localStorage.setItem(getEntriesKey(currentUser.uid), JSON.stringify(filtered));
+    recalcStats(currentUser.uid, filtered);
+    displayStats(currentUser.uid);
+    displayEntries(filtered);
+
+    // Sync deletion to server
+    if (syncManager && entryToDelete?.entry_id) {
+      if (syncManager.isOnline()) {
+        try {
+          await api.deleteEntry(entryToDelete.entry_id);
+          syncManager.updateSyncStatus('synced');
+        } catch (error) {
+          console.error('Failed to delete on server:', error);
+          syncManager.queueChange('delete', { entry_id: entryToDelete.entry_id });
+        }
+      } else {
         syncManager.queueChange('delete', { entry_id: entryToDelete.entry_id });
       }
-    } else {
-      syncManager.queueChange('delete', { entry_id: entryToDelete.entry_id });
     }
+
+    showToast('Entry deleted', 'success');
+    hideDeleteEntryModal();
+  } catch (error) {
+    console.error('Error deleting entry:', error);
+    showToast('Failed to delete entry', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Delete Entry';
+  }
+}
+
+// ============================================
+// EDIT ENTRY
+// ============================================
+let entryToEditId = null;
+
+function showEditEntryModal(id) {
+  if (!currentUser) return;
+
+  const entries = safeParseJSON(getEntriesKey(currentUser.uid), []);
+  const entry = entries.find(e => e.id === id);
+
+  if (!entry) return;
+
+  entryToEditId = id;
+  document.getElementById('editEntryTitle').value = entry.title;
+  document.getElementById('editEntryText').value = entry.text;
+  document.getElementById('editEntryModal').style.display = 'flex';
+
+  // Focus title input
+  setTimeout(() => document.getElementById('editEntryTitle').focus(), 100);
+}
+
+function hideEditEntryModal() {
+  document.getElementById('editEntryModal').style.display = 'none';
+  entryToEditId = null;
+  document.getElementById('editEntryTitle').value = '';
+  document.getElementById('editEntryText').value = '';
+}
+
+async function confirmEditEntry() {
+  if (!currentUser || !entryToEditId) return;
+
+  const newTitle = document.getElementById('editEntryTitle').value.trim();
+  const newText = document.getElementById('editEntryText').value.trim();
+
+  if (!newTitle && !newText) {
+    showToast('Please enter a title or content', 'error');
+    return;
+  }
+
+  const finalTitle = newTitle || newText.split('\n')[0].substring(0, 50) || 'Untitled';
+
+  const btn = document.getElementById('confirmEditEntryBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    const entries = safeParseJSON(getEntriesKey(currentUser.uid), []);
+    const entryIndex = entries.findIndex(e => e.id === entryToEditId);
+
+    if (entryIndex === -1) {
+      showToast('Entry not found', 'error');
+      return;
+    }
+
+    const entry = entries[entryIndex];
+    const updatedEntry = {
+      ...entry,
+      title: finalTitle,
+      text: newText,
+      synced: false // Mark as unsynced until server confirms
+    };
+
+    entries[entryIndex] = updatedEntry;
+
+    // Update locally first
+    localStorage.setItem(getEntriesKey(currentUser.uid), JSON.stringify(entries));
+    recalcStats(currentUser.uid, entries);
+    displayStats(currentUser.uid);
+    displayEntries(entries);
+
+    // Sync update to server
+    if (syncManager && entry.entry_id) {
+      if (syncManager.isOnline()) {
+        try {
+          await api.updateEntry(entry.entry_id, {
+            title: finalTitle,
+            text: newText
+          });
+          // Mark as synced after successful update
+          entries[entryIndex].synced = true;
+          localStorage.setItem(getEntriesKey(currentUser.uid), JSON.stringify(entries));
+          displayEntries(entries);
+          syncManager.updateSyncStatus('synced');
+        } catch (error) {
+          console.error('Failed to update on server:', error);
+          syncManager.queueChange('update', {
+            entry_id: entry.entry_id,
+            title: finalTitle,
+            text: newText
+          });
+          showToast('Entry saved locally. Sync pending...', 'warning');
+        }
+      } else {
+        syncManager.queueChange('update', {
+          entry_id: entry.entry_id,
+          title: finalTitle,
+          text: newText
+        });
+        showToast('Entry saved locally. Will sync when online.', 'info');
+      }
+    }
+
+    showToast('Entry updated', 'success');
+    hideEditEntryModal();
+  } catch (error) {
+    console.error('Error updating entry:', error);
+    showToast('Failed to update entry', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Changes';
   }
 }
 
@@ -2086,6 +2251,18 @@ document.getElementById('logoutModal').addEventListener('click', function(e) {
   }
 });
 
+document.getElementById('deleteEntryModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    hideDeleteEntryModal();
+  }
+});
+
+document.getElementById('editEntryModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    hideEditEntryModal();
+  }
+});
+
 // Online/offline event listeners
 window.addEventListener('online', async () => {
   console.log('Back online - syncing...');
@@ -2119,7 +2296,12 @@ window.showLogoutModal = showLogoutModal;
 window.hideLogoutModal = hideLogoutModal;
 window.confirmLogout = confirmLogout;
 window.clearForm = clearForm;
-window.deleteEntry = deleteEntry;
+window.showDeleteEntryModal = showDeleteEntryModal;
+window.hideDeleteEntryModal = hideDeleteEntryModal;
+window.confirmDeleteEntry = confirmDeleteEntry;
+window.showEditEntryModal = showEditEntryModal;
+window.hideEditEntryModal = hideEditEntryModal;
+window.confirmEditEntry = confirmEditEntry;
 window.shareEntry = shareEntry;
 window.scrollToForm = scrollToForm;
 window.showToast = showToast;
