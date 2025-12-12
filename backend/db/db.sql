@@ -32,6 +32,10 @@ CREATE TABLE IF NOT EXISTS journal_entries (
     text TEXT NOT NULL,
     prompt_id INT NULL,
     client_id VARCHAR(50) NULL,
+    image_url VARCHAR(512) NULL,
+    latitude DECIMAL(10, 8) NULL,
+    longitude DECIMAL(11, 8) NULL,
+    location_name VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_deleted TINYINT(1) DEFAULT 0,
@@ -39,6 +43,13 @@ CREATE TABLE IF NOT EXISTS journal_entries (
     INDEX idx_sync (firebase_uid, updated_at),
     INDEX idx_client_id (firebase_uid, client_id)
 );
+
+-- Migration: Add image and location columns to existing entries table
+-- Run these ALTER statements if the table already exists:
+-- ALTER TABLE journal_entries ADD COLUMN image_url VARCHAR(512) NULL AFTER client_id;
+-- ALTER TABLE journal_entries ADD COLUMN latitude DECIMAL(10, 8) NULL AFTER image_url;
+-- ALTER TABLE journal_entries ADD COLUMN longitude DECIMAL(11, 8) NULL AFTER latitude;
+-- ALTER TABLE journal_entries ADD COLUMN location_name VARCHAR(255) NULL AFTER longitude;
 
 -- ============================================
 -- PROMPTS TABLE

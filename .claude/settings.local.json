@@ -15,7 +15,13 @@
       "Bash(aws cognito-idp list-users:*)",
       "Bash(aws cognito-idp list-user-pools:*)",
       "Bash(aws cognito-idp admin-delete-user:*)",
-      "Bash(aws lambda get-function-configuration:*)"
+      "Bash(aws lambda get-function-configuration:*)",
+      "Bash(aws s3api create-bucket:*)",
+      "Bash(aws s3api put-bucket-cors:*)",
+      "Bash(aws lambda update-function-configuration:*)",
+      "Bash(aws iam put-role-policy:*)",
+      "Bash(npm install)",
+      "Bash(aws s3 cp:*)"
     ],
     "deny": [],
     "ask": []

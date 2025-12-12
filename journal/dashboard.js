@@ -128,6 +128,13 @@ class JournalAPI {
     });
   }
 
+  async getUploadUrl(filename, contentType) {
+    return this.request('/upload-url', {
+      method: 'POST',
+      body: JSON.stringify({ filename, contentType })
+    });
+  }
+
   async sync(entries, lastSyncTime) {
     return this.request('/sync', {
       method: 'POST',
@@ -637,9 +644,30 @@ function displayEntries(entries) {
     const div = document.createElement('div');
     div.className = 'entry';
     const entryId = entry.entry_id || entry.id;
+
+    // Build image HTML if present
+    const imageHtml = entry.image_url ? `<img src="${escapeHtml(entry.image_url)}" alt="Entry image" class="entry-image" loading="lazy">` : '';
+
+    // Build location HTML if present
+    let locationHtml = '';
+    if (entry.latitude && entry.longitude) {
+      const locationName = entry.location_name || `${entry.latitude.toFixed(4)}, ${entry.longitude.toFixed(4)}`;
+      locationHtml = `
+        <div class="entry-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>${escapeHtml(locationName)}</span>
+        </div>
+      `;
+    }
+
     div.innerHTML = `
+      ${imageHtml}
       <h3>${escapeHtml(entry.title)} ${syncIcon}</h3>
       <p>${escapeHtml(entry.text)}</p>
+      ${locationHtml}
       <div class="entry-meta">
         <small>${new Date(entry.date).toLocaleDateString('en-US', {
           weekday: 'long',
@@ -697,16 +725,240 @@ function loadEntries(uid) {
 }
 
 // ============================================
+// IMAGE UPLOAD HELPERS
+// ============================================
+let pendingImageFile = null;
+let pendingImagePreview = null;
+let currentLocation = null;
+
+// Compress image for upload (max 1MB, resize if needed)
+async function compressImage(file, maxWidth = 1920, maxHeight = 1920, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        // Create canvas and draw resized image
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to blob
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Failed to compress image'));
+          }
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Upload image to S3 via presigned URL
+async function uploadImageToS3(file) {
+  if (!file) return null;
+
+  try {
+    // Compress the image first
+    const compressedBlob = await compressImage(file);
+
+    // Get presigned URL from our API
+    const { uploadUrl, imageUrl } = await api.getUploadUrl(file.name, 'image/jpeg');
+
+    // Upload to S3
+    const uploadResponse = await fetch(uploadUrl, {
+      method: 'PUT',
+      body: compressedBlob,
+      headers: {
+        'Content-Type': 'image/jpeg'
+      }
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload image to S3');
+    }
+
+    return imageUrl;
+  } catch (error) {
+    console.error('Image upload failed:', error);
+    showToast('Failed to upload image', 'error');
+    return null;
+  }
+}
+
+// Handle image file selection
+function handleImageSelect(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    clearImagePreview();
+    return;
+  }
+
+  // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+  if (!allowedTypes.includes(file.type.toLowerCase())) {
+    showToast('Please select a valid image (JPEG, PNG, GIF, WebP)', 'error');
+    clearImagePreview();
+    return;
+  }
+
+  // Validate file size (max 10MB before compression)
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('Image too large. Max size is 10MB', 'error');
+    clearImagePreview();
+    return;
+  }
+
+  pendingImageFile = file;
+
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    pendingImagePreview = e.target.result;
+    updateImagePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateImagePreview() {
+  const previewContainer = document.getElementById('imagePreviewContainer');
+  if (!previewContainer) return;
+
+  if (pendingImagePreview) {
+    previewContainer.innerHTML = `
+      <div class="image-preview">
+        <img src="${pendingImagePreview}" alt="Preview">
+        <button type="button" class="remove-image-btn" onclick="clearImagePreview()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    `;
+    previewContainer.style.display = 'block';
+  } else {
+    previewContainer.innerHTML = '';
+    previewContainer.style.display = 'none';
+  }
+}
+
+function clearImagePreview() {
+  pendingImageFile = null;
+  pendingImagePreview = null;
+  const imageInput = document.getElementById('entryImage');
+  if (imageInput) imageInput.value = '';
+  updateImagePreview();
+}
+
+// ============================================
+// GEOLOCATION HELPERS
+// ============================================
+let locationEnabled = false;
+
+function toggleLocation() {
+  const locationBtn = document.getElementById('locationBtn');
+  if (!locationBtn) return;
+
+  if (locationEnabled) {
+    locationEnabled = false;
+    currentLocation = null;
+    locationBtn.classList.remove('active');
+    updateLocationIndicator();
+  } else {
+    // Request location
+    if ('geolocation' in navigator) {
+      locationBtn.classList.add('loading');
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          locationEnabled = true;
+          currentLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            name: null
+          };
+
+          // Try to get location name via reverse geocoding (optional)
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}&zoom=14`
+            );
+            const data = await response.json();
+            if (data.address) {
+              currentLocation.name = data.address.city || data.address.town || data.address.village || data.address.suburb || 'Unknown location';
+            }
+          } catch (e) {
+            console.log('Reverse geocoding failed:', e);
+          }
+
+          locationBtn.classList.remove('loading');
+          locationBtn.classList.add('active');
+          updateLocationIndicator();
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          locationBtn.classList.remove('loading');
+          showToast('Could not get location. Please check permissions.', 'error');
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    } else {
+      showToast('Geolocation not supported by your browser', 'error');
+    }
+  }
+}
+
+function updateLocationIndicator() {
+  const indicator = document.getElementById('locationIndicator');
+  if (!indicator) return;
+
+  if (currentLocation) {
+    indicator.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      ${currentLocation.name || 'Location added'}
+    `;
+    indicator.style.display = 'flex';
+  } else {
+    indicator.style.display = 'none';
+  }
+}
+
+// ============================================
 // ENTRY CRUD OPERATIONS
 // ============================================
-async function saveEntry(uid, title, text) {
+async function saveEntry(uid, title, text, imageUrl = null, location = null) {
   const clientId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   const newEntry = {
     id: clientId,
     title,
     text,
     date: new Date().toISOString(),
-    synced: false
+    synced: false,
+    image_url: imageUrl || null,
+    latitude: location?.latitude || null,
+    longitude: location?.longitude || null,
+    location_name: location?.name || null
   };
 
   // Save locally first (optimistic update)
@@ -722,12 +974,22 @@ async function saveEntry(uid, title, text) {
   // Sync to server
   if (syncManager && syncManager.isOnline()) {
     try {
-      const result = await api.createEntry({
+      const entryData = {
         title,
         text,
         date: newEntry.date,
         client_id: clientId
-      });
+      };
+
+      // Add optional fields if present
+      if (imageUrl) entryData.image_url = imageUrl;
+      if (location) {
+        entryData.latitude = location.latitude;
+        entryData.longitude = location.longitude;
+        if (location.name) entryData.location_name = location.name;
+      }
+
+      const result = await api.createEntry(entryData);
 
       // Update local entry with server ID
       const updated = entries.map(e =>
@@ -2185,7 +2447,37 @@ document.getElementById('entryForm').addEventListener('submit', async (e) => {
     return;
   }
 
-  const entryId = await saveEntry(currentUser.uid, finalTitle, text);
+  // Disable submit button and show progress
+  submitBtn.disabled = true;
+  submitBtn.textContent = pendingImageFile ? 'Uploading...' : 'Saving...';
+
+  // Upload image if present
+  let imageUrl = null;
+  if (pendingImageFile) {
+    imageUrl = await uploadImageToS3(pendingImageFile);
+    if (pendingImageFile && !imageUrl) {
+      // Image upload failed, but we can still save the entry without image
+      showToast('Image upload failed, saving entry without image', 'warning');
+    }
+  }
+
+  // Get location if enabled
+  const location = currentLocation ? { ...currentLocation } : null;
+
+  const entryId = await saveEntry(currentUser.uid, finalTitle, text, imageUrl, location);
+
+  // Reset image and location state
+  clearImagePreview();
+  locationEnabled = false;
+  currentLocation = null;
+  const locationBtn = document.getElementById('locationBtn');
+  if (locationBtn) locationBtn.classList.remove('active');
+  updateLocationIndicator();
+
+  // Re-enable submit button
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Save Entry';
+
   clearForm();
 
   // Share with selected friends if any
@@ -2322,3 +2614,8 @@ window.viewSharedEntry = viewSharedEntry;
 window.toggleFriendForShare = toggleFriendForShare;
 window.deselectFriend = deselectFriend;
 window.clearFriendSelections = clearFriendSelections;
+// Image upload
+window.handleImageSelect = handleImageSelect;
+window.clearImagePreview = clearImagePreview;
+// Location
+window.toggleLocation = toggleLocation;

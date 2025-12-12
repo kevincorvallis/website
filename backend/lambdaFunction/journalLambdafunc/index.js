@@ -4,12 +4,18 @@ const jwksClient = require('jwks-rsa');
 const crypto = require('crypto');
 const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
 const { CognitoIdentityProviderClient, AdminDeleteUserCommand } = require('@aws-sdk/client-cognito-identity-provider');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 // Initialize SNS client for SMS
 const snsClient = new SNSClient({ region: 'us-west-1' });
 
 // Initialize Cognito client for account deletion
 const cognitoClient = new CognitoIdentityProviderClient({ region: 'us-west-1' });
+
+// Initialize S3 client for image uploads
+const s3Client = new S3Client({ region: 'us-west-1' });
+const S3_BUCKET = process.env.S3_BUCKET || 'daybyday-journal-images';
 
 // ============================================
 // CONFIGURATION
@@ -51,7 +57,9 @@ const PATHS = {
   accountability: '/journalLambdafunc/accountability',
   accountabilityRequest: '/journalLambdafunc/accountability/request',
   // Account management
-  account: '/journalLambdafunc/account'
+  account: '/journalLambdafunc/account',
+  // Image upload
+  uploadUrl: '/journalLambdafunc/upload-url'
 };
 
 // Cognito Configuration
@@ -204,6 +212,66 @@ function errorResponse(statusCode, message) {
 }
 
 // ============================================
+// IMAGE UPLOAD HANDLERS
+// ============================================
+
+// Generate a presigned URL for uploading an image to S3
+async function getUploadUrl(event) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { filename, contentType } = body;
+
+  // Validate content type
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+  if (!contentType || !allowedTypes.includes(contentType.toLowerCase())) {
+    return errorResponse(400, 'Invalid content type. Allowed: JPEG, PNG, GIF, WebP, HEIC');
+  }
+
+  // Generate unique filename
+  const timestamp = Date.now();
+  const ext = filename ? filename.split('.').pop() : 'jpg';
+  const key = `entries/${uid}/${timestamp}-${crypto.randomBytes(8).toString('hex')}.${ext}`;
+
+  try {
+    const command = new PutObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key,
+      ContentType: contentType,
+      // Metadata for tracking
+      Metadata: {
+        'user-id': uid,
+        'upload-timestamp': timestamp.toString()
+      }
+    });
+
+    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 }); // 5 minutes
+
+    // Construct the final URL (after upload)
+    const imageUrl = `https://${S3_BUCKET}.s3.us-west-1.amazonaws.com/${key}`;
+
+    return buildResponse(200, {
+      uploadUrl,
+      imageUrl,
+      key,
+      expiresIn: 300
+    });
+  } catch (error) {
+    console.error('Error generating upload URL:', error);
+    return errorResponse(500, 'Failed to generate upload URL');
+  }
+}
+
+// ============================================
 // ENTRY HANDLERS
 // ============================================
 
@@ -233,6 +301,7 @@ async function getEntries(event, conn) {
   try {
     let sql = `
       SELECT entry_id, firebase_uid, date, title, text, prompt_id, client_id,
+             image_url, latitude, longitude, location_name,
              created_at, updated_at, is_deleted
       FROM journal_entries
       WHERE firebase_uid = ? AND is_deleted = 0
@@ -337,7 +406,7 @@ async function createEntry(event, conn) {
     return errorResponse(400, 'Invalid JSON body');
   }
 
-  const { title, text, date, prompt_id, client_id } = body;
+  const { title, text, date, prompt_id, client_id, image_url, latitude, longitude, location_name } = body;
 
   // Validate input
   const validation = validateEntryInput(title, text);
@@ -350,10 +419,18 @@ async function createEntry(event, conn) {
     return errorResponse(400, 'Invalid date format');
   }
 
+  // Validate location coordinates if provided
+  if (latitude !== undefined && (isNaN(parseFloat(latitude)) || latitude < -90 || latitude > 90)) {
+    return errorResponse(400, 'Invalid latitude');
+  }
+  if (longitude !== undefined && (isNaN(parseFloat(longitude)) || longitude < -180 || longitude > 180)) {
+    return errorResponse(400, 'Invalid longitude');
+  }
+
   try {
     const sql = `
-      INSERT INTO journal_entries (firebase_uid, date, title, text, prompt_id, client_id)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO journal_entries (firebase_uid, date, title, text, prompt_id, client_id, image_url, latitude, longitude, location_name)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const entryDate = date ? new Date(date) : new Date();
     const [result] = await conn.execute(sql, [
@@ -362,7 +439,11 @@ async function createEntry(event, conn) {
       title,
       text,
       prompt_id || null,
-      client_id || null
+      client_id || null,
+      image_url || null,
+      latitude || null,
+      longitude || null,
+      location_name || null
     ]);
 
     // Fetch the created entry
@@ -404,7 +485,7 @@ async function updateEntry(event, conn) {
     return errorResponse(400, 'Invalid JSON body');
   }
 
-  const { title, text } = body;
+  const { title, text, image_url, latitude, longitude, location_name } = body;
 
   // Validate input if provided
   if (title !== undefined && (typeof title !== 'string' || title.length > MAX_TITLE_LENGTH)) {
@@ -412,6 +493,13 @@ async function updateEntry(event, conn) {
   }
   if (text !== undefined && (typeof text !== 'string' || text.length > MAX_TEXT_LENGTH)) {
     return errorResponse(400, `Text must be a string under ${MAX_TEXT_LENGTH} characters`);
+  }
+  // Validate location coordinates if provided
+  if (latitude !== undefined && latitude !== null && (isNaN(parseFloat(latitude)) || latitude < -90 || latitude > 90)) {
+    return errorResponse(400, 'Invalid latitude');
+  }
+  if (longitude !== undefined && longitude !== null && (isNaN(parseFloat(longitude)) || longitude < -180 || longitude > 180)) {
+    return errorResponse(400, 'Invalid longitude');
   }
 
   try {
@@ -436,6 +524,22 @@ async function updateEntry(event, conn) {
     if (text !== undefined) {
       updates.push('text = ?');
       params.push(text);
+    }
+    if (image_url !== undefined) {
+      updates.push('image_url = ?');
+      params.push(image_url);
+    }
+    if (latitude !== undefined) {
+      updates.push('latitude = ?');
+      params.push(latitude);
+    }
+    if (longitude !== undefined) {
+      updates.push('longitude = ?');
+      params.push(longitude);
+    }
+    if (location_name !== undefined) {
+      updates.push('location_name = ?');
+      params.push(location_name);
     }
 
     if (updates.length === 0) {
@@ -2604,7 +2708,12 @@ async function runMigrations(conn) {
     "ALTER TABLE users ADD COLUMN phone_number VARCHAR(20)",
     "ALTER TABLE users ADD COLUMN phone_verified TINYINT(1) DEFAULT 0",
     "ALTER TABLE users ADD COLUMN phone_verification_code VARCHAR(6)",
-    "ALTER TABLE users ADD COLUMN phone_verification_expires DATETIME"
+    "ALTER TABLE users ADD COLUMN phone_verification_expires DATETIME",
+    // Add image and location columns to journal_entries
+    "ALTER TABLE journal_entries ADD COLUMN image_url VARCHAR(512)",
+    "ALTER TABLE journal_entries ADD COLUMN latitude DECIMAL(10, 8)",
+    "ALTER TABLE journal_entries ADD COLUMN longitude DECIMAL(11, 8)",
+    "ALTER TABLE journal_entries ADD COLUMN location_name VARCHAR(255)"
   ];
 
   const results = [];
@@ -2772,6 +2881,10 @@ exports.handler = async (event, context) => {
       // Sync
       case method === 'POST' && path === PATHS.sync:
         return await syncEntries(event, conn);
+
+      // Image upload - get presigned URL
+      case method === 'POST' && path === PATHS.uploadUrl:
+        return await getUploadUrl(event);
 
       // User endpoints
       case method === 'GET' && path === PATHS.usersSearch:

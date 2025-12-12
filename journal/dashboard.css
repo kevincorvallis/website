@@ -1528,3 +1528,165 @@ body::-webkit-scrollbar {
 .share-with-indicator .friend-chip .remove:hover {
   opacity: 1;
 }
+
+/* ============================================
+   IMAGE UPLOAD & LOCATION STYLES
+   ============================================ */
+
+/* Media Actions Bar */
+.media-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg-elevated);
+  border-radius: 12px;
+}
+
+.media-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.media-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+.media-btn.active {
+  background: rgba(124, 92, 255, 0.15);
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.media-btn.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.media-btn.loading svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.media-btn svg {
+  flex-shrink: 0;
+}
+
+/* Image Preview */
+.image-preview-container {
+  margin-top: 12px;
+}
+
+.image-preview {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background: rgba(255, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+/* Location Indicator */
+.location-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(124, 92, 255, 0.1);
+  border-radius: 8px;
+  color: var(--accent-primary);
+  font-size: 0.85rem;
+}
+
+.location-indicator svg {
+  flex-shrink: 0;
+}
+
+/* Entry Card Image */
+.entry-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.entry-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.entry-location svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Mobile optimization for media buttons */
+@media (max-width: 480px) {
+  .media-actions {
+    flex-wrap: wrap;
+  }
+
+  .media-btn {
+    flex: 1;
+    justify-content: center;
+    min-width: 120px;
+  }
+
+  .media-btn span {
+    display: none;
+  }
+
+  .media-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+}

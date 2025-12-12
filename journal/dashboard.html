@@ -74,6 +74,33 @@
         <div id="editorContainer">
           <div id="editor"></div>
         </div>
+
+        <!-- Image Preview Container -->
+        <div id="imagePreviewContainer" class="image-preview-container" style="display: none;"></div>
+
+        <!-- Media Actions (Image & Location) -->
+        <div class="media-actions">
+          <label class="media-btn" title="Add photo">
+            <input type="file" id="entryImage" accept="image/*" capture="environment" onchange="handleImageSelect(event)" style="display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span>Photo</span>
+          </label>
+          <button type="button" id="locationBtn" class="media-btn" onclick="toggleLocation()" title="Add location">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Location</span>
+          </button>
+        </div>
+
+        <!-- Location Indicator -->
+        <div id="locationIndicator" class="location-indicator" style="display: none;"></div>
+
         <div class="autosave-indicator" id="autosaveIndicator"></div>
         <div class="form-actions">
           <button type="submit" class="primary-btn" id="saveBtn">Save Entry</button>
