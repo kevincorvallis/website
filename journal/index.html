@@ -141,6 +141,7 @@
             <div class="dot" data-step="2"></div>
             <div class="dot" data-step="3"></div>
             <div class="dot" data-step="4"></div>
+            <div class="dot" data-step="5"></div>
         </div>
 
         <!-- Step 1: Welcome & Name -->
@@ -161,7 +162,6 @@
             <div class="step-actions">
                 <button type="button" class="continue-btn" onclick="nextStep(1)" id="step1Continue" disabled>Continue</button>
             </div>
-            <button type="button" class="skip-link" onclick="skipProfile()">Set up later</button>
         </div>
 
         <!-- Step 2: Journaling Goal -->
@@ -382,7 +382,50 @@
 
             <div class="step-actions">
                 <button type="button" class="back-btn" onclick="prevStep(4)">Back</button>
-                <button type="button" class="continue-btn finish-btn" onclick="completeOnboarding()" id="step4Continue">Get Started</button>
+                <button type="button" class="continue-btn" onclick="nextStep(4)" id="step4Continue">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Phone Verification -->
+        <div class="onboarding-step" data-step="5">
+            <div class="step-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                    <path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H7V4h10v16zm-5-1c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h1 class="step-title">Verify your phone</h1>
+            <p class="step-subtitle">Get notified when friends share journals with you</p>
+
+            <!-- Phone Input Form -->
+            <div id="phoneInputSection" class="phone-section">
+                <div class="input-group">
+                    <label for="onboardingPhone">Phone number</label>
+                    <input type="tel" id="onboardingPhone" placeholder="(555) 123-4567" maxlength="14" autocomplete="tel">
+                </div>
+                <button type="button" class="continue-btn" onclick="sendOnboardingPhoneCode()" id="sendPhoneCodeBtn">Send Code</button>
+            </div>
+
+            <!-- Verification Code Form (hidden initially) -->
+            <div id="phoneVerifySection" class="phone-section" style="display: none;">
+                <p class="verification-sent">Code sent to <strong id="phoneNumberDisplay"></strong></p>
+                <div class="code-input-container">
+                    <input type="text" maxlength="1" class="code-digit phone-code-digit" data-index="0" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit phone-code-digit" data-index="1" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit phone-code-digit" data-index="2" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit phone-code-digit" data-index="3" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit phone-code-digit" data-index="4" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="code-digit phone-code-digit" data-index="5" inputmode="numeric" pattern="[0-9]">
+                </div>
+                <input type="hidden" id="onboardingPhoneCode">
+                <button type="button" class="continue-btn" onclick="verifyOnboardingPhoneCode()" id="verifyPhoneCodeBtn" disabled>Verify Phone</button>
+                <div class="resend-section">
+                    <p id="phoneResendText">Didn't receive the code? <a href="#" onclick="resendOnboardingPhoneCode(); return false;">Resend</a></p>
+                    <p id="phoneResendTimer" style="display: none;">Resend code in <span id="phoneTimerCount">60</span>s</p>
+                </div>
+            </div>
+
+            <div class="step-actions">
+                <button type="button" class="back-btn" onclick="goBackFromPhone()">Back</button>
             </div>
         </div>
 
@@ -818,16 +861,16 @@
             // Save profile
             saveUserProfile(currentUser.uid, profileData);
 
-            // Show completion screen
-            const step4 = document.querySelector('.onboarding-step[data-step="4"]');
+            // Show completion screen (from step 5 - phone verification)
+            const step5 = document.querySelector('.onboarding-step[data-step="5"]');
             const completionStep = document.querySelector('.onboarding-step[data-step="complete"]');
 
             document.getElementById('completionName').textContent = displayName.split(' ')[0] || 'friend';
 
-            step4.classList.add('slide-out-left');
+            step5.classList.add('slide-out-left');
 
             setTimeout(() => {
-                step4.classList.remove('active', 'slide-out-left');
+                step5.classList.remove('active', 'slide-out-left');
                 completionStep.classList.add('active');
 
                 // Hide progress dots
@@ -838,6 +881,239 @@
                     window.location.href = getRedirectUrl();
                 }, 2500);
             }, 300);
+        }
+
+        // =============================================
+        // Phone Verification Functions (Step 5)
+        // =============================================
+
+        const API_BASE_URL = 'https://1t1byyi4x6.execute-api.us-west-1.amazonaws.com/default/journalLambdafunc';
+        let phoneResendTimerId = null;
+
+        async function getAuthToken() {
+            const session = await fetchAuthSession();
+            return session.tokens?.idToken?.toString();
+        }
+
+        // Setup phone code input handlers
+        function setupPhoneCodeInputs() {
+            const codeInputs = document.querySelectorAll('.phone-code-digit');
+
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    if (!/^\d*$/.test(value)) {
+                        e.target.value = '';
+                        return;
+                    }
+                    if (value && index < 5) {
+                        codeInputs[index + 1].focus();
+                    }
+                    updatePhoneVerificationCode();
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                });
+
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+                    pastedData.split('').forEach((char, i) => {
+                        if (codeInputs[i]) {
+                            codeInputs[i].value = char;
+                        }
+                    });
+                    const nextIndex = Math.min(pastedData.length, 5);
+                    codeInputs[nextIndex]?.focus();
+                    updatePhoneVerificationCode();
+                });
+            });
+        }
+
+        function updatePhoneVerificationCode() {
+            const codeInputs = document.querySelectorAll('.phone-code-digit');
+            const code = Array.from(codeInputs).map(input => input.value).join('');
+            document.getElementById('onboardingPhoneCode').value = code;
+            document.getElementById('verifyPhoneCodeBtn').disabled = code.length !== 6;
+
+            // Auto-submit when complete
+            if (code.length === 6) {
+                verifyOnboardingPhoneCode();
+            }
+        }
+
+        async function sendOnboardingPhoneCode() {
+            const phoneInput = document.getElementById('onboardingPhone');
+            const phone = phoneInput.value.replace(/\D/g, '');
+
+            if (phone.length < 10) {
+                showError('Please enter a valid 10-digit phone number');
+                return;
+            }
+
+            const btn = document.getElementById('sendPhoneCodeBtn');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            try {
+                const token = await getAuthToken();
+                const response = await fetch(`${API_BASE_URL}/users/phone`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ phoneNumber: phone })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to send code');
+                }
+
+                // Show verification form
+                document.getElementById('phoneInputSection').style.display = 'none';
+                document.getElementById('phoneVerifySection').style.display = 'block';
+                document.getElementById('phoneNumberDisplay').textContent = data.phoneNumber || formatPhoneDisplay(phone);
+
+                // Focus first code input
+                document.querySelector('.phone-code-digit')?.focus();
+
+                // Start resend timer
+                startPhoneResendTimer();
+
+            } catch (error) {
+                console.error('Error sending phone code:', error);
+                showError(error.message || 'Failed to send verification code');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Code';
+            }
+        }
+
+        async function verifyOnboardingPhoneCode() {
+            const code = document.getElementById('onboardingPhoneCode').value;
+
+            if (code.length !== 6) {
+                showError('Please enter the 6-digit code');
+                return;
+            }
+
+            const btn = document.getElementById('verifyPhoneCodeBtn');
+            btn.disabled = true;
+            btn.textContent = 'Verifying...';
+
+            try {
+                const token = await getAuthToken();
+                const response = await fetch(`${API_BASE_URL}/users/phone/verify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ code })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Invalid code');
+                }
+
+                // Phone verified! Complete onboarding
+                completeOnboarding();
+
+            } catch (error) {
+                console.error('Error verifying phone:', error);
+                showError(error.message || 'Invalid verification code');
+
+                // Clear inputs on error
+                const codeInputs = document.querySelectorAll('.phone-code-digit');
+                codeInputs.forEach(input => input.value = '');
+                codeInputs[0]?.focus();
+                document.getElementById('onboardingPhoneCode').value = '';
+
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Verify Phone';
+            }
+        }
+
+        function resendOnboardingPhoneCode() {
+            // Reset to phone input view
+            document.getElementById('phoneInputSection').style.display = 'block';
+            document.getElementById('phoneVerifySection').style.display = 'none';
+
+            // Clear code inputs
+            const codeInputs = document.querySelectorAll('.phone-code-digit');
+            codeInputs.forEach(input => input.value = '');
+            document.getElementById('onboardingPhoneCode').value = '';
+        }
+
+        function startPhoneResendTimer() {
+            document.getElementById('phoneResendText').style.display = 'none';
+            document.getElementById('phoneResendTimer').style.display = 'block';
+
+            let seconds = 60;
+            document.getElementById('phoneTimerCount').textContent = seconds;
+
+            if (phoneResendTimerId) clearInterval(phoneResendTimerId);
+
+            phoneResendTimerId = setInterval(() => {
+                seconds--;
+                document.getElementById('phoneTimerCount').textContent = seconds;
+
+                if (seconds <= 0) {
+                    clearInterval(phoneResendTimerId);
+                    document.getElementById('phoneResendText').style.display = 'block';
+                    document.getElementById('phoneResendTimer').style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function formatPhoneDisplay(phone) {
+            if (phone.length === 10) {
+                return `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`;
+            }
+            return phone;
+        }
+
+        function goBackFromPhone() {
+            // If we're in verification view, go back to phone input
+            if (document.getElementById('phoneVerifySection').style.display !== 'none') {
+                document.getElementById('phoneInputSection').style.display = 'block';
+                document.getElementById('phoneVerifySection').style.display = 'none';
+                // Clear code inputs
+                const codeInputs = document.querySelectorAll('.phone-code-digit');
+                codeInputs.forEach(input => input.value = '');
+                document.getElementById('onboardingPhoneCode').value = '';
+            } else {
+                // Go back to step 4
+                prevStep(5);
+            }
+        }
+
+        // Format phone number as user types
+        function setupPhoneInputFormatter() {
+            const phoneInput = document.getElementById('onboardingPhone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 10) value = value.slice(0, 10);
+
+                    if (value.length >= 6) {
+                        e.target.value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+                    } else if (value.length >= 3) {
+                        e.target.value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+                    } else if (value.length > 0) {
+                        e.target.value = `(${value}`;
+                    }
+                });
+            }
         }
 
         // Auth functions
@@ -1111,6 +1387,36 @@
             setTimeout(callback, 2000);
         }
 
+        // Show phone verification step directly (for returning users who need phone verification)
+        function showPhoneVerificationStep() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('signInContainer').style.display = 'none';
+            document.getElementById('profileSetup').style.display = 'flex';
+
+            // Hide all steps except step 5
+            document.querySelectorAll('.onboarding-step').forEach(step => {
+                step.classList.remove('active');
+            });
+
+            // Show step 5
+            const step5 = document.querySelector('.onboarding-step[data-step="5"]');
+            step5.classList.add('active');
+
+            // Update progress dots
+            document.querySelectorAll('.progress-dots .dot').forEach(dot => {
+                const dotStep = parseInt(dot.dataset.step);
+                dot.classList.toggle('active', dotStep === 5);
+                dot.classList.toggle('completed', dotStep < 5);
+            });
+
+            // Reset phone form state
+            document.getElementById('phoneInputSection').style.display = 'block';
+            document.getElementById('phoneVerifySection').style.display = 'none';
+            const codeInputs = document.querySelectorAll('.phone-code-digit');
+            codeInputs.forEach(input => input.value = '');
+            document.getElementById('onboardingPhoneCode').value = '';
+        }
+
         // Check authentication state on page load
         async function checkAuthState() {
             try {
@@ -1130,6 +1436,16 @@
                     name: session.tokens?.idToken?.payload?.name,
                     givenName: session.tokens?.idToken?.payload?.given_name
                 };
+
+                // Check if this is a returning user who needs phone verification
+                const urlParams = new URLSearchParams(window.location.search);
+                const requirePhone = urlParams.get('requirePhone');
+
+                if (requirePhone === 'true') {
+                    // User needs to complete phone verification
+                    showPhoneVerificationStep();
+                    return;
+                }
 
                 // User is signed in
                 if (hasUserProfile(currentUser.uid)) {
@@ -1163,6 +1479,8 @@
 
         // Initialize on page load
         setupCodeInputs();
+        setupPhoneCodeInputs();
+        setupPhoneInputFormatter();
         checkAuthState();
 
         // Expose functions to window for onclick handlers (ES modules have their own scope)
@@ -1178,6 +1496,10 @@
         window.nextStep = nextStep;
         window.prevStep = prevStep;
         window.completeOnboarding = completeOnboarding;
+        window.sendOnboardingPhoneCode = sendOnboardingPhoneCode;
+        window.verifyOnboardingPhoneCode = verifyOnboardingPhoneCode;
+        window.resendOnboardingPhoneCode = resendOnboardingPhoneCode;
+        window.goBackFromPhone = goBackFromPhone;
     </script>
 
 </body>

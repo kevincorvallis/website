@@ -1739,6 +1739,28 @@ async function initializeDashboard() {
       name: session.tokens?.idToken?.payload?.name,
       givenName: session.tokens?.idToken?.payload?.given_name
     };
+
+    // Check if phone is verified (required for all users)
+    try {
+      const token = session.tokens?.idToken?.toString();
+      const response = await fetch(`${API_BASE_URL}/users/phone`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const phoneData = await response.json();
+
+      if (!phoneData.verified) {
+        console.log('Phone not verified, redirecting to complete signup...');
+        isInitializing = false;
+        window.location.href = 'index.html?requirePhone=true';
+        return;
+      }
+    } catch (phoneError) {
+      console.error('Error checking phone verification:', phoneError);
+      // On error checking phone, redirect to be safe
+      isInitializing = false;
+      window.location.href = 'index.html?requirePhone=true';
+      return;
+    }
   } catch (error) {
     console.log('Not authenticated, redirecting to login:', error.message);
     isInitializing = false; // Reset flag before redirect

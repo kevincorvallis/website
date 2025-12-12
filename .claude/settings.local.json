@@ -11,7 +11,10 @@
       "Bash(zip:*)",
       "Bash(aws lambda update-function-code:*)",
       "Bash(aws lambda get-function:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(aws cognito-idp list-users:*)",
+      "Bash(aws cognito-idp list-user-pools:*)",
+      "Bash(aws cognito-idp admin-delete-user:*)"
     ],
     "deny": [],
     "ask": []
