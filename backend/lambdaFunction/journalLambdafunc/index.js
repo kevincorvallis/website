@@ -42,6 +42,14 @@ const PATHS = {
   usersPhoneVerify: '/journalLambdafunc/users/phone/verify',
   // Share with connections
   entriesSharedWithMe: '/journalLambdafunc/entries/shared-with-me',
+  // Streaks & Leaderboard
+  streaksMe: '/journalLambdafunc/streaks/me',
+  streaksFriends: '/journalLambdafunc/streaks/friends',
+  // Activity Feed
+  feed: '/journalLambdafunc/feed',
+  // Accountability Partners
+  accountability: '/journalLambdafunc/accountability',
+  accountabilityRequest: '/journalLambdafunc/accountability/request',
   // Account management
   account: '/journalLambdafunc/account'
 };
@@ -251,6 +259,70 @@ async function getEntries(event, conn) {
   }
 }
 
+// Helper function to update user streak
+async function updateUserStreak(conn, uid, entryDate) {
+  try {
+    const today = new Date(entryDate);
+    today.setHours(0, 0, 0, 0);
+    const todayStr = today.toISOString().split('T')[0];
+
+    // Get current streak data
+    const [streakRows] = await conn.execute(
+      'SELECT * FROM user_streaks WHERE firebase_uid = ?',
+      [uid]
+    );
+
+    if (streakRows.length === 0) {
+      // First entry ever - create streak record
+      await conn.execute(
+        `INSERT INTO user_streaks (firebase_uid, current_streak, longest_streak, last_entry_date, streak_start_date)
+         VALUES (?, 1, 1, ?, ?)`,
+        [uid, todayStr, todayStr]
+      );
+      return { current_streak: 1, longest_streak: 1, is_new_streak: true };
+    }
+
+    const streak = streakRows[0];
+    const lastEntryDate = streak.last_entry_date ? new Date(streak.last_entry_date) : null;
+
+    if (lastEntryDate) {
+      lastEntryDate.setHours(0, 0, 0, 0);
+      const dayDiff = Math.floor((today - lastEntryDate) / (1000 * 60 * 60 * 24));
+
+      if (dayDiff === 0) {
+        // Same day - no streak change
+        return { current_streak: streak.current_streak, longest_streak: streak.longest_streak, is_new_streak: false };
+      } else if (dayDiff === 1) {
+        // Consecutive day - increment streak
+        const newStreak = streak.current_streak + 1;
+        const newLongest = Math.max(newStreak, streak.longest_streak);
+        await conn.execute(
+          `UPDATE user_streaks SET current_streak = ?, longest_streak = ?, last_entry_date = ? WHERE firebase_uid = ?`,
+          [newStreak, newLongest, todayStr, uid]
+        );
+        return { current_streak: newStreak, longest_streak: newLongest, is_new_streak: false };
+      } else {
+        // Streak broken - reset to 1
+        await conn.execute(
+          `UPDATE user_streaks SET current_streak = 1, last_entry_date = ?, streak_start_date = ? WHERE firebase_uid = ?`,
+          [todayStr, todayStr, uid]
+        );
+        return { current_streak: 1, longest_streak: streak.longest_streak, is_new_streak: true };
+      }
+    } else {
+      // No previous entry date - start new streak
+      await conn.execute(
+        `UPDATE user_streaks SET current_streak = 1, last_entry_date = ?, streak_start_date = ? WHERE firebase_uid = ?`,
+        [todayStr, todayStr, uid]
+      );
+      return { current_streak: 1, longest_streak: streak.longest_streak || 1, is_new_streak: true };
+    }
+  } catch (error) {
+    console.error('Error updating streak:', error);
+    return null; // Don't fail entry creation if streak update fails
+  }
+}
+
 // POST /entry - Create a new entry
 async function createEntry(event, conn) {
   const uid = await getAuthenticatedUid(event);
@@ -299,9 +371,13 @@ async function createEntry(event, conn) {
       [result.insertId]
     );
 
+    // Update user streak
+    const streakData = await updateUserStreak(conn, uid, entryDate);
+
     return buildResponse(201, {
       message: 'Entry created',
-      entry: rows[0]
+      entry: rows[0],
+      streak: streakData
     });
   } catch (error) {
     console.error('Error creating entry:', error);
@@ -796,30 +872,33 @@ async function getConnections(event, conn) {
   }
 
   try {
+    // Single query with JOIN to avoid N+1 problem
     const [rows] = await conn.execute(
-      `SELECT c.connection_id, c.created_at,
-              CASE WHEN c.requester_uid = ? THEN c.target_uid ELSE c.requester_uid END as connected_uid
+      `SELECT
+        c.connection_id,
+        c.created_at as connected_at,
+        CASE WHEN c.requester_uid = ? THEN c.target_uid ELSE c.requester_uid END as connected_uid,
+        u.user_id,
+        u.username,
+        u.email,
+        u.first_name,
+        u.phone_verified
        FROM connections c
-       WHERE (c.requester_uid = ? OR c.target_uid = ?) AND c.status = 'accepted'`,
-      [uid, uid, uid]
+       JOIN users u ON u.firebase_uid = CASE WHEN c.requester_uid = ? THEN c.target_uid ELSE c.requester_uid END
+       WHERE (c.requester_uid = ? OR c.target_uid = ?) AND c.status = 'accepted'
+       ORDER BY c.created_at DESC`,
+      [uid, uid, uid, uid]
     );
 
-    // Get user details for each connection
-    const connections = [];
-    for (const row of rows) {
-      const [userRows] = await conn.execute(
-        'SELECT user_id, username, email FROM users WHERE firebase_uid = ?',
-        [row.connected_uid]
-      );
-      if (userRows.length > 0) {
-        connections.push({
-          connection_id: row.connection_id,
-          uid: row.connected_uid,
-          displayName: userRows[0].username || userRows[0].email?.split('@')[0] || 'User',
-          connected_at: row.created_at
-        });
-      }
-    }
+    const connections = rows.map(row => ({
+      connection_id: row.connection_id,
+      uid: row.connected_uid,
+      displayName: row.first_name || row.username || row.email?.split('@')[0] || 'User',
+      first_name: row.first_name,
+      username: row.username,
+      phone_verified: row.phone_verified === 1,
+      connected_at: row.connected_at
+    }));
 
     return buildResponse(200, { connections });
   } catch (error) {
@@ -836,30 +915,29 @@ async function getPendingConnections(event, conn) {
   }
 
   try {
+    // Single query with JOIN to avoid N+1 problem
     const [rows] = await conn.execute(
-      `SELECT c.connection_id, c.requester_uid, c.created_at
+      `SELECT
+        c.connection_id,
+        c.requester_uid,
+        c.created_at as requested_at,
+        u.user_id,
+        u.username,
+        u.email,
+        u.first_name
        FROM connections c
+       JOIN users u ON u.firebase_uid = c.requester_uid
        WHERE c.target_uid = ? AND c.status = 'pending'
        ORDER BY c.created_at DESC`,
       [uid]
     );
 
-    // Get user details for each requester
-    const pending = [];
-    for (const row of rows) {
-      const [userRows] = await conn.execute(
-        'SELECT user_id, username, email FROM users WHERE firebase_uid = ?',
-        [row.requester_uid]
-      );
-      if (userRows.length > 0) {
-        pending.push({
-          connection_id: row.connection_id,
-          uid: row.requester_uid,
-          displayName: userRows[0].username || userRows[0].email?.split('@')[0] || 'User',
-          requested_at: row.created_at
-        });
-      }
-    }
+    const pending = rows.map(row => ({
+      connection_id: row.connection_id,
+      uid: row.requester_uid,
+      displayName: row.first_name || row.username || row.email?.split('@')[0] || 'User',
+      requested_at: row.requested_at
+    }));
 
     return buildResponse(200, { pending, count: pending.length });
   } catch (error) {
@@ -1715,6 +1793,635 @@ async function getPhoneStatus(event, conn) {
 }
 
 // ============================================
+// STREAKS HANDLERS
+// ============================================
+
+// GET /streaks/me - Get current user's streak
+async function getMyStreak(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      'SELECT * FROM user_streaks WHERE firebase_uid = ?',
+      [uid]
+    );
+
+    if (rows.length === 0) {
+      return buildResponse(200, {
+        streak: { current_streak: 0, longest_streak: 0, last_entry_date: null, streak_start_date: null }
+      });
+    }
+
+    return buildResponse(200, { streak: rows[0] });
+  } catch (error) {
+    console.error('Error getting streak:', error);
+    return errorResponse(500, 'Failed to get streak');
+  }
+}
+
+// GET /streaks/friends - Get friends' streaks for leaderboard
+async function getFriendsStreaks(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    // Get all accepted connections with their streaks
+    const [rows] = await conn.execute(
+      `SELECT
+        u.firebase_uid,
+        u.username,
+        u.email,
+        u.first_name,
+        COALESCE(s.current_streak, 0) as current_streak,
+        COALESCE(s.longest_streak, 0) as longest_streak,
+        s.last_entry_date,
+        s.streak_start_date
+       FROM connections c
+       JOIN users u ON u.firebase_uid = CASE WHEN c.requester_uid = ? THEN c.target_uid ELSE c.requester_uid END
+       LEFT JOIN user_streaks s ON s.firebase_uid = u.firebase_uid
+       WHERE (c.requester_uid = ? OR c.target_uid = ?) AND c.status = 'accepted'
+       ORDER BY current_streak DESC, longest_streak DESC`,
+      [uid, uid, uid]
+    );
+
+    // Also get current user's streak
+    const [myStreak] = await conn.execute(
+      `SELECT
+        u.firebase_uid,
+        u.username,
+        u.email,
+        u.first_name,
+        COALESCE(s.current_streak, 0) as current_streak,
+        COALESCE(s.longest_streak, 0) as longest_streak,
+        s.last_entry_date,
+        s.streak_start_date
+       FROM users u
+       LEFT JOIN user_streaks s ON s.firebase_uid = u.firebase_uid
+       WHERE u.firebase_uid = ?`,
+      [uid]
+    );
+
+    const friends = rows.map(row => ({
+      uid: row.firebase_uid,
+      displayName: row.first_name || row.username || row.email?.split('@')[0] || 'User',
+      current_streak: row.current_streak,
+      longest_streak: row.longest_streak,
+      last_entry_date: row.last_entry_date,
+      streak_start_date: row.streak_start_date
+    }));
+
+    const me = myStreak[0] ? {
+      uid: myStreak[0].firebase_uid,
+      displayName: myStreak[0].first_name || myStreak[0].username || myStreak[0].email?.split('@')[0] || 'You',
+      current_streak: myStreak[0].current_streak,
+      longest_streak: myStreak[0].longest_streak,
+      last_entry_date: myStreak[0].last_entry_date,
+      streak_start_date: myStreak[0].streak_start_date,
+      isMe: true
+    } : null;
+
+    // Create combined leaderboard
+    const leaderboard = me ? [...friends, me].sort((a, b) => b.current_streak - a.current_streak) : friends;
+
+    return buildResponse(200, { leaderboard, me, friends });
+  } catch (error) {
+    console.error('Error getting friends streaks:', error);
+    return errorResponse(500, 'Failed to get friends streaks');
+  }
+}
+
+// ============================================
+// ACTIVITY FEED HANDLERS
+// ============================================
+
+// GET /feed - Get activity feed (entries shared by friends)
+async function getFeed(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const limit = parseInt(event.queryStringParameters?.limit) || 20;
+    const offset = parseInt(event.queryStringParameters?.offset) || 0;
+
+    // Get entries shared with the current user
+    const [rows] = await conn.execute(
+      `SELECT
+        es.share_id,
+        es.entry_id,
+        es.owner_uid,
+        es.shared_at,
+        es.is_read,
+        je.title,
+        je.text,
+        je.date as entry_date,
+        u.username,
+        u.email,
+        u.first_name,
+        (SELECT COUNT(*) FROM entry_reactions WHERE entry_id = es.entry_id) as reaction_count,
+        (SELECT COUNT(*) FROM entry_comments WHERE entry_id = es.entry_id AND is_deleted = 0) as comment_count
+       FROM entry_shares es
+       JOIN journal_entries je ON je.entry_id = es.entry_id AND je.is_deleted = 0
+       JOIN users u ON u.firebase_uid = es.owner_uid
+       WHERE es.shared_with_uid = ?
+       ORDER BY es.shared_at DESC
+       LIMIT ? OFFSET ?`,
+      [uid, limit, offset]
+    );
+
+    // Get reactions for each entry made by current user
+    const entryIds = rows.map(r => r.entry_id);
+    let myReactions = {};
+    if (entryIds.length > 0) {
+      const [reactionRows] = await conn.execute(
+        `SELECT entry_id, emoji FROM entry_reactions WHERE reactor_uid = ? AND entry_id IN (${entryIds.map(() => '?').join(',')})`,
+        [uid, ...entryIds]
+      );
+      reactionRows.forEach(r => {
+        if (!myReactions[r.entry_id]) myReactions[r.entry_id] = [];
+        myReactions[r.entry_id].push(r.emoji);
+      });
+    }
+
+    const feed = rows.map(row => ({
+      share_id: row.share_id,
+      entry_id: row.entry_id,
+      owner_uid: row.owner_uid,
+      owner_name: row.first_name || row.username || row.email?.split('@')[0] || 'User',
+      shared_at: row.shared_at,
+      is_read: row.is_read === 1,
+      title: row.title,
+      preview: row.text.substring(0, 200) + (row.text.length > 200 ? '...' : ''),
+      entry_date: row.entry_date,
+      reaction_count: row.reaction_count,
+      comment_count: row.comment_count,
+      my_reactions: myReactions[row.entry_id] || []
+    }));
+
+    return buildResponse(200, { feed, count: feed.length });
+  } catch (error) {
+    console.error('Error getting feed:', error);
+    return errorResponse(500, 'Failed to get feed');
+  }
+}
+
+// ============================================
+// REACTIONS HANDLERS
+// ============================================
+
+// POST /entry/{id}/react - Add reaction to entry
+async function addReaction(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const entryId = event.pathParameters?.id;
+  if (!entryId) {
+    return errorResponse(400, 'Entry ID required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { emoji } = body;
+  const validEmojis = ['❤️', '🔥', '👏', '✨', '😢'];
+  if (!emoji || !validEmojis.includes(emoji)) {
+    return errorResponse(400, 'Invalid emoji. Valid options: ❤️, 🔥, 👏, ✨, 😢');
+  }
+
+  try {
+    // Verify user has access to this entry (it was shared with them)
+    const [shareCheck] = await conn.execute(
+      'SELECT 1 FROM entry_shares WHERE entry_id = ? AND shared_with_uid = ?',
+      [entryId, uid]
+    );
+    if (shareCheck.length === 0) {
+      return errorResponse(403, 'You do not have access to this entry');
+    }
+
+    // Add or ignore duplicate reaction
+    await conn.execute(
+      'INSERT IGNORE INTO entry_reactions (entry_id, reactor_uid, emoji) VALUES (?, ?, ?)',
+      [entryId, uid, emoji]
+    );
+
+    // Get updated reaction counts
+    const [reactions] = await conn.execute(
+      'SELECT emoji, COUNT(*) as count FROM entry_reactions WHERE entry_id = ? GROUP BY emoji',
+      [entryId]
+    );
+
+    return buildResponse(200, { message: 'Reaction added', reactions });
+  } catch (error) {
+    console.error('Error adding reaction:', error);
+    return errorResponse(500, 'Failed to add reaction');
+  }
+}
+
+// DELETE /entry/{id}/react/{emoji} - Remove reaction
+async function removeReaction(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const entryId = event.pathParameters?.id;
+  const emoji = decodeURIComponent(event.pathParameters?.emoji || '');
+
+  if (!entryId || !emoji) {
+    return errorResponse(400, 'Entry ID and emoji required');
+  }
+
+  try {
+    await conn.execute(
+      'DELETE FROM entry_reactions WHERE entry_id = ? AND reactor_uid = ? AND emoji = ?',
+      [entryId, uid, emoji]
+    );
+
+    // Get updated reaction counts
+    const [reactions] = await conn.execute(
+      'SELECT emoji, COUNT(*) as count FROM entry_reactions WHERE entry_id = ? GROUP BY emoji',
+      [entryId]
+    );
+
+    return buildResponse(200, { message: 'Reaction removed', reactions });
+  } catch (error) {
+    console.error('Error removing reaction:', error);
+    return errorResponse(500, 'Failed to remove reaction');
+  }
+}
+
+// GET /entry/{id}/reactions - Get reactions for entry
+async function getReactions(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const entryId = event.pathParameters?.id;
+  if (!entryId) {
+    return errorResponse(400, 'Entry ID required');
+  }
+
+  try {
+    const [reactions] = await conn.execute(
+      `SELECT r.emoji, r.created_at, u.firebase_uid, u.username, u.email, u.first_name
+       FROM entry_reactions r
+       JOIN users u ON u.firebase_uid = r.reactor_uid
+       WHERE r.entry_id = ?
+       ORDER BY r.created_at DESC`,
+      [entryId]
+    );
+
+    const grouped = {};
+    reactions.forEach(r => {
+      if (!grouped[r.emoji]) grouped[r.emoji] = [];
+      grouped[r.emoji].push({
+        uid: r.firebase_uid,
+        name: r.first_name || r.username || r.email?.split('@')[0] || 'User'
+      });
+    });
+
+    return buildResponse(200, { reactions: grouped });
+  } catch (error) {
+    console.error('Error getting reactions:', error);
+    return errorResponse(500, 'Failed to get reactions');
+  }
+}
+
+// ============================================
+// COMMENTS HANDLERS
+// ============================================
+
+// POST /entry/{id}/comment - Add comment
+async function addComment(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const entryId = event.pathParameters?.id;
+  if (!entryId) {
+    return errorResponse(400, 'Entry ID required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { text, parent_comment_id } = body;
+  if (!text || typeof text !== 'string' || text.trim().length === 0) {
+    return errorResponse(400, 'Comment text required');
+  }
+  if (text.length > 1000) {
+    return errorResponse(400, 'Comment too long (max 1000 characters)');
+  }
+
+  try {
+    // Verify user has access (shared with them OR they own it)
+    const [accessCheck] = await conn.execute(
+      `SELECT 1 FROM entry_shares WHERE entry_id = ? AND shared_with_uid = ?
+       UNION
+       SELECT 1 FROM journal_entries WHERE entry_id = ? AND firebase_uid = ?`,
+      [entryId, uid, entryId, uid]
+    );
+    if (accessCheck.length === 0) {
+      return errorResponse(403, 'You do not have access to this entry');
+    }
+
+    const [result] = await conn.execute(
+      'INSERT INTO entry_comments (entry_id, commenter_uid, parent_comment_id, comment_text) VALUES (?, ?, ?, ?)',
+      [entryId, uid, parent_comment_id || null, text.trim()]
+    );
+
+    // Fetch the created comment with user info
+    const [comment] = await conn.execute(
+      `SELECT c.*, u.username, u.email, u.first_name
+       FROM entry_comments c
+       JOIN users u ON u.firebase_uid = c.commenter_uid
+       WHERE c.comment_id = ?`,
+      [result.insertId]
+    );
+
+    return buildResponse(201, {
+      message: 'Comment added',
+      comment: {
+        ...comment[0],
+        commenter_name: comment[0].first_name || comment[0].username || comment[0].email?.split('@')[0] || 'User'
+      }
+    });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    return errorResponse(500, 'Failed to add comment');
+  }
+}
+
+// GET /entry/{id}/comments - Get comments for entry
+async function getComments(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const entryId = event.pathParameters?.id;
+  if (!entryId) {
+    return errorResponse(400, 'Entry ID required');
+  }
+
+  try {
+    const [comments] = await conn.execute(
+      `SELECT c.*, u.username, u.email, u.first_name
+       FROM entry_comments c
+       JOIN users u ON u.firebase_uid = c.commenter_uid
+       WHERE c.entry_id = ? AND c.is_deleted = 0
+       ORDER BY c.created_at ASC`,
+      [entryId]
+    );
+
+    const formattedComments = comments.map(c => ({
+      comment_id: c.comment_id,
+      entry_id: c.entry_id,
+      commenter_uid: c.commenter_uid,
+      commenter_name: c.first_name || c.username || c.email?.split('@')[0] || 'User',
+      parent_comment_id: c.parent_comment_id,
+      text: c.comment_text,
+      created_at: c.created_at,
+      is_mine: c.commenter_uid === uid
+    }));
+
+    return buildResponse(200, { comments: formattedComments });
+  } catch (error) {
+    console.error('Error getting comments:', error);
+    return errorResponse(500, 'Failed to get comments');
+  }
+}
+
+// DELETE /comment/{id} - Delete own comment
+async function deleteComment(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const commentId = event.pathParameters?.id;
+  if (!commentId) {
+    return errorResponse(400, 'Comment ID required');
+  }
+
+  try {
+    // Verify ownership
+    const [check] = await conn.execute(
+      'SELECT 1 FROM entry_comments WHERE comment_id = ? AND commenter_uid = ?',
+      [commentId, uid]
+    );
+    if (check.length === 0) {
+      return errorResponse(403, 'You can only delete your own comments');
+    }
+
+    await conn.execute(
+      'UPDATE entry_comments SET is_deleted = 1 WHERE comment_id = ?',
+      [commentId]
+    );
+
+    return buildResponse(200, { message: 'Comment deleted' });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    return errorResponse(500, 'Failed to delete comment');
+  }
+}
+
+// ============================================
+// ACCOUNTABILITY PARTNERS HANDLERS
+// ============================================
+
+// POST /accountability/request - Request accountability partner
+async function requestAccountabilityPartner(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return errorResponse(400, 'Invalid JSON body');
+  }
+
+  const { partner_uid } = body;
+  if (!partner_uid) {
+    return errorResponse(400, 'Partner UID required');
+  }
+
+  if (partner_uid === uid) {
+    return errorResponse(400, 'Cannot partner with yourself');
+  }
+
+  try {
+    // Verify they are connected
+    const [connCheck] = await conn.execute(
+      `SELECT 1 FROM connections
+       WHERE ((requester_uid = ? AND target_uid = ?) OR (requester_uid = ? AND target_uid = ?))
+       AND status = 'accepted'`,
+      [uid, partner_uid, partner_uid, uid]
+    );
+    if (connCheck.length === 0) {
+      return errorResponse(400, 'You must be connected to request accountability partnership');
+    }
+
+    // Check for existing partnership
+    const [existing] = await conn.execute(
+      `SELECT * FROM accountability_partners
+       WHERE (user_uid = ? AND partner_uid = ?) OR (user_uid = ? AND partner_uid = ?)`,
+      [uid, partner_uid, partner_uid, uid]
+    );
+
+    if (existing.length > 0) {
+      const p = existing[0];
+      if (p.status === 'active') {
+        return errorResponse(400, 'Already partners');
+      }
+      if (p.status === 'pending') {
+        // If they requested us, auto-accept
+        if (p.user_uid === partner_uid) {
+          await conn.execute(
+            'UPDATE accountability_partners SET status = "active" WHERE partnership_id = ?',
+            [p.partnership_id]
+          );
+          return buildResponse(200, { message: 'Partnership activated', status: 'active' });
+        }
+        return errorResponse(400, 'Partnership request already pending');
+      }
+    }
+
+    // Create new request
+    await conn.execute(
+      'INSERT INTO accountability_partners (user_uid, partner_uid, status) VALUES (?, ?, "pending")',
+      [uid, partner_uid]
+    );
+
+    return buildResponse(201, { message: 'Partnership request sent' });
+  } catch (error) {
+    console.error('Error requesting partnership:', error);
+    return errorResponse(500, 'Failed to request partnership');
+  }
+}
+
+// POST /accountability/{id}/accept - Accept partnership
+async function acceptAccountabilityPartner(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const partnershipId = event.pathParameters?.id;
+  if (!partnershipId) {
+    return errorResponse(400, 'Partnership ID required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      'SELECT * FROM accountability_partners WHERE partnership_id = ? AND partner_uid = ? AND status = "pending"',
+      [partnershipId, uid]
+    );
+
+    if (rows.length === 0) {
+      return errorResponse(404, 'Partnership request not found');
+    }
+
+    await conn.execute(
+      'UPDATE accountability_partners SET status = "active" WHERE partnership_id = ?',
+      [partnershipId]
+    );
+
+    return buildResponse(200, { message: 'Partnership accepted' });
+  } catch (error) {
+    console.error('Error accepting partnership:', error);
+    return errorResponse(500, 'Failed to accept partnership');
+  }
+}
+
+// GET /accountability - Get current partnerships
+async function getAccountabilityPartners(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [rows] = await conn.execute(
+      `SELECT
+        ap.*,
+        u.firebase_uid as partner_firebase_uid,
+        u.username,
+        u.email,
+        u.first_name,
+        COALESCE(s.current_streak, 0) as partner_streak
+       FROM accountability_partners ap
+       JOIN users u ON u.firebase_uid = CASE WHEN ap.user_uid = ? THEN ap.partner_uid ELSE ap.user_uid END
+       LEFT JOIN user_streaks s ON s.firebase_uid = u.firebase_uid
+       WHERE (ap.user_uid = ? OR ap.partner_uid = ?) AND ap.status IN ('pending', 'active')
+       ORDER BY ap.status DESC, ap.created_at DESC`,
+      [uid, uid, uid]
+    );
+
+    const partners = rows.map(row => ({
+      partnership_id: row.partnership_id,
+      partner_uid: row.partner_firebase_uid,
+      partner_name: row.first_name || row.username || row.email?.split('@')[0] || 'User',
+      partner_streak: row.partner_streak,
+      status: row.status,
+      is_incoming: row.partner_uid === uid && row.status === 'pending',
+      created_at: row.created_at
+    }));
+
+    return buildResponse(200, { partners });
+  } catch (error) {
+    console.error('Error getting partnerships:', error);
+    return errorResponse(500, 'Failed to get partnerships');
+  }
+}
+
+// DELETE /accountability/{id} - End partnership
+async function endAccountabilityPartnership(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const partnershipId = event.pathParameters?.id;
+  if (!partnershipId) {
+    return errorResponse(400, 'Partnership ID required');
+  }
+
+  try {
+    await conn.execute(
+      'UPDATE accountability_partners SET status = "ended" WHERE partnership_id = ? AND (user_uid = ? OR partner_uid = ?)',
+      [partnershipId, uid, uid]
+    );
+
+    return buildResponse(200, { message: 'Partnership ended' });
+  } catch (error) {
+    console.error('Error ending partnership:', error);
+    return errorResponse(500, 'Failed to end partnership');
+  }
+}
+
+// ============================================
 // SCHEMA INITIALIZATION
 // ============================================
 async function initializeSchema(conn) {
@@ -1807,6 +2514,55 @@ async function initializeSchema(conn) {
       INDEX idx_shared_with (shared_with_uid, is_read),
       INDEX idx_owner (owner_uid),
       INDEX idx_entry (entry_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS entry_reactions (
+      reaction_id INT AUTO_INCREMENT PRIMARY KEY,
+      entry_id INT NOT NULL,
+      reactor_uid VARCHAR(128) NOT NULL,
+      emoji VARCHAR(10) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY unique_reaction (entry_id, reactor_uid, emoji),
+      INDEX idx_entry (entry_id),
+      INDEX idx_reactor (reactor_uid)
+    );
+
+    CREATE TABLE IF NOT EXISTS entry_comments (
+      comment_id INT AUTO_INCREMENT PRIMARY KEY,
+      entry_id INT NOT NULL,
+      commenter_uid VARCHAR(128) NOT NULL,
+      parent_comment_id INT NULL,
+      comment_text TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      is_deleted TINYINT(1) DEFAULT 0,
+      INDEX idx_entry (entry_id),
+      INDEX idx_commenter (commenter_uid),
+      INDEX idx_parent (parent_comment_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS user_streaks (
+      streak_id INT AUTO_INCREMENT PRIMARY KEY,
+      firebase_uid VARCHAR(128) NOT NULL UNIQUE,
+      current_streak INT DEFAULT 0,
+      longest_streak INT DEFAULT 0,
+      last_entry_date DATE,
+      streak_start_date DATE,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_uid (firebase_uid),
+      INDEX idx_streak (current_streak DESC)
+    );
+
+    CREATE TABLE IF NOT EXISTS accountability_partners (
+      partnership_id INT AUTO_INCREMENT PRIMARY KEY,
+      user_uid VARCHAR(128) NOT NULL,
+      partner_uid VARCHAR(128) NOT NULL,
+      status ENUM('pending', 'active', 'ended') DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      UNIQUE KEY unique_partnership (user_uid, partner_uid),
+      INDEX idx_user (user_uid),
+      INDEX idx_partner (partner_uid)
     );
   `;
 
@@ -2093,6 +2849,59 @@ exports.handler = async (event, context) => {
       case method === 'PUT' && /\/journalLambdafunc\/entry-share\/\d+\/read$/.test(path):
         event.pathParameters = { id: path.split('/')[3] };
         return await markSharedEntryRead(event, conn);
+
+      // Streaks endpoints
+      case method === 'GET' && path === PATHS.streaksMe:
+        return await getMyStreak(event, conn);
+
+      case method === 'GET' && path === PATHS.streaksFriends:
+        return await getFriendsStreaks(event, conn);
+
+      // Activity Feed endpoints
+      case method === 'GET' && path === PATHS.feed:
+        return await getFeed(event, conn);
+
+      // Reactions endpoints
+      case method === 'POST' && /\/journalLambdafunc\/entry\/\d+\/react$/.test(path):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await addReaction(event, conn);
+
+      case method === 'DELETE' && /\/journalLambdafunc\/entry\/\d+\/react\//.test(path):
+        const reactParts = path.split('/');
+        event.pathParameters = { id: reactParts[3], emoji: reactParts[5] };
+        return await removeReaction(event, conn);
+
+      case method === 'GET' && /\/journalLambdafunc\/entry\/\d+\/reactions$/.test(path):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await getReactions(event, conn);
+
+      // Comments endpoints
+      case method === 'POST' && /\/journalLambdafunc\/entry\/\d+\/comment$/.test(path):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await addComment(event, conn);
+
+      case method === 'GET' && /\/journalLambdafunc\/entry\/\d+\/comments$/.test(path):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await getComments(event, conn);
+
+      case method === 'DELETE' && /\/journalLambdafunc\/comment\/\d+$/.test(path):
+        event.pathParameters = { id: path.split('/').pop() };
+        return await deleteComment(event, conn);
+
+      // Accountability Partners endpoints
+      case method === 'GET' && path === PATHS.accountability:
+        return await getAccountabilityPartners(event, conn);
+
+      case method === 'POST' && path === PATHS.accountabilityRequest:
+        return await requestAccountabilityPartner(event, conn);
+
+      case method === 'POST' && /\/journalLambdafunc\/accountability\/\d+\/accept$/.test(path):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await acceptAccountabilityPartner(event, conn);
+
+      case method === 'DELETE' && /\/journalLambdafunc\/accountability\/\d+$/.test(path):
+        event.pathParameters = { id: path.split('/').pop() };
+        return await endAccountabilityPartnership(event, conn);
 
       // Account deletion
       case method === 'DELETE' && path === PATHS.account:

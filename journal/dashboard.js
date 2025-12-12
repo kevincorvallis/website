@@ -343,7 +343,14 @@ class SyncManager {
         }
       }
 
-      const result = await api.sync(entries, this.getLastSyncTime());
+      // If no local entries, use lastSyncTime of 0 to get ALL entries from server
+      let syncTime = this.getLastSyncTime();
+      if (currentLocalEntries.length === 0) {
+        console.log('fullSync: No local entries, fetching all from server');
+        syncTime = 0;
+      }
+
+      const result = await api.sync(entries, syncTime);
 
       // Transform server entries to local format
       const serverEntries = result.entries.map(e => ({
@@ -1772,26 +1779,59 @@ async function initializeDashboard() {
     syncManager.updateSyncStatus('offline');
   }
 
-  // Check if user needs sample entries (new user)
+  // Check local entries and sync state
   const localEntries = safeParseJSON(getEntriesKey(currentUser.uid), []);
   const seededKey = `seeded_${currentUser.uid}`;
+  const lastSyncTime = syncManager.getLastSyncTime();
 
-  if (localEntries.length === 0 && !localStorage.getItem(seededKey) && syncManager.isOnline()) {
+  console.log('Sync debug:', {
+    localEntriesCount: localEntries.length,
+    lastSyncTime,
+    isSeeded: !!localStorage.getItem(seededKey),
+    isOnline: syncManager.isOnline()
+  });
+
+  // IMPORTANT: If no local entries but we have a lastSyncTime, clear it to force full fetch
+  // This handles the case where user cleared browser data but lastSyncTime persisted somehow
+  // OR when localStorage was cleared but auth cookies remained
+  if (localEntries.length === 0 && lastSyncTime > 0) {
+    console.log('Resetting lastSyncTime because local entries are empty');
+    syncManager.setLastSyncTime(0);
+  }
+
+  // For fresh browser/cleared cache: fetch all entries from server first
+  if (localEntries.length === 0 && syncManager.isOnline()) {
     try {
-      // Try to fetch existing entries from server first
+      console.log('No local entries, fetching from server...');
       const result = await api.getEntries();
-      if (result.entries.length === 0) {
-        // No entries on server, seed sample entries
+      console.log('Server returned entries:', result.entries.length);
+
+      if (result.entries.length > 0) {
+        // Transform and save server entries to localStorage
+        const serverEntries = result.entries.map(e => ({
+          id: e.client_id || e.entry_id.toString(),
+          entry_id: e.entry_id,
+          title: e.title,
+          text: e.text,
+          date: e.date,
+          synced: true
+        }));
+        localStorage.setItem(getEntriesKey(currentUser.uid), JSON.stringify(serverEntries));
+        console.log('Saved server entries to localStorage');
+      } else if (!localStorage.getItem(seededKey)) {
+        // No entries on server and never seeded - seed sample entries
+        console.log('No entries on server, seeding sample entries...');
         await seedSampleEntries(currentUser.uid);
       }
     } catch (error) {
-      console.error('Failed to check/seed entries:', error);
+      console.error('Failed to fetch entries from server:', error);
     }
   }
 
-  // Perform initial sync
+  // Perform full sync to catch any pending changes and merge
   try {
     const syncedEntries = await syncManager.fullSync();
+    console.log('Full sync complete, entries:', syncedEntries?.length || 0);
     if (syncedEntries) {
       recalcStats(currentUser.uid, syncedEntries);
     }

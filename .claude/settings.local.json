@@ -5,7 +5,13 @@
       "Bash(aws lambda invoke:*)",
       "Bash(cat:*)",
       "Bash(aws logs:*)",
-      "Bash(aws rds describe-db-instances:*)"
+      "Bash(aws rds describe-db-instances:*)",
+      "Bash(grep:*)",
+      "Bash(aws sts get-caller-identity:*)",
+      "Bash(zip:*)",
+      "Bash(aws lambda update-function-code:*)",
+      "Bash(aws lambda get-function:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
