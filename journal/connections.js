@@ -97,6 +97,10 @@ async function searchUsers(query) {
   return apiRequest(`/users/search?q=${encodeURIComponent(query)}`);
 }
 
+async function discoverUsers(limit = 20, offset = 0) {
+  return apiRequest(`/users/discover?limit=${limit}&offset=${offset}`);
+}
+
 async function getConnections() {
   return apiRequest('/connections');
 }
@@ -396,6 +400,70 @@ async function loadConnections() {
 }
 
 // ============================================
+// DISCOVER USERS
+// ============================================
+let discoverOffset = 0;
+const DISCOVER_LIMIT = 10;
+
+async function loadDiscoverUsers(append = false) {
+  const listEl = document.getElementById('discoverList');
+  const countEl = document.getElementById('discoverCount');
+  const loadMoreBtn = document.getElementById('loadMoreDiscover');
+  const sectionEl = document.getElementById('discoverSection');
+
+  if (!listEl) return;
+
+  if (!append) {
+    discoverOffset = 0;
+    showLoadingSkeleton(listEl, 3);
+  }
+
+  try {
+    const result = await discoverUsers(DISCOVER_LIMIT, discoverOffset);
+    countEl.textContent = result.pagination.total;
+
+    if (result.users.length === 0 && !append) {
+      sectionEl.style.display = 'none';
+      return;
+    }
+
+    sectionEl.style.display = 'block';
+
+    const usersHtml = result.users.map(user => `
+      <div class="connection-card discover">
+        <div class="user-info">
+          <div class="user-avatar">${getInitials(user.displayName)}</div>
+          <div class="user-details">
+            <span class="user-name">${escapeHtml(user.displayName)}</span>
+            <span class="connection-time">Joined ${formatDate(user.joinedAt)}</span>
+          </div>
+        </div>
+        <button class="btn btn-primary connect-btn" data-uid="${user.uid}">Connect</button>
+      </div>
+    `).join('');
+
+    if (append) {
+      listEl.insertAdjacentHTML('beforeend', usersHtml);
+    } else {
+      listEl.innerHTML = usersHtml;
+    }
+
+    // Update pagination state
+    discoverOffset += result.users.length;
+
+    // Show/hide load more button
+    if (loadMoreBtn) {
+      loadMoreBtn.style.display = result.pagination.hasMore ? 'block' : 'none';
+    }
+  } catch (error) {
+    if (!append) {
+      listEl.innerHTML = '<div class="empty-state"><p>Failed to load users</p></div>';
+    }
+    showToast('Failed to load discover section', 'error');
+  }
+}
+
+// ============================================
 // INVITE LINK
 // ============================================
 async function loadInviteLink() {
@@ -589,6 +657,49 @@ function setupEventDelegation() {
       showToast('Failed to remove: ' + error.message, 'error');
     }
   });
+
+  // Discover list - connect button
+  document.getElementById('discoverList')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.connect-btn');
+    if (!btn || btn.disabled) return;
+
+    const targetUid = btn.dataset.uid;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      const result = await requestConnection(targetUid);
+      btn.textContent = result.status === 'accepted' ? 'Connected!' : 'Sent';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+      showToast(result.status === 'accepted' ? 'Connected!' : 'Friend request sent', 'success');
+
+      // Remove the card from discover list after a short delay
+      setTimeout(() => {
+        const card = btn.closest('.connection-card');
+        if (card) {
+          card.style.opacity = '0';
+          card.style.transform = 'translateX(20px)';
+          setTimeout(() => card.remove(), 300);
+        }
+        // Update count
+        const countEl = document.getElementById('discoverCount');
+        if (countEl) {
+          const currentCount = parseInt(countEl.textContent) || 0;
+          countEl.textContent = Math.max(0, currentCount - 1);
+        }
+      }, 1000);
+    } catch (error) {
+      btn.textContent = 'Connect';
+      btn.disabled = false;
+      showToast(error.message || 'Failed to send request', 'error');
+    }
+  });
+
+  // Load more discover button
+  document.getElementById('loadMoreDiscover')?.addEventListener('click', () => {
+    loadDiscoverUsers(true);
+  });
 }
 
 // ============================================
@@ -624,6 +735,7 @@ async function initialize() {
     await Promise.all([
       loadPendingConnections(),
       loadConnections(),
+      loadDiscoverUsers(),
       loadInviteLink()
     ]);
 

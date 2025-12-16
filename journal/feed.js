@@ -143,6 +143,12 @@ async function loadFeed() {
       return;
     }
 
+    // Store feed data for later use
+    window.feedData = {};
+    feed.forEach(item => {
+      window.feedData[item.entry_id] = item;
+    });
+
     listEl.innerHTML = feed.map(item => {
       const myReactionsSet = new Set(item.my_reactions || []);
 
@@ -165,17 +171,17 @@ async function loadFeed() {
             </div>
             <div class="reaction-actions">
               <div class="emoji-picker-wrapper" style="position: relative;">
-                <button class="reaction-btn" onclick="toggleEmojiPicker(${item.entry_id})">
+                <button class="reaction-btn" onclick="event.stopPropagation(); toggleEmojiPicker(${item.entry_id})">
                   ${myReactionsSet.size > 0 ? Array.from(myReactionsSet)[0] : '+'}
                 </button>
                 <div class="emoji-picker" id="emoji-picker-${item.entry_id}">
                   ${EMOJIS.map(emoji => `
                     <span class="emoji-option ${myReactionsSet.has(emoji) ? 'active' : ''}"
-                          onclick="toggleReaction(${item.entry_id}, '${emoji}')">${emoji}</span>
+                          onclick="event.stopPropagation(); toggleReaction(${item.entry_id}, '${emoji}')">${emoji}</span>
                   `).join('')}
                 </div>
               </div>
-              <button class="comment-btn" onclick="openComments(${item.entry_id})">
+              <button class="comment-btn" onclick="event.stopPropagation(); openComments(${item.entry_id})">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -274,9 +280,40 @@ async function toggleReaction(entryId, emoji) {
 // Comments
 async function openComments(entryId) {
   currentEntryId = entryId;
+
+  // Update modal header with entry info
+  const entryData = window.feedData?.[entryId];
+  const modalHeader = document.querySelector('.comments-modal .modal-header');
+  const entryTitle = entryData?.title || 'Entry';
+
+  modalHeader.innerHTML = `
+    <div class="modal-header-content">
+      <h3>${escapeHtml(entryTitle)}</h3>
+      <button class="read-article-btn" onclick="viewFullEntry(${entryId})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M18 13V19C18 20.1046 17.1046 21 16 21H5C3.89543 21 3 20.1046 3 19V8C3 6.89543 3.89543 6 5 6H11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M15 3H21V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Read Entry
+      </button>
+    </div>
+    <button class="modal-close" onclick="closeComments()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  `;
+
   document.getElementById('commentsModal').style.display = 'flex';
   document.getElementById('commentInput').value = '';
   await loadComments(entryId);
+}
+
+// View full entry
+function viewFullEntry(entryId) {
+  // Navigate to entry view page
+  window.location.href = `entry-view.html?id=${entryId}`;
 }
 
 function closeComments() {
@@ -371,6 +408,7 @@ window.openComments = openComments;
 window.closeComments = closeComments;
 window.sendComment = sendComment;
 window.deleteComment = deleteComment;
+window.viewFullEntry = viewFullEntry;
 
 // Close emoji pickers on outside click
 document.addEventListener('click', (e) => {
@@ -378,6 +416,17 @@ document.addEventListener('click', (e) => {
     document.querySelectorAll('.emoji-picker.show').forEach(picker => {
       picker.classList.remove('show');
     });
+  }
+});
+
+// Click on feed card to open comments
+document.addEventListener('click', (e) => {
+  const feedCard = e.target.closest('.feed-card');
+  if (feedCard && !e.target.closest('.reaction-actions')) {
+    const entryId = feedCard.dataset.entryId;
+    if (entryId) {
+      openComments(parseInt(entryId));
+    }
   }
 });
 

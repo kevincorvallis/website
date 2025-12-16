@@ -645,12 +645,45 @@ function displayEntries(entries) {
     div.className = 'entry';
     const entryId = entry.entry_id || entry.id;
 
-    // Build image HTML if present
-    const imageHtml = entry.image_url ? `<img src="${escapeHtml(entry.image_url)}" alt="Entry image" class="entry-image" loading="lazy">` : '';
+    // Build image HTML with creative wrapper
+    let imageHtml = '';
+    if (entry.image_url) {
+      const locationName = entry.location_name || (entry.latitude ? `${entry.latitude.toFixed(4)}, ${entry.longitude.toFixed(4)}` : '');
+      const locationBadge = (entry.latitude && entry.longitude)
+        ? `<div class="image-location-badge">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+               <circle cx="12" cy="10" r="3"/>
+             </svg>
+             <span>${escapeHtml(locationName)}</span>
+           </div>`
+        : '';
 
-    // Build location HTML if present
+      imageHtml = `
+        <div class="entry-image-wrapper loading" onclick="openImageLightbox('${escapeHtml(entry.image_url)}', '${escapeHtml(locationName)}')">
+          <img
+            src="${escapeHtml(entry.image_url)}"
+            alt="Entry image"
+            class="entry-image"
+            loading="lazy"
+            onload="this.classList.add('loaded'); this.parentElement.classList.remove('loading');"
+          >
+          ${locationBadge}
+          <div class="image-overlay">
+            <span class="tap-hint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+              </svg>
+              Tap to expand
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Build location HTML for entries without images but with location
     let locationHtml = '';
-    if (entry.latitude && entry.longitude) {
+    if (!entry.image_url && entry.latitude && entry.longitude) {
       const locationName = entry.location_name || `${entry.latitude.toFixed(4)}, ${entry.longitude.toFixed(4)}`;
       locationHtml = `
         <div class="entry-location">
@@ -723,6 +756,91 @@ function loadEntries(uid) {
   const entries = safeParseJSON(getEntriesKey(uid), []);
   displayEntries(entries);
 }
+
+// ============================================
+// IMAGE LIGHTBOX
+// ============================================
+let lightboxElement = null;
+
+function createLightboxElement() {
+  if (lightboxElement) return lightboxElement;
+
+  lightboxElement = document.createElement('div');
+  lightboxElement.className = 'image-lightbox';
+  lightboxElement.id = 'imageLightbox';
+  lightboxElement.innerHTML = `
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeImageLightbox()">&times;</button>
+      <img class="lightbox-image" src="" alt="Full size image">
+      <div class="lightbox-info"></div>
+    </div>
+  `;
+
+  // Close on background click
+  lightboxElement.addEventListener('click', (e) => {
+    if (e.target === lightboxElement) {
+      closeImageLightbox();
+    }
+  });
+
+  // Close on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightboxElement.classList.contains('active')) {
+      closeImageLightbox();
+    }
+  });
+
+  document.body.appendChild(lightboxElement);
+  return lightboxElement;
+}
+
+function openImageLightbox(imageUrl, locationName) {
+  const lightbox = createLightboxElement();
+  const img = lightbox.querySelector('.lightbox-image');
+  const info = lightbox.querySelector('.lightbox-info');
+
+  img.src = imageUrl;
+
+  // Show location info if available
+  if (locationName) {
+    info.innerHTML = `
+      <div class="lightbox-location">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        ${escapeHtml(locationName)}
+      </div>
+    `;
+  } else {
+    info.innerHTML = '';
+  }
+
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+
+  // Show lightbox
+  requestAnimationFrame(() => {
+    lightbox.classList.add('active');
+  });
+}
+
+function closeImageLightbox() {
+  if (!lightboxElement) return;
+
+  lightboxElement.classList.remove('active');
+  document.body.style.overflow = '';
+
+  // Clear image after animation
+  setTimeout(() => {
+    const img = lightboxElement.querySelector('.lightbox-image');
+    img.src = '';
+  }, 300);
+}
+
+// Expose lightbox functions globally
+window.openImageLightbox = openImageLightbox;
+window.closeImageLightbox = closeImageLightbox;
 
 // ============================================
 // IMAGE UPLOAD HELPERS

@@ -21,7 +21,18 @@
       "Bash(aws lambda update-function-configuration:*)",
       "Bash(aws iam put-role-policy:*)",
       "Bash(npm install)",
-      "Bash(aws s3 cp:*)"
+      "Bash(aws s3 cp:*)",
+      "Bash(aws ses list-identities:*)",
+      "Bash(aws ses get-account-sending-enabled:*)",
+      "Bash(aws ses verify-email-identity:*)",
+      "Bash(aws ses get-identity-verification-attributes:*)",
+      "Bash(ls:*)",
+      "Bash(aws s3 ls:*)",
+      "Bash(rm:*)",
+      "Bash(aws logs tail:*)",
+      "Bash(aws logs filter-log-events:*)",
+      "Bash(aws apigateway:*)",
+      "Read(//tmp/**)"
     ],
     "deny": [],
     "ask": []

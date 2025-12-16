@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Entry - Day by Day</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    .entry-view-page {
+      min-height: 100vh;
+      background: var(--bg-primary);
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--bg-primary);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .page-header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+      flex: 1;
+      text-align: center;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--accent-primary);
+    }
+
+    .header-spacer {
+      width: 40px;
+    }
+
+    .entry-container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    .entry-card {
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .entry-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .author-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .author-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .author-info {
+      flex: 1;
+    }
+
+    .author-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .entry-date {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+
+    .entry-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .entry-body {
+      padding: 24px;
+    }
+
+    .entry-image {
+      width: calc(100% + 48px);
+      margin: -24px -24px 24px -24px;
+      max-height: 400px;
+      object-fit: cover;
+    }
+
+    .entry-content {
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+
+    .entry-content p {
+      margin: 0 0 16px 0;
+    }
+
+    .entry-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .entry-prompt {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      border-left: 3px solid var(--accent-primary);
+    }
+
+    .entry-prompt-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .entry-prompt-text {
+      font-size: 15px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .entry-location {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+
+    .loading-state,
+    .error-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-secondary);
+    }
+
+    .loading-state .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--bg-secondary);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-state svg {
+      opacity: 0.5;
+      margin-bottom: 16px;
+    }
+
+    .error-state h2 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .error-state p {
+      margin-bottom: 20px;
+    }
+
+    .error-state .btn {
+      display: inline-block;
+      background: var(--accent-primary);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .error-state .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 92, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="entry-view-page">
+    <header class="page-header">
+      <a href="feed.html" class="back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <h1>Entry</h1>
+      <div class="header-spacer"></div>
+    </header>
+
+    <main class="entry-container" id="mainContent">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading entry...</p>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { Amplify } from 'https://esm.sh/aws-amplify@6';
+    import { getCurrentUser, fetchAuthSession } from 'https://esm.sh/aws-amplify@6/auth';
+
+    const cognitoConfig = {
+      userPoolId: 'us-west-1_81HBZnH92',
+      userPoolClientId: '7t77oqaipn9hldtdpesvde3eka',
+      region: 'us-west-1'
+    };
+
+    Amplify.configure({
+      Auth: {
+        Cognito: {
+          userPoolId: cognitoConfig.userPoolId,
+          userPoolClientId: cognitoConfig.userPoolClientId
+        }
+      }
+    });
+
+    const API_BASE = 'https://1t1byyi4x6.execute-api.us-west-1.amazonaws.com/default/journalLambdafunc';
+    const mainContent = document.getElementById('mainContent');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const entryId = urlParams.get('id');
+
+    if (!entryId) {
+      showError('Invalid Link', 'No entry ID provided.');
+    } else {
+      loadEntry();
+    }
+
+    async function getAuthToken() {
+      try {
+        await getCurrentUser();
+        const session = await fetchAuthSession();
+        return session.tokens?.idToken?.toString();
+      } catch {
+        return null;
+      }
+    }
+
+    async function loadEntry() {
+      try {
+        const authToken = await getAuthToken();
+        if (!authToken) {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        const response = await fetch(`${API_BASE}/entry/${entryId}/shared-view`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 403) {
+            showError('Access Denied', 'You don\'t have permission to view this entry.');
+          } else if (response.status === 404) {
+            showError('Entry Not Found', 'This entry may have been deleted.');
+          } else {
+            throw new Error('Failed to load entry');
+          }
+          return;
+        }
+
+        const data = await response.json();
+        showEntry(data);
+      } catch (error) {
+        console.error('Error loading entry:', error);
+        showError('Something went wrong', 'We couldn\'t load this entry. Please try again.');
+      }
+    }
+
+    function showEntry(data) {
+      const { entry, owner } = data;
+      const date = new Date(entry.entry_date || entry.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const initials = getInitials(owner.name);
+
+      let imageHtml = '';
+      if (entry.image_url) {
+        imageHtml = `<img src="${entry.image_url}" alt="Entry image" class="entry-image">`;
+      }
+
+      let promptHtml = '';
+      if (entry.prompt) {
+        promptHtml = `
+          <div class="entry-prompt">
+            <div class="entry-prompt-label">Writing Prompt</div>
+            <div class="entry-prompt-text">${escapeHtml(entry.prompt)}</div>
+          </div>
+        `;
+      }
+
+      let locationHtml = '';
+      if (entry.location) {
+        locationHtml = `
+          <div class="entry-location">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            ${escapeHtml(entry.location)}
+          </div>
+        `;
+      }
+
+      // Handle HTML content or plain text
+      let contentHtml;
+      if (entry.text && entry.text.includes('<')) {
+        contentHtml = entry.text;
+      } else if (entry.text) {
+        contentHtml = entry.text
+          .split('\n\n')
+          .filter(p => p.trim())
+          .map(p => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+          .join('');
+      } else {
+        contentHtml = '<p>No content</p>';
+      }
+
+      mainContent.innerHTML = `
+        <div class="entry-card">
+          <div class="entry-header">
+            <div class="author-row">
+              <div class="author-avatar">${initials}</div>
+              <div class="author-info">
+                <div class="author-name">${escapeHtml(owner.name)}</div>
+                <div class="entry-date">${date}</div>
+              </div>
+            </div>
+            ${entry.title ? `<h1 class="entry-title">${escapeHtml(entry.title)}</h1>` : ''}
+          </div>
+          <div class="entry-body">
+            ${imageHtml}
+            <div class="entry-content">${contentHtml}</div>
+            ${promptHtml}
+            ${locationHtml}
+          </div>
+        </div>
+      `;
+
+      document.title = `${entry.title || 'Entry'} - Day by Day`;
+    }
+
+    function showError(title, message) {
+      mainContent.innerHTML = `
+        <div class="error-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v4M12 16h.01"/>
+          </svg>
+          <h2>${title}</h2>
+          <p>${message}</p>
+          <a href="feed.html" class="btn">Back to Feed</a>
+        </div>
+      `;
+    }
+
+    function getInitials(name) {
+      if (!name) return '?';
+      return name.split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

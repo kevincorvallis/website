@@ -361,6 +361,24 @@
   border-color: rgba(251, 191, 36, 0.2);
 }
 
+.connection-card.discover {
+  background: rgba(92, 140, 255, 0.08);
+  border-color: rgba(92, 140, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.connection-card.discover:hover {
+  border-color: rgba(92, 140, 255, 0.3);
+}
+
+/* Load More Button */
+.load-more-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  text-align: center;
+}
+
 .user-info {
   display: flex;
   align-items: center;

@@ -6,6 +6,7 @@ const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
 const { CognitoIdentityProviderClient, AdminDeleteUserCommand } = require('@aws-sdk/client-cognito-identity-provider');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
 
 // Initialize SNS client for SMS
 const snsClient = new SNSClient({ region: 'us-west-1' });
@@ -16,6 +17,10 @@ const cognitoClient = new CognitoIdentityProviderClient({ region: 'us-west-1' })
 // Initialize S3 client for image uploads
 const s3Client = new S3Client({ region: 'us-west-1' });
 const S3_BUCKET = process.env.S3_BUCKET || 'daybyday-journal-images';
+
+// Initialize SES client for email notifications
+const sesClient = new SESClient({ region: 'us-west-1' });
+const SES_SENDER_EMAIL = process.env.SES_SENDER_EMAIL || 'kevinleems@outlook.com';
 
 // ============================================
 // CONFIGURATION
@@ -33,6 +38,7 @@ const PATHS = {
   user: '/journalLambdafunc/user',
   // User & Connections
   usersSearch: '/journalLambdafunc/users/search',
+  usersDiscover: '/journalLambdafunc/users/discover',
   usersProfile: '/journalLambdafunc/users/profile',
   connections: '/journalLambdafunc/connections',
   connectionsPending: '/journalLambdafunc/connections/pending',
@@ -801,25 +807,98 @@ async function searchUsers(event, conn) {
 
   try {
     const [rows] = await conn.execute(
-      `SELECT user_id, firebase_uid, username, email
+      `SELECT user_id, firebase_uid, username, email, first_name
        FROM users
        WHERE firebase_uid != ?
-         AND (username LIKE ? OR email LIKE ?)
+         AND (username LIKE ? OR email LIKE ? OR first_name LIKE ?)
        LIMIT 20`,
-      [uid, `%${query}%`, `%${query}%`]
+      [uid, `%${query}%`, `%${query}%`, `%${query}%`]
     );
 
     // Return sanitized results (no sensitive data)
     const users = rows.map(u => ({
       user_id: u.user_id,
       uid: u.firebase_uid,
-      displayName: u.username || u.email?.split('@')[0] || 'User'
+      displayName: u.first_name || u.username || u.email?.split('@')[0] || 'User'
     }));
 
     return buildResponse(200, { users });
   } catch (error) {
     console.error('Error searching users:', error);
     return errorResponse(500, 'Failed to search users');
+  }
+}
+
+// GET /users/discover - Get discoverable users (excluding self, existing connections, pending)
+async function discoverUsers(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  // Parse pagination parameters
+  const limit = Math.min(parseInt(event.queryStringParameters?.limit || '20'), 50);
+  const offset = parseInt(event.queryStringParameters?.offset || '0');
+
+  try {
+    // Get users excluding:
+    // 1. Current user
+    // 2. Users already connected (accepted)
+    // 3. Users with pending connection requests (either direction)
+    const [rows] = await conn.execute(
+      `SELECT u.user_id, u.firebase_uid, u.username, u.email, u.first_name, u.created_at
+       FROM users u
+       WHERE u.firebase_uid != ?
+         AND u.firebase_uid NOT IN (
+           SELECT CASE
+             WHEN c.requester_uid = ? THEN c.target_uid
+             ELSE c.requester_uid
+           END
+           FROM connections c
+           WHERE (c.requester_uid = ? OR c.target_uid = ?)
+             AND c.status IN ('accepted', 'pending')
+         )
+       ORDER BY u.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [uid, uid, uid, uid, limit, offset]
+    );
+
+    // Get total count for pagination
+    const [[{ total }]] = await conn.execute(
+      `SELECT COUNT(*) as total
+       FROM users u
+       WHERE u.firebase_uid != ?
+         AND u.firebase_uid NOT IN (
+           SELECT CASE
+             WHEN c.requester_uid = ? THEN c.target_uid
+             ELSE c.requester_uid
+           END
+           FROM connections c
+           WHERE (c.requester_uid = ? OR c.target_uid = ?)
+             AND c.status IN ('accepted', 'pending')
+         )`,
+      [uid, uid, uid, uid]
+    );
+
+    const users = rows.map(u => ({
+      user_id: u.user_id,
+      uid: u.firebase_uid,
+      displayName: u.first_name || u.username || u.email?.split('@')[0] || 'User',
+      joinedAt: u.created_at
+    }));
+
+    return buildResponse(200, {
+      users,
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + users.length < total
+      }
+    });
+  } catch (error) {
+    console.error('Error discovering users:', error);
+    return errorResponse(500, 'Failed to discover users');
   }
 }
 
@@ -958,6 +1037,31 @@ async function requestConnection(event, conn) {
       [uid, targetUid]
     );
 
+    // Send email notification to target user (non-blocking)
+    try {
+      // Get requester's display name
+      const [requesterInfo] = await conn.execute(
+        'SELECT first_name, username FROM users WHERE firebase_uid = ?',
+        [uid]
+      );
+      const requesterName = requesterInfo[0]?.first_name || requesterInfo[0]?.username || 'Someone';
+
+      // Get target's email
+      const [targetInfo] = await conn.execute(
+        'SELECT email FROM users WHERE firebase_uid = ?',
+        [targetUid]
+      );
+      const targetEmail = targetInfo[0]?.email;
+
+      if (targetEmail) {
+        const { subject, htmlBody, textBody } = generateFriendRequestEmail(requesterName);
+        sendEmail(targetEmail, subject, htmlBody, textBody); // Fire and forget
+      }
+    } catch (emailError) {
+      console.error('Error sending friend request email:', emailError);
+      // Don't fail the request if email fails
+    }
+
     return buildResponse(201, {
       message: 'Connection request sent',
       connection_id: result.insertId
@@ -1073,10 +1177,37 @@ async function acceptConnection(event, conn) {
       return errorResponse(404, 'Connection request not found');
     }
 
+    const requesterUid = rows[0].requester_uid;
+
     await conn.execute(
       'UPDATE connections SET status = "accepted" WHERE connection_id = ?',
       [connectionId]
     );
+
+    // Send email notification to requester (non-blocking)
+    try {
+      // Get accepter's display name
+      const [accepterInfo] = await conn.execute(
+        'SELECT first_name, username FROM users WHERE firebase_uid = ?',
+        [uid]
+      );
+      const accepterName = accepterInfo[0]?.first_name || accepterInfo[0]?.username || 'Someone';
+
+      // Get requester's email
+      const [requesterInfo] = await conn.execute(
+        'SELECT email FROM users WHERE firebase_uid = ?',
+        [requesterUid]
+      );
+      const requesterEmail = requesterInfo[0]?.email;
+
+      if (requesterEmail) {
+        const { subject, htmlBody, textBody } = generateRequestAcceptedEmail(accepterName);
+        sendEmail(requesterEmail, subject, htmlBody, textBody); // Fire and forget
+      }
+    } catch (emailError) {
+      console.error('Error sending acceptance email:', emailError);
+      // Don't fail the request if email fails
+    }
 
     return buildResponse(200, { message: 'Connection accepted' });
   } catch (error) {
@@ -1551,6 +1682,130 @@ async function sendSMS(phoneNumber, message) {
   }
 }
 
+// Send email via SES
+async function sendEmail(toEmail, subject, htmlBody, textBody) {
+  const params = {
+    Source: SES_SENDER_EMAIL,
+    Destination: { ToAddresses: [toEmail] },
+    Message: {
+      Subject: { Data: subject, Charset: 'UTF-8' },
+      Body: {
+        Html: { Data: htmlBody, Charset: 'UTF-8' },
+        Text: { Data: textBody, Charset: 'UTF-8' }
+      }
+    }
+  };
+
+  try {
+    await sesClient.send(new SendEmailCommand(params));
+    console.log(`Email sent to ${toEmail}: ${subject}`);
+    return true;
+  } catch (error) {
+    console.error('Email send error:', error);
+    return false;
+  }
+}
+
+// Generate friend request email
+function generateFriendRequestEmail(requesterName) {
+  const subject = `${requesterName} wants to connect with you on Day by Day`;
+
+  const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0f; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" max-width="500" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 40px; border: 1px solid rgba(255,255,255,0.1);">
+          <tr>
+            <td align="center" style="padding-bottom: 24px;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">New Friend Request</h1>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-bottom: 24px;">
+              <p style="color: #a0a0a0; margin: 0; font-size: 16px; line-height: 1.5;">
+                <strong style="color: #667eea;">${requesterName}</strong> wants to connect with you on Day by Day.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-bottom: 24px;">
+              <a href="https://daybyday.academy/journal/connections.html" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">View Request</a>
+            </td>
+          </tr>
+          <tr>
+            <td align="center">
+              <p style="color: #666666; margin: 0; font-size: 12px;">Day by Day - Your Daily Journal</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const textBody = `${requesterName} wants to connect with you on Day by Day.\n\nView the request at: https://daybyday.academy/journal/connections.html`;
+
+  return { subject, htmlBody, textBody };
+}
+
+// Generate request accepted email
+function generateRequestAcceptedEmail(accepterName) {
+  const subject = `${accepterName} accepted your friend request on Day by Day`;
+
+  const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0f; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" max-width="500" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 40px; border: 1px solid rgba(255,255,255,0.1);">
+          <tr>
+            <td align="center" style="padding-bottom: 24px;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">Friend Request Accepted!</h1>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-bottom: 24px;">
+              <p style="color: #a0a0a0; margin: 0; font-size: 16px; line-height: 1.5;">
+                <strong style="color: #667eea;">${accepterName}</strong> accepted your friend request. You're now connected!
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-bottom: 24px;">
+              <a href="https://daybyday.academy/journal/connections.html" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">View Friends</a>
+            </td>
+          </tr>
+          <tr>
+            <td align="center">
+              <p style="color: #666666; margin: 0; font-size: 12px;">Day by Day - Your Daily Journal</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const textBody = `${accepterName} accepted your friend request on Day by Day. You're now connected!\n\nView your friends at: https://daybyday.academy/journal/connections.html`;
+
+  return { subject, htmlBody, textBody };
+}
+
 // POST /users/phone - Save phone number and send verification code
 async function sendPhoneVerification(event, conn) {
   const uid = await getAuthenticatedUid(event);
@@ -1865,6 +2120,93 @@ async function markSharedEntryRead(event, conn) {
   } catch (error) {
     console.error('Error marking shared entry as read:', error);
     return errorResponse(500, 'Failed to mark as read');
+  }
+}
+
+// GET /entry/{id}/shared-view - Get full entry for friends who have access
+async function getSharedEntryView(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const entryId = event.pathParameters?.id;
+  if (!entryId || isNaN(parseInt(entryId))) {
+    return errorResponse(400, 'Invalid entry ID');
+  }
+
+  try {
+    // Check if user has access (entry was shared with them or they're the owner)
+    const [accessCheck] = await conn.execute(
+      `SELECT es.share_id, es.owner_uid
+       FROM entry_shares es
+       WHERE es.entry_id = ? AND es.shared_with_uid = ?
+       UNION
+       SELECT NULL as share_id, je.firebase_uid as owner_uid
+       FROM journal_entries je
+       WHERE je.entry_id = ? AND je.firebase_uid = ?`,
+      [entryId, uid, entryId, uid]
+    );
+
+    if (accessCheck.length === 0) {
+      return errorResponse(403, 'You don\'t have access to this entry');
+    }
+
+    const ownerUid = accessCheck[0].owner_uid;
+
+    // Get the full entry
+    const [entries] = await conn.execute(
+      `SELECT je.entry_id, je.title, je.text, je.date as entry_date,
+              je.prompt_id, je.location, je.image_url
+       FROM journal_entries je
+       WHERE je.entry_id = ? AND je.is_deleted = 0`,
+      [entryId]
+    );
+
+    if (entries.length === 0) {
+      return errorResponse(404, 'Entry not found');
+    }
+
+    const entry = entries[0];
+
+    // Get prompt text if exists
+    if (entry.prompt_id) {
+      const [promptRows] = await conn.execute(
+        'SELECT prompt FROM prompts WHERE prompt_id = ?',
+        [entry.prompt_id]
+      );
+      if (promptRows.length > 0) {
+        entry.prompt = promptRows[0].prompt;
+      }
+    }
+
+    // Get owner info
+    const [ownerRows] = await conn.execute(
+      'SELECT first_name, username, email FROM users WHERE firebase_uid = ?',
+      [ownerUid]
+    );
+
+    const owner = ownerRows[0] || {};
+    const ownerName = owner.first_name || owner.username || owner.email?.split('@')[0] || 'User';
+
+    return buildResponse(200, {
+      entry: {
+        entry_id: entry.entry_id,
+        title: entry.title,
+        text: entry.text,
+        entry_date: entry.entry_date,
+        prompt: entry.prompt || null,
+        location: entry.location || null,
+        image_url: entry.image_url || null
+      },
+      owner: {
+        uid: ownerUid,
+        name: ownerName
+      }
+    });
+  } catch (error) {
+    console.error('Error getting shared entry view:', error);
+    return errorResponse(500, 'Failed to get entry');
   }
 }
 
@@ -2890,6 +3232,9 @@ exports.handler = async (event, context) => {
       case method === 'GET' && path === PATHS.usersSearch:
         return await searchUsers(event, conn);
 
+      case method === 'GET' && path === PATHS.usersDiscover:
+        return await discoverUsers(event, conn);
+
       case method === 'GET' && path === PATHS.usersProfile:
         return await getUserProfile(event, conn);
 
@@ -3000,6 +3345,11 @@ exports.handler = async (event, context) => {
       case method === 'DELETE' && /\/journalLambdafunc\/comment\/\d+$/.test(path):
         event.pathParameters = { id: path.split('/').pop() };
         return await deleteComment(event, conn);
+
+      // Shared entry view for friends
+      case method === 'GET' && /\/journalLambdafunc\/entry\/\d+\/shared-view$/.test(path):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await getSharedEntryView(event, conn);
 
       // Accountability Partners endpoints
       case method === 'GET' && path === PATHS.accountability:
