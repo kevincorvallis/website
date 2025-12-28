@@ -61,7 +61,7 @@
 /* Invite Card */
 .invite-card {
   background: linear-gradient(135deg, rgba(124, 92, 255, 0.15) 0%, rgba(92, 140, 255, 0.1) 100%);
-  border: 1px solid rgba(124, 92, 255, 0.3);
+  border: 2px solid rgba(124, 92, 255, 0.3);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
@@ -115,7 +115,7 @@
   flex: 1;
   padding: 14px 16px;
   background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   color: var(--text-primary, #ffffff);
   font-size: 0.9rem;
@@ -158,7 +158,7 @@
   margin-top: 12px;
   padding: 10px 14px;
   background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  border: 2px solid rgba(34, 197, 94, 0.3);
   border-radius: 10px;
   color: #4ade80;
   font-size: 0.85rem;
@@ -186,7 +186,7 @@
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.06);
 }
 
 .search-header h2 {
@@ -213,7 +213,7 @@
   width: 100%;
   padding: 14px 44px;
   background: var(--bg-secondary, #12121a);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   color: var(--text-primary, #ffffff);
   font-size: 0.95rem;
@@ -268,7 +268,7 @@
   background: var(--bg-secondary, #12121a);
   border-radius: 12px;
   margin-bottom: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.04);
   transition: all 0.2s ease;
 }
 
@@ -295,7 +295,7 @@
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.06);
 }
 
 .section-header {
@@ -348,7 +348,7 @@
   padding: 14px;
   background: var(--bg-secondary, #12121a);
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.04);
   transition: all 0.2s ease;
 }
 
@@ -468,7 +468,7 @@
 .btn-secondary {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-primary, #ffffff);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -478,7 +478,7 @@
 .btn-danger {
   background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 2px solid rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger:hover:not(:disabled) {
@@ -488,7 +488,7 @@
 .btn-success {
   background: rgba(34, 197, 94, 0.15);
   color: #4ade80;
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  border: 2px solid rgba(34, 197, 94, 0.3);
 }
 
 .btn-success:hover:not(:disabled) {
@@ -505,7 +505,7 @@
   height: 16px;
   border: 2px solid transparent;
   border-top-color: currentColor;
-  border-radius: 50%;
+  border-radius: 0;
   animation: spin 0.8s linear infinite;
 }
 
@@ -604,7 +604,7 @@
   gap: 12px;
   padding: 14px 18px;
   background: var(--bg-card, #1a1a24);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   animation: toastIn 0.3s ease;
@@ -751,7 +751,7 @@
   gap: 6px;
   padding: 8px 14px;
   background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 2px solid rgba(239, 68, 68, 0.3);
   border-radius: 8px;
   color: #ef4444;
   font-size: 0.8rem;

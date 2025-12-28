@@ -83,23 +83,26 @@
 /* Feed Card */
 .feed-card {
   background: var(--bg-secondary);
-  border-radius: 16px;
+  border-radius: 0;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
   cursor: pointer;
+  border: 2px solid var(--border-color);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .feed-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 rgba(139, 92, 246, 0.4);
 }
 
 .feed-card:active {
-  transform: translateY(0);
+  transform: translate(-1px, -1px);
 }
 
 .feed-card.unread {
-  border-left: 3px solid var(--accent-primary);
+  border-left: 4px solid var(--accent-primary);
+  box-shadow: 6px 6px 0 rgba(139, 92, 246, 0.3);
 }
 
 .feed-header {
@@ -191,9 +194,9 @@
 
 .reaction-btn {
   background: var(--bg-tertiary);
-  border: none;
+  border: 2px solid var(--border-color);
+  border-radius: 0;
   padding: 6px 10px;
-  border-radius: 16px;
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s;
@@ -208,14 +211,16 @@
 }
 
 .reaction-btn.active {
-  background: rgba(124, 92, 255, 0.2);
+  background: var(--accent-primary);
+  color: white;
+  box-shadow: 2px 2px 0 rgba(139, 92, 246, 0.5);
 }
 
 .comment-btn {
   background: var(--bg-tertiary);
-  border: none;
+  border: 2px solid var(--border-color);
+  border-radius: 0;
   padding: 6px 12px;
-  border-radius: 16px;
   cursor: pointer;
   color: var(--text-secondary);
   font-size: 13px;
@@ -293,7 +298,8 @@
 .modal-content {
   position: relative;
   background: var(--bg-secondary);
-  border-radius: 24px 24px 0 0;
+  border-radius: 0;
+  border-top: 4px solid var(--accent-primary);
   width: 100%;
   max-width: 600px;
   max-height: 80vh;

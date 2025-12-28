@@ -1,34 +1,50 @@
-/* Dashboard - Dark Mode Mobile-First Design */
+/* Dashboard - Brutalist Design System */
 
 :root {
-  /* Dark mode color palette */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-card: #1a1a24;
-  --bg-elevated: #22222e;
-  --bg-input: #2a2a38;
+  /* Backgrounds - Richer blacks */
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-card: #111111;
+  --bg-elevated: #1a1a1a;
+  --bg-input: #0a0a0a;
 
+  /* Text - Higher contrast */
   --text-primary: #ffffff;
-  --text-secondary: #a0a0b0;
-  --text-muted: #666680;
+  --text-secondary: #b0b0b0;
+  --text-muted: #707070;
 
-  --accent-primary: #7c5cff;
-  --accent-secondary: #5c8cff;
-  --accent-gradient: linear-gradient(135deg, #7c5cff, #5c8cff);
+  /* Accents - Vibrant */
+  --accent-primary: #8b5cf6;
+  --accent-secondary: #6366f1;
+  --accent-tertiary: #ec4899;
+  --accent-gradient: linear-gradient(135deg, #8b5cf6, #6366f1);
 
-  --success: #4caf50;
-  --warning: #ff9800;
-  --error: #f44336;
+  /* Status colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
 
-  --border-color: rgba(255, 255, 255, 0.08);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  /* Borders - Sharp, high contrast */
+  --border-color: rgba(255, 255, 255, 0.15);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  /* Shadows - Brutal hard shadows */
+  --shadow-sm: 2px 2px 0 rgba(139, 92, 246, 0.2);
+  --shadow-md: 4px 4px 0 rgba(139, 92, 246, 0.3);
+  --shadow-lg: 8px 8px 0 rgba(139, 92, 246, 0.3);
+  --shadow-brutal: 8px 8px 0px rgba(139, 92, 246, 0.3);
+  --shadow-brutal-lg: 12px 12px 0px rgba(139, 92, 246, 0.4);
+
+  /* Geometry - Sharp edges */
+  --radius-none: 0;
+  --radius-sharp: 2px;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+
+  /* Typography */
+  --font-display: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
 
   --bottom-nav-height: 70px;
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -45,7 +61,7 @@ body {
   min-height: 100vh;
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -89,9 +105,12 @@ body::-webkit-scrollbar {
 }
 
 .header-content h1 {
+  font-family: var(--font-display);
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 900;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -168,8 +187,8 @@ body::-webkit-scrollbar {
 /* Icon Buttons */
 .icon-btn {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-none);
   width: 44px;
   height: 44px;
   display: flex;
@@ -178,12 +197,14 @@ body::-webkit-scrollbar {
   cursor: pointer;
   transition: all 0.2s ease;
   color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
 }
 
 .icon-btn:hover, .icon-btn:active {
   background: var(--bg-elevated);
   color: var(--text-primary);
-  transform: scale(1.05);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Connections link */
@@ -235,21 +256,24 @@ body::-webkit-scrollbar {
   min-width: 120px;
   background: var(--bg-card);
   padding: 16px 20px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-none);
   text-align: center;
-  border: 1px solid var(--border-color);
+  border: 3px solid var(--border-color);
   scroll-snap-align: start;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .stat-card:active {
-  transform: scale(0.98);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
 }
 
 .stat-card h3 {
-  font-size: 1.75rem;
+  font-family: var(--font-display);
+  font-size: 2.5rem;
   margin: 0 0 4px 0;
-  font-weight: 700;
+  font-weight: 900;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -270,9 +294,10 @@ body::-webkit-scrollbar {
 .entry-form-container {
   background: var(--bg-card);
   padding: 20px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-none);
   margin-bottom: 24px;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-md);
 }
 
 .entry-form-container h2 {
@@ -285,8 +310,9 @@ body::-webkit-scrollbar {
 .entry-form-container input[type="text"] {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-none);
+  border-bottom: 4px solid var(--accent-primary);
   background: var(--bg-input);
   color: var(--text-primary);
   font-size: 1rem;
@@ -303,6 +329,8 @@ body::-webkit-scrollbar {
   outline: none;
   border-color: var(--accent-primary);
   background: var(--bg-elevated);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .entry-form-container textarea {
@@ -333,9 +361,9 @@ body::-webkit-scrollbar {
 /* Quill Editor Styling */
 .ql-container {
   background: var(--bg-input);
-  border: 1px solid var(--border-color) !important;
+  border: 2px solid var(--border-color) !important;
   border-top: none !important;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  border-radius: 0 !important;
   color: var(--text-primary);
   font-size: 1rem;
   min-height: 180px;
@@ -343,8 +371,8 @@ body::-webkit-scrollbar {
 
 .ql-toolbar {
   background: var(--bg-elevated);
-  border: 1px solid var(--border-color) !important;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0 !important;
   padding: 8px !important;
 }
 
@@ -407,17 +435,17 @@ body::-webkit-scrollbar {
   background: var(--accent-gradient);
   color: white;
   border: none;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-none);
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 16px rgba(124, 92, 255, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .primary-btn:hover, .primary-btn:active {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(124, 92, 255, 0.4);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-brutal);
 }
 
 .primary-btn:disabled {
@@ -431,17 +459,20 @@ body::-webkit-scrollbar {
   padding: 14px 24px;
   background: transparent;
   color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-xl);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-none);
   font-weight: 500;
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .secondary-btn:hover, .secondary-btn:active {
   background: var(--bg-elevated);
   color: var(--text-primary);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ============================================
@@ -468,17 +499,19 @@ body::-webkit-scrollbar {
 .entry {
   background: var(--bg-card);
   padding: 16px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  border-left: 3px solid var(--accent-primary);
+  border-radius: var(--radius-none);
+  border: 2px solid var(--border-color);
+  border-left: 4px solid var(--accent-primary);
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .entry:active {
-  transform: scale(0.99);
+  transform: translate(-2px, -2px);
   background: var(--bg-elevated);
+  box-shadow: var(--shadow-md);
 }
 
 /* Swipe action background */
@@ -656,13 +689,13 @@ body::-webkit-scrollbar {
   right: 16px;
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: var(--radius-none);
   background: var(--accent-gradient);
   border: none;
   color: white;
   font-size: 24px;
   cursor: pointer;
-  box-shadow: var(--shadow-lg), 0 4px 20px rgba(124, 92, 255, 0.4);
+  box-shadow: var(--shadow-brutal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -671,8 +704,8 @@ body::-webkit-scrollbar {
 }
 
 .fab:hover, .fab:active {
-  transform: scale(1.1);
-  box-shadow: var(--shadow-lg), 0 6px 28px rgba(124, 92, 255, 0.5);
+  transform: translate(-2px, -2px) rotate(-5deg);
+  box-shadow: 8px 8px 0 rgba(139, 92, 246, 0.5);
 }
 
 .fab svg {
@@ -689,15 +722,15 @@ body::-webkit-scrollbar {
   left: 0;
   right: 0;
   height: calc(var(--bottom-nav-height) + var(--safe-area-bottom));
-  background: rgba(18, 18, 24, 0.98);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-secondary);
+  border-top: 3px solid var(--accent-primary);
   display: flex;
   justify-content: space-around;
   align-items: center;
   padding-bottom: var(--safe-area-bottom);
   z-index: 1000;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .nav-item {
@@ -708,25 +741,27 @@ body::-webkit-scrollbar {
   padding: 10px 18px;
   background: none;
   border: none;
+  border-radius: var(--radius-none);
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
   position: relative;
-  border-radius: 12px;
 }
 
 .nav-item:hover {
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .nav-item.active {
   color: var(--accent-primary);
+  border-top: 4px solid var(--accent-primary);
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, transparent 100%);
 }
 
 .nav-item.active svg {
-  filter: drop-shadow(0 0 6px rgba(124, 92, 255, 0.5));
+  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
 }
 
 .nav-item svg {

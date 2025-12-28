@@ -18,6 +18,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="animation-styles.css">
 </head>
 <body>
   <div class="dashboard-container">
@@ -39,16 +40,16 @@
     </header>
 
     <!-- Quick Stats - Horizontal Scroll -->
-    <div class="stats-container">
-      <div class="stat-card">
+    <div class="stats-container" data-animate="geometric" data-stagger>
+      <div class="stat-card stagger-item">
         <h3 id="entryCount">0</h3>
         <p>Entries</p>
       </div>
-      <div class="stat-card">
+      <div class="stat-card stagger-item">
         <h3 id="streakCount">0</h3>
         <p>Day Streak</p>
       </div>
-      <div class="stat-card">
+      <div class="stat-card stagger-item">
         <h3 id="wordCount">0</h3>
         <p>Words</p>
       </div>
@@ -67,7 +68,7 @@
     </div>
 
     <!-- New Entry Form with Quill -->
-    <div class="entry-form-container" id="entryFormContainer">
+    <div class="entry-form-container" id="entryFormContainer" data-animate="slide">
       <h2>What's on your mind?</h2>
       <form id="entryForm">
         <input type="text" id="entryTitle" placeholder="Title (optional)" autocomplete="off">
@@ -351,5 +352,6 @@
 
   <!-- Dashboard Logic -->
   <script type="module" src="dashboard.js"></script>
+  <script src="scroll-animations.js"></script>
 </body>
 </html>

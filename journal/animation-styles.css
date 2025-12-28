@@ -1,0 +1,280 @@
+/**
+ * Brutalist Animation Styles
+ * Keyframes and utility classes for scroll animations
+ */
+
+/* ====================
+   Keyframe Animations
+   ==================== */
+
+@keyframes geometricReveal {
+  from {
+    opacity: 0;
+    transform: translateY(60px) skewY(-2deg);
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) skewY(0);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+@keyframes brutalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100px) rotate(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(0);
+  }
+}
+
+@keyframes brutalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card3DFlip {
+  from {
+    transform: perspective(1000px) rotateY(-90deg);
+    opacity: 0;
+  }
+  to {
+    transform: perspective(1000px) rotateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes skewReveal {
+  from {
+    transform: skewX(-10deg) translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: skewX(0) translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.05) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* ====================
+   Utility Classes
+   ==================== */
+
+[data-animate] {
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-animate].animate-in {
+  opacity: 1;
+}
+
+/* Geometric reveal */
+[data-animate="geometric"] {
+  animation: geometricReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+[data-animate="geometric"].animate-in {
+  opacity: 1;
+}
+
+/* Brutal slide */
+[data-animate="slide"] {
+  animation: brutalSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Fade in */
+[data-animate="fade"] {
+  animation: brutalFadeIn 0.6s ease-out forwards;
+}
+
+/* 3D flip */
+[data-animate="flip"] {
+  animation: card3DFlip 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Skew reveal */
+[data-animate="skew"] {
+  animation: skewReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Pop in */
+[data-animate="pop"] {
+  animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* ====================
+   Stagger Support
+   ==================== */
+
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stagger-item.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Entry and card stagger animations */
+.entry.animate-in,
+.stat-card.animate-in,
+.feed-card.animate-in {
+  animation: brutalFadeIn 0.6s ease-out forwards;
+}
+
+/* ====================
+   Parallax Elements
+   ==================== */
+
+[data-parallax] {
+  will-change: transform;
+  transition: transform 0.1s ease-out;
+}
+
+/* ====================
+   3D Card Effects
+   ==================== */
+
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.stat-card,
+.entry,
+.feed-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ====================
+   Hover Enhancements
+   ==================== */
+
+.stat-card:hover,
+.entry:hover,
+.feed-card:hover {
+  animation: none; /* Prevent conflict with scroll animations */
+}
+
+/* ====================
+   Loading States
+   ==================== */
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0%,
+    var(--bg-elevated) 50%,
+    var(--bg-secondary) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ====================
+   Performance Hints
+   ==================== */
+
+.animate-in,
+[data-animate],
+[data-parallax],
+.card-3d,
+.stat-card,
+.entry,
+.feed-card {
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
+/* ====================
+   Entrance Delays
+   ==================== */
+
+.stat-card:nth-child(1) { animation-delay: 0ms; }
+.stat-card:nth-child(2) { animation-delay: 100ms; }
+.stat-card:nth-child(3) { animation-delay: 200ms; }
+.stat-card:nth-child(4) { animation-delay: 300ms; }
+
+.entry:nth-child(1), .feed-card:nth-child(1) { animation-delay: 0ms; }
+.entry:nth-child(2), .feed-card:nth-child(2) { animation-delay: 100ms; }
+.entry:nth-child(3), .feed-card:nth-child(3) { animation-delay: 200ms; }
+.entry:nth-child(4), .feed-card:nth-child(4) { animation-delay: 300ms; }
+.entry:nth-child(5), .feed-card:nth-child(5) { animation-delay: 400ms; }
+
+/* ====================
+   Reduced Motion
+   ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-parallax] {
+    transform: none !important;
+  }
+
+  .card-3d,
+  .stat-card,
+  .entry,
+  .feed-card {
+    transform: none !important;
+  }
+
+  [data-animate] {
+    opacity: 1 !important;
+  }
+}
