@@ -54,3 +54,24 @@ serviceAccountKey.json
 firebaseConfig.js
 firebase-debug.log
 .cache/
+
+# Lambda deployment artifacts
+function.zip
+**/function.zip
+
+# Secrets files
+secrets.js
+**/secrets.js
+
+# Large media files (videos)
+*.mov
+*.mp4
+
+# Local settings
+.claude/settings.local.json
+
+# iOS build artifacts
+ios/**/Pods/
+ios/**/*.xcworkspace
+ios/**/DerivedData/
+ios/**/.build/

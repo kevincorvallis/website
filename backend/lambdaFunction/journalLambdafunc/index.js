@@ -1,4 +1,3 @@
-const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
 const crypto = require('crypto');
@@ -7,6 +6,10 @@ const { CognitoIdentityProviderClient, AdminDeleteUserCommand } = require('@aws-
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
+
+// DynamoDB imports
+const db = require('./db/dynamodb');
+const cache = require('./db/cache');
 
 // Initialize SNS client for SMS
 const snsClient = new SNSClient({ region: 'us-west-1' });
@@ -25,7 +28,8 @@ const SES_SENDER_EMAIL = process.env.SES_SENDER_EMAIL || 'kevinleems@outlook.com
 // ============================================
 // CONFIGURATION
 // ============================================
-const mysqlDatabase = 'journaldb';
+// Initialize cache on Lambda cold start
+cache.init().catch(err => console.error('Cache initialization failed:', err));
 
 // API Paths
 const PATHS = {
@@ -65,7 +69,11 @@ const PATHS = {
   // Account management
   account: '/journalLambdafunc/account',
   // Image upload
-  uploadUrl: '/journalLambdafunc/upload-url'
+  uploadUrl: '/journalLambdafunc/upload-url',
+  // Trips
+  trips: '/journalLambdafunc/trips',
+  trip: '/journalLambdafunc/trip',
+  tripsSharedWithMe: '/journalLambdafunc/trips/shared-with-me'
 };
 
 // Cognito Configuration
@@ -110,16 +118,10 @@ function verifyCognitoToken(token) {
 }
 
 // ============================================
-// DATABASE CONNECTION
+// DATABASE CONNECTION (DynamoDB)
 // ============================================
-async function getConnection() {
-  return mysql.createConnection({
-    host: process.env.RDS_HOSTNAME,
-    user: process.env.RDS_USERNAME,
-    password: process.env.RDS_PASSWORD,
-    database: mysqlDatabase
-  });
-}
+// No connection pooling needed for DynamoDB - SDK handles this
+// Data access layer is in ./db/dynamodb.js
 
 // ============================================
 // VALIDATION
@@ -288,7 +290,7 @@ async function getEntries(event, conn) {
     return errorResponse(401, 'Authentication required');
   }
 
-  // Ensure user exists in users table (important for OAuth users)
+  // Ensure user exists (important for OAuth users)
   const authHeader = event.headers?.Authorization || event.headers?.authorization;
   if (authHeader) {
     try {
@@ -296,36 +298,61 @@ async function getEntries(event, conn) {
       const decoded = jwt.decode(token);
       const email = decoded?.email;
       const displayName = decoded?.name || decoded?.given_name || (email ? email.split('@')[0] : null);
-      await ensureUser(conn, uid, email, displayName);
+
+      // Check if user exists, create if not
+      let user = await db.getUserByUid(uid);
+      if (!user) {
+        await db.createUser({
+          uid,
+          username: displayName,
+          email: email,
+          firstName: decoded?.given_name || null,
+          lastName: decoded?.family_name || null
+        });
+      }
     } catch (e) {
       // Silently continue - user creation is best effort
+      console.log('Could not ensure user exists:', e.message);
     }
   }
 
   const since = event.queryStringParameters?.since;
 
   try {
-    let sql = `
-      SELECT entry_id, firebase_uid, date, title, text, prompt_id, client_id,
-             image_url, latitude, longitude, location_name,
-             created_at, updated_at, is_deleted
-      FROM journal_entries
-      WHERE firebase_uid = ? AND is_deleted = 0
-    `;
-    const params = [uid];
+    // Get entries from DynamoDB
+    const entries = await db.getEntries(uid, null, null, 1000);
 
+    // Filter by updatedAt if since parameter provided
+    let filteredEntries = entries;
     if (since) {
-      sql += ' AND updated_at > ?';
-      params.push(new Date(parseInt(since)));
+      const sinceTime = parseInt(since);
+      filteredEntries = entries.filter(entry => {
+        const updatedAt = new Date(entry.updatedAt).getTime();
+        return updatedAt > sinceTime;
+      });
     }
 
-    sql += ' ORDER BY date ASC';
-
-    const [rows] = await conn.execute(sql, params);
+    // Format entries to match old MySQL structure
+    const formattedEntries = filteredEntries.map(entry => ({
+      entry_id: entry.entryId,
+      firebase_uid: entry.ownerUid,
+      date: entry.date,
+      title: entry.title,
+      text: entry.text,
+      prompt_id: entry.promptId,
+      client_id: entry.clientId,
+      image_url: entry.imageUrl,
+      latitude: entry.latitude,
+      longitude: entry.longitude,
+      location_name: entry.locationName,
+      created_at: entry.createdAt,
+      updated_at: entry.updatedAt,
+      is_deleted: entry.isDeleted ? 1 : 0
+    }));
 
     return buildResponse(200, {
-      entries: rows,
-      count: rows.length,
+      entries: formattedEntries,
+      count: formattedEntries.length,
       syncTime: Date.now()
     });
   } catch (error) {
@@ -434,37 +461,51 @@ async function createEntry(event, conn) {
   }
 
   try {
-    const sql = `
-      INSERT INTO journal_entries (firebase_uid, date, title, text, prompt_id, client_id, image_url, latitude, longitude, location_name)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
     const entryDate = date ? new Date(date) : new Date();
-    const [result] = await conn.execute(sql, [
-      uid,
-      entryDate,
+
+    // Create entry in DynamoDB
+    const entry = await db.createEntry({
+      ownerUid: uid,
+      date: entryDate.toISOString(),
       title,
       text,
-      prompt_id || null,
-      client_id || null,
-      image_url || null,
-      latitude || null,
-      longitude || null,
-      location_name || null
-    ]);
-
-    // Fetch the created entry
-    const [rows] = await conn.execute(
-      'SELECT * FROM journal_entries WHERE entry_id = ?',
-      [result.insertId]
-    );
+      promptId: prompt_id || null,
+      clientId: client_id || null,
+      imageUrl: image_url || null,
+      latitude: latitude || null,
+      longitude: longitude || null,
+      locationName: location_name || null
+    });
 
     // Update user streak
-    const streakData = await updateUserStreak(conn, uid, entryDate);
+    const streakData = await db.updateStreakOnEntry(uid, entryDate);
+
+    // Format entry response to match old MySQL structure
+    const formattedEntry = {
+      entry_id: entry.entryId,
+      firebase_uid: entry.ownerUid,
+      date: entry.date,
+      title: entry.title,
+      text: entry.text,
+      prompt_id: entry.promptId,
+      client_id: entry.clientId,
+      image_url: entry.imageUrl,
+      latitude: entry.latitude,
+      longitude: entry.longitude,
+      location_name: entry.locationName,
+      created_at: entry.createdAt,
+      updated_at: entry.updatedAt,
+      is_deleted: entry.isDeleted ? 1 : 0
+    };
 
     return buildResponse(201, {
       message: 'Entry created',
-      entry: rows[0],
-      streak: streakData
+      entry: formattedEntry,
+      streak: {
+        current_streak: streakData.currentStreak,
+        longest_streak: streakData.longestStreak,
+        is_new_streak: streakData.isNewStreak
+      }
     });
   } catch (error) {
     console.error('Error creating entry:', error);
@@ -509,65 +550,60 @@ async function updateEntry(event, conn) {
   }
 
   try {
-    // Verify ownership
-    const [existing] = await conn.execute(
-      'SELECT * FROM journal_entries WHERE entry_id = ? AND firebase_uid = ?',
-      [entryId, uid]
-    );
-
-    if (existing.length === 0) {
-      return errorResponse(404, 'Entry not found or not authorized');
-    }
-
-    // Update
-    const updates = [];
-    const params = [];
+    // Build updates object
+    const updates = {};
 
     if (title !== undefined) {
-      updates.push('title = ?');
-      params.push(title);
+      updates.title = title;
     }
     if (text !== undefined) {
-      updates.push('text = ?');
-      params.push(text);
+      updates.text = text;
     }
     if (image_url !== undefined) {
-      updates.push('image_url = ?');
-      params.push(image_url);
+      updates.imageUrl = image_url;
     }
     if (latitude !== undefined) {
-      updates.push('latitude = ?');
-      params.push(latitude);
+      updates.latitude = latitude;
     }
     if (longitude !== undefined) {
-      updates.push('longitude = ?');
-      params.push(longitude);
+      updates.longitude = longitude;
     }
     if (location_name !== undefined) {
-      updates.push('location_name = ?');
-      params.push(location_name);
+      updates.locationName = location_name;
     }
 
-    if (updates.length === 0) {
+    if (Object.keys(updates).length === 0) {
       return errorResponse(400, 'No fields to update');
     }
 
-    params.push(entryId, uid);
+    // Update entry in DynamoDB (will verify ownership)
+    const entry = await db.updateEntry(entryId, uid, updates);
 
-    await conn.execute(
-      `UPDATE journal_entries SET ${updates.join(', ')} WHERE entry_id = ? AND firebase_uid = ?`,
-      params
-    );
+    if (!entry) {
+      return errorResponse(404, 'Entry not found or not authorized');
+    }
 
-    // Fetch updated entry
-    const [rows] = await conn.execute(
-      'SELECT * FROM journal_entries WHERE entry_id = ?',
-      [entryId]
-    );
+    // Format entry response to match old MySQL structure
+    const formattedEntry = {
+      entry_id: entry.entryId,
+      firebase_uid: entry.ownerUid,
+      date: entry.date,
+      title: entry.title,
+      text: entry.text,
+      prompt_id: entry.promptId,
+      client_id: entry.clientId,
+      image_url: entry.imageUrl,
+      latitude: entry.latitude,
+      longitude: entry.longitude,
+      location_name: entry.locationName,
+      created_at: entry.createdAt,
+      updated_at: entry.updatedAt,
+      is_deleted: entry.isDeleted ? 1 : 0
+    };
 
     return buildResponse(200, {
       message: 'Entry updated',
-      entry: rows[0]
+      entry: formattedEntry
     });
   } catch (error) {
     console.error('Error updating entry:', error);
@@ -588,19 +624,16 @@ async function deleteEntry(event, conn) {
   }
 
   try {
-    // Verify ownership and soft delete
-    const [result] = await conn.execute(
-      'UPDATE journal_entries SET is_deleted = 1 WHERE entry_id = ? AND firebase_uid = ?',
-      [entryId, uid]
-    );
+    // Soft delete entry in DynamoDB (will verify ownership)
+    const success = await db.deleteEntry(entryId, uid);
 
-    if (result.affectedRows === 0) {
+    if (!success) {
       return errorResponse(404, 'Entry not found or not authorized');
     }
 
     return buildResponse(200, {
       message: 'Entry deleted',
-      entry_id: parseInt(entryId)
+      entry_id: entryId
     });
   } catch (error) {
     console.error('Error deleting entry:', error);
@@ -615,7 +648,7 @@ async function syncEntries(event, conn) {
     return errorResponse(401, 'Authentication required');
   }
 
-  // Ensure user exists in users table (important for OAuth users)
+  // Ensure user exists (important for OAuth users)
   const authHeader = event.headers?.Authorization || event.headers?.authorization;
   if (authHeader) {
     try {
@@ -623,9 +656,20 @@ async function syncEntries(event, conn) {
       const decoded = jwt.decode(token);
       const email = decoded?.email;
       const displayName = decoded?.name || decoded?.given_name || (email ? email.split('@')[0] : null);
-      await ensureUser(conn, uid, email, displayName);
+
+      // Check if user exists, create if not
+      let user = await db.getUserByUid(uid);
+      if (!user) {
+        await db.createUser({
+          uid,
+          username: displayName,
+          email: email,
+          firstName: decoded?.given_name || null,
+          lastName: decoded?.family_name || null
+        });
+      }
     } catch (e) {
-      console.log('Could not extract user details from token for ensureUser:', e.message);
+      console.log('Could not ensure user exists:', e.message);
     }
   }
 
@@ -648,65 +692,90 @@ async function syncEntries(event, conn) {
       conflicts: []
     };
 
+    // Get all user's entries to check for client_id duplicates
+    const existingEntries = await db.getEntries(uid, null, null, 10000);
+    const clientIdMap = new Map();
+    existingEntries.forEach(e => {
+      if (e.clientId) {
+        clientIdMap.set(e.clientId, e.entryId);
+      }
+    });
+
     // Process incoming entries
     for (const entry of entries) {
       if (entry.action === 'create') {
         // Check if client_id already exists (avoid duplicates)
-        if (entry.client_id) {
-          const [existing] = await conn.execute(
-            'SELECT entry_id FROM journal_entries WHERE firebase_uid = ? AND client_id = ?',
-            [uid, entry.client_id]
-          );
-          if (existing.length > 0) {
-            results.updated.push({ client_id: entry.client_id, entry_id: existing[0].entry_id });
-            continue;
-          }
+        if (entry.client_id && clientIdMap.has(entry.client_id)) {
+          results.updated.push({
+            client_id: entry.client_id,
+            entry_id: clientIdMap.get(entry.client_id)
+          });
+          continue;
         }
 
         // Create new entry
-        const [result] = await conn.execute(
-          `INSERT INTO journal_entries (firebase_uid, date, title, text, prompt_id, client_id)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [uid, new Date(entry.date), entry.title, entry.text, entry.prompt_id || null, entry.client_id || null]
-        );
-        results.created.push({ client_id: entry.client_id, entry_id: result.insertId });
+        const newEntry = await db.createEntry({
+          ownerUid: uid,
+          date: new Date(entry.date).toISOString(),
+          title: entry.title,
+          text: entry.text,
+          promptId: entry.prompt_id || null,
+          clientId: entry.client_id || null
+        });
+
+        results.created.push({
+          client_id: entry.client_id,
+          entry_id: newEntry.entryId
+        });
 
       } else if (entry.action === 'update' && entry.entry_id) {
-        await conn.execute(
-          'UPDATE journal_entries SET title = ?, text = ? WHERE entry_id = ? AND firebase_uid = ?',
-          [entry.title, entry.text, entry.entry_id, uid]
-        );
+        await db.updateEntry(entry.entry_id, uid, {
+          title: entry.title,
+          text: entry.text
+        });
         results.updated.push({ entry_id: entry.entry_id });
 
       } else if (entry.action === 'delete' && entry.entry_id) {
-        await conn.execute(
-          'UPDATE journal_entries SET is_deleted = 1 WHERE entry_id = ? AND firebase_uid = ?',
-          [entry.entry_id, uid]
-        );
+        await db.deleteEntry(entry.entry_id, uid);
       }
     }
 
     // Get all entries updated since lastSyncTime
-    let sql = `
-      SELECT entry_id, firebase_uid, date, title, text, prompt_id, client_id,
-             created_at, updated_at, is_deleted
-      FROM journal_entries
-      WHERE firebase_uid = ?
-    `;
-    const params = [uid];
+    const allEntries = await db.getEntries(uid, null, null, 10000);
 
+    let serverEntries = allEntries;
     if (lastSyncTime > 0) {
-      sql += ' AND updated_at > ?';
-      params.push(new Date(lastSyncTime));
+      serverEntries = allEntries.filter(entry => {
+        const updatedAt = new Date(entry.updatedAt).getTime();
+        return updatedAt > lastSyncTime;
+      });
     }
 
-    const [serverEntries] = await conn.execute(sql, params);
+    // Format entries to match old MySQL structure
+    const formattedEntries = serverEntries
+      .filter(e => !e.isDeleted)
+      .map(entry => ({
+        entry_id: entry.entryId,
+        firebase_uid: entry.ownerUid,
+        date: entry.date,
+        title: entry.title,
+        text: entry.text,
+        prompt_id: entry.promptId,
+        client_id: entry.clientId,
+        created_at: entry.createdAt,
+        updated_at: entry.updatedAt,
+        is_deleted: 0
+      }));
+
+    const deletedIds = serverEntries
+      .filter(e => e.isDeleted)
+      .map(e => e.entryId);
 
     return buildResponse(200, {
       message: 'Sync complete',
       results,
-      entries: serverEntries.filter(e => !e.is_deleted),
-      deletedIds: serverEntries.filter(e => e.is_deleted).map(e => e.entry_id),
+      entries: formattedEntries,
+      deletedIds,
       syncTime: syncStartTime  // Use start time to avoid missing concurrent updates
     });
   } catch (error) {
@@ -720,17 +789,18 @@ async function syncEntries(event, conn) {
 // ============================================
 
 // GET /prompts - Get a random prompt
-async function getPrompt(conn) {
+async function getPrompt() {
   try {
-    const [rows] = await conn.execute(
-      'SELECT prompt_id, prompt FROM prompts ORDER BY RAND() LIMIT 1'
-    );
+    const prompt = await db.getRandomPrompt();
 
-    if (rows.length === 0) {
+    if (!prompt) {
       return buildResponse(200, { prompt: 'What is on your mind today?' });
     }
 
-    return buildResponse(200, rows[0]);
+    return buildResponse(200, {
+      prompt_id: prompt.promptId,
+      prompt: prompt.promptText
+    });
   } catch (error) {
     console.error('Error getting prompt:', error);
     return errorResponse(500, 'Failed to get prompt');
@@ -738,7 +808,7 @@ async function getPrompt(conn) {
 }
 
 // POST /prompt - Add a new prompt
-async function addPrompt(event, conn) {
+async function addPrompt(event) {
   const uid = await getAuthenticatedUid(event);
   if (!uid) {
     return errorResponse(401, 'Authentication required');
@@ -758,14 +828,11 @@ async function addPrompt(event, conn) {
   }
 
   try {
-    const [result] = await conn.execute(
-      'INSERT INTO prompts (prompt, firebase_uid) VALUES (?, ?)',
-      [prompt, uid]
-    );
+    const newPrompt = await db.createPrompt(prompt, uid);
 
     return buildResponse(201, {
       message: 'Prompt added',
-      prompt_id: result.insertId
+      prompt_id: newPrompt.promptId
     });
   } catch (error) {
     console.error('Error adding prompt:', error);
@@ -806,21 +873,17 @@ async function searchUsers(event, conn) {
   }
 
   try {
-    const [rows] = await conn.execute(
-      `SELECT user_id, firebase_uid, username, email, first_name
-       FROM users
-       WHERE firebase_uid != ?
-         AND (username LIKE ? OR email LIKE ? OR first_name LIKE ?)
-       LIMIT 20`,
-      [uid, `%${query}%`, `%${query}%`, `%${query}%`]
-    );
+    // Search users in DynamoDB
+    const results = await db.searchUsers(query, 20);
 
-    // Return sanitized results (no sensitive data)
-    const users = rows.map(u => ({
-      user_id: u.user_id,
-      uid: u.firebase_uid,
-      displayName: u.first_name || u.username || u.email?.split('@')[0] || 'User'
-    }));
+    // Filter out current user and format response
+    const users = results
+      .filter(u => u.uid !== uid)
+      .map(u => ({
+        user_id: u.uid, // Using uid as user_id for compatibility
+        uid: u.uid,
+        displayName: u.firstName || u.username || u.email?.split('@')[0] || 'User'
+      }));
 
     return buildResponse(200, { users });
   } catch (error) {
@@ -903,23 +966,30 @@ async function discoverUsers(event, conn) {
 }
 
 // GET /users/profile - Get current user's profile
-async function getUserProfile(event, conn) {
+async function getUserProfile(event) {
   const uid = await getAuthenticatedUid(event);
   if (!uid) {
     return errorResponse(401, 'Authentication required');
   }
 
   try {
-    const [rows] = await conn.execute(
-      'SELECT user_id, firebase_uid, username, email, first_name, last_name, created_at FROM users WHERE firebase_uid = ?',
-      [uid]
-    );
+    const user = await db.getUserByUid(uid);
 
-    if (rows.length === 0) {
+    if (!user) {
       return buildResponse(200, { profile: null });
     }
 
-    return buildResponse(200, { profile: rows[0] });
+    // Format response to match old structure
+    const profile = {
+      firebase_uid: user.uid,
+      username: user.username,
+      email: user.email,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      created_at: user.createdAt
+    };
+
+    return buildResponse(200, { profile });
   } catch (error) {
     console.error('Error getting profile:', error);
     return errorResponse(500, 'Failed to get profile');
@@ -927,7 +997,7 @@ async function getUserProfile(event, conn) {
 }
 
 // PUT /users/profile - Update display name
-async function updateUserProfile(event, conn) {
+async function updateUserProfile(event) {
   const uid = await getAuthenticatedUid(event);
   if (!uid) {
     return errorResponse(401, 'Authentication required');
@@ -940,23 +1010,48 @@ async function updateUserProfile(event, conn) {
     return errorResponse(400, 'Invalid JSON body');
   }
 
-  const { displayName, email } = body;
+  const { displayName, email, firstName, lastName } = body;
 
   if (displayName && (typeof displayName !== 'string' || displayName.length > 100)) {
     return errorResponse(400, 'Display name must be under 100 characters');
   }
 
   try {
-    await ensureUser(conn, uid, email, displayName);
+    // Check if user exists
+    let user = await db.getUserByUid(uid);
 
-    const [rows] = await conn.execute(
-      'SELECT user_id, firebase_uid, username, email FROM users WHERE firebase_uid = ?',
-      [uid]
-    );
+    if (!user) {
+      // Create new user
+      user = await db.createUser({
+        uid,
+        username: displayName || null,
+        email: email || null,
+        firstName: firstName || null,
+        lastName: lastName || null
+      });
+    } else {
+      // Update existing user
+      const updates = {};
+      if (displayName !== undefined) updates.username = displayName;
+      if (email !== undefined) updates.email = email;
+      if (firstName !== undefined) updates.firstName = firstName;
+      if (lastName !== undefined) updates.lastName = lastName;
+
+      user = await db.updateUserProfile(uid, updates);
+    }
+
+    // Format response to match old structure
+    const profile = {
+      firebase_uid: user.uid,
+      username: user.username,
+      email: user.email,
+      first_name: user.firstName,
+      last_name: user.lastName
+    };
 
     return buildResponse(200, {
       message: 'Profile updated',
-      profile: rows[0]
+      profile
     });
   } catch (error) {
     console.error('Error updating profile:', error);
@@ -993,69 +1088,22 @@ async function requestConnection(event, conn) {
 
   try {
     // Check if target user exists
-    const [targetUser] = await conn.execute(
-      'SELECT firebase_uid FROM users WHERE firebase_uid = ?',
-      [targetUid]
-    );
-
-    if (targetUser.length === 0) {
+    const targetUser = await db.getUserByUid(targetUid);
+    if (!targetUser) {
       return errorResponse(404, 'User not found');
     }
 
-    // Check for existing connection (either direction)
-    const [existing] = await conn.execute(
-      `SELECT connection_id, status, requester_uid FROM connections
-       WHERE (requester_uid = ? AND target_uid = ?)
-          OR (requester_uid = ? AND target_uid = ?)`,
-      [uid, targetUid, targetUid, uid]
-    );
-
-    if (existing.length > 0) {
-      const existingConn = existing[0];
-      if (existingConn.status === 'accepted') {
-        return errorResponse(400, 'Already connected');
-      }
-      if (existingConn.status === 'pending') {
-        // If they sent us a request, auto-accept
-        if (existingConn.requester_uid === targetUid) {
-          await conn.execute(
-            'UPDATE connections SET status = "accepted" WHERE connection_id = ?',
-            [existingConn.connection_id]
-          );
-          return buildResponse(200, { message: 'Connection accepted', status: 'accepted' });
-        }
-        return errorResponse(400, 'Connection request already pending');
-      }
-      if (existingConn.status === 'blocked') {
-        return errorResponse(403, 'Cannot connect with this user');
-      }
-    }
-
-    // Create new connection request
-    const [result] = await conn.execute(
-      'INSERT INTO connections (requester_uid, target_uid, status) VALUES (?, ?, "pending")',
-      [uid, targetUid]
-    );
+    // Create connection request in DynamoDB (handles auto-accept logic internally)
+    const connection = await db.createConnectionRequest(uid, targetUid);
 
     // Send email notification to target user (non-blocking)
     try {
-      // Get requester's display name
-      const [requesterInfo] = await conn.execute(
-        'SELECT first_name, username FROM users WHERE firebase_uid = ?',
-        [uid]
-      );
-      const requesterName = requesterInfo[0]?.first_name || requesterInfo[0]?.username || 'Someone';
+      const requester = await db.getUserByUid(uid);
+      const requesterName = requester?.firstName || requester?.username || 'Someone';
 
-      // Get target's email
-      const [targetInfo] = await conn.execute(
-        'SELECT email FROM users WHERE firebase_uid = ?',
-        [targetUid]
-      );
-      const targetEmail = targetInfo[0]?.email;
-
-      if (targetEmail) {
+      if (targetUser.email) {
         const { subject, htmlBody, textBody } = generateFriendRequestEmail(requesterName);
-        sendEmail(targetEmail, subject, htmlBody, textBody); // Fire and forget
+        sendEmail(targetUser.email, subject, htmlBody, textBody); // Fire and forget
       }
     } catch (emailError) {
       console.error('Error sending friend request email:', emailError);
@@ -1063,10 +1111,18 @@ async function requestConnection(event, conn) {
     }
 
     return buildResponse(201, {
-      message: 'Connection request sent',
-      connection_id: result.insertId
+      message: connection.status === 'accepted' ? 'Connection accepted' : 'Connection request sent',
+      connection_id: connection.connectionId,
+      status: connection.status
     });
   } catch (error) {
+    // Handle specific error cases from DynamoDB layer
+    if (error.message.includes('Already connected')) {
+      return errorResponse(400, 'Already connected');
+    }
+    if (error.message.includes('already pending')) {
+      return errorResponse(400, 'Connection request already pending');
+    }
     console.error('Error requesting connection:', error);
     return errorResponse(500, 'Failed to send connection request');
   }
@@ -1080,35 +1136,21 @@ async function getConnections(event, conn) {
   }
 
   try {
-    // Single query with JOIN to avoid N+1 problem
-    const [rows] = await conn.execute(
-      `SELECT
-        c.connection_id,
-        c.created_at as connected_at,
-        CASE WHEN c.requester_uid = ? THEN c.target_uid ELSE c.requester_uid END as connected_uid,
-        u.user_id,
-        u.username,
-        u.email,
-        u.first_name,
-        u.phone_verified
-       FROM connections c
-       JOIN users u ON u.firebase_uid = CASE WHEN c.requester_uid = ? THEN c.target_uid ELSE c.requester_uid END
-       WHERE (c.requester_uid = ? OR c.target_uid = ?) AND c.status = 'accepted'
-       ORDER BY c.created_at DESC`,
-      [uid, uid, uid, uid]
-    );
+    // Get accepted connections from DynamoDB
+    const connections = await db.getConnections(uid, 'accepted');
 
-    const connections = rows.map(row => ({
-      connection_id: row.connection_id,
-      uid: row.connected_uid,
-      displayName: row.first_name || row.username || row.email?.split('@')[0] || 'User',
-      first_name: row.first_name,
-      username: row.username,
-      phone_verified: row.phone_verified === 1,
-      connected_at: row.connected_at
+    // Format response to match old structure
+    const formattedConnections = connections.map(conn => ({
+      connection_id: conn.connectionId,
+      uid: conn.otherUserUid,
+      displayName: conn.otherUserFirstName || conn.otherUserUsername || conn.otherUserEmail?.split('@')[0] || 'User',
+      first_name: conn.otherUserFirstName,
+      username: conn.otherUserUsername,
+      phone_verified: conn.otherUserPhoneVerified || false,
+      connected_at: conn.createdAt
     }));
 
-    return buildResponse(200, { connections });
+    return buildResponse(200, { connections: formattedConnections });
   } catch (error) {
     console.error('Error getting connections:', error);
     return errorResponse(500, 'Failed to get connections');
@@ -1123,29 +1165,18 @@ async function getPendingConnections(event, conn) {
   }
 
   try {
-    // Single query with JOIN to avoid N+1 problem
-    const [rows] = await conn.execute(
-      `SELECT
-        c.connection_id,
-        c.requester_uid,
-        c.created_at as requested_at,
-        u.user_id,
-        u.username,
-        u.email,
-        u.first_name
-       FROM connections c
-       JOIN users u ON u.firebase_uid = c.requester_uid
-       WHERE c.target_uid = ? AND c.status = 'pending'
-       ORDER BY c.created_at DESC`,
-      [uid]
-    );
+    // Get pending connections from DynamoDB (where uid is the target)
+    const allPending = await db.getConnections(uid, 'pending');
 
-    const pending = rows.map(row => ({
-      connection_id: row.connection_id,
-      uid: row.requester_uid,
-      displayName: row.first_name || row.username || row.email?.split('@')[0] || 'User',
-      requested_at: row.requested_at
-    }));
+    // Filter to only show incoming requests (where uid is NOT the requester)
+    const pending = allPending
+      .filter(conn => conn.requesterUid !== uid)
+      .map(conn => ({
+        connection_id: conn.connectionId,
+        uid: conn.requesterUid || conn.otherUserUid,
+        displayName: conn.otherUserFirstName || conn.otherUserUsername || conn.otherUserEmail?.split('@')[0] || 'User',
+        requested_at: conn.createdAt
+      }));
 
     return buildResponse(200, { pending, count: pending.length });
   } catch (error) {
@@ -1167,38 +1198,27 @@ async function acceptConnection(event, conn) {
   }
 
   try {
-    // Verify this is a pending request to the current user
-    const [rows] = await conn.execute(
-      'SELECT * FROM connections WHERE connection_id = ? AND target_uid = ? AND status = "pending"',
-      [connectionId, uid]
-    );
+    // Get all pending connections to find the one with this connectionId
+    const pendingConnections = await db.getConnections(uid, 'pending');
+    const connection = pendingConnections.find(c => c.connectionId === connectionId);
 
-    if (rows.length === 0) {
+    if (!connection) {
       return errorResponse(404, 'Connection request not found');
     }
 
-    const requesterUid = rows[0].requester_uid;
+    // Determine the requester UID (the other person who sent the request)
+    const requesterUid = connection.requesterUid === uid ? connection.targetUid : connection.requesterUid;
 
-    await conn.execute(
-      'UPDATE connections SET status = "accepted" WHERE connection_id = ?',
-      [connectionId]
-    );
+    // Accept the connection
+    await db.acceptConnectionRequest(requesterUid, uid);
 
     // Send email notification to requester (non-blocking)
     try {
-      // Get accepter's display name
-      const [accepterInfo] = await conn.execute(
-        'SELECT first_name, username FROM users WHERE firebase_uid = ?',
-        [uid]
-      );
-      const accepterName = accepterInfo[0]?.first_name || accepterInfo[0]?.username || 'Someone';
+      const accepter = await db.getUserByUid(uid);
+      const accepterName = accepter?.firstName || accepter?.username || 'Someone';
 
-      // Get requester's email
-      const [requesterInfo] = await conn.execute(
-        'SELECT email FROM users WHERE firebase_uid = ?',
-        [requesterUid]
-      );
-      const requesterEmail = requesterInfo[0]?.email;
+      const requester = await db.getUserByUid(requesterUid);
+      const requesterEmail = requester?.email;
 
       if (requesterEmail) {
         const { subject, htmlBody, textBody } = generateRequestAcceptedEmail(accepterName);
@@ -1229,19 +1249,19 @@ async function declineConnection(event, conn) {
   }
 
   try {
-    const [rows] = await conn.execute(
-      'SELECT * FROM connections WHERE connection_id = ? AND target_uid = ? AND status = "pending"',
-      [connectionId, uid]
-    );
+    // Get all pending connections to find the one with this connectionId
+    const pendingConnections = await db.getConnections(uid, 'pending');
+    const connection = pendingConnections.find(c => c.connectionId === connectionId);
 
-    if (rows.length === 0) {
+    if (!connection) {
       return errorResponse(404, 'Connection request not found');
     }
 
-    await conn.execute(
-      'UPDATE connections SET status = "declined" WHERE connection_id = ?',
-      [connectionId]
-    );
+    // Determine the requester UID
+    const requesterUid = connection.requesterUid === uid ? connection.targetUid : connection.requesterUid;
+
+    // Decline the connection
+    await db.declineConnectionRequest(requesterUid, uid);
 
     return buildResponse(200, { message: 'Connection declined' });
   } catch (error) {
@@ -1263,15 +1283,17 @@ async function removeConnection(event, conn) {
   }
 
   try {
-    // Verify user is part of this connection
-    const [result] = await conn.execute(
-      'DELETE FROM connections WHERE connection_id = ? AND (requester_uid = ? OR target_uid = ?)',
-      [connectionId, uid, uid]
-    );
+    // Get all connections to find the one with this connectionId
+    const allConnections = await db.getConnections(uid, 'accepted');
+    const connection = allConnections.find(c => c.connectionId === connectionId);
 
-    if (result.affectedRows === 0) {
+    if (!connection) {
       return errorResponse(404, 'Connection not found');
     }
+
+    // Delete the connection
+    const otherUid = connection.otherUserUid;
+    await db.deleteConnection(uid, otherUid);
 
     return buildResponse(200, { message: 'Connection removed' });
   } catch (error) {
@@ -1292,30 +1314,12 @@ async function createInviteLink(event, conn) {
   }
 
   try {
-    // Check if user already has an invite link
-    const [existing] = await conn.execute(
-      'SELECT invite_token FROM invite_links WHERE creator_uid = ?',
-      [uid]
-    );
+    // Create invite link in DynamoDB (returns existing if already exists)
+    const invite = await db.createInviteLink(uid);
 
-    if (existing.length > 0) {
-      return buildResponse(200, {
-        inviteToken: existing[0].invite_token,
-        inviteUrl: `https://klee.page/journal/?invite=${existing[0].invite_token}`
-      });
-    }
-
-    // Generate new token (256-bit entropy, URL-safe)
-    const token = crypto.randomBytes(32).toString('base64url');
-
-    await conn.execute(
-      'INSERT INTO invite_links (invite_token, creator_uid) VALUES (?, ?)',
-      [token, uid]
-    );
-
-    return buildResponse(201, {
-      inviteToken: token,
-      inviteUrl: `https://klee.page/journal/?invite=${token}`
+    return buildResponse(invite.isNew ? 201 : 200, {
+      inviteToken: invite.token,
+      inviteUrl: `https://klee.page/journal/?invite=${invite.token}`
     });
   } catch (error) {
     console.error('Error creating invite link:', error);
@@ -1331,22 +1335,19 @@ async function getInviteInfo(event, conn) {
   }
 
   try {
-    const [rows] = await conn.execute(
-      `SELECT i.creator_uid, u.username, u.email
-       FROM invite_links i
-       JOIN users u ON i.creator_uid = u.firebase_uid
-       WHERE i.invite_token = ?`,
-      [token]
-    );
+    // Get invite from DynamoDB
+    const invite = await db.getInviteByToken(token);
 
-    if (rows.length === 0) {
+    if (!invite) {
       return errorResponse(404, 'Invalid invite link');
     }
 
-    const creator = rows[0];
+    // Get creator info
+    const creator = await db.getUserByUid(invite.creatorUid);
+
     return buildResponse(200, {
       valid: true,
-      creatorName: creator.username || creator.email?.split('@')[0] || 'A friend'
+      creatorName: creator?.username || creator?.email?.split('@')[0] || 'A friend'
     });
   } catch (error) {
     console.error('Error getting invite info:', error);
@@ -1374,52 +1375,24 @@ async function redeemInvite(event, conn) {
   }
 
   try {
-    // Get invite link and creator
-    const [inviteRows] = await conn.execute(
-      'SELECT creator_uid FROM invite_links WHERE invite_token = ?',
-      [token]
-    );
+    // Redeem invite in DynamoDB (handles all logic internally)
+    const result = await db.redeemInvite(token, uid);
 
-    if (inviteRows.length === 0) {
-      return errorResponse(404, 'Invalid invite link');
-    }
-
-    const creatorUid = inviteRows[0].creator_uid;
-
-    // Cannot connect with yourself
-    if (creatorUid === uid) {
-      return errorResponse(400, 'Cannot use your own invite link');
-    }
-
-    // Check for existing connection (either direction)
-    const [existing] = await conn.execute(
-      `SELECT connection_id, status FROM connections
-       WHERE (requester_uid = ? AND target_uid = ?)
-          OR (requester_uid = ? AND target_uid = ?)`,
-      [uid, creatorUid, creatorUid, uid]
-    );
-
-    if (existing.length > 0) {
-      if (existing[0].status === 'accepted') {
-        return buildResponse(200, { message: 'Already connected', alreadyConnected: true });
+    if (result.error) {
+      if (result.error === 'Invalid invite link') {
+        return errorResponse(404, result.error);
       }
-      if (existing[0].status === 'pending') {
-        // Accept the pending request
-        await conn.execute(
-          'UPDATE connections SET status = "accepted" WHERE connection_id = ?',
-          [existing[0].connection_id]
-        );
-        return buildResponse(200, { message: 'Connection accepted', connected: true });
+      if (result.error === 'Cannot use your own invite link') {
+        return errorResponse(400, result.error);
       }
+      return errorResponse(400, result.error);
     }
 
-    // Create new accepted connection (auto-accept since using invite link)
-    await conn.execute(
-      'INSERT INTO connections (requester_uid, target_uid, status) VALUES (?, ?, "accepted")',
-      [creatorUid, uid]
-    );
-
-    return buildResponse(201, { message: 'Connected successfully', connected: true });
+    return buildResponse(result.created ? 201 : 200, {
+      message: result.alreadyConnected ? 'Already connected' : 'Connected successfully',
+      connected: true,
+      alreadyConnected: result.alreadyConnected
+    });
   } catch (error) {
     console.error('Error redeeming invite:', error);
     return errorResponse(500, 'Failed to redeem invite');
@@ -1807,7 +1780,7 @@ function generateRequestAcceptedEmail(accepterName) {
 }
 
 // POST /users/phone - Save phone number and send verification code
-async function sendPhoneVerification(event, conn) {
+async function sendPhoneVerification(event) {
   const uid = await getAuthenticatedUid(event);
   if (!uid) {
     return errorResponse(401, 'Authentication required');
@@ -1839,15 +1812,12 @@ async function sendPhoneVerification(event, conn) {
 
   try {
     // Update user with phone and verification code
-    await conn.execute(
-      `UPDATE users
-       SET phone_number = ?,
-           phone_verification_code = ?,
-           phone_verification_expires = ?,
-           phone_verified = 0
-       WHERE firebase_uid = ?`,
-      [normalizedPhone, verificationCode, expiresAt, uid]
-    );
+    await db.updateUserProfile(uid, {
+      phoneNumber: normalizedPhone,
+      phoneVerificationCode: verificationCode,
+      phoneVerificationExpires: expiresAt.toISOString(),
+      phoneVerified: false
+    });
 
     // Send SMS
     const message = `Your Day by Day verification code is: ${verificationCode}. It expires in 10 minutes.`;
@@ -1868,7 +1838,7 @@ async function sendPhoneVerification(event, conn) {
 }
 
 // POST /users/phone/verify - Verify the OTP code
-async function verifyPhone(event, conn) {
+async function verifyPhone(event) {
   const uid = await getAuthenticatedUid(event);
   if (!uid) {
     return errorResponse(401, 'Authentication required');
@@ -1887,44 +1857,35 @@ async function verifyPhone(event, conn) {
   }
 
   try {
-    // Check verification code
-    const [rows] = await conn.execute(
-      `SELECT phone_verification_code, phone_verification_expires, phone_number
-       FROM users WHERE firebase_uid = ?`,
-      [uid]
-    );
+    // Get user to check verification code
+    const user = await db.getUserByUid(uid);
 
-    if (rows.length === 0) {
+    if (!user) {
       return errorResponse(404, 'User not found');
     }
 
-    const user = rows[0];
-
-    if (!user.phone_verification_code) {
+    if (!user.phoneVerificationCode) {
       return errorResponse(400, 'No verification pending');
     }
 
-    if (new Date() > new Date(user.phone_verification_expires)) {
+    if (new Date() > new Date(user.phoneVerificationExpires)) {
       return errorResponse(400, 'Verification code expired');
     }
 
-    if (user.phone_verification_code !== code) {
+    if (user.phoneVerificationCode !== code) {
       return errorResponse(400, 'Invalid verification code');
     }
 
-    // Mark phone as verified
-    await conn.execute(
-      `UPDATE users
-       SET phone_verified = 1,
-           phone_verification_code = NULL,
-           phone_verification_expires = NULL
-       WHERE firebase_uid = ?`,
-      [uid]
-    );
+    // Mark phone as verified and clear verification data
+    await db.updateUserProfile(uid, {
+      phoneVerified: true,
+      phoneVerificationCode: null,
+      phoneVerificationExpires: null
+    });
 
     return buildResponse(200, {
       message: 'Phone verified successfully',
-      phoneNumber: user.phone_number
+      phoneNumber: user.phoneNumber
     });
   } catch (error) {
     console.error('Error verifying phone:', error);
@@ -2211,26 +2172,22 @@ async function getSharedEntryView(event, conn) {
 }
 
 // GET /users/phone - Get current phone verification status
-async function getPhoneStatus(event, conn) {
+async function getPhoneStatus(event) {
   const uid = await getAuthenticatedUid(event);
   if (!uid) {
     return errorResponse(401, 'Authentication required');
   }
 
   try {
-    const [rows] = await conn.execute(
-      'SELECT phone_number, phone_verified FROM users WHERE firebase_uid = ?',
-      [uid]
-    );
+    const user = await db.getUserByUid(uid);
 
-    if (rows.length === 0) {
+    if (!user) {
       return buildResponse(200, { phoneNumber: null, verified: false });
     }
 
-    const user = rows[0];
     return buildResponse(200, {
-      phoneNumber: user.phone_number ? user.phone_number.slice(0, -4) + '****' : null,
-      verified: !!user.phone_verified
+      phoneNumber: user.phoneNumber ? user.phoneNumber.slice(0, -4) + '****' : null,
+      verified: !!user.phoneVerified
     });
   } catch (error) {
     console.error('Error getting phone status:', error);
@@ -2868,6 +2825,344 @@ async function endAccountabilityPartnership(event, conn) {
 }
 
 // ============================================
+// TRIPS
+// ============================================
+
+// GET /trips - Get all trips for the authenticated user
+async function getTrips(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [trips] = await conn.execute(
+      `SELECT t.*,
+        (SELECT COUNT(*) FROM journal_entries WHERE trip_id = t.trip_id AND is_deleted = 0) as entry_count,
+        (SELECT COUNT(*) FROM trip_shares WHERE trip_id = t.trip_id) as share_count
+       FROM trips t
+       WHERE t.owner_uid = ? AND t.is_active = 1
+       ORDER BY t.created_at DESC`,
+      [uid]
+    );
+
+    return buildResponse(200, trips);
+  } catch (error) {
+    console.error('Error fetching trips:', error);
+    return errorResponse(500, 'Failed to fetch trips');
+  }
+}
+
+// POST /trip - Create a new trip
+async function createTrip(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const data = JSON.parse(event.body || '{}');
+  const { title, description, destination, start_date, end_date, cover_image_url } = data;
+
+  if (!title) {
+    return errorResponse(400, 'Title is required');
+  }
+
+  try {
+    const [result] = await conn.execute(
+      `INSERT INTO trips (owner_uid, title, description, destination, start_date, end_date, cover_image_url)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [uid, title, description || null, destination || null, start_date || null, end_date || null, cover_image_url || null]
+    );
+
+    const [trip] = await conn.execute(
+      'SELECT * FROM trips WHERE trip_id = ?',
+      [result.insertId]
+    );
+
+    return buildResponse(201, trip[0]);
+  } catch (error) {
+    console.error('Error creating trip:', error);
+    return errorResponse(500, 'Failed to create trip');
+  }
+}
+
+// PUT /trip/{id} - Update a trip
+async function updateTrip(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const tripId = event.pathParameters?.id;
+  if (!tripId) {
+    return errorResponse(400, 'Trip ID required');
+  }
+
+  const data = JSON.parse(event.body || '{}');
+  const { title, description, destination, start_date, end_date, cover_image_url } = data;
+
+  try {
+    // Verify ownership
+    const [trips] = await conn.execute(
+      'SELECT * FROM trips WHERE trip_id = ? AND owner_uid = ?',
+      [tripId, uid]
+    );
+
+    if (trips.length === 0) {
+      return errorResponse(404, 'Trip not found or access denied');
+    }
+
+    // Build update query dynamically
+    const updates = [];
+    const values = [];
+
+    if (title !== undefined) {
+      updates.push('title = ?');
+      values.push(title);
+    }
+    if (description !== undefined) {
+      updates.push('description = ?');
+      values.push(description);
+    }
+    if (destination !== undefined) {
+      updates.push('destination = ?');
+      values.push(destination);
+    }
+    if (start_date !== undefined) {
+      updates.push('start_date = ?');
+      values.push(start_date);
+    }
+    if (end_date !== undefined) {
+      updates.push('end_date = ?');
+      values.push(end_date);
+    }
+    if (cover_image_url !== undefined) {
+      updates.push('cover_image_url = ?');
+      values.push(cover_image_url);
+    }
+
+    if (updates.length === 0) {
+      return errorResponse(400, 'No fields to update');
+    }
+
+    values.push(tripId);
+    values.push(uid);
+
+    await conn.execute(
+      `UPDATE trips SET ${updates.join(', ')} WHERE trip_id = ? AND owner_uid = ?`,
+      values
+    );
+
+    const [updatedTrip] = await conn.execute(
+      'SELECT * FROM trips WHERE trip_id = ?',
+      [tripId]
+    );
+
+    return buildResponse(200, updatedTrip[0]);
+  } catch (error) {
+    console.error('Error updating trip:', error);
+    return errorResponse(500, 'Failed to update trip');
+  }
+}
+
+// DELETE /trip/{id} - Delete (soft delete) a trip
+async function deleteTrip(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const tripId = event.pathParameters?.id;
+  if (!tripId) {
+    return errorResponse(400, 'Trip ID required');
+  }
+
+  try {
+    // Verify ownership
+    const [trips] = await conn.execute(
+      'SELECT * FROM trips WHERE trip_id = ? AND owner_uid = ?',
+      [tripId, uid]
+    );
+
+    if (trips.length === 0) {
+      return errorResponse(404, 'Trip not found or access denied');
+    }
+
+    // Soft delete the trip
+    await conn.execute(
+      'UPDATE trips SET is_active = 0 WHERE trip_id = ? AND owner_uid = ?',
+      [tripId, uid]
+    );
+
+    return buildResponse(200, { message: 'Trip deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting trip:', error);
+    return errorResponse(500, 'Failed to delete trip');
+  }
+}
+
+// GET /trip/{id}/entries - Get all entries for a specific trip
+async function getTripEntries(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const tripId = event.pathParameters?.id;
+  if (!tripId) {
+    return errorResponse(400, 'Trip ID required');
+  }
+
+  try {
+    // Check if user owns the trip or has it shared with them
+    const [access] = await conn.execute(
+      `SELECT t.* FROM trips t
+       LEFT JOIN trip_shares ts ON t.trip_id = ts.trip_id AND ts.shared_with_uid = ?
+       WHERE t.trip_id = ? AND (t.owner_uid = ? OR ts.share_id IS NOT NULL)`,
+      [uid, tripId, uid]
+    );
+
+    if (access.length === 0) {
+      return errorResponse(404, 'Trip not found or access denied');
+    }
+
+    // Get entries for the trip
+    const [entries] = await conn.execute(
+      `SELECT e.*, u.username, u.first_name, u.last_name
+       FROM journal_entries e
+       LEFT JOIN users u ON e.firebase_uid = u.firebase_uid
+       WHERE e.trip_id = ? AND e.is_deleted = 0
+       ORDER BY e.date DESC`,
+      [tripId]
+    );
+
+    return buildResponse(200, entries);
+  } catch (error) {
+    console.error('Error fetching trip entries:', error);
+    return errorResponse(500, 'Failed to fetch trip entries');
+  }
+}
+
+// POST /trip/{id}/share - Share a trip with another user
+async function shareTripWithUser(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const tripId = event.pathParameters?.id;
+  if (!tripId) {
+    return errorResponse(400, 'Trip ID required');
+  }
+
+  const data = JSON.parse(event.body || '{}');
+  const { shared_with_uid, permission } = data;
+
+  if (!shared_with_uid) {
+    return errorResponse(400, 'shared_with_uid is required');
+  }
+
+  try {
+    // Verify trip ownership
+    const [trips] = await conn.execute(
+      'SELECT * FROM trips WHERE trip_id = ? AND owner_uid = ?',
+      [tripId, uid]
+    );
+
+    if (trips.length === 0) {
+      return errorResponse(404, 'Trip not found or access denied');
+    }
+
+    // Check if users are connected
+    const [connections] = await conn.execute(
+      `SELECT * FROM connections
+       WHERE ((requester_uid = ? AND target_uid = ?) OR (requester_uid = ? AND target_uid = ?))
+       AND status = 'accepted'`,
+      [uid, shared_with_uid, shared_with_uid, uid]
+    );
+
+    if (connections.length === 0) {
+      return errorResponse(400, 'Can only share with connected users');
+    }
+
+    // Create the share
+    await conn.execute(
+      `INSERT INTO trip_shares (trip_id, owner_uid, shared_with_uid, permission)
+       VALUES (?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE permission = ?`,
+      [tripId, uid, shared_with_uid, permission || 'view', permission || 'view']
+    );
+
+    // Get shared user info
+    const [sharedUser] = await conn.execute(
+      'SELECT username, first_name, last_name, email FROM users WHERE firebase_uid = ?',
+      [shared_with_uid]
+    );
+
+    return buildResponse(201, {
+      message: 'Trip shared successfully',
+      shared_with: sharedUser[0]
+    });
+  } catch (error) {
+    console.error('Error sharing trip:', error);
+    return errorResponse(500, 'Failed to share trip');
+  }
+}
+
+// DELETE /trip/{tripId}/share/{shareId} - Remove trip share
+async function removeTripShare(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  const { tripId, shareId } = event.pathParameters;
+  if (!tripId || !shareId) {
+    return errorResponse(400, 'Trip ID and Share ID required');
+  }
+
+  try {
+    // Verify ownership and delete
+    await conn.execute(
+      'DELETE FROM trip_shares WHERE share_id = ? AND trip_id = ? AND owner_uid = ?',
+      [shareId, tripId, uid]
+    );
+
+    return buildResponse(200, { message: 'Share removed successfully' });
+  } catch (error) {
+    console.error('Error removing trip share:', error);
+    return errorResponse(500, 'Failed to remove share');
+  }
+}
+
+// GET /trips/shared-with-me - Get trips shared with the authenticated user
+async function getTripsSharedWithMe(event, conn) {
+  const uid = await getAuthenticatedUid(event);
+  if (!uid) {
+    return errorResponse(401, 'Authentication required');
+  }
+
+  try {
+    const [trips] = await conn.execute(
+      `SELECT t.*, ts.permission, ts.shared_at,
+        u.username as owner_username, u.first_name as owner_first_name, u.last_name as owner_last_name,
+        (SELECT COUNT(*) FROM journal_entries WHERE trip_id = t.trip_id AND is_deleted = 0) as entry_count
+       FROM trip_shares ts
+       JOIN trips t ON ts.trip_id = t.trip_id
+       JOIN users u ON t.owner_uid = u.firebase_uid
+       WHERE ts.shared_with_uid = ? AND t.is_active = 1
+       ORDER BY ts.shared_at DESC`,
+      [uid]
+    );
+
+    return buildResponse(200, trips);
+  } catch (error) {
+    console.error('Error fetching shared trips:', error);
+    return errorResponse(500, 'Failed to fetch shared trips');
+  }
+}
+
+// ============================================
 // SCHEMA INITIALIZATION
 // ============================================
 async function initializeSchema(conn) {
@@ -3010,6 +3305,34 @@ async function initializeSchema(conn) {
       INDEX idx_user (user_uid),
       INDEX idx_partner (partner_uid)
     );
+
+    CREATE TABLE IF NOT EXISTS trips (
+      trip_id INT AUTO_INCREMENT PRIMARY KEY,
+      owner_uid VARCHAR(128) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      destination VARCHAR(255),
+      start_date DATE,
+      end_date DATE,
+      cover_image_url VARCHAR(512),
+      is_active TINYINT(1) DEFAULT 1,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_owner (owner_uid),
+      INDEX idx_dates (start_date, end_date)
+    );
+
+    CREATE TABLE IF NOT EXISTS trip_shares (
+      share_id INT AUTO_INCREMENT PRIMARY KEY,
+      trip_id INT NOT NULL,
+      owner_uid VARCHAR(128) NOT NULL,
+      shared_with_uid VARCHAR(128) NOT NULL,
+      permission ENUM('view', 'comment') DEFAULT 'view',
+      shared_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE KEY unique_trip_share (trip_id, shared_with_uid),
+      INDEX idx_shared_with (shared_with_uid),
+      INDEX idx_trip (trip_id)
+    );
   `;
 
   // Execute each statement
@@ -3055,7 +3378,10 @@ async function runMigrations(conn) {
     "ALTER TABLE journal_entries ADD COLUMN image_url VARCHAR(512)",
     "ALTER TABLE journal_entries ADD COLUMN latitude DECIMAL(10, 8)",
     "ALTER TABLE journal_entries ADD COLUMN longitude DECIMAL(11, 8)",
-    "ALTER TABLE journal_entries ADD COLUMN location_name VARCHAR(255)"
+    "ALTER TABLE journal_entries ADD COLUMN location_name VARCHAR(255)",
+    // Add trip_id to journal_entries for travel journal
+    "ALTER TABLE journal_entries ADD COLUMN trip_id INT NULL",
+    "ALTER TABLE journal_entries ADD INDEX idx_trip_id (trip_id)"
   ];
 
   const results = [];
@@ -3174,12 +3500,41 @@ exports.handler = async (event, context) => {
     return buildResponse(200, {});
   }
 
+  const method = event.httpMethod;
+  const path = event.path;
+
+  // List of endpoints that have been migrated to DynamoDB (no MySQL connection needed)
+  const dynamoDbEndpoints = [
+    // Tier 1 - Basic endpoints
+    PATHS.health,
+    PATHS.prompts,
+    PATHS.prompt,
+    PATHS.usersProfile,
+    PATHS.usersPhone,
+    PATHS.usersPhoneVerify,
+    PATHS.uploadUrl,
+
+    // Tier 2 - Medium complexity endpoints
+    PATHS.entry,
+    PATHS.entries,
+    PATHS.sync,
+    PATHS.connections,
+    PATHS.connectionsPending,
+    PATHS.connectionsRequest,
+    PATHS.usersSearch,
+    PATHS.inviteCreate,
+    PATHS.invite
+  ];
+
+  const isDynamoDbEndpoint = dynamoDbEndpoints.some(ep => path === ep || path.startsWith(ep));
+
   let conn;
   try {
-    conn = await getConnection();
-
-    const method = event.httpMethod;
-    const path = event.path;
+    // Only create MySQL connection for non-migrated endpoints
+    if (!isDynamoDbEndpoint) {
+      // Note: Uncomment when MySQL is available
+      // conn = await getConnection();
+    }
 
     // Route handling
     switch (true) {
@@ -3197,10 +3552,10 @@ exports.handler = async (event, context) => {
 
       // Prompts
       case method === 'GET' && path === PATHS.prompts:
-        return await getPrompt(conn);
+        return await getPrompt();
 
       case method === 'POST' && path === PATHS.prompt:
-        return await addPrompt(event, conn);
+        return await addPrompt(event);
 
       // Entries - List
       case method === 'GET' && path === PATHS.entries:
@@ -3236,10 +3591,10 @@ exports.handler = async (event, context) => {
         return await discoverUsers(event, conn);
 
       case method === 'GET' && path === PATHS.usersProfile:
-        return await getUserProfile(event, conn);
+        return await getUserProfile(event);
 
       case method === 'PUT' && path === PATHS.usersProfile:
-        return await updateUserProfile(event, conn);
+        return await updateUserProfile(event);
 
       // Connection endpoints
       case method === 'GET' && path === PATHS.connections:
@@ -3288,13 +3643,13 @@ exports.handler = async (event, context) => {
 
       // Phone verification endpoints
       case method === 'GET' && path === PATHS.usersPhone:
-        return await getPhoneStatus(event, conn);
+        return await getPhoneStatus(event);
 
       case method === 'POST' && path === PATHS.usersPhone:
-        return await sendPhoneVerification(event, conn);
+        return await sendPhoneVerification(event);
 
       case method === 'POST' && path === PATHS.usersPhoneVerify:
-        return await verifyPhone(event, conn);
+        return await verifyPhone(event);
 
       // Share with connections endpoints
       case method === 'POST' && /\/journalLambdafunc\/entry\/\d+\/share-with$/.test(path):
@@ -3365,6 +3720,39 @@ exports.handler = async (event, context) => {
       case method === 'DELETE' && /\/journalLambdafunc\/accountability\/\d+$/.test(path):
         event.pathParameters = { id: path.split('/').pop() };
         return await endAccountabilityPartnership(event, conn);
+
+      // Trips
+      case method === 'GET' && path === PATHS.trips:
+        return await getTrips(event, conn);
+
+      case method === 'POST' && path === PATHS.trip:
+        return await createTrip(event, conn);
+
+      case method === 'PUT' && path.startsWith(PATHS.trip + '/'):
+        event.pathParameters = { id: path.split('/').pop() };
+        return await updateTrip(event, conn);
+
+      case method === 'DELETE' && path.startsWith(PATHS.trip + '/') && !path.includes('/entries') && !path.includes('/share'):
+        event.pathParameters = { id: path.split('/').pop() };
+        return await deleteTrip(event, conn);
+
+      case method === 'GET' && /\/journalLambdafunc\/trip\/\d+\/entries$/.test(path):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await getTripEntries(event, conn);
+
+      case method === 'POST' && /\/journalLambdafunc\/trip\/\d+\/share$/.test(path):
+        event.pathParameters = { id: path.split('/')[3] };
+        return await shareTripWithUser(event, conn);
+
+      case method === 'DELETE' && /\/journalLambdafunc\/trip\/\d+\/share\/\d+$/.test(path):
+        event.pathParameters = {
+          tripId: path.split('/')[3],
+          shareId: path.split('/')[5]
+        };
+        return await removeTripShare(event, conn);
+
+      case method === 'GET' && path === PATHS.tripsSharedWithMe:
+        return await getTripsSharedWithMe(event, conn);
 
       // Account deletion
       case method === 'DELETE' && path === PATHS.account:
