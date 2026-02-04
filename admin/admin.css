@@ -1,0 +1,862 @@
+/* ============================================
+   Admin Panel Styles
+   ============================================ */
+
+:root {
+    --admin-bg: #0a0a0a;
+    --admin-bg-secondary: #111111;
+    --admin-bg-tertiary: #1a1a1a;
+    --admin-text: #ffffff;
+    --admin-text-secondary: #a3a3a3;
+    --admin-text-muted: #525252;
+    --admin-border: #262626;
+    --admin-accent: #3b82f6;
+    --admin-accent-hover: #2563eb;
+    --admin-success: #22c55e;
+    --admin-error: #ef4444;
+    --admin-warning: #f59e0b;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--admin-bg);
+    color: var(--admin-text);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* ============================================
+   Login Page
+   ============================================ */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-box {
+    background: var(--admin-bg-secondary);
+    border: 1px solid var(--admin-border);
+    border-radius: 16px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-box h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.login-box p {
+    color: var(--admin-text-secondary);
+    font-size: 0.875rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--admin-text-secondary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--admin-bg-tertiary);
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    color: var(--admin-text);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--admin-text-muted);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--admin-accent);
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: var(--admin-accent-hover);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: var(--admin-bg-tertiary);
+    color: var(--admin-text);
+    border: 1px solid var(--admin-border);
+}
+
+.btn-secondary:hover {
+    background: var(--admin-border);
+}
+
+.btn-danger {
+    background: var(--admin-error);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--admin-error);
+    color: var(--admin-error);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.success-message {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid var(--admin-success);
+    color: var(--admin-success);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    display: none;
+}
+
+.success-message.show {
+    display: block;
+}
+
+/* ============================================
+   Dashboard Layout
+   ============================================ */
+.dashboard {
+    display: none;
+    min-height: 100vh;
+}
+
+.dashboard.active {
+    display: block;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: var(--admin-bg-secondary);
+    border-bottom: 1px solid var(--admin-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.dashboard-header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.dashboard-header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.user-info {
+    color: var(--admin-text-secondary);
+    font-size: 0.875rem;
+}
+
+.dashboard-content {
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   Stats Cards
+   ============================================ */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--admin-bg-secondary);
+    border: 1px solid var(--admin-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.stat-card-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--admin-text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.stat-card-value {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* ============================================
+   Upload Zone
+   ============================================ */
+.upload-section {
+    margin-bottom: 2rem;
+}
+
+.upload-section h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.upload-zone {
+    border: 2px dashed var(--admin-border);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    background: var(--admin-bg-secondary);
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: var(--admin-accent);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.upload-zone-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.upload-zone-text {
+    color: var(--admin-text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.upload-zone-hint {
+    font-size: 0.75rem;
+    color: var(--admin-text-muted);
+}
+
+.upload-zone input[type="file"] {
+    display: none;
+}
+
+/* Upload Progress */
+.upload-progress {
+    margin-top: 1.5rem;
+    display: none;
+}
+
+.upload-progress.active {
+    display: block;
+}
+
+.upload-progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.upload-progress-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--admin-bg-tertiary);
+    border-radius: 8px;
+}
+
+.upload-progress-item-name {
+    flex: 1;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.upload-progress-bar {
+    width: 100px;
+    height: 4px;
+    background: var(--admin-border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.upload-progress-bar-fill {
+    height: 100%;
+    background: var(--admin-accent);
+    transition: width 0.3s;
+}
+
+.upload-progress-item-status {
+    font-size: 0.75rem;
+    color: var(--admin-text-muted);
+}
+
+.upload-progress-item-status.success {
+    color: var(--admin-success);
+}
+
+.upload-progress-item-status.error {
+    color: var(--admin-error);
+}
+
+/* Upload Settings */
+.upload-settings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--admin-bg-tertiary);
+    border-radius: 12px;
+}
+
+/* ============================================
+   Photo Grid
+   ============================================ */
+.photos-section {
+    margin-bottom: 2rem;
+}
+
+.photos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.photos-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.photos-filters {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.photos-filters select {
+    padding: 0.5rem 1rem;
+    background: var(--admin-bg-tertiary);
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    color: var(--admin-text);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.photo-card {
+    background: var(--admin-bg-secondary);
+    border: 1px solid var(--admin-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: grab;
+}
+
+.photo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.photo-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.photo-card-image {
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    position: relative;
+    background: var(--admin-bg-tertiary);
+}
+
+.photo-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.photo-card:hover .photo-card-image img {
+    transform: scale(1.05);
+}
+
+.photo-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem;
+}
+
+.photo-card:hover .photo-card-overlay {
+    opacity: 1;
+}
+
+.photo-card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.photo-card-content {
+    padding: 1rem;
+}
+
+.photo-card-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.photo-card-meta {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--admin-text-muted);
+}
+
+.photo-card-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    background: var(--admin-bg-tertiary);
+    border-radius: 4px;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.photo-card-badge.featured {
+    background: var(--admin-accent);
+    color: white;
+}
+
+/* ============================================
+   Edit Modal
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: var(--admin-bg-secondary);
+    border: 1px solid var(--admin-border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+}
+
+.modal-overlay.active .modal {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.modal-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--admin-text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--admin-text);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-preview {
+    width: 100%;
+    aspect-ratio: 16/10;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    background: var(--admin-bg-tertiary);
+}
+
+.modal-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--admin-border);
+}
+
+.modal-footer-left {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.modal-footer-right {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--admin-text-secondary);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-hint {
+    font-size: 0.875rem;
+    color: var(--admin-text-muted);
+}
+
+/* ============================================
+   Loading Spinner
+   ============================================ */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--admin-border);
+    border-top-color: var(--admin-accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 2000;
+}
+
+.loading-overlay .spinner {
+    width: 40px;
+    height: 40px;
+}
+
+/* ============================================
+   Toast Notifications
+   ============================================ */
+.toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    z-index: 3000;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: var(--admin-bg-secondary);
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+    max-width: 400px;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.toast.success {
+    border-color: var(--admin-success);
+}
+
+.toast.error {
+    border-color: var(--admin-error);
+}
+
+.toast-icon {
+    font-size: 1.25rem;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 0.875rem;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--admin-text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1rem;
+}
+
+/* ============================================
+   Checkbox & Toggle
+   ============================================ */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--admin-accent);
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .dashboard-content {
+        padding: 1rem;
+    }
+
+    .photos-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .photos-filters {
+        justify-content: center;
+    }
+
+    .photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+
+    .upload-settings {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-footer-left,
+    .modal-footer-right {
+        width: 100%;
+    }
+
+    .modal-footer-right {
+        justify-content: flex-end;
+    }
+
+    .toast-container {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+    }
+
+    .toast {
+        max-width: none;
+    }
+}
+
+/* ============================================
+   Drag & Drop Sortable
+   ============================================ */
+.sortable-ghost {
+    opacity: 0.4;
+}
+
+.sortable-chosen {
+    box-shadow: 0 0 0 2px var(--admin-accent);
+}
+
+.sortable-drag {
+    opacity: 1 !important;
+}
+
+/* ============================================
+   Confirmation Dialog
+   ============================================ */
+.confirm-dialog {
+    text-align: center;
+    padding: 2rem;
+}
+
+.confirm-dialog-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--admin-warning);
+}
+
+.confirm-dialog h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.confirm-dialog p {
+    color: var(--admin-text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
