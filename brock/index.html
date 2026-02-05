@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brock — A Year in the Life</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font: 'Satoshi', -apple-system, sans-serif;
+            --bg: #0a0a0a;
+            --text: #f0f0ec;
+            --caption: #7a7a75;
+            --accent: #d4a574;
+        }
+
+        html {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            overflow-x: hidden;
+            background: var(--bg);
+        }
+
+        /* ========== LOADING SCREEN ========== */
+        .loader {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--caption);
+        }
+
+        .loader-bar {
+            width: 120px;
+            height: 2px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        .loader-bar-inner {
+            width: 0%;
+            height: 100%;
+            background: var(--text);
+            border-radius: 1px;
+            transition: width 0.3s ease;
+        }
+
+        /* ========== NAVIGATION ========== */
+        .back-link {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 50;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text);
+            text-decoration: none;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+            mix-blend-mode: difference;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--accent);
+            z-index: 50;
+            transition: none;
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to top,
+                rgba(10,10,10,0.9) 0%,
+                rgba(10,10,10,0.3) 40%,
+                rgba(10,10,10,0.05) 100%
+            );
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding-bottom: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            opacity: 0;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 11vw, 5.5rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 0.95;
+            margin-bottom: 1rem;
+            opacity: 0;
+        }
+
+        .hero-description {
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 320px;
+            margin: 0 auto;
+            opacity: 0;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+        }
+
+        .scroll-hint span {
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--caption);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to bottom, var(--caption), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ========== CHAPTER SECTIONS ========== */
+        .chapter {
+            position: relative;
+            padding: 0;
+        }
+
+        .chapter-header {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .chapter-number {
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.25rem;
+        }
+
+        .chapter-title {
+            font-size: clamp(2rem, 10vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 0.95;
+            margin-bottom: 1rem;
+        }
+
+        .chapter-tagline {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 360px;
+        }
+
+        /* ========== PHOTO SECTIONS ========== */
+
+        /* Full-bleed single image */
+        .photo-full {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        .photo-full img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .photo-full .photo-caption {
+            position: absolute;
+            bottom: 2rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            z-index: 2;
+        }
+
+        .photo-full::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to top, rgba(10,10,10,0.7), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Inset image (with padding) */
+        .photo-inset {
+            padding: 1rem 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .photo-inset img {
+            width: 100%;
+            border-radius: 4px;
+            display: block;
+        }
+
+        /* Two-up grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            padding: 0 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .photo-grid img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        /* ========== CAPTIONS ========== */
+        .photo-caption {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .photo-caption .caption-location {
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.35rem;
+        }
+
+        /* ========== TEXT BLOCKS ========== */
+        .text-block {
+            padding: 4rem 1.5rem;
+            max-width: 520px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .text-block p {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.8;
+        }
+
+        .text-block p strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ========== SPACERS ========== */
+        .spacer {
+            height: 6rem;
+        }
+
+        .spacer-sm {
+            height: 3rem;
+        }
+
+        .spacer-lg {
+            height: 10rem;
+        }
+
+        /* ========== HORIZONTAL SCROLL STRIP ========== */
+        .hscroll-wrapper {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hscroll-strip {
+            display: flex;
+            flex-wrap: nowrap;
+            width: max-content;
+        }
+
+        .hscroll-strip .hscroll-photo {
+            flex: 0 0 85vw;
+            height: 70vh;
+            padding: 0 0.35rem;
+        }
+
+        .hscroll-strip .hscroll-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        /* ========== EPILOGUE ========== */
+        .epilogue {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .epilogue-title {
+            font-size: clamp(1.8rem, 8vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+        }
+
+        .epilogue-text {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.8;
+            max-width: 400px;
+            margin: 0 auto 3rem;
+        }
+
+        /* ========== FOOTER ========== */
+        .story-footer {
+            padding: 4rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .story-footer p {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--caption);
+            letter-spacing: 0.05em;
+        }
+
+        .story-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* ========== REVEAL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal-fade {
+            opacity: 0;
+        }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        /* ========== DIVIDER ========== */
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 0 auto;
+            opacity: 0.4;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (min-width: 768px) {
+            .hero-content {
+                padding-bottom: 4rem;
+            }
+
+            .hero-description {
+                max-width: 420px;
+            }
+
+            .chapter-header {
+                height: 70vh;
+            }
+
+            .photo-inset {
+                padding: 2rem 3rem;
+                max-width: 700px;
+            }
+
+            .photo-grid {
+                gap: 1rem;
+                padding: 0 3rem;
+                max-width: 900px;
+            }
+
+            .text-block {
+                padding: 6rem 3rem;
+                max-width: 600px;
+            }
+
+            .hscroll-strip .hscroll-photo {
+                flex: 0 0 55vw;
+                height: 75vh;
+                padding: 0 0.5rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .photo-inset {
+                max-width: 800px;
+            }
+
+            .photo-grid {
+                max-width: 1000px;
+            }
+
+            .hscroll-strip .hscroll-photo {
+                flex: 0 0 45vw;
+                height: 80vh;
+            }
+        }
+
+        /* Reduce motion */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-fade, .reveal-scale {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+
+            .scroll-line {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-text">Loading Brock's Story</div>
+        <div class="loader-bar">
+            <div class="loader-bar-inner" id="loaderBar"></div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Back Link -->
+    <a href="/" class="back-link">&larr; Back</a>
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero">
+        <div class="hero-image">
+            <img src="images/01-prologue-portrait.jpg" alt="Brock portrait" id="heroImg">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-subtitle">A year in the life of</div>
+            <h1 class="hero-title">Brock</h1>
+            <p class="hero-description">From city sidewalks to coastal cliffs, ER waiting rooms to autumn leaves. One little golden doodle, one very big year.</p>
+        </div>
+        <div class="scroll-hint">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ==================== CHAPTER 1: CITY DOG ==================== -->
+    <section class="chapter">
+        <div class="chapter-header reveal">
+            <div class="chapter-number">Chapter One</div>
+            <h2 class="chapter-title">City Dog</h2>
+            <p class="chapter-tagline">Life in San Francisco. Coffee shops, coding sessions, and couch naps.</p>
+        </div>
+
+        <div class="photo-full reveal-scale">
+            <img src="images/02-city-sleepy.jpg" alt="Brock sleepy on the couch" loading="lazy" decoding="async">
+            <div class="photo-caption">
+                <span class="caption-location">San Francisco, CA</span>
+                The face of a dog who has fully claimed the couch.
+            </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="photo-grid reveal">
+            <img src="images/03-city-coding.jpg" alt="Brock next to coding setup" loading="lazy" decoding="async">
+            <img src="images/04-city-couch.jpg" alt="Brock on couch being pet" loading="lazy" decoding="async">
+        </div>
+
+        <div class="text-block reveal">
+            <p>Every morning, the same routine. Kevin codes. Brock supervises. <strong>The best coworker never sends a Slack message</strong> &mdash; he just nudges your hand when it's time for a walk.</p>
+        </div>
+
+        <div class="spacer-sm"></div>
+
+        <div class="photo-inset reveal">
+            <video src="images/brock-hairdryer.mp4" autoplay loop muted playsinline style="width:100%; border-radius:4px; display:block;"></video>
+        </div>
+
+        <div class="text-block reveal">
+            <p>Post-bath blowout. <strong>Not a fan of the hair dryer</strong> &mdash; but absolutely a fan of being fluffy.</p>
+        </div>
+    </section>
+
+    <!-- ==================== CHAPTER 2: THE SCARE ==================== -->
+    <section class="chapter">
+        <div class="chapter-header reveal">
+            <div class="chapter-number">Chapter Two</div>
+            <h2 class="chapter-title">The Scare</h2>
+            <p class="chapter-tagline">The late-night drives. The waiting room. The relief.</p>
+        </div>
+
+        <div class="photo-full reveal-scale">
+            <img src="images/05-scare-beryl-holding.jpg" alt="Beryl holding Brock in blanket" loading="lazy" decoding="async">
+            <div class="photo-caption">
+                <span class="caption-location">Emergency Vet</span>
+                Wrapped up safe. Everything's going to be okay.
+            </div>
+        </div>
+
+        <div class="text-block reveal">
+            <p>Sterile panniculitis. Words no puppy parent wants to hear. It meant multiple ER visits, sleepless nights, and a kind of fear that made everything else disappear. <strong>It freaked Mom and Dad out &mdash; a lot.</strong> But Dr. Schnabl was a savior, and Brock pulled through. He's been blessed ever since.</p>
+        </div>
+    </section>
+
+    <!-- ==================== CHAPTER 3: OREGON WILD ==================== -->
+    <section class="chapter">
+        <div class="chapter-header reveal">
+            <div class="chapter-number">Chapter Three</div>
+            <h2 class="chapter-title">Oregon Wild</h2>
+            <p class="chapter-tagline">Coastlines, canoes, wildflowers, and the best camping buddy you could ask for.</p>
+        </div>
+
+        <div class="photo-full reveal-scale">
+            <img src="images/06-oregon-canoe.jpg" alt="Kevin and Brock canoeing" loading="lazy" decoding="async">
+            <div class="photo-caption">
+                <span class="caption-location">Oregon Coast</span>
+                First mate Brock. Yellow vest, tongue out, ready for anything.
+            </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="photo-full reveal-scale">
+            <img src="images/07-oregon-coast.jpg" alt="Brock on coastal cliff" loading="lazy" decoding="async">
+            <div class="photo-caption">
+                <span class="caption-location">Pacific Coast</span>
+                King of the cliff.
+            </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="photo-grid reveal">
+            <img src="images/08-oregon-hiking-family.jpg" alt="Family hiking together" loading="lazy" decoding="async">
+            <img src="images/09-oregon-beryl-carry.jpg" alt="Beryl carrying Brock on trail" loading="lazy" decoding="async">
+        </div>
+
+        <div class="text-block reveal">
+            <p>When his little legs got tired on the trail, <strong>Beryl carried him like a baby</strong>. He didn't seem to mind one bit.</p>
+        </div>
+
+        <div class="photo-full reveal-scale">
+            <img src="images/10-oregon-daisies.jpg" alt="Brock in field of daisies" loading="lazy" decoding="async">
+            <div class="photo-caption">
+                <span class="caption-location">Oregon</span>
+                Stop and smell the daisies.
+            </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="photo-inset reveal">
+            <img src="images/11-oregon-tent.jpg" alt="Brock in tent" loading="lazy" decoding="async">
+        </div>
+
+        <div class="text-block reveal">
+            <p>Camping with a mini goldendoodle means sharing your sleeping bag, finding fur in your coffee, and waking up to a face that says: <strong>can we do this forever?</strong></p>
+        </div>
+    </section>
+
+    <!-- ==================== CHAPTER 4: THE BIG MOVE ==================== -->
+    <section class="chapter">
+        <div class="chapter-header reveal">
+            <div class="chapter-number">Chapter Four</div>
+            <h2 class="chapter-title">The Big Move</h2>
+            <p class="chapter-tagline">San Francisco &rarr; South Bend, Indiana. 2,200 miles. One very good co-pilot.</p>
+        </div>
+
+        <!-- Horizontal scroll strip for the journey -->
+        <div class="hscroll-wrapper">
+            <div class="hscroll-strip" id="moveStrip">
+                <div class="hscroll-photo">
+                    <img src="images/12-move-airplane.jpg" alt="Brock on airplane" loading="lazy" decoding="async">
+                </div>
+                <div class="hscroll-photo">
+                    <img src="images/13-move-roadtrip.jpg" alt="Brock road trip co-pilot" loading="lazy" decoding="async">
+                </div>
+                <div class="hscroll-photo">
+                    <img src="images/14-move-boxes.jpg" alt="Brock with moving boxes" loading="lazy" decoding="async">
+                </div>
+            </div>
+        </div>
+
+        <div class="text-block reveal">
+            <p>Airplane carriers, golden hour on the highway, and that first night in a half-empty apartment surrounded by boxes. <strong>Home isn't the city. Home is whoever's on the couch with you.</strong></p>
+        </div>
+    </section>
+
+    <!-- ==================== CHAPTER 5: HOME AGAIN ==================== -->
+    <section class="chapter">
+        <div class="chapter-header reveal">
+            <div class="chapter-number">Chapter Five</div>
+            <h2 class="chapter-title">Home Again</h2>
+            <p class="chapter-tagline">South Bend, Indiana. New town, same good boy.</p>
+        </div>
+
+        <div class="photo-full reveal-scale">
+            <img src="images/16-home-fall.jpg" alt="Beryl and Brock in autumn leaves" loading="lazy" decoding="async">
+            <div class="photo-caption">
+                <span class="caption-location">South Bend, IN</span>
+                First fall in Indiana. The leaves didn't disappoint.
+            </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="photo-inset reveal">
+            <img src="images/15-home-notredame.jpg" alt="Brock in Notre Dame bandana" loading="lazy" decoding="async">
+        </div>
+
+        <div class="text-block reveal">
+            <p>Notre Dame bandana on, blessed in the spirit of St. Francis. <strong>Technically, the first Catholic in the family.</strong> He moved Kevin and Beryl so much that day, they both joined OCIA. Leave it to a 15-pound goldendoodle to lead his parents to faith.</p>
+        </div>
+
+        <div class="photo-grid reveal">
+            <img src="images/17-home-family-kitchen.jpg" alt="Family portrait in kitchen" loading="lazy" decoding="async">
+            <img src="images/18-home-cozy-toy.jpg" alt="Brock with toy on couch" loading="lazy" decoding="async">
+        </div>
+
+        <div class="text-block reveal">
+            <p>Dinner parties in the new kitchen. Movie nights with his favorite Mr. Bunny. Some things never change &mdash; <strong>and that's the whole point.</strong></p>
+        </div>
+    </section>
+
+    <!-- ==================== EPILOGUE ==================== -->
+    <section class="chapter">
+        <div class="spacer-lg"></div>
+
+        <div class="divider reveal-fade"></div>
+
+        <div class="epilogue reveal">
+            <h2 class="epilogue-title">Through It All</h2>
+            <p class="epilogue-text">Cities change. Zip codes change. But the little guy on the couch? He just wants to be wherever you are. And honestly, that's enough.</p>
+        </div>
+
+        <div class="photo-full reveal-scale">
+            <img src="images/19-epilogue-embrace.jpg" alt="Beryl embracing Brock" loading="lazy" decoding="async">
+            <div class="photo-caption">
+                <span class="caption-location">Always</span>
+                Through every chapter.
+            </div>
+        </div>
+
+        <div class="spacer-lg"></div>
+
+        <div class="photo-full reveal-scale">
+            <img src="images/20-epilogue-sleep.jpg" alt="Brock sleeping peacefully" loading="lazy" decoding="async">
+            <div class="photo-caption">
+                <span class="caption-location">&nbsp;</span>
+                Goodnight, Brock.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="story-footer">
+        <p>Made with love by Kevin &amp; Beryl &mdash; <a href="/">kevinlee.me</a></p>
+    </footer>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>
+        // ==================== LOADER ====================
+        const loader = document.getElementById('loader');
+        const loaderBar = document.getElementById('loaderBar');
+        const images = document.querySelectorAll('img');
+        let loaded = 0;
+        const total = images.length;
+
+        function updateLoader() {
+            loaded++;
+            const pct = Math.round((loaded / total) * 100);
+            loaderBar.style.width = pct + '%';
+            if (loaded >= total) {
+                setTimeout(initStory, 400);
+            }
+        }
+
+        images.forEach(img => {
+            if (img.complete) {
+                updateLoader();
+            } else {
+                img.addEventListener('load', updateLoader);
+                img.addEventListener('error', updateLoader);
+            }
+        });
+
+        // Fallback: if images don't fire events
+        setTimeout(() => {
+            if (!loader.classList.contains('hidden')) {
+                initStory();
+            }
+        }, 5000);
+
+        // ==================== INIT ====================
+        function initStory() {
+            loader.classList.add('hidden');
+
+            // Init Lenis
+            const lenis = new Lenis({
+                lerp: 0.08,
+                smoothWheel: true,
+            });
+
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add((time) => lenis.raf(time * 1000));
+            gsap.ticker.lagSmoothing(0);
+
+            // ==================== PROGRESS BAR ====================
+            const progressBar = document.getElementById('progressBar');
+            gsap.to(progressBar, {
+                width: '100%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: 0.3,
+                }
+            });
+
+            // ==================== HERO ANIMATIONS ====================
+            const heroTl = gsap.timeline({ delay: 0.3 });
+            heroTl
+                .to('.hero-subtitle', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+                .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
+                .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+                .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+
+            // Hero Ken Burns zoom
+            gsap.to('#heroImg', {
+                scale: 1.15,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Fade out scroll hint
+            gsap.to('.scroll-hint', {
+                opacity: 0,
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: '15% top',
+                    end: '30% top',
+                    scrub: true,
+                }
+            });
+
+            // ==================== REVEAL ANIMATIONS ====================
+            // Standard reveal (translate up + fade)
+            gsap.utils.toArray('.reveal').forEach(el => {
+                gsap.to(el, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.9,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        once: true,
+                    }
+                });
+            });
+
+            // Fade only
+            gsap.utils.toArray('.reveal-fade').forEach(el => {
+                gsap.to(el, {
+                    opacity: 1,
+                    duration: 1,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        once: true,
+                    }
+                });
+            });
+
+            // Scale reveal (for full-bleed photos)
+            gsap.utils.toArray('.reveal-scale').forEach(el => {
+                gsap.to(el, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1.2,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 80%',
+                        once: true,
+                    }
+                });
+            });
+
+            // ==================== KEN BURNS ON FULL IMAGES ====================
+            gsap.utils.toArray('.photo-full img').forEach(img => {
+                gsap.fromTo(img,
+                    { scale: 1.05 },
+                    {
+                        scale: 1.12,
+                        ease: 'none',
+                        scrollTrigger: {
+                            trigger: img.closest('.photo-full'),
+                            start: 'top bottom',
+                            end: 'bottom top',
+                            scrub: true,
+                        }
+                    }
+                );
+            });
+
+            // ==================== HORIZONTAL SCROLL (MOVE CHAPTER) ====================
+            const moveStrip = document.getElementById('moveStrip');
+            if (moveStrip) {
+                const photos = moveStrip.querySelectorAll('.hscroll-photo');
+                const totalWidth = moveStrip.scrollWidth;
+                const viewportWidth = window.innerWidth;
+
+                gsap.to(moveStrip, {
+                    x: -(totalWidth - viewportWidth),
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: '.hscroll-wrapper',
+                        start: 'top 20%',
+                        end: () => '+=' + (totalWidth - viewportWidth),
+                        scrub: 1,
+                        pin: true,
+                        anticipatePin: 1,
+                    }
+                });
+            }
+
+            // ==================== CHAPTER TITLE PARALLAX ====================
+            gsap.utils.toArray('.chapter-title').forEach(title => {
+                gsap.to(title, {
+                    yPercent: -15,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: title.closest('.chapter-header'),
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: true,
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
