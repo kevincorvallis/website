@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brock-story-v1';
+const CACHE_NAME = 'brock-story-v2';
 const ASSETS = [
   '/brock/',
   '/brock/images/01-prologue-portrait.webp',
@@ -42,6 +42,23 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+
+  // HTML pages: network-first so users always get latest content
+  if (e.request.mode === 'navigate' || url.pathname.endsWith('/')) {
+    e.respondWith(
+      fetch(e.request)
+        .then((res) => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          return res;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Static assets: cache-first for speed
   e.respondWith(
     caches.match(e.request).then((cached) => cached || fetch(e.request))
   );
