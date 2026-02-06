@@ -75,3 +75,4 @@ ios/**/Pods/
 ios/**/*.xcworkspace
 ios/**/DerivedData/
 ios/**/.build/
+.vercel

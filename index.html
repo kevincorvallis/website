@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kevin Lee — Photographer</title>
-    <meta name="description" content="Kevin Lee is a photographer based in Seattle, WA capturing moments that matter.">
-    <meta name="keywords" content="photographer, Seattle, portrait photography, film photography, travel photography, Kevin Lee">
+    <title>Kevin Lee</title>
+    <meta name="description" content="Kevin Lee — Software Engineer, Pilot, Photographer. Building at Microsoft AI.">
     <meta name="author" content="Kevin Lee">
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kevinlee.photo/">
-    <meta property="og:title" content="Kevin Lee — Photographer">
-    <meta property="og:description" content="Kevin Lee is a photographer based in Seattle, WA capturing moments that matter.">
-    <meta property="og:image" content="images/01.jpg">
+    <meta property="og:title" content="Kevin Lee">
+    <meta property="og:description" content="Software Engineer, Pilot, Photographer">
+    <meta property="og:image" content="images/kevi394-053.jpg">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://kevinlee.photo/">
-    <meta name="twitter:title" content="Kevin Lee — Photographer">
-    <meta name="twitter:description" content="Kevin Lee is a photographer based in Seattle, WA capturing moments that matter.">
-    <meta name="twitter:image" content="images/01.jpg">
+    <meta name="twitter:title" content="Kevin Lee">
+    <meta name="twitter:description" content="Software Engineer, Pilot, Photographer">
+    <meta name="twitter:image" content="images/kevi394-053.jpg">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
@@ -30,255 +28,178 @@
         (function() {
             const stored = localStorage.getItem('theme');
             const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            const theme = stored || systemPreference;
-            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-theme', stored || systemPreference);
         })();
     </script>
 
-    <!-- Preload critical assets -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://res.cloudinary.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400;500;700;900&display=swap" rel="stylesheet">
 
-    <!-- GLightbox for gallery -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
-
-    <\!-- Main Styles -->
+    <!-- Styles -->
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <!-- Progress Bar -->
-    <div class="progress-bar" id="progressBar"></div>
-
-    <!-- Custom Cursor -->
-    <div class="cursor" id="cursor"></div>
-    <div class="cursor-follower" id="cursorFollower"></div>
 
     <!-- Navigation -->
     <nav>
-        <div class="nav-left">
-            <a href="/" class="nav-logo">Kevin Lee</a>
-        </div>
+        <a href="/" class="nav-logo">Kevin Lee</a>
         <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
+            <span></span>
+            <span></span>
         </button>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#work">Work</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="journal/index.html">Journal</a></li>
-            <li><a href="https://www.linkedin.com/in/kevin0813/" target="_blank" rel="noopener">LinkedIn</a></li>
-            <li>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
-                </button>
-            </li>
-        </ul>
+        <div class="nav-links" id="navLinks">
+            <a href="#work">Work</a>
+            <a href="#about">About</a>
+            <a href="#projects">Projects</a>
+            <a href="#connect">Connect</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <svg class="moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+        </div>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
-        <div class="hero-content">
-            <h1 class="display-large" id="heroTitle">Kevin Lee</h1>
-            <p class="hero-tagline">Photographer — Seattle, WA</p>
-        </div>
-        <div class="hero-scroll">
-            <span>Scroll</span>
-            <div class="scroll-line"></div>
+        <h1 class="reveal">Kevin Lee</h1>
+        <p class="hero-sub reveal">Software Engineer · Pilot · Photographer</p>
+    </section>
+
+    <!-- Work -->
+    <section class="work" id="work">
+        <h2 class="section-label reveal">Selected Work</h2>
+        <div class="work-grid">
+            <div class="work-item reveal">
+                <img src="images/kevi394-053.jpg" alt="Photography work" loading="eager">
+            </div>
+            <div class="work-item reveal">
+                <img src="images/kevi394-084.jpg" alt="Photography work" loading="lazy">
+            </div>
+            <div class="work-item reveal">
+                <img src="images/KEVI554-009.jpg" alt="Photography work" loading="lazy">
+            </div>
+            <div class="work-item reveal">
+                <img src="images/KEVI554-056.jpg" alt="Photography work" loading="lazy">
+            </div>
+            <div class="work-item reveal">
+                <img src="images/kevi742-032.jpg" alt="Photography work" loading="lazy">
+            </div>
+            <div class="work-item reveal">
+                <img src="images/kevi742-050.jpg" alt="Photography work" loading="lazy">
+            </div>
+            <div class="work-item reveal">
+                <img src="images/kevi742-064.jpg" alt="Photography work" loading="lazy">
+            </div>
+            <div class="work-item reveal">
+                <img src="images/kevi742-070.jpg" alt="Photography work" loading="lazy">
+            </div>
         </div>
     </section>
 
-    <!-- Featured Image -->
-    <section class="featured-section">
-        <div class="featured-image-container">
-            <img
-                src="images/01.jpg"
-                alt="Featured photograph"
-                class="featured-image"
-                id="featuredImage"
-                loading="eager"
-                fetchpriority="high"
-            >
-        </div>
-    </section>
-
-    <!-- Horizontal Scroll Gallery -->
-    <section class="gallery-section" id="work">
-        <div class="gallery-header">
-            <h2 class="display-medium">Selected Work</h2>
-            <p class="gallery-subtitle text-large">A collection of moments captured through my lens.</p>
-        </div>
-        <div class="horizontal-scroll" id="gallery">
-            <a href="images/justinandalia.JPG" class="gallery-item large glightbox" data-gallery="portfolio">
-                <img src="images/justinandalia.JPG" alt="Portrait photography" loading="lazy" decoding="async">
-                <div class="gallery-item-overlay">
-                    <span class="text-small">Portrait</span>
-                </div>
-            </a>
-            <a href="images/kevfilm.jpg" class="gallery-item medium glightbox" data-gallery="portfolio">
-                <img src="images/kevfilm.jpg" alt="Film photography" loading="lazy" decoding="async">
-                <div class="gallery-item-overlay">
-                    <span class="text-small">Film</span>
-                </div>
-            </a>
-            <a href="images/salvador.JPG" class="gallery-item small glightbox" data-gallery="portfolio">
-                <img src="images/salvador.JPG" alt="Travel photography" loading="lazy" decoding="async">
-                <div class="gallery-item-overlay">
-                    <span class="text-small">Travel</span>
-                </div>
-            </a>
-            <a href="images/kobenme.png" class="gallery-item medium glightbox" data-gallery="portfolio">
-                <img src="images/kobenme.png" alt="Candid photography" loading="lazy" decoding="async">
-                <div class="gallery-item-overlay">
-                    <span class="text-small">Candid</span>
-                </div>
-            </a>
-            <a href="images/olivia.webp" class="gallery-item large glightbox" data-gallery="portfolio">
-                <img src="images/olivia.webp" alt="Portrait photography" loading="lazy" decoding="async">
-                <div class="gallery-item-overlay">
-                    <span class="text-small">Portrait</span>
-                </div>
-            </a>
-        </div>
-    </section>
-
-    <!-- Video Section -->
-    <section class="video-section">
-        <video autoplay muted loop playsinline>
-            <source src="images/ella.mp4" type="video/mp4">
-        </video>
-        <div class="video-overlay">
-            <h2 class="display-medium">Motion</h2>
-        </div>
-    </section>
-
-    <!-- Bento Grid -->
-    <section class="bento-section">
-        <div class="bento-header">
-            <h2 class="display-medium reveal">Gallery</h2>
-        </div>
-        <div class="bento-grid">
-            <a href="images/01.jpg" class="bento-item glightbox" data-gallery="bento">
-                <img src="images/01.jpg" alt="Featured work" loading="lazy" decoding="async">
-            </a>
-            <a href="images/pic01.jpg" class="bento-item glightbox" data-gallery="bento">
-                <img src="images/pic01.jpg" alt="Photography work" loading="lazy" decoding="async">
-            </a>
-            <a href="images/pic02.jpg" class="bento-item glightbox" data-gallery="bento">
-                <img src="images/pic02.jpg" alt="Photography work" loading="lazy" decoding="async">
-            </a>
-            <a href="images/pic03.jpg" class="bento-item glightbox" data-gallery="bento">
-                <img src="images/pic03.jpg" alt="Photography work" loading="lazy" decoding="async">
-            </a>
-        </div>
-    </section>
-
-    <!-- About Quote -->
-    <section class="quote-section" id="about">
-        <blockquote>
-            "Photography is the story I fail to put into words."
-        </blockquote>
-        <cite>— Destin Sparks</cite>
-    </section>
-
-    <!-- Text Section -->
-    <section class="text-section">
-        <div class="text-section-content">
-            <h2 class="display-medium">About</h2>
-            <p>
-                I'm Kevin Lee, a photographer based in Seattle, Washington.
-                I specialize in capturing authentic moments — from intimate portraits
-                to spontaneous street photography. Every frame tells a story,
-                and I believe the best photographs are the ones that make you feel something.
+    <!-- About -->
+    <section class="about" id="about">
+        <div class="about-content">
+            <h2 class="section-label reveal">About</h2>
+            <p class="reveal">
+                I'm Kevin — a software engineer at Microsoft AI, where I build and ship
+                Copilot experiences and design large-scale Azure data pipelines processing
+                40TB+ daily. USC Computer Science, Army veteran, former NASA JPL intern.
+            </p>
+            <p class="reveal">
+                Outside of work, I'm a student pilot pursuing my private pilot license
+                and volunteer with Angel Flight West providing medical transport flights
+                in the Pacific Northwest. I also shoot photos, surf, and build apps
+                about things I care about.
+            </p>
+            <p class="reveal">
+                <a href="assets/kevin-lee-resume.docx" class="resume-link" download>Download Resume ↓</a>
             </p>
         </div>
     </section>
 
     <!-- Projects -->
-    <section class="projects-section">
-        <div class="projects-header">
-            <h2 class="display-medium reveal">Projects</h2>
-        </div>
+    <section class="projects" id="projects">
+        <h2 class="section-label reveal">Projects</h2>
         <div class="projects-grid">
-            <a href="journal/index.html" class="project-card reveal">
-                <div class="project-card-inner">
-                    <div class="project-card-image">
-                        <img src="images/justinandalia.JPG" alt="Journal App" loading="lazy" decoding="async">
-                    </div>
-                    <div class="project-card-content">
-                        <span class="project-card-label">Web App</span>
-                        <h3 class="project-card-title">Day by Day Journal</h3>
-                    </div>
+            <a href="https://shredders-bay.vercel.app" class="project-card reveal" target="_blank" rel="noopener">
+                <span class="project-icon">🏔</span>
+                <div class="project-meta">
+                    <span class="project-tag">Web + iOS</span>
+                    <h3>Shredders</h3>
+                </div>
+                <p class="project-desc">Real-time ski conditions and AI powder predictions for Pacific Northwest resorts.</p>
+                <div class="project-footer">
+                    <span class="project-tech">Next.js · SwiftUI · Supabase</span>
+                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
                 </div>
             </a>
-            <a href="https://www.instagram.com/klee0813" class="project-card reveal" target="_blank" rel="noopener">
-                <div class="project-card-inner">
-                    <div class="project-card-image">
-                        <img src="images/kevfilm.jpg" alt="Instagram" loading="lazy" decoding="async">
-                    </div>
-                    <div class="project-card-content">
-                        <span class="project-card-label">Social</span>
-                        <h3 class="project-card-title">Instagram Gallery</h3>
-                    </div>
+            <a href="https://daybyday.kevinlee.photo" class="project-card reveal" target="_blank" rel="noopener">
+                <span class="project-icon">📔</span>
+                <div class="project-meta">
+                    <span class="project-tag">Web + iOS</span>
+                    <h3>Day by Day</h3>
+                </div>
+                <p class="project-desc">A daily journaling platform for reflection, gratitude, and staying connected.</p>
+                <div class="project-footer">
+                    <span class="project-tech">AWS · DynamoDB · Cognito</span>
+                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
+                </div>
+            </a>
+            <a href="https://ai-atc-sigma.vercel.app" class="project-card reveal" target="_blank" rel="noopener">
+                <span class="project-icon">✈️</span>
+                <div class="project-meta">
+                    <span class="project-tag">Web App</span>
+                    <h3>AI ATC</h3>
+                </div>
+                <p class="project-desc">Interactive air traffic control radio trainer with AI-powered pilot responses.</p>
+                <div class="project-footer">
+                    <span class="project-tech">JavaScript · OpenAI · GSAP</span>
+                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
+                </div>
+            </a>
+            <a href="https://github.com/kevincorvallis/iwbh-support" class="project-card reveal" target="_blank" rel="noopener">
+                <span class="project-icon">💛</span>
+                <div class="project-meta">
+                    <span class="project-tag">iOS</span>
+                    <h3>IWBH</h3>
+                </div>
+                <p class="project-desc">AI relationship coaching with habit tracking and partner sync for iOS.</p>
+                <div class="project-footer">
+                    <span class="project-tech">SwiftUI · Node.js · DynamoDB</span>
+                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
                 </div>
             </a>
         </div>
     </section>
 
-    <!-- Links Section -->
-    <section class="links-section">
-        <div class="links-container">
-            <h2>Let's Connect</h2>
-            <a href="mailto:contact@kevinlee.photo" class="link-button magnetic">Email Me</a>
-            <a href="https://www.linkedin.com/in/kevin0813/" class="link-button magnetic" target="_blank" rel="noopener">LinkedIn</a>
-            <a href="https://www.instagram.com/klee0813" class="link-button magnetic" target="_blank" rel="noopener">Instagram</a>
-            <a href="journal/index.html" class="link-button magnetic">Journal App</a>
+    <!-- Connect -->
+    <section class="connect" id="connect">
+        <h2 class="section-label reveal">Let's Connect</h2>
+        <div class="connect-links reveal">
+            <a href="mailto:contact@kevinlee.photo">Email</a>
+            <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://www.linkedin.com/in/kevin0813/" target="_blank" rel="noopener">LinkedIn</a>
         </div>
     </section>
-
-    <!-- Back to Top Button -->
-    <button class="back-to-top" id="backToTop" aria-label="Back to top">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-        </svg>
-    </button>
 
     <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <ul class="footer-links">
-                <li><a href="#work">Work</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="journal/index.html">Journal</a></li>
-                <li><a href="mailto:contact@kevinlee.photo">Contact</a></li>
-            </ul>
-            <p class="footer-copyright">&copy; <span id="copyrightYear"></span> Kevin Lee. All rights reserved.</p>
-        </div>
+        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/ScrollTrigger.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/split-type@0.3.4/umd/index.min.js"></script>
-
-    <!-- Supabase Client (for dynamic portfolio images) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- Portfolio Config & Dynamic Loading -->
-    <script src="js/config.js"></script>
-    <script src="js/portfolio.js"></script>
-
-    <\!-- Main Scripts -->
     <script src="js/main.js"></script>
 </body>
 </html>

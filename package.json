@@ -1,26 +1,14 @@
 {
-  "dependencies": {
-    "firebase-admin": "^12.6.0",
-    "g": "^2.0.1",
-    "http-server": "^14.1.0",
-    "mongodb": "^6.9.0",
-    "mysql": "^2.18.1",
-    "openai": "^3.2.1"
-  },
-  "name": "website",
+  "name": "kevin-lee-website",
   "version": "1.0.0",
-  "description": "An on-going personal project.",
-  "main": "index.js",
+  "description": "Personal portfolio website for Kevin Lee.",
   "scripts": {
-    "test": "jest"
+    "dev": "npx http-server . -p 8080 -o"
+  },
+  "dependencies": {
+    "http-server": "^14.1.0"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "jest": "^30.0.3"
-  },
-  "jest": {
-    "testPathIgnorePatterns": ["/node_modules/", "backend/lambda/test.js"]
-  }
+  "author": "Kevin Lee",
+  "license": "ISC"
 }
