@@ -1,6 +1,10 @@
-# Node.js dependencies
+# Dependencies
 node_modules/
 **/node_modules/
+
+# Next.js
+.next/
+out/
 
 # Logs
 npm-debug.log*
@@ -11,7 +15,6 @@ yarn-error.log*
 # Build output
 build/
 dist/
-public/
 coverage/
 .nyc_output/
 
@@ -31,6 +34,7 @@ ehthumbs.db
 
 # Environment files
 .env
+.env.local
 .env.*.local
 
 # Temporary files
@@ -55,17 +59,9 @@ firebaseConfig.js
 firebase-debug.log
 .cache/
 
-# Lambda deployment artifacts
-function.zip
-**/function.zip
-
 # Secrets files
 secrets.js
 **/secrets.js
-
-# Large media files (videos)
-*.mov
-*.mp4
 
 # Local settings
 .claude/settings.local.json

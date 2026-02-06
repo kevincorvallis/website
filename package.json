@@ -1,14 +1,35 @@
 {
-  "name": "kevin-lee-website",
-  "version": "1.0.0",
-  "description": "Personal portfolio website for Kevin Lee.",
+  "name": "website-next",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "npx http-server . -p 8080 -o"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
   "dependencies": {
-    "http-server": "^14.1.0"
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.95.2",
+    "@vercel/analytics": "^1.6.1",
+    "@vercel/speed-insights": "^1.3.1",
+    "framer-motion": "^12.33.0",
+    "gsap": "^3.14.2",
+    "lenis": "^1.3.17",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "sortablejs": "^1.15.6"
   },
-  "keywords": [],
-  "author": "Kevin Lee",
-  "license": "ISC"
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/sortablejs": "^1.15.9",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
 }
