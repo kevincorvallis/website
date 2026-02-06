@@ -816,12 +816,9 @@
             }
         });
 
-        // Nuke all service workers and their caches
+        // Install self-destructing SW to replace and kill old cached one
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
-        }
-        if ('caches' in window) {
-            caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+            navigator.serviceWorker.register('/brock/sw.js');
         }
 
         // Fallback: if images don't fire events
