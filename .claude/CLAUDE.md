@@ -50,9 +50,49 @@ website/
 - **Animation boundary:** GSAP for scroll-based, Framer Motion for page transitions only
 
 ## Adding New Stories
-1. Create a data file in `src/data/stories/[name].ts` following the `Story` type
-2. Import and add it to the `stories` map in `src/app/stories/[slug]/page.tsx`
-3. Add images to `public/[name]/images/`
+To add a new photo story (like Brock), three files need to change:
+
+### Step 1: Add images to `public/[name]/images/`
+- Name images with numbered prefixes: `01-hero.jpg`, `02-chapter1-photo.jpg`, etc.
+- Include both JPG and WebP versions when possible for performance
+- Hero image should be portrait-oriented and high resolution (used as full-viewport background)
+
+### Step 2: Create a data file at `src/data/stories/[name].ts`
+Use the `Story` type from `src/types/story.ts`. Reference `src/data/stories/brock.ts` as the template.
+
+Required fields:
+- `slug` — URL path segment (e.g., `"roadtrip"` → `/stories/roadtrip`)
+- `title` — Large display title on hero
+- `subtitle` — Small text above title (e.g., "A year in the life of")
+- `description` — Hero description paragraph
+- `heroImage` — Path to hero background image in `/public`
+- `accent` — Hex color for chapter numbers, captions, accent details
+- `chapters[]` — Array of chapters, each with `number`, `title`, `tagline`, and `sections[]`
+- `epilogue` — Closing section with `title`, `text`, and `images[]`
+- `footer` — Attribution text
+
+Available section types for chapters:
+| Type | Props | Description |
+|------|-------|-------------|
+| `photo-full` | `src`, `caption?`, `location?` | Full-bleed viewport image with Ken Burns + gradient caption |
+| `photo-inset` | `src` | Centered padded image |
+| `photo-grid` | `images: [{src, alt}]` | Two-up side-by-side photos |
+| `text-block` | `content` (HTML string) | Centered narrative text. Use `<strong>` for emphasis |
+| `video-inset` | `src`, `poster?` | Autoplay muted looping video |
+| `hscroll-strip` | `images: [{src, alt}]` | Horizontal scroll strip on desktop, vertical stack on mobile |
+| `spacer` | `size: "sm" \| "md" \| "lg"` | Vertical spacing between sections |
+
+### Step 3: Register the story in `src/app/stories/[slug]/page.tsx`
+```ts
+import { newStory } from "@/data/stories/newname";
+
+const stories = {
+  brock: brockStory,
+  newname: newStory,  // add here
+};
+```
+
+The page will auto-generate static params, metadata (OG tags), and the full story layout.
 
 ## Related Projects
 The Day by Day Journal app (web + iOS + backend) lives in a separate repo at `/Users/kevin/Downloads/Projects/daybyday-journal`.
