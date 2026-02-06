@@ -168,7 +168,7 @@ export function ArticleClient({ slug }: { slug: string }) {
             {!preview ? (
               <>
                 <div
-                  className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors duration-300 ${
+                  className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors duration-300 active:scale-[0.98] active:bg-bg min-h-[140px] flex flex-col items-center justify-center ${
                     dragOver
                       ? "border-text-primary bg-bg"
                       : "border-border hover:border-text-muted"
@@ -213,7 +213,7 @@ export function ArticleClient({ slug }: { slug: string }) {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="What makes this photo meaningful to you?"
-                    className="w-full px-4 py-2.5 rounded-lg bg-bg border border-border text-text-primary text-sm focus:outline-none focus:border-text-muted transition-colors duration-300"
+                    className="w-full px-4 py-2.5 rounded-lg bg-bg border border-border text-text-primary text-base focus:outline-none focus:border-text-muted transition-colors duration-300"
                   />
                 </div>
               </>
@@ -250,7 +250,7 @@ export function ArticleClient({ slug }: { slug: string }) {
                     </p>
                     <button
                       onClick={resetUpload}
-                      className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-300"
+                      className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-300 py-2 -my-2 active:opacity-70"
                     >
                       Submit another photo &rarr;
                     </button>
@@ -262,7 +262,7 @@ export function ArticleClient({ slug }: { slug: string }) {
                     <p className="text-sm text-red-500 mb-3">{error}</p>
                     <button
                       onClick={resetUpload}
-                      className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-300"
+                      className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-300 py-2 -my-2 active:opacity-70"
                     >
                       Try again
                     </button>

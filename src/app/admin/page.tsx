@@ -195,7 +195,7 @@ export default function AdminPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 bg-[#111] border border-[#222] rounded-lg text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] transition-colors"
+                className="w-full px-3 py-2.5 bg-[#111] border border-[#222] rounded-lg text-base text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] transition-colors"
                 required
               />
             </div>
@@ -205,7 +205,7 @@ export default function AdminPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 bg-[#111] border border-[#222] rounded-lg text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] transition-colors"
+                className="w-full px-3 py-2.5 bg-[#111] border border-[#222] rounded-lg text-base text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] transition-colors"
                 required
               />
             </div>
@@ -225,10 +225,10 @@ export default function AdminPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
-      <header className="flex items-center justify-between mb-8 pb-4 border-b border-[#222]">
-        <h1 className="text-xl font-semibold">Portfolio Admin</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-[#7a7a75]">{session.user.email}</span>
+      <header className="flex items-center justify-between mb-8 pb-4 border-b border-[#222] gap-4">
+        <h1 className="text-xl font-semibold flex-shrink-0">Portfolio Admin</h1>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-sm text-[#7a7a75] truncate hidden sm:block">{session.user.email}</span>
           <button
             onClick={handleLogout}
             className="px-3 py-1.5 text-sm border border-[#222] rounded-lg hover:border-[#444] transition-colors"
@@ -327,28 +327,28 @@ export default function AdminPage() {
                             Note: {item.submitter_note}
                           </p>
                         )}
-                        <div className="flex gap-2 mt-4">
+                        <div className="flex flex-wrap gap-2 mt-4">
                           <button
                             onClick={() => handleAdviceAction(item.id, "approved")}
-                            className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            className="px-4 py-2.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleAdviceAction(item.id, "rejected")}
-                            className="px-4 py-2 text-sm bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                            className="px-4 py-2.5 text-sm bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 active:bg-red-500/40 transition-colors"
                           >
                             Reject
                           </button>
                           <button
                             onClick={() => setEditAdvice({ ...item })}
-                            className="px-4 py-2 text-sm border border-[#222] rounded-lg hover:border-[#444] transition-colors"
+                            className="px-4 py-2.5 text-sm border border-[#222] rounded-lg hover:border-[#444] active:bg-[#1a1a1a] transition-colors"
                           >
                             Edit Text
                           </button>
                           <button
                             onClick={() => deleteAdvice(item.id)}
-                            className="px-4 py-2 text-sm text-[#555] hover:text-red-400 transition-colors ml-auto"
+                            className="px-4 py-2.5 text-sm text-[#555] hover:text-red-400 active:text-red-500 transition-colors ml-auto"
                           >
                             Delete
                           </button>
@@ -440,7 +440,7 @@ export default function AdminPage() {
             <select
               value={sectionFilter}
               onChange={(e) => setSectionFilter(e.target.value)}
-              className="px-3 py-1.5 bg-[#111] border border-[#222] rounded-lg text-sm text-[#f0f0f0] focus:outline-none"
+              className="px-3 py-1.5 bg-[#111] border border-[#222] rounded-lg text-base md:text-sm text-[#f0f0f0] focus:outline-none"
             >
               <option value="">All Sections</option>
               {PHOTO_SECTIONS.map((s) => (
@@ -450,7 +450,7 @@ export default function AdminPage() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-3 py-1.5 bg-[#111] border border-[#222] rounded-lg text-sm text-[#f0f0f0] focus:outline-none"
+              className="px-3 py-1.5 bg-[#111] border border-[#222] rounded-lg text-base md:text-sm text-[#f0f0f0] focus:outline-none"
             >
               <option value="">All Categories</option>
               {PHOTO_CATEGORIES.map((c) => (
@@ -487,16 +487,16 @@ export default function AdminPage() {
                     )}
                   </div>
                 </div>
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => setEditPhoto({ ...photo })}
-                    className="p-1.5 bg-[#111]/80 backdrop-blur-sm rounded-lg text-xs hover:bg-[#222] transition-colors"
+                    className="p-2.5 bg-[#111]/80 backdrop-blur-sm rounded-lg text-xs hover:bg-[#222] active:bg-[#333] transition-colors"
                   >
                     ✏️
                   </button>
                   <button
                     onClick={() => setDeletePhoto(photo)}
-                    className="p-1.5 bg-[#111]/80 backdrop-blur-sm rounded-lg text-xs hover:bg-red-500/20 transition-colors"
+                    className="p-2.5 bg-[#111]/80 backdrop-blur-sm rounded-lg text-xs hover:bg-red-500/20 active:bg-red-500/30 transition-colors"
                   >
                     🗑️
                   </button>
@@ -526,7 +526,7 @@ export default function AdminPage() {
               value={editAdvice.ai_generated_text}
               onChange={(e) => setEditAdvice({ ...editAdvice, ai_generated_text: e.target.value })}
               rows={4}
-              className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#222] rounded-lg text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] resize-none"
+              className="w-full px-3 py-2.5 bg-[#0a0a0a] border border-[#222] rounded-lg text-base text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] resize-none"
             />
             <div className="flex justify-end gap-2 mt-4">
               <button
@@ -561,7 +561,7 @@ export default function AdminPage() {
                   type="text"
                   value={editPhoto.title || ""}
                   onChange={(e) => setEditPhoto({ ...editPhoto, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#222] rounded-lg text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6]"
+                  className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#222] rounded-lg text-base text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6]"
                 />
               </div>
               <div>
@@ -570,7 +570,7 @@ export default function AdminPage() {
                   value={editPhoto.alt_text || ""}
                   onChange={(e) => setEditPhoto({ ...editPhoto, alt_text: e.target.value })}
                   rows={2}
-                  className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#222] rounded-lg text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] resize-none"
+                  className="w-full px-3 py-2.5 bg-[#0a0a0a] border border-[#222] rounded-lg text-base text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] resize-none"
                 />
               </div>
               <div>
@@ -578,7 +578,7 @@ export default function AdminPage() {
                 <select
                   value={editPhoto.section}
                   onChange={(e) => setEditPhoto({ ...editPhoto, section: e.target.value as Photo["section"] })}
-                  className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#222] rounded-lg text-[#f0f0f0] focus:outline-none"
+                  className="w-full px-3 py-2.5 bg-[#0a0a0a] border border-[#222] rounded-lg text-base text-[#f0f0f0] focus:outline-none"
                 >
                   {PHOTO_SECTIONS.map((s) => (
                     <option key={s} value={s}>{s}</option>
@@ -590,7 +590,7 @@ export default function AdminPage() {
                 <select
                   value={editPhoto.category || ""}
                   onChange={(e) => setEditPhoto({ ...editPhoto, category: e.target.value || null })}
-                  className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#222] rounded-lg text-[#f0f0f0] focus:outline-none"
+                  className="w-full px-3 py-2.5 bg-[#0a0a0a] border border-[#222] rounded-lg text-base text-[#f0f0f0] focus:outline-none"
                 >
                   <option value="">None</option>
                   {PHOTO_CATEGORIES.map((c) => (
