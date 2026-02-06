@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { getCloudinaryUrl, PHOTO_CATEGORIES, PHOTO_SECTIONS } from "@/lib/cloudinary";
 import type { Photo } from "@/types/photo";
+import type { AdviceSubmission } from "@/types/advice";
 
 export default function AdminPage() {
   const [session, setSession] = useState<{ user: { email: string } } | null>(null);
@@ -16,6 +17,9 @@ export default function AdminPage() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [editPhoto, setEditPhoto] = useState<Photo | null>(null);
   const [deletePhoto, setDeletePhoto] = useState<Photo | null>(null);
+  const [adviceQueue, setAdviceQueue] = useState<AdviceSubmission[]>([]);
+  const [editAdvice, setEditAdvice] = useState<AdviceSubmission | null>(null);
+  const [activeTab, setActiveTab] = useState<"photos" | "advice">("photos");
 
   // Check session
   useEffect(() => {
@@ -37,9 +41,21 @@ export default function AdminPage() {
     if (!error && data) setPhotos(data);
   }, []);
 
+  // Load advice submissions
+  const loadAdvice = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("advice_submissions")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error && data) setAdviceQueue(data);
+  }, []);
+
   useEffect(() => {
-    if (session) loadPhotos();
-  }, [session, loadPhotos]);
+    if (session) {
+      loadPhotos();
+      loadAdvice();
+    }
+  }, [session, loadPhotos, loadAdvice]);
 
   // Login
   const handleLogin = async (e: React.FormEvent) => {
@@ -110,6 +126,33 @@ export default function AdminPage() {
     setEditPhoto(null);
     loadPhotos();
   };
+
+  // Advice actions
+  const handleAdviceAction = async (id: string, status: "approved" | "rejected") => {
+    await supabase
+      .from("advice_submissions")
+      .update({ status, reviewed_at: new Date().toISOString() })
+      .eq("id", id);
+    loadAdvice();
+  };
+
+  const saveAdviceEdit = async () => {
+    if (!editAdvice) return;
+    await supabase
+      .from("advice_submissions")
+      .update({ ai_generated_text: editAdvice.ai_generated_text })
+      .eq("id", editAdvice.id);
+    setEditAdvice(null);
+    loadAdvice();
+  };
+
+  const deleteAdvice = async (id: string) => {
+    await supabase.from("advice_submissions").delete().eq("id", id);
+    loadAdvice();
+  };
+
+  const pendingAdvice = adviceQueue.filter((a) => a.status === "pending");
+  const reviewedAdvice = adviceQueue.filter((a) => a.status !== "pending");
 
   // Filtered photos
   const filtered = photos.filter((p) => {
@@ -196,20 +239,169 @@ export default function AdminPage() {
       </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         {[
           { label: "Total Photos", value: stats.total },
           { label: "Gallery", value: stats.gallery },
           { label: "Bento Grid", value: stats.bento },
           { label: "Featured", value: stats.featured },
+          { label: "Pending Advice", value: pendingAdvice.length },
         ].map((stat) => (
-          <div key={stat.label} className="p-4 bg-[#111] border border-[#222] rounded-xl">
+          <div key={stat.label} className={`p-4 bg-[#111] border rounded-xl ${stat.label === "Pending Advice" && stat.value > 0 ? "border-amber-500/40" : "border-[#222]"}`}>
             <p className="text-xs text-[#7a7a75] mb-1">{stat.label}</p>
             <p className="text-2xl font-semibold">{stat.value}</p>
           </div>
         ))}
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-1 mb-8 border-b border-[#222]">
+        <button
+          onClick={() => setActiveTab("photos")}
+          className={`px-4 py-2.5 text-sm font-medium transition-colors -mb-px ${
+            activeTab === "photos"
+              ? "text-[#f0f0f0] border-b-2 border-[#3b82f6]"
+              : "text-[#7a7a75] hover:text-[#a0a0a0]"
+          }`}
+        >
+          Photos
+        </button>
+        <button
+          onClick={() => setActiveTab("advice")}
+          className={`px-4 py-2.5 text-sm font-medium transition-colors -mb-px flex items-center gap-2 ${
+            activeTab === "advice"
+              ? "text-[#f0f0f0] border-b-2 border-[#3b82f6]"
+              : "text-[#7a7a75] hover:text-[#a0a0a0]"
+          }`}
+        >
+          Advice Review
+          {pendingAdvice.length > 0 && (
+            <span className="px-1.5 py-0.5 text-[0.65rem] bg-amber-500/20 text-amber-400 rounded-full">
+              {pendingAdvice.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === "advice" && (
+        <>
+          {/* Pending Queue */}
+          <section className="mb-10">
+            <h2 className="text-lg font-semibold mb-4">Pending Submissions</h2>
+            {pendingAdvice.length === 0 ? (
+              <div className="text-center py-12 bg-[#111] border border-[#222] rounded-xl">
+                <p className="text-[#7a7a75]">No pending submissions</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {pendingAdvice.map((item) => (
+                  <div key={item.id} className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+                    <div className="flex flex-col md:flex-row">
+                      <div className="md:w-64 flex-shrink-0">
+                        <img
+                          src={item.image_url}
+                          alt=""
+                          className="w-full h-48 md:h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 p-5">
+                        <div className="flex items-start justify-between mb-3">
+                          <p className="text-xs text-[#7a7a75]">
+                            {new Date(item.created_at).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                          <span className="text-[0.65rem] px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded-full">
+                            pending
+                          </span>
+                        </div>
+                        <p className="text-[#f0f0f0] leading-relaxed mb-2">
+                          &ldquo;{item.ai_generated_text}&rdquo;
+                        </p>
+                        {item.submitter_note && (
+                          <p className="text-xs text-[#7a7a75] mb-3">
+                            Note: {item.submitter_note}
+                          </p>
+                        )}
+                        <div className="flex gap-2 mt-4">
+                          <button
+                            onClick={() => handleAdviceAction(item.id, "approved")}
+                            className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleAdviceAction(item.id, "rejected")}
+                            className="px-4 py-2 text-sm bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                          >
+                            Reject
+                          </button>
+                          <button
+                            onClick={() => setEditAdvice({ ...item })}
+                            className="px-4 py-2 text-sm border border-[#222] rounded-lg hover:border-[#444] transition-colors"
+                          >
+                            Edit Text
+                          </button>
+                          <button
+                            onClick={() => deleteAdvice(item.id)}
+                            className="px-4 py-2 text-sm text-[#555] hover:text-red-400 transition-colors ml-auto"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Previously Reviewed */}
+          {reviewedAdvice.length > 0 && (
+            <section>
+              <h2 className="text-lg font-semibold mb-4">Previously Reviewed</h2>
+              <div className="space-y-3">
+                {reviewedAdvice.map((item) => (
+                  <div key={item.id} className="flex items-center gap-4 bg-[#111] border border-[#222] rounded-xl p-4">
+                    <img
+                      src={item.image_url}
+                      alt=""
+                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[#f0f0f0] truncate">{item.ai_generated_text}</p>
+                      <p className="text-xs text-[#7a7a75] mt-1">
+                        {item.reviewed_at && new Date(item.reviewed_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className={`text-[0.65rem] px-2 py-0.5 rounded-full flex-shrink-0 ${
+                      item.status === "approved"
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-red-500/20 text-red-400"
+                    }`}>
+                      {item.status}
+                    </span>
+                    <button
+                      onClick={() => deleteAdvice(item.id)}
+                      className="text-xs text-[#555] hover:text-red-400 transition-colors flex-shrink-0"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      )}
+
+      {activeTab === "photos" && (
+        <>
       {/* Upload */}
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-4">Upload Photos</h2>
@@ -314,6 +506,45 @@ export default function AdminPage() {
           </div>
         )}
       </section>
+        </>
+      )}
+
+      {/* Edit Advice Modal */}
+      {editAdvice && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setEditAdvice(null)}>
+          <div className="bg-[#111] border border-[#222] rounded-2xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Edit Advice Text</h2>
+              <button onClick={() => setEditAdvice(null)} className="text-[#7a7a75] hover:text-white text-xl">&times;</button>
+            </div>
+            <img
+              src={editAdvice.image_url}
+              alt=""
+              className="w-full h-48 object-cover rounded-xl mb-4"
+            />
+            <textarea
+              value={editAdvice.ai_generated_text}
+              onChange={(e) => setEditAdvice({ ...editAdvice, ai_generated_text: e.target.value })}
+              rows={4}
+              className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#222] rounded-lg text-[#f0f0f0] focus:outline-none focus:border-[#3b82f6] resize-none"
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setEditAdvice(null)}
+                className="px-4 py-2 text-sm border border-[#222] rounded-lg hover:border-[#444] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveAdviceEdit}
+                className="px-4 py-2 text-sm bg-[#3b82f6] text-white rounded-lg hover:bg-[#2563eb] transition-colors"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Modal */}
       {editPhoto && (
