@@ -7,6 +7,15 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+];
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -17,8 +26,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
+    // Validate file type — accept HEIC/HEIF from iOS
+    if (!file.type.startsWith("image/") && !ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
         { error: "Only image files are allowed" },
         { status: 400 }
@@ -33,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Upload to Cloudinary
+    // 1. Upload to Cloudinary (auto-converts HEIC to JPEG)
     const cloudinaryForm = new FormData();
     cloudinaryForm.append("file", file);
     cloudinaryForm.append(
@@ -55,22 +64,13 @@ export async function POST(request: NextRequest) {
     }
 
     const cloudinaryData = await cloudinaryRes.json();
-    const imageUrl = cloudinaryData.secure_url;
-    const cloudinaryId = cloudinaryData.public_id;
+    const imageUrl: string = cloudinaryData.secure_url;
+    const cloudinaryId: string = cloudinaryData.public_id;
 
-    // 2. Send to Claude for analysis
+    // 2. Send Cloudinary URL to Claude (already converted from HEIC if needed)
     const anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
-
-    // Convert file to base64
-    const bytes = await file.arrayBuffer();
-    const base64 = Buffer.from(bytes).toString("base64");
-    const mediaType = file.type as
-      | "image/jpeg"
-      | "image/png"
-      | "image/gif"
-      | "image/webp";
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
@@ -81,11 +81,11 @@ export async function POST(request: NextRequest) {
           content: [
             {
               type: "image",
-              source: { type: "base64", media_type: mediaType, data: base64 },
+              source: { type: "url", url: imageUrl },
             },
             {
               type: "text",
-              text: 'Look at this photo and generate a single piece of timeless, heartfelt advice inspired by what you see. The advice should be 1-2 sentences, feel personal and reflective — like wisdom from a close friend. Do not describe the photo. Just give the advice. Return only the advice text, no quotes or attribution.',
+              text: "Look at this photo and generate a single piece of timeless, heartfelt advice inspired by what you see. The advice should be 1-2 sentences, feel personal and reflective — like wisdom from a close friend. Do not describe the photo. Just give the advice. Return only the advice text, no quotes or attribution.",
             },
           ],
         },
