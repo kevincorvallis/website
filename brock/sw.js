@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brock-story-v2';
+const CACHE_NAME = 'brock-story-v3';
 const ASSETS = [
   '/brock/',
   '/brock/images/01-prologue-portrait.webp',
