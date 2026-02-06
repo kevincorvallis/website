@@ -390,17 +390,15 @@
         }
 
         .hscroll-strip {
-            display: flex;
-            flex-wrap: nowrap;
-            width: max-content;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            padding: 0 1rem;
         }
 
         .hscroll-strip .hscroll-photo {
-            flex: 0 0 85vw;
-            height: 70vh;
-            padding: 0 0.35rem;
+            aspect-ratio: 4/5;
         }
-
 
         .hscroll-strip .hscroll-photo img {
             width: 100%;
@@ -505,9 +503,18 @@
                 max-width: 600px;
             }
 
+            .hscroll-strip {
+                display: flex;
+                flex-wrap: nowrap;
+                width: max-content;
+                gap: 0;
+                padding: 0;
+            }
+
             .hscroll-strip .hscroll-photo {
                 flex: 0 0 55vw;
                 height: 75vh;
+                aspect-ratio: auto;
                 padding: 0 0.5rem;
             }
         }
@@ -783,7 +790,7 @@
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="story-footer">
-        <p>Made with love by Kevin &amp; Beryl &mdash; <a href="/">kevinlee.me</a></p>
+        <p>Made with love by Kevin &amp; Beryl &mdash; <a href="/">klee.page</a></p>
     </footer>
 
     <!-- ==================== SCRIPTS ==================== -->
@@ -950,8 +957,7 @@
 
             // ==================== HORIZONTAL SCROLL (MOVE CHAPTER) ====================
             const moveStrip = document.getElementById('moveStrip');
-            if (moveStrip) {
-                const photos = moveStrip.querySelectorAll('.hscroll-photo');
+            if (moveStrip && window.innerWidth >= 768) {
                 const totalWidth = moveStrip.scrollWidth;
                 const viewportWidth = window.innerWidth;
 
