@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Someone has a question for you...">
+    <meta property="og:description" content="Open this to find out what Brock wants to ask you">
+    <meta property="og:image" content="/brock/images/01-prologue-portrait.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Someone has a question for you...">
+    <meta name="twitter:description" content="Open this to find out what Brock wants to ask you">
+    <meta name="twitter:image" content="/brock/images/01-prologue-portrait.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💝</text></svg>">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font: 'Satoshi', -apple-system, sans-serif;
+            --bg: #0a0a0a;
+            --text: #f0f0ec;
+            --caption: #7a7a75;
+            --accent: #d4a574;
+            --pink: #e8a0bf;
+            --pink-soft: #f2c4d4;
+            --red: #c9544d;
+            --heart: #e25555;
+        }
+
+        html {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            overflow-x: hidden;
+            background: var(--bg);
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        /* ========== FLOATING HEARTS BACKGROUND ========== */
+        .hearts-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0;
+            animation: floatUp linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(0deg) scale(0.5);
+            }
+            10% {
+                opacity: 0.15;
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-10vh) rotate(25deg) scale(1);
+            }
+        }
+
+        /* ========== MAIN CONTAINER ========== */
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ========== BROCK IMAGE ========== */
+        .brock-photo {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid rgba(232, 160, 191, 0.3);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: scale(0.8);
+            box-shadow: 0 0 40px rgba(232, 160, 191, 0.1);
+        }
+
+        .brock-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ========== QUESTION TEXT ========== */
+        .question-label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            opacity: 0;
+        }
+
+        .question {
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            text-align: center;
+            margin-bottom: 0.75rem;
+            opacity: 0;
+        }
+
+        .question-sub {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--caption);
+            text-align: center;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+            max-width: 320px;
+            opacity: 0;
+        }
+
+        /* ========== BUTTONS ========== */
+        .buttons {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+            opacity: 0;
+            position: relative;
+        }
+
+        .btn {
+            font-family: var(--font);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            padding: 1rem 2.5rem;
+            border-radius: 60px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .btn-yes {
+            background: var(--pink);
+            color: var(--bg);
+            box-shadow: 0 4px 24px rgba(232, 160, 191, 0.3);
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 32px rgba(232, 160, 191, 0.4);
+        }
+
+        .btn-yes:active {
+            transform: scale(0.98);
+        }
+
+        .btn-no {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--caption);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.15s ease, left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), font-size 0.3s ease, padding 0.3s ease;
+            position: relative;
+        }
+
+        .btn-no:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-no.dodging {
+            position: fixed;
+            z-index: 100;
+        }
+
+        /* ========== DODGE MESSAGE ========== */
+        .dodge-message {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--pink-soft);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .dodge-message.show {
+            opacity: 1;
+        }
+
+        /* ========== SUCCESS STATE ========== */
+        .success-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .success-screen.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-heart {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            animation: heartBeat 1s ease-in-out infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.2); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+            60% { transform: scale(1); }
+        }
+
+        .success-title {
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .success-sub {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--caption);
+            text-align: center;
+            line-height: 1.6;
+            max-width: 360px;
+        }
+
+        .success-brock {
+            width: 200px;
+            height: 200px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 2.5rem;
+            border: 2px solid rgba(232, 160, 191, 0.2);
+            box-shadow: 0 8px 40px rgba(232, 160, 191, 0.15);
+        }
+
+        .success-brock img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ========== CONFETTI CANVAS ========== */
+        .confetti-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 201;
+            pointer-events: none;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (min-width: 768px) {
+            .brock-photo {
+                width: 200px;
+                height: 200px;
+            }
+
+            .success-brock {
+                width: 260px;
+                height: 260px;
+                border-radius: 20px;
+            }
+        }
+
+        /* ========== REDUCED MOTION ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .floating-heart {
+                animation: none !important;
+                display: none;
+            }
+
+            .success-heart {
+                animation: none !important;
+            }
+
+            .btn-no {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating hearts background -->
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <!-- Main question screen -->
+    <div class="container" id="questionScreen">
+        <div class="brock-photo" id="brockPhoto">
+            <img src="/brock/images/01-prologue-portrait.jpg" alt="Brock">
+        </div>
+
+        <div class="question-label" id="qLabel">Brock wants to know...</div>
+        <h1 class="question" id="qTitle">Will you be my Valentine?</h1>
+        <p class="question-sub" id="qSub">He's been practicing his puppy eyes all week for this moment</p>
+
+        <div class="buttons" id="buttons">
+            <button class="btn btn-yes" id="btnYes">Yes!</button>
+            <button class="btn btn-no" id="btnNo">No</button>
+        </div>
+    </div>
+
+    <!-- Dodge message -->
+    <div class="dodge-message" id="dodgeMessage"></div>
+
+    <!-- Success screen -->
+    <div class="success-screen" id="successScreen">
+        <div class="success-heart">💝</div>
+        <h1 class="success-title">Yay!</h1>
+        <p class="success-sub">Brock is SO happy right now. He's doing the spinny thing he does when you come home. Happy Valentine's Day!</p>
+        <div class="success-brock">
+            <img src="/brock/images/10-oregon-daisies.jpg" alt="Happy Brock in daisies">
+        </div>
+    </div>
+
+    <!-- Confetti canvas -->
+    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+    <script>
+        // ==================== FLOATING HEARTS ====================
+        const heartsBg = document.getElementById('heartsBg');
+        const heartEmojis = ['💕', '💗', '💖', '🩷', '🤍', '🐾'];
+
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (8 + Math.random() * 12) + 's';
+            heart.style.animationDelay = (Math.random() * 10) + 's';
+            heart.style.fontSize = (0.8 + Math.random() * 1) + 'rem';
+            heartsBg.appendChild(heart);
+        }
+
+        // ==================== ENTRANCE ANIMATIONS ====================
+        const brockPhoto = document.getElementById('brockPhoto');
+        const qLabel = document.getElementById('qLabel');
+        const qTitle = document.getElementById('qTitle');
+        const qSub = document.getElementById('qSub');
+        const buttons = document.getElementById('buttons');
+
+        function animate(el, delay, extras = {}) {
+            setTimeout(() => {
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+                el.style.opacity = '1';
+                el.style.transform = extras.transform || 'none';
+            }, delay);
+        }
+
+        animate(brockPhoto, 200, { transform: 'scale(1)' });
+        animate(qLabel, 600);
+        animate(qTitle, 900);
+        animate(qSub, 1200);
+        animate(buttons, 1500);
+
+        // ==================== NO BUTTON DODGE LOGIC ====================
+        const btnNo = document.getElementById('btnNo');
+        const btnYes = document.getElementById('btnYes');
+        const dodgeMsg = document.getElementById('dodgeMessage');
+
+        let dodgeCount = 0;
+        const dodgeMessages = [
+            "Brock's ears just drooped... try again?",
+            "That button has commitment issues!",
+            "Brock says: please reconsider",
+            "The button is running away!",
+            "Are you really saying no to this face?",
+            "Brock is giving you the puppy eyes...",
+            "He practiced his sad face for this...",
+            "The button refuses to cooperate!",
+            "Not an option, sorry!",
+            "Brock's tail stopped wagging...",
+        ];
+
+        let msgTimeout;
+        function showDodgeMessage() {
+            const msg = dodgeMessages[dodgeCount % dodgeMessages.length];
+            dodgeMsg.textContent = msg;
+            dodgeMsg.classList.add('show');
+            clearTimeout(msgTimeout);
+            msgTimeout = setTimeout(() => {
+                dodgeMsg.classList.remove('show');
+            }, 2000);
+        }
+
+        function dodgeButton() {
+            dodgeCount++;
+            showDodgeMessage();
+
+            // Make the no button dodge to a random position
+            btnNo.classList.add('dodging');
+
+            const padding = 20;
+            const btnW = btnNo.offsetWidth;
+            const btnH = btnNo.offsetHeight;
+            const maxX = window.innerWidth - btnW - padding;
+            const maxY = window.innerHeight - btnH - padding;
+
+            let newX, newY;
+            // Make sure it doesn't land near the same spot
+            do {
+                newX = padding + Math.random() * (maxX - padding);
+                newY = padding + Math.random() * (maxY - padding);
+            } while (
+                Math.abs(newX - btnNo.getBoundingClientRect().left) < 100 &&
+                Math.abs(newY - btnNo.getBoundingClientRect().top) < 100
+            );
+
+            btnNo.style.left = newX + 'px';
+            btnNo.style.top = newY + 'px';
+
+            // Shrink the no button progressively
+            const shrinkFactor = Math.max(0.5, 1 - dodgeCount * 0.08);
+            btnNo.style.fontSize = (1 * shrinkFactor) + 'rem';
+            btnNo.style.padding = `${1 * shrinkFactor}rem ${2.5 * shrinkFactor}rem`;
+
+            // Grow the yes button!
+            const growFactor = Math.min(1.4, 1 + dodgeCount * 0.06);
+            btnYes.style.transform = `scale(${growFactor})`;
+            btnYes.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
+            btnYes.style.boxShadow = `0 6px ${24 + dodgeCount * 4}px rgba(232, 160, 191, ${0.3 + dodgeCount * 0.05})`;
+
+            // After enough dodges, change the no text
+            if (dodgeCount >= 3) btnNo.textContent = 'Noo...';
+            if (dodgeCount >= 5) btnNo.textContent = '...fine';
+            if (dodgeCount >= 7) btnNo.textContent = 'ok ok';
+        }
+
+        // Dodge on hover (desktop) and touch (mobile)
+        btnNo.addEventListener('mouseenter', dodgeButton);
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            dodgeButton();
+        }, { passive: false });
+        // Also dodge on click just in case
+        btnNo.addEventListener('click', (e) => {
+            e.preventDefault();
+            dodgeButton();
+        });
+
+        // ==================== YES BUTTON ====================
+        const successScreen = document.getElementById('successScreen');
+
+        btnYes.addEventListener('click', () => {
+            successScreen.classList.add('show');
+            launchConfetti();
+
+            // Disable interaction on question screen
+            document.getElementById('questionScreen').style.pointerEvents = 'none';
+        });
+
+        // ==================== CONFETTI ====================
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        let confettiPieces = [];
+        let animating = false;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function launchConfetti() {
+            confettiPieces = [];
+            const colors = ['#e8a0bf', '#f2c4d4', '#d4a574', '#e25555', '#f0f0ec', '#ffd4e5', '#ffb3ba', '#bae1ff'];
+
+            for (let i = 0; i < 150; i++) {
+                confettiPieces.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    w: 4 + Math.random() * 6,
+                    h: 8 + Math.random() * 8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10,
+                    speedX: (Math.random() - 0.5) * 4,
+                    speedY: 2 + Math.random() * 4,
+                    opacity: 0.7 + Math.random() * 0.3,
+                });
+            }
+
+            if (!animating) {
+                animating = true;
+                animateConfetti();
+            }
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let activeCount = 0;
+            confettiPieces.forEach(p => {
+                if (p.y < canvas.height + 50) {
+                    activeCount++;
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.rotation += p.rotationSpeed;
+                    p.speedY += 0.05; // gravity
+                    p.opacity *= 0.999;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                }
+            });
+
+            if (activeCount > 0) {
+                requestAnimationFrame(animateConfetti);
+            } else {
+                animating = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+    </script>
+</body>
+</html>
