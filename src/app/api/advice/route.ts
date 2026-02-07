@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 const ALLOWED_TYPES = [
   "image/jpeg",
@@ -98,6 +100,7 @@ export async function POST(request: NextRequest) {
         : "Unable to generate advice.";
 
     // 3. Save to Supabase as pending
+    const supabase = getSupabase();
     const { data, error } = await supabase
       .from("advice_submissions")
       .insert({
