@@ -241,11 +241,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 2rem;
+            padding-top: max(2rem, 8vh);
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.6s ease, visibility 0.6s ease;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .success-screen.show {
@@ -301,6 +304,152 @@
             object-fit: cover;
         }
 
+        /* ========== GIFT OPTIONS ========== */
+        .gift-section {
+            width: 100%;
+            max-width: 520px;
+            margin-top: 3rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .gift-section.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .gift-heading {
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .gift-title {
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .gift-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .gift-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.25rem 1rem;
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        background 0.3s ease,
+                        border-color 0.3s ease,
+                        box-shadow 0.3s ease;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gift-card:hover {
+            background: rgba(232, 160, 191, 0.08);
+            border-color: rgba(232, 160, 191, 0.2);
+            transform: scale(1.03);
+        }
+
+        .gift-card:active {
+            transform: scale(0.97);
+        }
+
+        .gift-card.selected {
+            background: rgba(232, 160, 191, 0.12);
+            border-color: var(--pink);
+            box-shadow: 0 0 24px rgba(232, 160, 191, 0.15);
+        }
+
+        .gift-card.selected .gift-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .gift-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .gift-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.25rem;
+        }
+
+        .gift-desc {
+            font-size: 0.65rem;
+            color: var(--caption);
+            line-height: 1.4;
+        }
+
+        .gift-check {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--pink);
+            color: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 900;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* ========== GIFT CONFIRM ========== */
+        .gift-confirm {
+            margin-top: 1.5rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .gift-confirm.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .gift-confirm-text {
+            font-size: 0.85rem;
+            color: var(--pink-soft);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .gift-confirm-sub {
+            font-size: 0.7rem;
+            color: var(--caption);
+            font-style: italic;
+        }
+
         /* ========== CONFETTI CANVAS ========== */
         .confetti-canvas {
             position: fixed;
@@ -337,6 +486,18 @@
             .btn-no {
                 transition: none !important;
             }
+
+            .gift-card {
+                transition: none !important;
+            }
+
+            .gift-section {
+                transition: none !important;
+            }
+
+            .gift-confirm {
+                transition: none !important;
+            }
         }
     </style>
 </head>
@@ -371,6 +532,55 @@
         <p class="success-sub">Brock is SO happy right now. He's doing the spinny thing he does when you come home. Happy Valentine's Day!</p>
         <div class="success-brock">
             <img src="/brock/images/10-oregon-daisies.jpg" alt="Happy Brock in daisies">
+        </div>
+
+        <!-- Gift Options -->
+        <div class="gift-section" id="giftSection">
+            <div class="gift-heading">Now for the fun part...</div>
+            <div class="gift-title">Pick your Valentine's gift 💝</div>
+            <div class="gift-grid" id="giftGrid">
+                <div class="gift-card" data-gift="star-map">
+                    <span class="gift-check">✓</span>
+                    <span class="gift-emoji">🌌</span>
+                    <div class="gift-name">Star Map</div>
+                    <div class="gift-desc">The night sky from the day we met, printed just for you</div>
+                </div>
+                <div class="gift-card" data-gift="adventure-book">
+                    <span class="gift-check">✓</span>
+                    <span class="gift-emoji">📖</span>
+                    <div class="gift-name">Adventure Book</div>
+                    <div class="gift-desc">Our bucket list of adventures, "Up" style</div>
+                </div>
+                <div class="gift-card" data-gift="letter-jar">
+                    <span class="gift-check">✓</span>
+                    <span class="gift-emoji">💌</span>
+                    <div class="gift-name">Love Letter Jar</div>
+                    <div class="gift-desc">52 handwritten notes — open one each week</div>
+                </div>
+                <div class="gift-card" data-gift="sunset-picnic">
+                    <span class="gift-check">✓</span>
+                    <span class="gift-emoji">🧺</span>
+                    <div class="gift-name">Sunset Picnic</div>
+                    <div class="gift-desc">A surprise golden-hour picnic at our favorite spot</div>
+                </div>
+                <div class="gift-card" data-gift="playlist">
+                    <span class="gift-check">✓</span>
+                    <span class="gift-emoji">🎵</span>
+                    <div class="gift-name">Custom Playlist</div>
+                    <div class="gift-desc">The soundtrack of us — every song that's ours</div>
+                </div>
+                <div class="gift-card" data-gift="spa-night">
+                    <span class="gift-check">✓</span>
+                    <span class="gift-emoji">🕯️</span>
+                    <div class="gift-name">Spa Night</div>
+                    <div class="gift-desc">At-home spa night with candles, masks & relaxation</div>
+                </div>
+            </div>
+
+            <div class="gift-confirm" id="giftConfirm">
+                <div class="gift-confirm-text" id="giftConfirmText"></div>
+                <div class="gift-confirm-sub">Brock approves of your choice 🐾</div>
+            </div>
         </div>
     </div>
 
@@ -501,6 +711,7 @@
 
         // ==================== YES BUTTON ====================
         const successScreen = document.getElementById('successScreen');
+        const giftSection = document.getElementById('giftSection');
 
         btnYes.addEventListener('click', () => {
             successScreen.classList.add('show');
@@ -508,6 +719,50 @@
 
             // Disable interaction on question screen
             document.getElementById('questionScreen').style.pointerEvents = 'none';
+
+            // Show gift options after a beat
+            setTimeout(() => {
+                giftSection.classList.add('show');
+            }, 2000);
+        });
+
+        // ==================== GIFT SELECTION ====================
+        const giftGrid = document.getElementById('giftGrid');
+        const giftConfirm = document.getElementById('giftConfirm');
+        const giftConfirmText = document.getElementById('giftConfirmText');
+
+        const giftResponses = {
+            'star-map': "A map of the stars just for us ✨ — the most romantic thing ever.",
+            'adventure-book': "Our very own adventure book! Time to start filling it 🏔️",
+            'letter-jar': "52 love notes?? You won't make it a week without reading them all 💕",
+            'sunset-picnic': "Golden hour + good food + you = perfection 🌅",
+            'playlist': "Every song will remind you of us. Press play & feel the love 🎧",
+            'spa-night': "Candles, face masks, and zero stress. You deserve it 🧖‍♀️",
+        };
+
+        giftGrid.addEventListener('click', (e) => {
+            const card = e.target.closest('.gift-card');
+            if (!card) return;
+
+            // Toggle selection
+            const wasSelected = card.classList.contains('selected');
+
+            // Deselect all
+            giftGrid.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
+
+            if (!wasSelected) {
+                card.classList.add('selected');
+                const gift = card.dataset.gift;
+                giftConfirmText.textContent = giftResponses[gift];
+                giftConfirm.classList.add('show');
+
+                // Scroll to confirm message
+                setTimeout(() => {
+                    giftConfirm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 200);
+            } else {
+                giftConfirm.classList.remove('show');
+            }
         });
 
         // ==================== CONFETTI ====================
