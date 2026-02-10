@@ -341,7 +341,7 @@
 
         .gift-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 0.75rem;
         }
 
@@ -349,7 +349,7 @@
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 16px;
-            padding: 1.25rem 1rem;
+            padding: 1.5rem 1.25rem;
             cursor: pointer;
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
                         background 0.3s ease,
@@ -360,6 +360,9 @@
             user-select: none;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .gift-card:hover {
@@ -390,16 +393,27 @@
         }
 
         .gift-name {
-            font-size: 0.85rem;
+            font-size: 1rem;
             font-weight: 700;
             letter-spacing: -0.01em;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.3rem;
         }
 
         .gift-desc {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             color: var(--caption);
             line-height: 1.4;
+            max-width: 280px;
+        }
+
+        .gift-tier {
+            font-size: 0.55rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--pink);
+            margin-top: 0.4rem;
+            opacity: 0.7;
         }
 
         .gift-check {
@@ -537,43 +551,28 @@
         <!-- Gift Options -->
         <div class="gift-section" id="giftSection">
             <div class="gift-heading">Now for the fun part...</div>
-            <div class="gift-title">Pick your Valentine's gift 💝</div>
+            <div class="gift-title">Pick your Valentine's adventure 💝</div>
             <div class="gift-grid" id="giftGrid">
-                <div class="gift-card" data-gift="star-map">
+                <div class="gift-card" data-gift="chocolates">
                     <span class="gift-check">✓</span>
-                    <span class="gift-emoji">🌌</span>
-                    <div class="gift-name">Star Map</div>
-                    <div class="gift-desc">The night sky from the day we met, printed just for you</div>
+                    <span class="gift-emoji">🍫💐</span>
+                    <div class="gift-name">Chocolates & Flowers</div>
+                    <div class="gift-desc">The timeless combo — a cozy night in with sweets and something pretty</div>
+                    <div class="gift-tier">Classic & Sweet</div>
                 </div>
-                <div class="gift-card" data-gift="adventure-book">
+                <div class="gift-card" data-gift="south-bend">
                     <span class="gift-check">✓</span>
-                    <span class="gift-emoji">📖</span>
-                    <div class="gift-name">Adventure Book</div>
-                    <div class="gift-desc">Our bucket list of adventures, "Up" style</div>
+                    <span class="gift-emoji">🏈🏡</span>
+                    <div class="gift-name">Visit South Bend</div>
+                    <div class="gift-desc">A weekend trip down to South Bend — good vibes, good food, great company</div>
+                    <div class="gift-tier">Road Trip Energy</div>
                 </div>
-                <div class="gift-card" data-gift="letter-jar">
+                <div class="gift-card" data-gift="asia-trip">
                     <span class="gift-check">✓</span>
-                    <span class="gift-emoji">💌</span>
-                    <div class="gift-name">Love Letter Jar</div>
-                    <div class="gift-desc">52 handwritten notes — open one each week</div>
-                </div>
-                <div class="gift-card" data-gift="sunset-picnic">
-                    <span class="gift-check">✓</span>
-                    <span class="gift-emoji">🧺</span>
-                    <div class="gift-name">Sunset Picnic</div>
-                    <div class="gift-desc">A surprise golden-hour picnic at our favorite spot</div>
-                </div>
-                <div class="gift-card" data-gift="playlist">
-                    <span class="gift-check">✓</span>
-                    <span class="gift-emoji">🎵</span>
-                    <div class="gift-name">Custom Playlist</div>
-                    <div class="gift-desc">The soundtrack of us — every song that's ours</div>
-                </div>
-                <div class="gift-card" data-gift="spa-night">
-                    <span class="gift-check">✓</span>
-                    <span class="gift-emoji">🕯️</span>
-                    <div class="gift-name">Spa Night</div>
-                    <div class="gift-desc">At-home spa night with candles, masks & relaxation</div>
+                    <span class="gift-emoji">🇯🇵🇰🇷</span>
+                    <div class="gift-name">Japan & Korea Trip</div>
+                    <div class="gift-desc">Tokyo streets, Korean BBQ, cherry blossoms — the ultimate adventure for two</div>
+                    <div class="gift-tier">Dream Tier ✨</div>
                 </div>
             </div>
 
@@ -732,12 +731,9 @@
         const giftConfirmText = document.getElementById('giftConfirmText');
 
         const giftResponses = {
-            'star-map': "A map of the stars just for us ✨ — the most romantic thing ever.",
-            'adventure-book': "Our very own adventure book! Time to start filling it 🏔️",
-            'letter-jar': "52 love notes?? You won't make it a week without reading them all 💕",
-            'sunset-picnic': "Golden hour + good food + you = perfection 🌅",
-            'playlist': "Every song will remind you of us. Press play & feel the love 🎧",
-            'spa-night': "Candles, face masks, and zero stress. You deserve it 🧖‍♀️",
+            'chocolates': "Sweet and classic — just like you! 🍫 Brock might steal a piece though...",
+            'south-bend': "Pack your bags! South Bend is calling and we're answering 🚗💨",
+            'asia-trip': "SAY LESS. Booking flights, packing bags, learning 'arigatou' 🗼✈️",
         };
 
         giftGrid.addEventListener('click', (e) => {
