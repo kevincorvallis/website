@@ -34,6 +34,7 @@
             --bg: #f0eee6;
             --text: #1f1e1d;
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            color-scheme: light dark;
         }
 
         [data-theme="dark"] {
@@ -52,7 +53,6 @@
             color: var(--text);
             font-size: 20px;
             line-height: 1.6;
-            transition: color 0.2s linear, background-color 0.2s linear;
         }
 
         ::selection {
@@ -62,7 +62,7 @@
 
         a {
             color: var(--text);
-            transition: opacity 0.2s linear;
+            transition: opacity 0.2s ease;
         }
 
         a:hover {
@@ -106,7 +106,6 @@
             background: var(--text);
             border-radius: 10px;
             cursor: pointer;
-            transition: background 0.2s linear;
         }
 
         .toggle-wrap label::after {
@@ -118,7 +117,7 @@
             height: 16px;
             background: var(--bg);
             border-radius: 50%;
-            transition: transform 0.2s ease, background 0.2s linear;
+            transition: transform 0.2s ease;
         }
 
         .toggle-wrap input:checked + label::after {
@@ -203,8 +202,16 @@
 
         toggle.addEventListener('change', () => {
             const next = toggle.checked ? 'dark' : 'light';
+
+            const style = document.createElement('style');
+            style.textContent = '*, *::before, *::after { transition: none !important; }';
+            document.head.appendChild(style);
+
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
+
+            getComputedStyle(style).opacity;
+            document.head.removeChild(style);
         });
 
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
