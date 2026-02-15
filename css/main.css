@@ -28,7 +28,7 @@ body {
     font-size: 20px;
     line-height: 1.6;
     will-change: color, background-color, border-color;
-    transition: color 0.4s ease, background-color 0.4s ease;
+    transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 ::selection {
@@ -40,7 +40,7 @@ a {
     color: var(--text);
     text-decoration: underline;
     text-underline-offset: 2px;
-    transition: color 0.4s ease;
+    transition: color 0.3s ease;
     will-change: color;
 }
 
@@ -194,6 +194,6 @@ footer p {
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
-        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
     }
 }
