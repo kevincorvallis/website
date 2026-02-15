@@ -28,17 +28,19 @@ body {
     font-size: 20px;
     line-height: 1.6;
     will-change: color, background-color, border-color;
-    transition: color 0.2s linear, background-color 0.2s linear;
+    transition: color 0.4s ease, background-color 0.4s ease;
 }
 
 ::selection {
-    background: var(--text);
-    color: var(--bg);
+    background: rgba(0, 100, 255, 0.26);
+    color: inherit;
 }
 
 a {
     color: var(--text);
-    transition: color 0.2s linear, opacity 0.2s linear;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.4s ease;
     will-change: color;
 }
 
@@ -51,12 +53,10 @@ a:hover {
 header {
     max-width: 620px;
     margin: 0 auto;
-    padding: 2.5rem 20px 1.5rem;
+    padding: 15px 20px 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--text);
-    transition: border-color 0.2s linear;
 }
 
 header h1 {
@@ -66,7 +66,7 @@ header h1 {
 }
 
 header h1 a {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 /* ——— Theme Toggle (pill slider) ——— */
@@ -119,12 +119,11 @@ main {
 }
 
 article section {
-    padding: 2rem 0;
+    margin-top: 26px;
 }
 
-article section:not(:last-child) {
-    border-bottom: 1px solid var(--text);
-    transition: border-color 0.2s linear;
+article section:first-child {
+    margin-top: 2rem;
 }
 
 article section p {
@@ -148,6 +147,14 @@ ul {
 
 ul li {
     margin-bottom: 0.5rem;
+    position: relative;
+    padding-left: 0.9em;
+}
+
+ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
 }
 
 ul li:last-child {
@@ -159,9 +166,7 @@ ul li:last-child {
 footer {
     max-width: 620px;
     margin: 0 auto;
-    padding: 2rem 20px;
-    border-top: 1px solid var(--text);
-    transition: border-color 0.2s linear;
+    padding: 3rem 20px 2rem;
 }
 
 footer p {
