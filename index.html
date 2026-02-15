@@ -33,212 +33,75 @@
     </script>
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://api.fontshare.com">
-    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
-    <!-- Navigation -->
-    <nav>
-        <a href="/" class="nav-logo">Kevin Lee</a>
-        <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-            <span></span>
-            <span></span>
-        </button>
-        <div class="nav-links" id="navLinks">
-            <a href="#work">Work</a>
-            <a href="#about">About</a>
-            <a href="#projects">Projects</a>
-            <a href="#connect">Connect</a>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                <svg class="sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <svg class="moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-            </button>
+    <header>
+        <h1><a href="/">Kevin Lee</a></h1>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero -->
-    <section class="hero">
-        <h1 class="reveal">Kevin Lee</h1>
-        <p class="hero-sub reveal">Software Engineer · Pilot · Photographer</p>
-    </section>
+    <main>
+        <article>
+            <section>
+                <p>
+                    I'm Kevin — a software engineer at Microsoft AI, where I build and ship
+                    Copilot experiences and design large-scale Azure data pipelines processing
+                    40TB+ daily. USC Computer Science, Army veteran, former NASA JPL intern.
+                </p>
+                <p>
+                    I also run ACL Solutions LLC, building consumer apps and developer tools
+                    under the PookieB brand — 10 products spanning full-stack web, iOS, and AI/ML.
+                </p>
+                <p>
+                    Outside of work, I'm a pilot and volunteer with Angel Flight West
+                    providing medical transport flights in the Pacific Northwest.
+                    I also shoot photos, surf, and travel.
+                </p>
+            </section>
 
-    <!-- Work -->
-    <section class="work" id="work">
-        <h2 class="section-label reveal">Selected Work</h2>
-        <div class="work-grid">
-            <div class="work-item reveal">
-                <img src="images/kevi394-053.jpg" alt="Photography work" loading="eager">
-            </div>
-            <div class="work-item reveal">
-                <img src="images/kevi394-084.jpg" alt="Photography work" loading="lazy">
-            </div>
-            <div class="work-item reveal">
-                <img src="images/KEVI554-009.jpg" alt="Photography work" loading="lazy">
-            </div>
-            <div class="work-item reveal">
-                <img src="images/KEVI554-056.jpg" alt="Photography work" loading="lazy">
-            </div>
-            <div class="work-item reveal">
-                <img src="images/kevi742-032.jpg" alt="Photography work" loading="lazy">
-            </div>
-            <div class="work-item reveal">
-                <img src="images/kevi742-050.jpg" alt="Photography work" loading="lazy">
-            </div>
-            <div class="work-item reveal">
-                <img src="images/kevi742-064.jpg" alt="Photography work" loading="lazy">
-            </div>
-            <div class="work-item reveal">
-                <img src="images/kevi742-070.jpg" alt="Photography work" loading="lazy">
-            </div>
-        </div>
-    </section>
+            <section>
+                <h2>Projects</h2>
+                <ul>
+                    <li><a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Shredders</a> — Real-time snow conditions and powder scoring for PNW ski resorts</li>
+                    <li><a href="https://github.com/kevincorvallis/PookieBNews" target="_blank" rel="noopener">Pookie B News Daily</a> — Automated news aggregation with AI summaries and podcast generation</li>
+                    <li><a href="https://github.com/kevincorvallis/SmartSpender" target="_blank" rel="noopener">SmartSpender</a> — AI financial decision engine with plain-English analysis</li>
+                    <li><a href="https://daybyday.klee.page" target="_blank" rel="noopener">DayByDay</a> — Social journaling with photo uploads, streaks, and trip organization</li>
+                    <li><a href="https://github.com/kevincorvallis/IWBH" target="_blank" rel="noopener">Harmony Tracker</a> — AI relationship coaching with habit tracking and communication analysis</li>
+                    <li><a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener">Wilco</a> — Aviation radio training simulator with voice I/O and ICAO phraseology scoring</li>
+                    <li><a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">SPACEc</a> — Stanford library for multiplexed imaging and spatial analysis</li>
+                    <li><a href="https://github.com/kevincorvallis/san-jose-adu-checker" target="_blank" rel="noopener">ADU Checker</a> — Automates 17 ADU permit eligibility checks using government GIS APIs</li>
+                </ul>
+            </section>
 
-    <!-- About -->
-    <section class="about" id="about">
-        <div class="about-content">
-            <h2 class="section-label reveal">About</h2>
-            <p class="reveal">
-                I'm Kevin — a software engineer at Microsoft AI, where I build and ship
-                Copilot experiences and design large-scale Azure data pipelines processing
-                40TB+ daily. USC Computer Science, Army veteran, former NASA JPL intern.
-            </p>
-            <p class="reveal">
-                I also run ACL Solutions LLC, building consumer apps and developer tools
-                under the PookieB brand — 10 products spanning full-stack web, iOS, and AI/ML.
-            </p>
-            <p class="reveal">
-                Outside of work, I'm a pilot and volunteer with Angel Flight West
-                providing medical transport flights in the Pacific Northwest.
-                I also shoot photos, surf, and travel.
-            </p>
-            <p class="reveal">
-                <a href="assets/kevin-lee-resume.docx" class="resume-link" download>Download Resume ↓</a>
-            </p>
-        </div>
-    </section>
+            <section>
+                <h2>Photography</h2>
+                <ul>
+                    <li><a href="/photos">Gallery</a></li>
+                    <li><a href="/brock">Brock — A Photo Story</a></li>
+                </ul>
+            </section>
 
-    <!-- Projects -->
-    <section class="projects" id="projects">
-        <h2 class="section-label reveal">Projects</h2>
-        <div class="projects-grid">
-            <a href="https://shredders-bay.vercel.app" class="project-card reveal" target="_blank" rel="noopener">
-                <span class="project-icon">🏔</span>
-                <div class="project-meta">
-                    <span class="project-tag">Web + iOS</span>
-                    <h3>Shredders</h3>
-                </div>
-                <p class="project-desc">Real-time snow conditions, 8-factor powder scoring, and AI chat for 28 PNW ski resorts.</p>
-                <div class="project-footer">
-                    <span class="project-tech">Next.js · SwiftUI · Supabase · Claude</span>
-                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
-                </div>
-            </a>
-            <a href="https://github.com/kevincorvallis/PookieBNews" class="project-card reveal" target="_blank" rel="noopener">
-                <span class="project-icon">📰</span>
-                <div class="project-meta">
-                    <span class="project-tag">Web + iOS</span>
-                    <h3>Pookie B News Daily</h3>
-                </div>
-                <p class="project-desc">Automated news aggregation from 9 sources with AI summaries and NPR-style podcast generation.</p>
-                <div class="project-footer">
-                    <span class="project-tech">Flask · DynamoDB · GPT-4o · ElevenLabs</span>
-                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
-                </div>
-            </a>
-            <a href="https://github.com/kevincorvallis/SmartSpender" class="project-card reveal" target="_blank" rel="noopener">
-                <span class="project-icon">💰</span>
-                <div class="project-meta">
-                    <span class="project-tag">Web + iOS</span>
-                    <h3>SmartSpender</h3>
-                </div>
-                <p class="project-desc">AI financial decision engine — ask questions in plain English, get analysis with recommendations.</p>
-                <div class="project-footer">
-                    <span class="project-tech">AWS Lambda · Step Functions · Bedrock · GPT-4o</span>
-                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
-                </div>
-            </a>
-            <a href="https://daybyday.klee.page" class="project-card reveal" target="_blank" rel="noopener">
-                <span class="project-icon">📔</span>
-                <div class="project-meta">
-                    <span class="project-tag">Web + iOS</span>
-                    <h3>DayByDay</h3>
-                </div>
-                <p class="project-desc">Social journaling with rich text, photo uploads, friend connections, streaks, and trip organization.</p>
-                <div class="project-footer">
-                    <span class="project-tech">AWS Lambda · DynamoDB · Cognito · SwiftUI</span>
-                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
-                </div>
-            </a>
-            <a href="https://github.com/kevincorvallis/IWBH" class="project-card reveal" target="_blank" rel="noopener">
-                <span class="project-icon">💛</span>
-                <div class="project-meta">
-                    <span class="project-tag">iOS</span>
-                    <h3>Harmony Tracker</h3>
-                </div>
-                <p class="project-desc">AI relationship coaching with habit tracking, partner pairing, and communication analysis.</p>
-                <div class="project-footer">
-                    <span class="project-tech">SwiftUI · Node.js · DynamoDB · GPT-4</span>
-                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
-                </div>
-            </a>
-            <a href="https://ai-atc-sigma.vercel.app" class="project-card reveal" target="_blank" rel="noopener">
-                <span class="project-icon">✈️</span>
-                <div class="project-meta">
-                    <span class="project-tag">Web + iOS</span>
-                    <h3>Wilco</h3>
-                </div>
-                <p class="project-desc">Aviation radio training simulator with 20 scenarios, voice I/O, and ICAO phraseology scoring.</p>
-                <div class="project-footer">
-                    <span class="project-tech">JavaScript · OpenAI · ElevenLabs · Web Speech</span>
-                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
-                </div>
-            </a>
-            <a href="https://github.com/nolanlab/SPACEc" class="project-card reveal" target="_blank" rel="noopener">
-                <span class="project-icon">🔬</span>
-                <div class="project-meta">
-                    <span class="project-tag">Python Library</span>
-                    <h3>SPACEc</h3>
-                </div>
-                <p class="project-desc">Stanford academic library for multiplexed imaging — cell segmentation, clustering, and spatial analysis.</p>
-                <div class="project-footer">
-                    <span class="project-tech">Python · TensorFlow · PyTorch · AnnData</span>
-                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
-                </div>
-            </a>
-            <a href="https://github.com/kevincorvallis/san-jose-adu-checker" class="project-card reveal" target="_blank" rel="noopener">
-                <span class="project-icon">🏠</span>
-                <div class="project-meta">
-                    <span class="project-tag">Web App</span>
-                    <h3>ADU Checker</h3>
-                </div>
-                <p class="project-desc">Automates 17 ADU permit eligibility checks for San Jose properties using 11 government GIS APIs.</p>
-                <div class="project-footer">
-                    <span class="project-tech">Next.js · Python · GeoPandas · GIS APIs</span>
-                    <svg class="project-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10m0 0l-4-4m4 4l-4 4"/></svg>
-                </div>
-            </a>
-        </div>
-    </section>
+            <section>
+                <h2>Connect</h2>
+                <ul>
+                    <li><a href="mailto:contact@klee.page">Email</a></li>
+                    <li><a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">GitHub</a></li>
+                    <li><a href="https://www.linkedin.com/in/kevin0813/" target="_blank" rel="noopener">LinkedIn</a></li>
+                </ul>
+            </section>
+        </article>
+    </main>
 
-    <!-- Connect -->
-    <section class="connect" id="connect">
-        <h2 class="section-label reveal">Let's Connect</h2>
-        <div class="connect-links reveal">
-            <a href="mailto:contact@klee.page">Email</a>
-            <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">GitHub</a>
-            <a href="https://www.linkedin.com/in/kevin0813/" target="_blank" rel="noopener">LinkedIn</a>
-        </div>
-    </section>
-
-    <!-- Footer -->
     <footer>
         <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
@@ -248,9 +111,6 @@
     <script defer src="/_vercel/speed-insights/script.js"></script>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
