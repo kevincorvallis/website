@@ -53,6 +53,8 @@
             color: var(--text);
             font-size: 20px;
             line-height: 1.6;
+            will-change: color, background-color, border-color;
+            transition: color 0.2s linear, background-color 0.2s linear;
         }
 
         ::selection {
@@ -62,7 +64,8 @@
 
         a {
             color: var(--text);
-            transition: opacity 0.2s ease;
+            transition: color 0.2s linear, opacity 0.2s linear;
+            will-change: color;
         }
 
         a:hover {
@@ -77,6 +80,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--text);
+            transition: border-color 0.2s linear;
         }
 
         header h1 {
@@ -117,7 +121,11 @@
             height: 16px;
             background: var(--bg);
             border-radius: 50%;
-            transition: transform 0.2s ease;
+            transition: transform 0s;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.2s;
         }
 
         .toggle-wrap input:checked + label::after {
@@ -144,6 +152,7 @@
             margin: 0 auto;
             padding: 2rem 20px;
             border-top: 1px solid var(--text);
+            transition: border-color 0.2s linear;
         }
 
         footer p {
@@ -198,20 +207,17 @@
         document.getElementById('copyrightYear').textContent = new Date().getFullYear();
 
         const toggle = document.getElementById('theme-toggle');
+        const toggleLabel = toggle.nextElementSibling;
         toggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
+
+        setTimeout(() => {
+            toggleLabel.classList.add('has-transition');
+        }, 100);
 
         toggle.addEventListener('change', () => {
             const next = toggle.checked ? 'dark' : 'light';
-
-            const style = document.createElement('style');
-            style.textContent = '*, *::before, *::after { transition: none !important; }';
-            document.head.appendChild(style);
-
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
-
-            getComputedStyle(style).opacity;
-            document.head.removeChild(style);
         });
 
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
