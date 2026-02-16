@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects — Kevin Lee</title>
+    <meta name="description" content="Projects by Kevin Lee">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <!-- Prevent flash of wrong theme -->
+    <script>
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || systemPreference);
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            will-change: color, background-color, border-color;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection {
+            background: rgba(0, 100, 255, 0.26);
+            color: inherit;
+        }
+
+        a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.3s ease;
+            will-change: color;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+        header {
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 15px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        header h1 a {
+            text-decoration: none !important;
+        }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-wrap input {
+            display: none;
+        }
+
+        .toggle-wrap label {
+            position: relative;
+            display: block;
+            width: 40px;
+            height: 20px;
+            background: var(--text);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0s;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.2s;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        main {
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .content {
+            margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        ul li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 0.9em;
+        }
+
+        ul li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+        }
+
+        ul li:last-child {
+            margin-bottom: 0;
+        }
+
+        footer {
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 3rem 20px 2rem;
+        }
+
+        footer p {
+            font-size: 14px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 18px;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 21px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><a href="/">Kevin Lee</a></h1>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </header>
+
+    <main>
+        <div class="content">
+            <h2>Projects</h2>
+            <ul>
+                <li><a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Shredders</a> — Real-time snow conditions and powder scoring for PNW ski resorts</li>
+                <li><a href="https://github.com/kevincorvallis/PookieBNews" target="_blank" rel="noopener">Pookie B News Daily</a> — Automated news aggregation with AI summaries and podcast generation</li>
+                <li><a href="https://github.com/kevincorvallis/SmartSpender" target="_blank" rel="noopener">SmartSpender</a> — AI financial decision engine with plain-English analysis</li>
+                <li><a href="https://daybyday.klee.page" target="_blank" rel="noopener">DayByDay</a> — Social journaling with photo uploads, streaks, and trip organization</li>
+                <li><a href="https://github.com/kevincorvallis/IWBH" target="_blank" rel="noopener">Harmony Tracker</a> — AI relationship coaching with habit tracking and communication analysis</li>
+                <li><a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener">Wilco</a> — Aviation radio training simulator with voice I/O and ICAO phraseology scoring</li>
+                <li><a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">SPACEc</a> — Stanford library for multiplexed imaging and spatial analysis</li>
+                <li><a href="https://github.com/kevincorvallis/san-jose-adu-checker" target="_blank" rel="noopener">ADU Checker</a> — Automates 17 ADU permit eligibility checks using government GIS APIs</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+    </footer>
+
+    <script>
+        document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+
+        const toggle = document.getElementById('theme-toggle');
+        const toggleLabel = toggle.nextElementSibling;
+        toggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
+
+        setTimeout(() => {
+            toggleLabel.classList.add('has-transition');
+        }, 100);
+
+        toggle.addEventListener('change', () => {
+            const next = toggle.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        });
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                const theme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                toggle.checked = e.matches;
+            }
+        });
+    </script>
+</body>
+</html>
