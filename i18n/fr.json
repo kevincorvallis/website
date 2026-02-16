@@ -63,7 +63,15 @@
     "skillsDB": "<strong>Bases de données :</strong> PostgreSQL (Supabase), DynamoDB, Redis (Upstash)",
     "skillsIOS": "<strong>iOS :</strong> SwiftUI, UIKit, WidgetKit, MapKit, Push Notifications, Apple Sign-In",
     "interestsHeading": "Centres d'intérêt",
-    "interestsList": "Aide humanitaire, énergie durable, surf, aviation, voyages"
+    "interestsList": "Aide humanitaire, énergie durable, surf, aviation, voyages",
+    "chatHeading": "Posez-moi une question",
+    "chatSubtitle": "Curieux de mon parcours ? Posez votre question ci-dessous.",
+    "chatSuggestion1": "Kevin serait-il bon pour construire un moteur de recommandation ?",
+    "chatSuggestion2": "Quelles plateformes cloud Kevin connaît-il ?",
+    "chatSuggestion3": "Parlez-moi du travail de Kevin au NASA JPL.",
+    "chatPlaceholder": "Posez une question sur mes compétences...",
+    "chatDisclaimer": "Propulsé par l'IA · Réponses basées sur le CV de Kevin",
+    "chatThinking": "Réflexion en cours..."
   },
   "projects": {
     "pageTitle": "Projets — Kevin Lee",

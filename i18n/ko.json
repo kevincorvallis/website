@@ -63,7 +63,15 @@
     "skillsDB": "<strong>데이터베이스:</strong> PostgreSQL (Supabase), DynamoDB, Redis (Upstash)",
     "skillsIOS": "<strong>iOS:</strong> SwiftUI, UIKit, WidgetKit, MapKit, Push Notifications, Apple Sign-In",
     "interestsHeading": "관심사",
-    "interestsList": "인도주의 활동, 지속 가능 에너지, 서핑, 비행, 여행"
+    "interestsList": "인도주의 활동, 지속 가능 에너지, 서핑, 비행, 여행",
+    "chatHeading": "무엇이든 물어보세요",
+    "chatSubtitle": "경력이 궁금하신가요? 아래에서 질문해 보세요.",
+    "chatSuggestion1": "Kevin이 추천 엔진을 만드는 데 적합할까요?",
+    "chatSuggestion2": "Kevin이 아는 클라우드 플랫폼은 무엇인가요?",
+    "chatSuggestion3": "Kevin의 NASA JPL 경험에 대해 알려주세요.",
+    "chatPlaceholder": "역량에 대해 질문하세요...",
+    "chatDisclaimer": "AI 기반 · Kevin의 이력서를 바탕으로 응답합니다",
+    "chatThinking": "생각 중..."
   },
   "projects": {
     "pageTitle": "프로젝트 — Kevin Lee",

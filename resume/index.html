@@ -232,6 +232,149 @@
             }
         }
 
+        /* Chat section */
+        .chat-section hr {
+            border: none;
+            border-top: 1px solid var(--text);
+            opacity: 0.15;
+            margin: 0 0 2rem;
+        }
+
+        .chat-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .chat-section .chat-subtitle {
+            opacity: 0.6;
+            margin-bottom: 1.5rem;
+            font-size: 18px;
+        }
+
+        .chat-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .chat-suggestions button {
+            background: none;
+            border: 1px solid var(--text);
+            border-radius: 20px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 15px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            line-height: 1.4;
+        }
+
+        .chat-suggestions button:hover {
+            opacity: 0.6;
+        }
+
+        .chat-messages {
+            margin-bottom: 1.5rem;
+        }
+
+        .chat-message {
+            margin-bottom: 1.25rem;
+        }
+
+        .chat-message .chat-role {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-message .chat-body {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .chat-message .chat-body.thinking {
+            font-style: italic;
+            opacity: 0.5;
+        }
+
+        .chat-input-wrap {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .chat-input-wrap input {
+            flex: 1;
+            background: none;
+            border: 1px solid var(--text);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 10px 14px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .chat-input-wrap input::placeholder {
+            color: var(--text);
+            opacity: 0.4;
+        }
+
+        .chat-input-wrap button {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-size: 18px;
+            width: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .chat-input-wrap button:hover {
+            opacity: 0.7;
+        }
+
+        .chat-input-wrap button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .chat-disclaimer {
+            font-size: 13px;
+            opacity: 0.4;
+        }
+
+        @media (max-width: 768px) {
+            .chat-section h2 {
+                font-size: 21px;
+            }
+
+            .chat-section .chat-subtitle {
+                font-size: 16px;
+            }
+
+            .chat-suggestions button {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .chat-message .chat-body {
+                font-size: 16px;
+            }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -335,6 +478,27 @@
         </div>
     </main>
 
+    <div class="chat-section" style="max-width:620px;margin:0 auto;padding:0 20px;">
+        <hr>
+        <h2 data-i18n="resume.chatHeading">Ask me anything</h2>
+        <p class="chat-subtitle" data-i18n="resume.chatSubtitle">Curious about my experience? Ask below.</p>
+
+        <div class="chat-suggestions" id="chat-suggestions">
+            <button type="button" data-i18n="resume.chatSuggestion1">Would Kevin be good at building a recommendation engine?</button>
+            <button type="button" data-i18n="resume.chatSuggestion2">What cloud platforms does Kevin know?</button>
+            <button type="button" data-i18n="resume.chatSuggestion3">Tell me about Kevin's work at NASA JPL.</button>
+        </div>
+
+        <div class="chat-messages" id="chat-messages"></div>
+
+        <div class="chat-input-wrap">
+            <input type="text" id="chat-input" data-i18n-placeholder="resume.chatPlaceholder" placeholder="Ask about my skills..." maxlength="500" autocomplete="off">
+            <button type="button" id="chat-send" aria-label="Send" disabled>&rarr;</button>
+        </div>
+
+        <p class="chat-disclaimer" data-i18n="resume.chatDisclaimer">Powered by AI · Responses based on Kevin's resume</p>
+    </div>
+
     <footer>
         <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
@@ -362,6 +526,129 @@
                 toggle.checked = e.matches;
             }
         });
+
+        // Chat functionality
+        (function() {
+            const input = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send');
+            const messagesEl = document.getElementById('chat-messages');
+            const suggestionsEl = document.getElementById('chat-suggestions');
+            const history = [];
+            let isLoading = false;
+            let cachedTranslations = null;
+
+            function getLabel(role) {
+                return role === 'user' ? 'You' : 'Kevin';
+            }
+
+            function addMessage(role, text) {
+                const div = document.createElement('div');
+                div.className = 'chat-message';
+                div.innerHTML = '<div class="chat-role">' + getLabel(role) + '</div><div class="chat-body">' + escapeHtml(text) + '</div>';
+                messagesEl.appendChild(div);
+                div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                return div;
+            }
+
+            function addThinking() {
+                const div = document.createElement('div');
+                div.className = 'chat-message';
+                div.id = 'chat-thinking';
+                const thinkingText = cachedTranslations?.resume?.chatThinking || 'Thinking...';
+                div.innerHTML = '<div class="chat-role">' + getLabel('assistant') + '</div><div class="chat-body thinking">' + escapeHtml(thinkingText) + '</div>';
+                messagesEl.appendChild(div);
+                div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function removeThinking() {
+                const el = document.getElementById('chat-thinking');
+                if (el) el.remove();
+            }
+
+            function escapeHtml(str) {
+                const d = document.createElement('div');
+                d.textContent = str;
+                return d.innerHTML;
+            }
+
+            async function sendMessage(text) {
+                if (isLoading || !text.trim()) return;
+                isLoading = true;
+                sendBtn.disabled = true;
+                input.value = '';
+
+                addMessage('user', text.trim());
+                addThinking();
+
+                try {
+                    const res = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text.trim(), history })
+                    });
+
+                    removeThinking();
+
+                    if (!res.ok) throw new Error('Request failed');
+
+                    const data = await res.json();
+                    const reply = data.reply || 'Sorry, something went wrong.';
+                    addMessage('assistant', reply);
+
+                    history.push({ role: 'user', content: text.trim() });
+                    history.push({ role: 'assistant', content: reply });
+
+                    if (history.length > 20) history.splice(0, 2);
+                } catch (err) {
+                    removeThinking();
+                    addMessage('assistant', 'Sorry, I couldn\'t respond right now. Please try again.');
+                }
+
+                isLoading = false;
+                sendBtn.disabled = !input.value.trim();
+            }
+
+            input.addEventListener('input', () => {
+                sendBtn.disabled = isLoading || !input.value.trim();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(input.value);
+                }
+            });
+
+            sendBtn.addEventListener('click', () => {
+                sendMessage(input.value);
+            });
+
+            suggestionsEl.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                suggestionsEl.style.display = 'none';
+                sendMessage(btn.textContent);
+            });
+
+            // i18n support for placeholder and cached translations
+            document.addEventListener('i18n:applied', () => {
+                const lang = localStorage.getItem('lang') || 'en';
+                if (lang !== 'en') {
+                    fetch('/i18n/' + lang + '.json')
+                        .then(r => r.json())
+                        .then(data => {
+                            cachedTranslations = data;
+                            if (data?.resume?.chatPlaceholder) {
+                                input.placeholder = data.resume.chatPlaceholder;
+                            }
+                        })
+                        .catch(() => {});
+                } else {
+                    cachedTranslations = null;
+                    input.placeholder = 'Ask about my skills...';
+                }
+            });
+        })();
     </script>
 </body>
 </html>
