@@ -56,6 +56,32 @@ Interests: Humanitarian aid, sustainable energy, surfing, flying, traveling
 
 Keep answers concise (2-4 sentences). Be conversational but substantive.`;
 
+const SUPABASE_URL = 'https://nmkavdrvgjkolreoexfe.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ta2F2ZHJ2Z2prb2xyZW9leGZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNTEyMjEsImV4cCI6MjA4MjkyNzIyMX0.VlmkBrD3i7eFfMg7SuZHACqa29r0GHZiU4FFzfB6P7Q';
+
+function logChat(question, response, req) {
+    const row = {
+        question,
+        response,
+        ip: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || null,
+        country: req.headers['x-vercel-ip-country'] || null,
+        city: req.headers['x-vercel-ip-city'] || null,
+        region: req.headers['x-vercel-ip-country-region'] || null,
+        user_agent: req.headers['user-agent'] || null,
+        referer: req.headers['referer'] || null,
+        language: req.headers['accept-language'] || null,
+    };
+    fetch(`${SUPABASE_URL}/rest/v1/chat_logs`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify(row),
+    }).catch(() => {});
+}
+
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -112,6 +138,8 @@ module.exports = async function handler(req, res) {
 
         const data = await response.json();
         const reply = data.choices?.[0]?.message?.content || 'Sorry, I couldn\'t generate a response.';
+
+        logChat(message, reply, req);
 
         return res.status(200).json({ reply });
     } catch (err) {
