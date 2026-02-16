@@ -1,6 +1,3 @@
-// Copyright Year
-document.getElementById('copyrightYear').textContent = new Date().getFullYear();
-
 // ——— Theme Toggle ———
 const toggle = document.getElementById('theme-toggle');
 const toggleLabel = toggle.nextElementSibling;

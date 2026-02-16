@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-page="index">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -53,45 +53,45 @@
     <main>
         <article>
             <section>
-                <p>
+                <p data-i18n="index.bio1">
                     I'm Kevin — a software engineer at Microsoft AI working on Copilot
                     and large-scale data pipelines. Before that I interned at NASA JPL,
                     studied CS at USC, and served in the Army.
                 </p>
-                <p>
+                <p data-i18n-html="index.bio2">
                     On the side I run a small software company called
                     <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a> —
                     10 products and counting across web, iOS, and AI/ML.
                     I like building things that are genuinely useful.
                 </p>
-                <p>
+                <p data-i18n="index.bio3">
                     When I'm not coding, I'm usually flying. I volunteer with
                     Angel Flight West doing medical transport flights around the
                     Pacific Northwest. I also surf, take photos, and travel
                     whenever I can.
                 </p>
                 <p>
-                    <a href="/resume">Resume</a>
+                    <a href="/resume" data-i18n="index.resumeLink">Resume</a>
                 </p>
             </section>
 
             <section>
-                <h2>Projects</h2>
-                <p><a href="/projects">View all projects</a></p>
+                <h2 data-i18n="index.projectsHeading">Projects</h2>
+                <p><a href="/projects" data-i18n="index.projectsLink">View all projects</a></p>
             </section>
 
             <section>
-                <h2>Photography</h2>
+                <h2 data-i18n="index.photographyHeading">Photography</h2>
                 <ul>
-                    <li><a href="/photos">Gallery</a></li>
-                    <li><a href="/brock">Brock — A Photo Story</a></li>
+                    <li><a href="/photos" data-i18n="index.galleryLink">Gallery</a></li>
+                    <li><a href="/brock" data-i18n="index.brockLink">Brock — A Photo Story</a></li>
                 </ul>
             </section>
 
             <section>
-                <h2>Connect</h2>
+                <h2 data-i18n="index.connectHeading">Connect</h2>
                 <ul>
-                    <li><a href="mailto:contact@klee.page">Email</a></li>
+                    <li><a href="mailto:contact@klee.page" data-i18n="index.emailLink">Email</a></li>
                     <li><a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">GitHub</a></li>
                     <li><a href="https://www.linkedin.com/in/kevin0813/" target="_blank" rel="noopener">LinkedIn</a></li>
                 </ul>
@@ -100,7 +100,7 @@
     </main>
 
     <footer>
-        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+        <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
 
     <!-- Analytics -->
@@ -108,6 +108,7 @@
     <script defer src="/_vercel/speed-insights/script.js"></script>
 
     <!-- Scripts -->
+    <script src="js/i18n.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-page="projects">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -278,13 +278,13 @@
 
     <main>
         <div class="content">
-            <h2>Projects</h2>
-            <p>Things I've built across web, iOS, and AI/ML. Most of these live under <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a>.</p>
+            <h2 data-i18n="projects.heading">Projects</h2>
+            <p data-i18n-html="projects.subtitle">Things I've built across web, iOS, and AI/ML. Most of these live under <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a>.</p>
 
             <div class="project-grid">
                 <div class="project-card">
                     <h3><a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Shredders</a></h3>
-                    <p class="description">Real-time snow conditions and powder scoring for PNW ski resorts.</p>
+                    <p class="description" data-i18n="projects.shreddersDesc">Real-time snow conditions and powder scoring for PNW ski resorts.</p>
                     <div class="tags">
                         <span class="tag">React</span>
                         <span class="tag">Vercel</span>
@@ -294,7 +294,7 @@
 
                 <div class="project-card">
                     <h3><a href="https://github.com/kevincorvallis/PookieBNews" target="_blank" rel="noopener">Pookie B News Daily</a></h3>
-                    <p class="description">Automated news aggregation with AI summaries and podcast generation.</p>
+                    <p class="description" data-i18n="projects.newsDesc">Automated news aggregation with AI summaries and podcast generation.</p>
                     <div class="tags">
                         <span class="tag">AI/ML</span>
                         <span class="tag">Python</span>
@@ -304,7 +304,7 @@
 
                 <div class="project-card">
                     <h3><a href="https://github.com/kevincorvallis/SmartSpender" target="_blank" rel="noopener">SmartSpender</a></h3>
-                    <p class="description">AI financial decision engine with plain-English analysis.</p>
+                    <p class="description" data-i18n="projects.smartspenderDesc">AI financial decision engine with plain-English analysis.</p>
                     <div class="tags">
                         <span class="tag">AI/ML</span>
                         <span class="tag">Finance</span>
@@ -313,7 +313,7 @@
 
                 <div class="project-card">
                     <h3><a href="https://daybyday.klee.page" target="_blank" rel="noopener">DayByDay</a></h3>
-                    <p class="description">Social journaling with photo uploads, streaks, and trip organization.</p>
+                    <p class="description" data-i18n="projects.daybydayDesc">Social journaling with photo uploads, streaks, and trip organization.</p>
                     <div class="tags">
                         <span class="tag">Web App</span>
                         <span class="tag">Supabase</span>
@@ -322,7 +322,7 @@
 
                 <div class="project-card">
                     <h3><a href="https://github.com/kevincorvallis/IWBH" target="_blank" rel="noopener">Harmony Tracker</a></h3>
-                    <p class="description">AI relationship coaching with habit tracking and communication analysis.</p>
+                    <p class="description" data-i18n="projects.harmonyDesc">AI relationship coaching with habit tracking and communication analysis.</p>
                     <div class="tags">
                         <span class="tag">AI/ML</span>
                         <span class="tag">iOS</span>
@@ -331,7 +331,7 @@
 
                 <div class="project-card">
                     <h3><a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener">Wilco</a></h3>
-                    <p class="description">Aviation radio training simulator with voice I/O and ICAO phraseology scoring.</p>
+                    <p class="description" data-i18n="projects.wilcoDesc">Aviation radio training simulator with voice I/O and ICAO phraseology scoring.</p>
                     <div class="tags">
                         <span class="tag">AI/ML</span>
                         <span class="tag">Web Audio</span>
@@ -341,7 +341,7 @@
 
                 <div class="project-card">
                     <h3><a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">SPACEc</a></h3>
-                    <p class="description">Stanford library for multiplexed imaging and spatial analysis.</p>
+                    <p class="description" data-i18n="projects.spacecDesc">Stanford library for multiplexed imaging and spatial analysis.</p>
                     <div class="tags">
                         <span class="tag">Python</span>
                         <span class="tag">Research</span>
@@ -351,7 +351,7 @@
 
                 <div class="project-card">
                     <h3><a href="https://github.com/kevincorvallis/san-jose-adu-checker" target="_blank" rel="noopener">ADU Checker</a></h3>
-                    <p class="description">Automates 17 ADU permit eligibility checks using government GIS APIs.</p>
+                    <p class="description" data-i18n="projects.aduDesc">Automates 17 ADU permit eligibility checks using government GIS APIs.</p>
                     <div class="tags">
                         <span class="tag">Python</span>
                         <span class="tag">GIS</span>
@@ -363,12 +363,11 @@
     </main>
 
     <footer>
-        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+        <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
 
+    <script src="/js/i18n.js"></script>
     <script>
-        document.getElementById('copyrightYear').textContent = new Date().getFullYear();
-
         const toggle = document.getElementById('theme-toggle');
         const toggleLabel = toggle.nextElementSibling;
         toggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-page="photos">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -198,12 +198,11 @@
     </div>
 
     <footer>
-        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+        <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
 
+    <script src="/js/i18n.js"></script>
     <script>
-        document.getElementById('copyrightYear').textContent = new Date().getFullYear();
-
         const toggle = document.getElementById('theme-toggle');
         const toggleLabel = toggle.nextElementSibling;
         toggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
