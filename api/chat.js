@@ -68,6 +68,24 @@ Interests: Humanitarian aid, sustainable energy, surfing, flying, traveling`;
 const SUPABASE_URL = 'https://nmkavdrvgjkolreoexfe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ta2F2ZHJ2Z2prb2xyZW9leGZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNTEyMjEsImV4cCI6MjA4MjkyNzIyMX0.VlmkBrD3i7eFfMg7SuZHACqa29r0GHZiU4FFzfB6P7Q';
 
+const ALLOWED_ORIGINS = ['https://klee.page', 'https://www.klee.page'];
+
+// In-memory rate limiter: 10 requests per minute per IP
+const rateMap = new Map();
+const RATE_LIMIT = 10;
+const RATE_WINDOW = 60 * 1000;
+
+function isRateLimited(ip) {
+    const now = Date.now();
+    const entry = rateMap.get(ip);
+    if (!entry || now - entry.start > RATE_WINDOW) {
+        rateMap.set(ip, { start: now, count: 1 });
+        return false;
+    }
+    entry.count++;
+    return entry.count > RATE_LIMIT;
+}
+
 function logChat(question, response, req) {
     const row = {
         question,
@@ -88,12 +106,30 @@ function logChat(question, response, req) {
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify(row),
-    }).catch(() => {});
+    }).catch(err => console.error('Supabase log error:', err.message));
 }
 
 module.exports = async function handler(req, res) {
+    // CORS
+    const origin = req.headers.origin;
+    if (ALLOWED_ORIGINS.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(204).end();
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    // Rate limit
+    const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
+    if (isRateLimited(ip)) {
+        return res.status(429).json({ error: 'Too many requests. Try again in a minute.' });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
