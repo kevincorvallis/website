@@ -27,7 +27,6 @@ body {
     color: var(--text);
     font-size: 20px;
     line-height: 1.6;
-    will-change: color, background-color, border-color;
     transition: color 0.3s ease, background-color 0.3s ease;
 }
 
@@ -41,7 +40,6 @@ a {
     text-decoration: underline;
     text-underline-offset: 2px;
     transition: color 0.3s ease;
-    will-change: color;
 }
 
 a:hover {

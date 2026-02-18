@@ -59,7 +59,6 @@
             color: var(--text);
             font-size: 20px;
             line-height: 1.6;
-            will-change: color, background-color, border-color;
             transition: color 0.3s ease, background-color 0.3s ease;
         }
 
@@ -73,7 +72,6 @@
             text-decoration: underline;
             text-underline-offset: 2px;
             transition: color 0.3s ease;
-            will-change: color;
         }
 
         a:hover {
@@ -89,14 +87,22 @@
             align-items: center;
         }
 
-        header h1 {
-            font-size: 28px;
-            font-weight: 600;
-            line-height: 1.2;
+        .back-link {
+            font-size: 15px;
+            font-weight: 400;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, color 0.3s ease;
         }
 
-        header h1 a {
-            text-decoration: none !important;
+        .back-link:hover {
+            opacity: 0.75;
+        }
+
+        .page-title {
+            font-size: 34px;
+            font-weight: 600;
+            line-height: 1.15;
         }
 
         .toggle-wrap {
@@ -243,8 +249,12 @@
                 font-size: 18px;
             }
 
-            header h1 {
-                font-size: 24px;
+            .back-link {
+                font-size: 14px;
+            }
+
+            .page-title {
+                font-size: 28px;
             }
 
             h2 {
@@ -269,7 +279,7 @@
 <body>
 
     <header>
-        <h1><a href="/">Kevin Lee</a></h1>
+        <a href="/" class="back-link">← Kevin Lee</a>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle">
             <label for="theme-toggle"></label>
@@ -278,7 +288,7 @@
 
     <main>
         <div class="content">
-            <h2 data-i18n="projects.heading">Projects</h2>
+            <h1 class="page-title" data-i18n="projects.heading">Projects</h1>
             <p data-i18n-html="projects.subtitle">Things I've built across web, iOS, and AI/ML. Most of these live under <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a>.</p>
 
             <div class="project-grid">
@@ -366,29 +376,11 @@
         <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
 
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
     <script src="/js/i18n.js"></script>
-    <script>
-        const toggle = document.getElementById('theme-toggle');
-        const toggleLabel = toggle.nextElementSibling;
-        toggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
-
-        setTimeout(() => {
-            toggleLabel.classList.add('has-transition');
-        }, 100);
-
-        toggle.addEventListener('change', () => {
-            const next = toggle.checked ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
-        });
-
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!localStorage.getItem('theme')) {
-                const theme = e.matches ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', theme);
-                toggle.checked = e.matches;
-            }
-        });
-    </script>
+    <script src="/js/theme.js"></script>
 </body>
 </html>

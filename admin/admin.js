@@ -5,6 +5,13 @@
 // Get config from parent window or global
 const config = window.portfolioConfig || {};
 
+// HTML escaping to prevent XSS
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str || '');
+    return div.innerHTML;
+}
+
 // State
 let currentUser = null;
 let photos = [];
@@ -374,7 +381,7 @@ function createProgressItem(filename) {
     const div = document.createElement('div');
     div.className = 'upload-progress-item';
     div.innerHTML = `
-        <span class="upload-progress-item-name">${filename}</span>
+        <span class="upload-progress-item-name">${escapeHtml(filename)}</span>
         <div class="upload-progress-bar">
             <div class="upload-progress-bar-fill" style="width: 0%"></div>
         </div>
@@ -458,26 +465,33 @@ function createPhotoCard(photo) {
         ? config.getCloudinaryUrl(photo.cloudinary_id, { width: 400, height: 300, crop: 'fill' })
         : photo.cloudinary_url;
 
+    const safeId = escapeHtml(photo.id);
+    const safeSection = escapeHtml(photo.section);
+    const safeTitle = escapeHtml(photo.title || 'Untitled');
+    const safeAlt = escapeHtml(photo.alt_text || photo.title);
+    const safeCategory = photo.category ? escapeHtml(photo.category) : '';
+    const safeThumbnail = escapeHtml(thumbnailUrl);
+
     return `
-        <div class="photo-card" data-id="${photo.id}" data-section="${photo.section}">
+        <div class="photo-card" data-id="${safeId}" data-section="${safeSection}">
             <div class="photo-card-image">
-                <img src="${thumbnailUrl}" alt="${photo.alt_text || photo.title}" loading="lazy">
+                <img src="${safeThumbnail}" alt="${safeAlt}" loading="lazy">
                 <div class="photo-card-overlay">
                     <div class="photo-card-actions">
-                        <button class="btn btn-secondary btn-small" onclick="openEditModal('${photo.id}')">
+                        <button class="btn btn-secondary btn-small" onclick="openEditModal('${safeId}')">
                             Edit
                         </button>
-                        <button class="btn btn-danger btn-small" onclick="openDeleteModal('${photo.id}')">
+                        <button class="btn btn-danger btn-small" onclick="openDeleteModal('${safeId}')">
                             Delete
                         </button>
                     </div>
                 </div>
             </div>
             <div class="photo-card-content">
-                <h3 class="photo-card-title">${photo.title || 'Untitled'}</h3>
+                <h3 class="photo-card-title">${safeTitle}</h3>
                 <div class="photo-card-meta">
-                    <span class="photo-card-badge">${photo.section}</span>
-                    ${photo.category ? `<span class="photo-card-badge">${photo.category}</span>` : ''}
+                    <span class="photo-card-badge">${safeSection}</span>
+                    ${safeCategory ? `<span class="photo-card-badge">${safeCategory}</span>` : ''}
                     ${photo.featured ? `<span class="photo-card-badge featured">Featured</span>` : ''}
                 </div>
             </div>
@@ -585,7 +599,7 @@ function showToast(message, type = 'info') {
 
     toast.innerHTML = `
         <span class="toast-icon">${icon}</span>
-        <span class="toast-message">${message}</span>
+        <span class="toast-message">${escapeHtml(message)}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">×</button>
     `;
 

@@ -253,10 +253,10 @@
 
     <!-- Scripts -->
     <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3" integrity="sha384-aRAaCbKYByQpx0fjPuC0PQ9P9moWMEsHXP9tyzP7tbyD5fPK6oTp+THsxdWiq02L" crossorigin="anonymous"></script>
 
     <!-- Sortable.js for drag reorder -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" integrity="sha384-eeLEhtwdMwD3X9y+8P3Cn7Idl/M+w8H4uZqkgD/2eJVkWIN1yKzEj6XegJ9dL3q0" crossorigin="anonymous"></script>
 
     <!-- Config (inline to avoid MIME type issues with local server) -->
     <script>
@@ -290,6 +290,12 @@
     (function() {
         var cfg = window.portfolioConfig;
         var supabaseClient = null;
+
+        function esc(str) {
+            var d = document.createElement('div');
+            d.textContent = String(str || '');
+            return d.innerHTML;
+        }
 
         function getSupabase() {
             if (!supabaseClient && window.supabase && cfg) {
@@ -333,7 +339,7 @@
                 } else {
                     grid.innerHTML = photos.map(function(photo) {
                         var thumbUrl = cfg.getCloudinaryUrl ? cfg.getCloudinaryUrl(photo.cloudinary_id, { width: 400, height: 300, crop: 'fill' }) : photo.cloudinary_url;
-                        return '<div class="photo-card" data-id="' + photo.id + '"><div class="photo-card-image"><img src="' + thumbUrl + '" alt="' + (photo.alt_text || photo.title || '') + '" loading="lazy"></div><div class="photo-card-content"><h3 class="photo-card-title">' + (photo.title || 'Untitled') + '</h3><div class="photo-card-meta"><span class="photo-card-badge">' + photo.section + '</span>' + (photo.category ? '<span class="photo-card-badge">' + photo.category + '</span>' : '') + '</div></div></div>';
+                        return '<div class="photo-card" data-id="' + esc(photo.id) + '"><div class="photo-card-image"><img src="' + esc(thumbUrl) + '" alt="' + esc(photo.alt_text || photo.title || '') + '" loading="lazy"></div><div class="photo-card-content"><h3 class="photo-card-title">' + esc(photo.title || 'Untitled') + '</h3><div class="photo-card-meta"><span class="photo-card-badge">' + esc(photo.section) + '</span>' + (photo.category ? '<span class="photo-card-badge">' + esc(photo.category) + '</span>' : '') + '</div></div></div>';
                     }).join('');
                 }
             } catch (err) {
