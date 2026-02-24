@@ -231,6 +231,45 @@
             background: var(--frame-bar);
         }
 
+        /* ——— Phone Frame Mockup ——— */
+
+        .phone-frame {
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--frame-shadow);
+            border: 3px solid var(--frame-dot);
+        }
+
+        .phone-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: var(--frame-bar);
+        }
+
+        /* ——— Screenshot Pair (browser + phone) ——— */
+
+        .screenshot-pair {
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .screenshot-pair .browser-frame {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .screenshot-pair .phone-frame {
+            width: 160px;
+            flex-shrink: 0;
+        }
+
+        .row-screenshot .screenshot-pair .phone-frame {
+            width: 120px;
+        }
+
         /* ——— Tags ——— */
 
         .tags {
@@ -420,6 +459,14 @@
             .row-screenshot {
                 max-width: 100%;
             }
+
+            .screenshot-pair .phone-frame {
+                width: 120px;
+            }
+
+            .row-screenshot .screenshot-pair .phone-frame {
+                width: 100px;
+            }
         }
 
         /* ——— Entrance Animations ——— */
@@ -483,12 +530,18 @@
 
             <section class="featured" data-featured="shredders" style="display:none">
                 <h2 class="featured-name">Shredders</h2>
-                <div class="browser-frame">
-                    <img src="/projects/images/shredders.jpg" alt="Shredders app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
+                <div class="screenshot-pair">
+                    <div class="browser-frame">
+                        <img src="/projects/images/shredders.jpg" alt="Shredders web app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
+                    </div>
+                    <div class="phone-frame">
+                        <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS app screenshot" onerror="this.closest('.phone-frame').style.display='none'">
+                    </div>
                 </div>
                 <p class="featured-desc" data-i18n="projects.shreddersDesc">Real-time snow conditions and powder scoring for PNW ski resorts.</p>
                 <div class="tags">
                     <span class="tag">React</span>
+                    <span class="tag">SwiftUI</span>
                     <span class="tag">Vercel</span>
                     <span class="tag">Weather API</span>
                 </div>
@@ -577,8 +630,13 @@
                                     <span class="tag">Weather API</span>
                                 </div>
                                 <div class="row-screenshot">
-                                    <div class="browser-frame">
-                                        <img src="/projects/images/shredders.jpg" alt="Shredders screenshot" loading="lazy" onerror="this.closest('.row-screenshot').style.display='none'">
+                                    <div class="screenshot-pair">
+                                        <div class="browser-frame">
+                                            <img src="/projects/images/shredders.jpg" alt="Shredders web screenshot" loading="lazy" onerror="this.closest('.browser-frame').style.display='none'">
+                                        </div>
+                                        <div class="phone-frame">
+                                            <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS screenshot" loading="lazy" onerror="this.closest('.phone-frame').style.display='none'">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row-links">
