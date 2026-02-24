@@ -84,6 +84,7 @@
     "daybydayDesc": "사진 업로드, 연속 기록, 여행 정리 기능의 소셜 저널링.",
     "harmonyDesc": "습관 추적과 커뮤니케이션 분석을 포함한 AI 관계 코칭.",
     "wilcoDesc": "음성 입출력과 ICAO 용어 채점이 가능한 항공 무선 훈련 시뮬레이터.",
+    "coletteDesc": "회화 연습, 간격 반복, 저널 분석 기능의 AI 언어 튜터.",
     "spacecDesc": "다중 이미징 및 공간 분석을 위한 Stanford 라이브러리.",
     "aduDesc": "정부 GIS API를 사용한 17가지 ADU 허가 자격 검사 자동화."
   },

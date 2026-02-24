@@ -33,9 +33,10 @@
         :root {
             --bg: #f0eee6;
             --text: #1f1e1d;
-            --card-border: rgba(31, 30, 29, 0.15);
-            --card-hover: rgba(31, 30, 29, 0.05);
             --tag-bg: rgba(31, 30, 29, 0.08);
+            --frame-bar: rgba(31, 30, 29, 0.06);
+            --frame-dot: rgba(31, 30, 29, 0.15);
+            --frame-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
             color-scheme: light dark;
         }
@@ -43,9 +44,10 @@
         [data-theme="dark"] {
             --bg: #1f1e1d;
             --text: #f0eee6;
-            --card-border: rgba(240, 238, 230, 0.15);
-            --card-hover: rgba(240, 238, 230, 0.05);
             --tag-bg: rgba(240, 238, 230, 0.1);
+            --frame-bar: rgba(240, 238, 230, 0.06);
+            --frame-dot: rgba(240, 238, 230, 0.2);
+            --frame-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
         }
 
         html {
@@ -78,6 +80,8 @@
             opacity: 0.6;
         }
 
+        /* ——— Header ——— */
+
         header {
             max-width: 800px;
             margin: 0 auto;
@@ -99,11 +103,7 @@
             opacity: 0.75;
         }
 
-        .page-title {
-            font-size: 34px;
-            font-weight: 600;
-            line-height: 1.15;
-        }
+        /* ——— Theme Toggle ——— */
 
         .toggle-wrap {
             display: flex;
@@ -144,6 +144,8 @@
             transform: translateX(20px);
         }
 
+        /* ——— Main ——— */
+
         main {
             max-width: 800px;
             margin: 0 auto;
@@ -154,79 +156,224 @@
             margin-top: 2rem;
         }
 
-        .content > p {
-            margin-bottom: 2rem;
+        .page-title {
+            font-size: 34px;
+            font-weight: 600;
+            line-height: 1.15;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            margin-bottom: 2.5rem;
             opacity: 0.7;
             font-size: 18px;
         }
 
-        h2 {
+        /* ——— Featured Project ——— */
+
+        .featured {
+            margin-bottom: 2rem;
+        }
+
+        .featured-name {
             font-size: 24px;
             font-weight: 600;
             line-height: 1.2;
             margin-bottom: 1rem;
         }
 
-        /* ——— Project Cards Grid ——— */
-
-        .project-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 2.5rem;
+        .featured-desc {
+            font-size: 17px;
+            opacity: 0.7;
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
         }
 
-        .project-card {
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 20px;
+        .featured-links {
             display: flex;
-            flex-direction: column;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            gap: 1.5rem;
+            font-size: 16px;
         }
 
-        .project-card:hover {
-            background: var(--card-hover);
-            border-color: var(--text);
-        }
-
-        .project-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 1.3;
-            margin-bottom: 8px;
-        }
-
-        .project-card h3 a {
+        .featured-links a {
             text-decoration: none;
         }
 
-        .project-card h3 a:hover {
+        .featured-links a:hover {
             text-decoration: underline;
             opacity: 1;
         }
 
-        .project-card .description {
-            font-size: 15px;
-            line-height: 1.5;
-            opacity: 0.7;
-            flex: 1;
-            margin-bottom: 14px;
+        /* ——— Browser Frame Mockup ——— */
+
+        .browser-frame {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--frame-shadow);
+            margin-bottom: 1rem;
         }
 
-        .project-card .tags {
+        .browser-frame::before {
+            content: '';
+            display: block;
+            height: 28px;
+            background:
+                radial-gradient(circle 3px at 16px 14px, var(--frame-dot) 3px, transparent 3.5px),
+                radial-gradient(circle 3px at 30px 14px, var(--frame-dot) 3px, transparent 3.5px),
+                radial-gradient(circle 3px at 44px 14px, var(--frame-dot) 3px, transparent 3.5px),
+                var(--frame-bar);
+        }
+
+        .browser-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: var(--frame-bar);
+        }
+
+        /* ——— Tags ——— */
+
+        .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
+            margin-bottom: 0.75rem;
         }
 
-        .project-card .tag {
+        .tag {
             font-size: 12px;
             padding: 2px 8px;
             border-radius: 12px;
             background: var(--tag-bg);
             opacity: 0.8;
             white-space: nowrap;
+        }
+
+        /* ——— Separator ——— */
+
+        .separator {
+            border: none;
+            border-top: 1px solid var(--text);
+            opacity: 0.15;
+            margin: 0 0 2rem;
+        }
+
+        /* ——— Project Index ——— */
+
+        .project-index {
+            margin-bottom: 2.5rem;
+        }
+
+        .row-summary {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            padding: 0.6rem 0;
+            background: none;
+            border: none;
+            color: inherit;
+            font: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            text-align: left;
+            transition: opacity 0.2s ease;
+        }
+
+        .row-summary:hover {
+            opacity: 0.6;
+        }
+
+        .row-summary:focus-visible {
+            outline: 2px solid var(--text);
+            outline-offset: 4px;
+            border-radius: 2px;
+        }
+
+        .row-number {
+            font-size: 14px;
+            opacity: 0.35;
+            min-width: 20px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .row-name {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .row-live {
+            font-size: 11px;
+            opacity: 0.4;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .row-arrow {
+            font-size: 14px;
+            opacity: 0.3;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .project-row.open .row-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* ——— Expand/Collapse ——— */
+
+        .row-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease;
+        }
+
+        .project-row.open .row-content {
+            grid-template-rows: 1fr;
+        }
+
+        .row-inner {
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .row-detail {
+            padding: 0.25rem 0 1.25rem calc(20px + 1rem);
+        }
+
+        .row-desc {
+            font-size: 16px;
+            opacity: 0.7;
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .row-screenshot {
+            margin: 0.5rem 0 0.75rem;
+            max-width: 600px;
+        }
+
+        .row-screenshot .browser-frame {
+            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        [data-theme="dark"] .row-screenshot .browser-frame {
+            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .row-links {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 15px;
+        }
+
+        .row-links a {
+            text-decoration: none;
+        }
+
+        .row-links a:hover {
+            text-decoration: underline;
+            opacity: 1;
         }
 
         /* ——— Footer ——— */
@@ -257,12 +404,53 @@
                 font-size: 28px;
             }
 
-            h2 {
+            .featured-name {
                 font-size: 21px;
             }
 
-            .project-grid {
-                grid-template-columns: 1fr;
+            .row-summary {
+                font-size: 16px;
+                gap: 0.75rem;
+            }
+
+            .row-detail {
+                padding-left: 0;
+            }
+
+            .row-screenshot {
+                max-width: 100%;
+            }
+        }
+
+        /* ——— Entrance Animations ——— */
+
+        @media (prefers-reduced-motion: no-preference) {
+            .page-title,
+            .page-subtitle,
+            .featured,
+            .separator,
+            .project-row {
+                opacity: 0;
+                transform: translateY(12px);
+                animation: fadeUp 0.5s ease forwards;
+            }
+
+            .page-title { animation-delay: 0.05s; }
+            .page-subtitle { animation-delay: 0.1s; }
+            .featured { animation-delay: 0.15s; }
+            .separator { animation-delay: 0.2s; }
+            .project-row:nth-child(1) { animation-delay: 0.22s; }
+            .project-row:nth-child(2) { animation-delay: 0.25s; }
+            .project-row:nth-child(3) { animation-delay: 0.28s; }
+            .project-row:nth-child(4) { animation-delay: 0.31s; }
+            .project-row:nth-child(5) { animation-delay: 0.34s; }
+            .project-row:nth-child(6) { animation-delay: 0.37s; }
+            .project-row:nth-child(7) { animation-delay: 0.40s; }
+            .project-row:nth-child(8) { animation-delay: 0.43s; }
+            .project-row:nth-child(9) { animation-delay: 0.46s; }
+
+            @keyframes fadeUp {
+                to { opacity: 1; transform: translateY(0); }
             }
         }
 
@@ -289,95 +477,325 @@
     <main>
         <div class="content">
             <h1 class="page-title" data-i18n="projects.heading">Projects</h1>
-            <p data-i18n-html="projects.subtitle">Things I've built across web, iOS, and AI/ML. Most of these live under <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a>.</p>
+            <p class="page-subtitle" data-i18n-html="projects.subtitle">Things I've built across web, iOS, and AI/ML. Most of these live under <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a>.</p>
 
-            <div class="project-grid">
-                <div class="project-card">
-                    <h3><a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Shredders</a></h3>
-                    <p class="description" data-i18n="projects.shreddersDesc">Real-time snow conditions and powder scoring for PNW ski resorts.</p>
-                    <div class="tags">
-                        <span class="tag">React</span>
-                        <span class="tag">Vercel</span>
-                        <span class="tag">Weather API</span>
+            <!-- ——— Featured Project (random rotation) ——— -->
+
+            <section class="featured" data-featured="shredders" style="display:none">
+                <h2 class="featured-name">Shredders</h2>
+                <div class="browser-frame">
+                    <img src="/projects/images/shredders.jpg" alt="Shredders app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
+                </div>
+                <p class="featured-desc" data-i18n="projects.shreddersDesc">Real-time snow conditions and powder scoring for PNW ski resorts.</p>
+                <div class="tags">
+                    <span class="tag">React</span>
+                    <span class="tag">Vercel</span>
+                    <span class="tag">Weather API</span>
+                </div>
+                <div class="featured-links">
+                    <a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Visit →</a>
+                </div>
+            </section>
+
+            <section class="featured" data-featured="daybyday" style="display:none">
+                <h2 class="featured-name">DayByDay</h2>
+                <div class="browser-frame">
+                    <img src="/projects/images/daybyday.jpg" alt="DayByDay app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
+                </div>
+                <p class="featured-desc" data-i18n="projects.daybydayDesc">Social journaling with photo uploads, streaks, and trip organization.</p>
+                <div class="tags">
+                    <span class="tag">Web App</span>
+                    <span class="tag">Supabase</span>
+                </div>
+                <div class="featured-links">
+                    <a href="https://daybyday.klee.page" target="_blank" rel="noopener">Visit →</a>
+                </div>
+            </section>
+
+            <section class="featured" data-featured="wilco" style="display:none">
+                <h2 class="featured-name">Wilco</h2>
+                <div class="browser-frame">
+                    <img src="/projects/images/wilco.jpg" alt="Wilco app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
+                </div>
+                <p class="featured-desc" data-i18n="projects.wilcoDesc">Aviation radio training simulator with voice I/O and ICAO phraseology scoring.</p>
+                <div class="tags">
+                    <span class="tag">AI/ML</span>
+                    <span class="tag">Web Audio</span>
+                    <span class="tag">Aviation</span>
+                </div>
+                <div class="featured-links">
+                    <a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener">Visit →</a>
+                </div>
+            </section>
+
+            <section class="featured" data-featured="colette" style="display:none">
+                <h2 class="featured-name">Colette</h2>
+                <div class="browser-frame">
+                    <img src="/projects/images/colette.jpg" alt="Colette app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
+                </div>
+                <p class="featured-desc" data-i18n="projects.coletteDesc">AI language tutor with conversation practice, spaced repetition, and journal analysis.</p>
+                <div class="tags">
+                    <span class="tag">AI/ML</span>
+                    <span class="tag">Next.js</span>
+                    <span class="tag">Supabase</span>
+                </div>
+                <div class="featured-links">
+                    <a href="https://colette.pookiebco.com" target="_blank" rel="noopener">Visit →</a>
+                </div>
+            </section>
+
+            <!-- Pick random featured before paint -->
+            <script>
+            (function() {
+                var f = ['shredders', 'daybyday', 'wilco', 'colette'];
+                var pick = f[Math.floor(Math.random() * f.length)];
+                document.querySelector('.featured[data-featured="' + pick + '"]').style.display = '';
+            })();
+            </script>
+
+            <hr class="separator">
+
+            <!-- ——— Project Index ——— -->
+
+            <div class="project-index">
+
+                <!-- 01 Shredders -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">01</span>
+                        <span class="row-name">Shredders</span>
+                        <span class="row-live">Live</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.shreddersDesc">Real-time snow conditions and powder scoring for PNW ski resorts.</p>
+                                <div class="tags">
+                                    <span class="tag">React</span>
+                                    <span class="tag">Vercel</span>
+                                    <span class="tag">Weather API</span>
+                                </div>
+                                <div class="row-screenshot">
+                                    <div class="browser-frame">
+                                        <img src="/projects/images/shredders.jpg" alt="Shredders screenshot" loading="lazy" onerror="this.closest('.row-screenshot').style.display='none'">
+                                    </div>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Visit →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3><a href="https://github.com/kevincorvallis/PookieBNews" target="_blank" rel="noopener">Pookie B News Daily</a></h3>
-                    <p class="description" data-i18n="projects.newsDesc">Automated news aggregation with AI summaries and podcast generation.</p>
-                    <div class="tags">
-                        <span class="tag">AI/ML</span>
-                        <span class="tag">Python</span>
-                        <span class="tag">Automation</span>
+                <!-- 02 Pookie B News Daily -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">02</span>
+                        <span class="row-name">Pookie B News Daily</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.newsDesc">Automated news aggregation with AI summaries and podcast generation.</p>
+                                <div class="tags">
+                                    <span class="tag">AI/ML</span>
+                                    <span class="tag">Python</span>
+                                    <span class="tag">Automation</span>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://github.com/kevincorvallis/PookieBNews" target="_blank" rel="noopener">GitHub →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3><a href="https://github.com/kevincorvallis/SmartSpender" target="_blank" rel="noopener">SmartSpender</a></h3>
-                    <p class="description" data-i18n="projects.smartspenderDesc">AI financial decision engine with plain-English analysis.</p>
-                    <div class="tags">
-                        <span class="tag">AI/ML</span>
-                        <span class="tag">Finance</span>
+                <!-- 03 SmartSpender -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">03</span>
+                        <span class="row-name">SmartSpender</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.smartspenderDesc">AI financial decision engine with plain-English analysis.</p>
+                                <div class="tags">
+                                    <span class="tag">AI/ML</span>
+                                    <span class="tag">Finance</span>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://github.com/kevincorvallis/SmartSpender" target="_blank" rel="noopener">GitHub →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3><a href="https://daybyday.klee.page" target="_blank" rel="noopener">DayByDay</a></h3>
-                    <p class="description" data-i18n="projects.daybydayDesc">Social journaling with photo uploads, streaks, and trip organization.</p>
-                    <div class="tags">
-                        <span class="tag">Web App</span>
-                        <span class="tag">Supabase</span>
+                <!-- 04 DayByDay -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">04</span>
+                        <span class="row-name">DayByDay</span>
+                        <span class="row-live">Live</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.daybydayDesc">Social journaling with photo uploads, streaks, and trip organization.</p>
+                                <div class="tags">
+                                    <span class="tag">Web App</span>
+                                    <span class="tag">Supabase</span>
+                                </div>
+                                <div class="row-screenshot">
+                                    <div class="browser-frame">
+                                        <img src="/projects/images/daybyday.jpg" alt="DayByDay screenshot" loading="lazy" onerror="this.closest('.row-screenshot').style.display='none'">
+                                    </div>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://daybyday.klee.page" target="_blank" rel="noopener">Visit →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3><a href="https://github.com/kevincorvallis/IWBH" target="_blank" rel="noopener">Harmony Tracker</a></h3>
-                    <p class="description" data-i18n="projects.harmonyDesc">AI relationship coaching with habit tracking and communication analysis.</p>
-                    <div class="tags">
-                        <span class="tag">AI/ML</span>
-                        <span class="tag">iOS</span>
+                <!-- 05 Harmony Tracker -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">05</span>
+                        <span class="row-name">Harmony Tracker</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.harmonyDesc">AI relationship coaching with habit tracking and communication analysis.</p>
+                                <div class="tags">
+                                    <span class="tag">AI/ML</span>
+                                    <span class="tag">iOS</span>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://github.com/kevincorvallis/IWBH" target="_blank" rel="noopener">GitHub →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3><a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener">Wilco</a></h3>
-                    <p class="description" data-i18n="projects.wilcoDesc">Aviation radio training simulator with voice I/O and ICAO phraseology scoring.</p>
-                    <div class="tags">
-                        <span class="tag">AI/ML</span>
-                        <span class="tag">Web Audio</span>
-                        <span class="tag">Aviation</span>
+                <!-- 06 Wilco -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">06</span>
+                        <span class="row-name">Wilco</span>
+                        <span class="row-live">Live</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.wilcoDesc">Aviation radio training simulator with voice I/O and ICAO phraseology scoring.</p>
+                                <div class="tags">
+                                    <span class="tag">AI/ML</span>
+                                    <span class="tag">Web Audio</span>
+                                    <span class="tag">Aviation</span>
+                                </div>
+                                <div class="row-screenshot">
+                                    <div class="browser-frame">
+                                        <img src="/projects/images/wilco.jpg" alt="Wilco screenshot" loading="lazy" onerror="this.closest('.row-screenshot').style.display='none'">
+                                    </div>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener">Visit →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3><a href="https://colette.pookiebco.com" target="_blank" rel="noopener">Colette</a></h3>
-                    <p class="description" data-i18n="projects.coletteDesc">AI language tutor with conversation practice, spaced repetition, and journal analysis.</p>
-                    <div class="tags">
-                        <span class="tag">AI/ML</span>
-                        <span class="tag">Next.js</span>
-                        <span class="tag">Supabase</span>
+                <!-- 07 Colette -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">07</span>
+                        <span class="row-name">Colette</span>
+                        <span class="row-live">Live</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.coletteDesc">AI language tutor with conversation practice, spaced repetition, and journal analysis.</p>
+                                <div class="tags">
+                                    <span class="tag">AI/ML</span>
+                                    <span class="tag">Next.js</span>
+                                    <span class="tag">Supabase</span>
+                                </div>
+                                <div class="row-screenshot">
+                                    <div class="browser-frame">
+                                        <img src="/projects/images/colette.jpg" alt="Colette screenshot" loading="lazy" onerror="this.closest('.row-screenshot').style.display='none'">
+                                    </div>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://colette.pookiebco.com" target="_blank" rel="noopener">Visit →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3><a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">SPACEc</a></h3>
-                    <p class="description" data-i18n="projects.spacecDesc">Stanford library for multiplexed imaging and spatial analysis.</p>
-                    <div class="tags">
-                        <span class="tag">Python</span>
-                        <span class="tag">Research</span>
-                        <span class="tag">Stanford</span>
+                <!-- 08 SPACEc -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">08</span>
+                        <span class="row-name">SPACEc</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.spacecDesc">Stanford library for multiplexed imaging and spatial analysis.</p>
+                                <div class="tags">
+                                    <span class="tag">Python</span>
+                                    <span class="tag">Research</span>
+                                    <span class="tag">Stanford</span>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">GitHub →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <h3><a href="https://github.com/kevincorvallis/san-jose-adu-checker" target="_blank" rel="noopener">ADU Checker</a></h3>
-                    <p class="description" data-i18n="projects.aduDesc">Automates 17 ADU permit eligibility checks using government GIS APIs.</p>
-                    <div class="tags">
-                        <span class="tag">Python</span>
-                        <span class="tag">GIS</span>
-                        <span class="tag">Automation</span>
+                <!-- 09 ADU Checker -->
+                <div class="project-row">
+                    <button class="row-summary" aria-expanded="false">
+                        <span class="row-number">09</span>
+                        <span class="row-name">ADU Checker</span>
+                        <span class="row-arrow">→</span>
+                    </button>
+                    <div class="row-content" aria-hidden="true">
+                        <div class="row-inner">
+                            <div class="row-detail">
+                                <p class="row-desc" data-i18n="projects.aduDesc">Automates 17 ADU permit eligibility checks using government GIS APIs.</p>
+                                <div class="tags">
+                                    <span class="tag">Python</span>
+                                    <span class="tag">GIS</span>
+                                    <span class="tag">Automation</span>
+                                </div>
+                                <div class="row-links">
+                                    <a href="https://github.com/kevincorvallis/san-jose-adu-checker" target="_blank" rel="noopener">GitHub →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </main>
@@ -389,6 +807,19 @@
     <!-- Analytics -->
     <script defer src="/_vercel/insights/script.js"></script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- Expand/collapse -->
+    <script>
+    document.querySelectorAll('.row-summary').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var row = btn.closest('.project-row');
+            var content = row.querySelector('.row-content');
+            var isOpen = row.classList.toggle('open');
+            btn.setAttribute('aria-expanded', isOpen);
+            content.setAttribute('aria-hidden', !isOpen);
+        });
+    });
+    </script>
 
     <script src="/js/i18n.js"></script>
     <script src="/js/theme.js"></script>
