@@ -657,6 +657,119 @@
             transition: color 0.3s ease;
         }
 
+        /* ========== SUBSCRIBE ========== */
+        .subscribe {
+            padding: 5rem 1.5rem 3rem;
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .subscribe-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-desc {
+            font-size: 16px;
+            color: var(--caption);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .subscribe-input::placeholder {
+            color: var(--caption);
+        }
+
+        .subscribe-input:focus {
+            border-color: var(--accent);
+        }
+
+        .subscribe-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .subscribe-btn:hover {
+            opacity: 0.7;
+        }
+
+        .subscribe-success {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent);
+            display: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe.submitted .subscribe-form {
+            display: none;
+        }
+
+        .subscribe.submitted .subscribe-success {
+            display: block;
+        }
+
+        .subscribe-note {
+            font-size: 13px;
+            color: var(--caption);
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .subscribe-form {
+                flex-direction: column;
+            }
+
+            .subscribe-btn {
+                padding: 14px 24px;
+            }
+        }
+
         /* ========== REVEAL ANIMATIONS ========== */
         .reveal {
             opacity: 0;
@@ -1105,6 +1218,47 @@
     </div>
 
     <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Subscribe ——— -->
+    <div class="subscribe reveal" id="subscribe">
+        <p class="subscribe-label">
+            <span data-l="en">Stay in the Loop</span>
+            <span data-l="ko">소식 받기</span>
+        </p>
+        <h2 class="subscribe-title">
+            <span data-l="en">Want this weekly?</span>
+            <span data-l="ko">매주 받고 싶다면?</span>
+        </h2>
+        <p class="subscribe-desc">
+            <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
+            <span data-l="ko">이메일을 남겨주면 Dispatch를 받은편지함으로 바로 보내줄게. 스팸 없이, 그냥 내 소식만.</span>
+        </p>
+        <form class="subscribe-form" id="subscribeForm">
+            <input
+                type="email"
+                class="subscribe-input"
+                id="subscribeEmail"
+                placeholder="your@email.com"
+                required
+                autocomplete="email"
+            >
+            <button type="submit" class="subscribe-btn" id="subscribeBtn">
+                <span data-l="en">Subscribe</span>
+                <span data-l="ko">구독</span>
+            </button>
+        </form>
+        <p class="subscribe-success" id="subscribeSuccess">
+            <span data-l="en">You're in. See you next week.</span>
+            <span data-l="ko">등록 완료. 다음 주에 보자.</span>
+        </p>
+        <p class="subscribe-note">
+            <span data-l="en">Just between us — no third parties, ever.</span>
+            <span data-l="ko">우리끼리만 — 제3자에게 절대 공유하지 않아.</span>
+        </p>
+    </div>
+
+    <div class="spacer-lg"></div>
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="story-footer">
@@ -1136,6 +1290,34 @@
                 document.documentElement.setAttribute('lang', current);
                 localStorage.setItem('dispatch-lang', current);
                 btn.textContent = current === 'ko' ? '한/EN' : 'EN/한';
+            });
+        })();
+
+        // ==================== SUBSCRIBE ====================
+        (function() {
+            var form = document.getElementById('subscribeForm');
+            var emailInput = document.getElementById('subscribeEmail');
+            var section = document.getElementById('subscribe');
+
+            // Check if already subscribed
+            if (localStorage.getItem('dispatch-subscribed')) {
+                section.classList.add('submitted');
+                return;
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = emailInput.value.trim();
+                if (!email) return;
+
+                // Store locally + open pre-filled email to Kevin
+                localStorage.setItem('dispatch-subscribed', email);
+                section.classList.add('submitted');
+
+                // Send a quick email to Kevin so he knows
+                var subject = encodeURIComponent('Dispatch — New subscriber');
+                var body = encodeURIComponent('Hey Kevin,\n\nI\'d like to get Dispatch weekly!\n\nEmail: ' + email);
+                window.open('mailto:contact@klee.page?subject=' + subject + '&body=' + body, '_self');
             });
         })();
     </script>
