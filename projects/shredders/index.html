@@ -169,6 +169,44 @@
         }
         .phone-frame img { width: 100%; height: auto; display: block; }
 
+        /* Phone Gallery */
+        .phone-gallery {
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+            margin: 0 0 2.5rem;
+            padding: 2rem 0;
+        }
+        .phone-gallery .phone-frame {
+            width: 200px;
+            flex-shrink: 0;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+            border: 3px solid rgba(31,30,29,0.12);
+        }
+        [data-theme="dark"] .phone-gallery .phone-frame {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            border-color: rgba(240,238,230,0.12);
+        }
+        .phone-gallery .phone-frame img { width: 100%; height: auto; display: block; }
+        .gallery-caption {
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.45;
+            margin: -1.5rem 0 2.5rem;
+        }
+
+        /* Full-width image */
+        .full-image {
+            margin: 1.5rem 0 2rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        [data-theme="dark"] .full-image { box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .full-image img { width: 100%; height: auto; display: block; }
+
         /* Sections */
         h2 {
             font-size: 24px;
@@ -280,12 +318,14 @@
             h2 { font-size: 21px; }
             h3 { font-size: 17px; }
             .screenshot-pair .phone-frame { width: 120px; }
+            .phone-gallery .phone-frame { width: 150px; border-radius: 22px; }
+            .phone-gallery { gap: 0.75rem; padding: 1.25rem 0; }
             .diagram-flow { flex-direction: column; min-width: 0; }
             .diagram-edge { justify-content: center; padding: 0.3rem 0; transform: rotate(90deg); }
         }
 
         @media (prefers-reduced-motion: no-preference) {
-            .hero, h2, .diagram, .screenshot-pair {
+            .hero, h2, .diagram, .screenshot-pair, .phone-gallery {
                 opacity: 0;
                 transform: translateY(12px);
                 animation: fadeUp 0.5s ease forwards;
@@ -334,6 +374,16 @@
                 <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS app" onerror="this.closest('.phone-frame').style.display='none'">
             </div>
         </div>
+
+        <div class="phone-gallery">
+            <div class="phone-frame">
+                <img src="/projects/images/shredders-today.jpg" alt="Shredders iOS app — Today view with powder score, snow forecast chart, and tracked mountains" loading="lazy" width="591" height="1280">
+            </div>
+            <div class="phone-frame">
+                <img src="/projects/images/shredders-mountains.jpg" alt="Shredders iOS app — Mountains list sorted by best conditions with powder scores" loading="lazy" width="591" height="1280">
+            </div>
+        </div>
+        <p class="gallery-caption">iOS app — Today's forecast and Mountain rankings</p>
 
         <h2>The Problem</h2>
         <p>Planning a ski day in the Pacific Northwest means checking five different websites. SNOTEL for snowpack. NOAA for the forecast. WSDOT for road conditions. The resort's webcam page. Your group chat for who's actually going.</p>

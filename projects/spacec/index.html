@@ -148,6 +148,60 @@
             margin: 2.5rem 0;
         }
 
+        /* Full-width image */
+        .full-image {
+            margin: 1.5rem 0 2rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        [data-theme="dark"] .full-image { box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .full-image img { width: 100%; height: auto; display: block; }
+        .image-caption {
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.45;
+            margin: -1rem 0 2rem;
+        }
+
+        /* Logo + intro pair */
+        .logo-intro {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .logo-intro img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+        .logo-intro p { margin-bottom: 0; font-size: 18px; opacity: 0.7; }
+
+        /* Talk embed */
+        .talk-card {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: var(--tag-bg);
+            border-radius: 8px;
+            margin: 1.5rem 0 2rem;
+            text-decoration: none;
+            transition: opacity 0.2s ease;
+        }
+        .talk-card:hover { opacity: 0.75; text-decoration: none; }
+        .talk-card img {
+            width: 180px;
+            height: auto;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .talk-card-text { font-size: 16px; line-height: 1.5; }
+        .talk-card-title { font-weight: 600; display: block; margin-bottom: 0.25rem; }
+        .talk-card-sub { font-size: 14px; opacity: 0.5; }
+
         /* Code block */
         .code-block {
             background: var(--tag-bg);
@@ -262,10 +316,15 @@
             h3 { font-size: 17px; }
             .diagram-flow { flex-direction: column; min-width: 0; }
             .diagram-edge { justify-content: center; padding: 0.3rem 0; transform: rotate(90deg); }
+            .logo-intro { gap: 1rem; }
+            .logo-intro img { width: 72px; height: 72px; border-radius: 16px; }
+            .logo-intro p { font-size: 16px; }
+            .talk-card { flex-direction: column; text-align: center; }
+            .talk-card img { width: 100%; max-width: 300px; }
         }
 
         @media (prefers-reduced-motion: no-preference) {
-            .hero, h2, .diagram, .code-block {
+            .hero, h2, .diagram, .code-block, .full-image, .logo-intro, .talk-card {
                 opacity: 0;
                 transform: translateY(12px);
                 animation: fadeUp 0.5s ease forwards;
@@ -304,6 +363,11 @@
             </p>
         </div>
 
+        <div class="logo-intro">
+            <img src="/projects/images/spacec-logo.png" alt="SPACEc logo" width="100" height="100">
+            <p>A streamlined, interactive Python workflow for multiplexed image processing — from tissue extraction to spatial analysis in a single library.</p>
+        </div>
+
         <div class="code-block">
             <span class="code-comment"># From raw images to spatial analysis</span><br>
             <span class="code-fn">sp.tl</span>.cellpose_segmentation(img, ...)<br>
@@ -324,6 +388,11 @@
         <hr>
 
         <h2>Architecture</h2>
+
+        <div class="full-image">
+            <img src="/projects/images/spacec-overview.jpg" alt="SPACEc pipeline overview — tissue extraction, segmentation, preprocessing, clustering, annotation, and spatial analysis" loading="lazy" width="1200" height="848">
+        </div>
+        <p class="image-caption">Full pipeline overview from the SPACEc paper</p>
 
         <div class="diagram">
             <div class="diagram-flow">
@@ -401,6 +470,17 @@
         <p><strong>Python 3.9&ndash;3.10 only.</strong> TensorFlow, PyTorch, and RAPIDS all have strict version requirements that don't overlap cleanly above 3.10. This is the single biggest friction point for adoption. Docker containers (CPU and GPU variants) are the recommended install path for a reason.</p>
         <p><strong>Monolithic modules.</strong> <code>_general.py</code> at 5,446 lines is hard to navigate and contributes to. The scanpy convention prioritizes API consistency (<code>sp.tl.function()</code>) over file organization. This was a conscious tradeoff &mdash; the public API is clean even if the internals are dense.</p>
         <p><strong>Dependency sprawl.</strong> Cellpose, DeepCell, RAPIDS, PyTorch Geometric, GeoPandas, TensorFlow &mdash; each brings transitive dependencies that conflict with each other. A fresh install without Docker is an afternoon project. This is the cost of wrapping the best tool for each step rather than reimplementing everything.</p>
+
+        <hr>
+
+        <h2>Talk</h2>
+        <a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener" class="talk-card">
+            <img src="/projects/images/spacec-talk.jpg" alt="SPACEc presentation at Stanford" loading="lazy" width="180" height="101">
+            <div class="talk-card-text">
+                <span class="talk-card-title">SPACEc: A Streamlined, Interactive Python Workflow</span>
+                <span class="talk-card-sub">Stanford University &middot; Nolan Lab</span>
+            </div>
+        </a>
 
         <hr>
 
