@@ -43,7 +43,11 @@
 <body>
 
     <header>
-        <h1><a href="/">Kevin Lee</a></h1>
+        <h1 class="site-title">
+            <a href="/">
+                <span class="char-keep">K</span><span class="char-collapse" aria-hidden="true">evin</span><span class="char-collapse char-space" aria-hidden="true"> </span><span class="char-keep">lee</span>
+            </a>
+        </h1>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle">
             <label for="theme-toggle"></label>
@@ -89,6 +93,12 @@
             </section>
 
             <section>
+                <h2 data-i18n="index.dispatchHeading">Dispatch</h2>
+                <p>A weekly letter to friends and family.</p>
+                <p><a href="/newsletter">Read the latest</a></p>
+            </section>
+
+            <section>
                 <h2 data-i18n="index.connectHeading">Connect</h2>
                 <ul>
                     <li><a href="mailto:contact@klee.page" data-i18n="index.emailLink">Email</a></li>
@@ -110,5 +120,6 @@
     <!-- Scripts -->
     <script src="js/i18n.js"></script>
     <script src="js/theme.js"></script>
+    <script src="js/header-scroll.js"></script>
 </body>
 </html>

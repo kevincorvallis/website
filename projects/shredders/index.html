@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shredders — Kevin Lee</title>
+    <meta name="description" content="Case study: Shredders — real-time powder conditions for 53 ski resorts across 11 regions.">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <script>
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || systemPreference);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --tag-bg: rgba(31, 30, 29, 0.08);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --tag-bg: rgba(240, 238, 230, 0.1);
+        }
+
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection { background: rgba(0, 100, 255, 0.26); color: inherit; }
+
+        a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s ease; }
+        a:hover { opacity: 0.6; }
+
+        header {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            font-size: 15px;
+            font-weight: 400;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, color 0.3s ease;
+        }
+        .back-link:hover { opacity: 0.75; }
+
+        .toggle-wrap { display: flex; align-items: center; }
+        .toggle-wrap input { display: none; }
+        .toggle-wrap label {
+            position: relative; display: block; width: 40px; height: 20px;
+            background: var(--text); border-radius: 10px; cursor: pointer;
+        }
+        .toggle-wrap label::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 16px; height: 16px; background: var(--bg);
+            border-radius: 50%; transition: transform 0s;
+        }
+        .toggle-wrap label.has-transition::after { transition: transform 0.2s; }
+        .toggle-wrap input:checked + label::after { transform: translateX(20px); }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero { margin-top: 2rem; }
+
+        .page-title {
+            font-size: 38px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            font-size: 18px;
+            opacity: 0.6;
+            margin-bottom: 1.25rem;
+        }
+
+        .stats {
+            font-size: 16px;
+            opacity: 0.55;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+        .stats strong { font-weight: 600; opacity: 1; }
+
+        /* Screenshots */
+        .screenshot-pair {
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+        .browser-frame {
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        [data-theme="dark"] .browser-frame { box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .browser-frame::before {
+            content: ''; display: block; height: 28px;
+            background:
+                radial-gradient(circle 3px at 16px 14px, rgba(31,30,29,0.15) 3px, transparent 3.5px),
+                radial-gradient(circle 3px at 30px 14px, rgba(31,30,29,0.15) 3px, transparent 3.5px),
+                radial-gradient(circle 3px at 44px 14px, rgba(31,30,29,0.15) 3px, transparent 3.5px),
+                rgba(31,30,29,0.06);
+        }
+        [data-theme="dark"] .browser-frame::before {
+            background:
+                radial-gradient(circle 3px at 16px 14px, rgba(240,238,230,0.2) 3px, transparent 3.5px),
+                radial-gradient(circle 3px at 30px 14px, rgba(240,238,230,0.2) 3px, transparent 3.5px),
+                radial-gradient(circle 3px at 44px 14px, rgba(240,238,230,0.2) 3px, transparent 3.5px),
+                rgba(240,238,230,0.06);
+        }
+        .browser-frame img { width: 100%; height: auto; display: block; }
+        .phone-frame {
+            width: 160px; flex-shrink: 0;
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            border: 3px solid rgba(31,30,29,0.15);
+        }
+        [data-theme="dark"] .phone-frame {
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            border-color: rgba(240,238,230,0.15);
+        }
+        .phone-frame img { width: 100%; height: auto; display: block; }
+
+        /* Sections */
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin: 2.5rem 0 1rem;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin: 1.75rem 0 0.5rem;
+        }
+
+        p { margin-bottom: 1rem; }
+        p:last-child { margin-bottom: 0; }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--text);
+            opacity: 0.15;
+            margin: 2.5rem 0;
+        }
+
+        /* Architecture Diagram */
+        .diagram {
+            margin: 1.5rem 0 2rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .diagram-flow {
+            display: flex;
+            align-items: stretch;
+            min-width: max-content;
+        }
+
+        .diagram-node {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem 1rem;
+            background: var(--tag-bg);
+            border-radius: 6px;
+        }
+
+        .diagram-node-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.5;
+            margin-bottom: 0.35rem;
+        }
+
+        .diagram-node-body {
+            display: block;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .diagram-edge {
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            opacity: 0.25;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 1.5rem 0;
+        }
+        .tag {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: var(--tag-bg);
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+
+        /* Links */
+        .project-links {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 16px;
+            margin-top: 1.5rem;
+        }
+        .project-links a { text-decoration: none; }
+        .project-links a:hover { text-decoration: underline; opacity: 1; }
+
+        footer {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 20px 2rem;
+        }
+        footer p { font-size: 14px; opacity: 0.5; }
+
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .back-link { font-size: 14px; }
+            .page-title { font-size: 30px; }
+            h2 { font-size: 21px; }
+            h3 { font-size: 17px; }
+            .screenshot-pair .phone-frame { width: 120px; }
+            .diagram-flow { flex-direction: column; min-width: 0; }
+            .diagram-edge { justify-content: center; padding: 0.3rem 0; transform: rotate(90deg); }
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .hero, h2, .diagram, .screenshot-pair {
+                opacity: 0;
+                transform: translateY(12px);
+                animation: fadeUp 0.5s ease forwards;
+            }
+            .hero { animation-delay: 0.05s; }
+            .screenshot-pair { animation-delay: 0.15s; }
+            @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/projects" class="back-link">&larr; Projects</a>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1 class="page-title">Shredders</h1>
+            <p class="tagline">Real-time powder conditions for 53 ski resorts across 11 regions.</p>
+            <p class="stats">
+                <strong>53</strong> resorts &middot;
+                <strong>11</strong> regions &middot;
+                <strong>90</strong> API routes &middot;
+                <strong>24</strong> database tables &middot;
+                <strong>7</strong> data sources
+            </p>
+        </div>
+
+        <div class="screenshot-pair">
+            <div class="browser-frame">
+                <img src="/projects/images/shredders.jpg" alt="Shredders web app" onerror="this.closest('.screenshot-pair').style.display='none'">
+            </div>
+            <div class="phone-frame">
+                <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS app" onerror="this.closest('.phone-frame').style.display='none'">
+            </div>
+        </div>
+
+        <h2>The Problem</h2>
+        <p>Planning a ski day in the Pacific Northwest means checking five different websites. SNOTEL for snowpack. NOAA for the forecast. WSDOT for road conditions. The resort's webcam page. Your group chat for who's actually going.</p>
+        <p>By the time you've assembled the picture, your motivation to get up at 5 AM has evaporated.</p>
+        <p>Shredders aggregates seven data sources into one dashboard &mdash; web and iOS &mdash; with an 8-factor powder score, 7-day forecasts, weather alerts, AI chat for trip planning, and social features for coordinating with friends.</p>
+
+        <hr>
+
+        <h2>Architecture</h2>
+
+        <div class="diagram">
+            <div class="diagram-flow">
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Data Sources</span>
+                    <span class="diagram-node-body">SNOTEL (USDA)<br>NOAA / Weather.gov<br>Open-Meteo<br>WSDOT<br>RainViewer<br>Resort websites</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Ingestion</span>
+                    <span class="diagram-node-body">Cheerio (HTML)<br>Puppeteer (JS-rendered)<br>REST APIs<br>Cron schedules</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Storage</span>
+                    <span class="diagram-node-body">PostgreSQL<br>24 tables &middot; 14 migrations<br>Upstash Redis cache</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">API Layer</span>
+                    <span class="diagram-node-body">90 Next.js routes<br>Claude chat (streaming)<br>GPT-4 predictions</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Clients</span>
+                    <span class="diagram-node-body">Web (React 19)<br>iOS (SwiftUI)<br>Push notifications</span>
+                </div>
+            </div>
+        </div>
+
+        <p>The backend is a Next.js 16 app with 90 API routes organized across mountains (batch conditions, forecasts, powder score, alerts, webcams, lifts, parking, trip advice), auth (email + Apple Sign-In), events (CRUD, RSVP, carpool, recurring series), social (check-ins, likes, photos), and AI chat. Three Vercel cron jobs handle daily event reminders, weather alerts, and powder notifications.</p>
+        <p>The database is Supabase PostgreSQL with 24 tables spanning users, events (with attendees, comments, photos, activity feeds, date polls, invite tokens), social features, push tokens, alert subscriptions, sessions, audit logs, mountain status, and scraper health monitoring.</p>
+
+        <h3>The Powder Score</h3>
+        <p>An 8-factor composite score from 0&ndash;100: recent snowfall (24h/48h/7d), temperature at elevation, wind and gusts, visibility, current conditions, upcoming snow in the forecast, base depth, and seasonal trends. Designed to answer one question: is it worth the drive?</p>
+
+        <h3>Performance</h3>
+        <p>The original frontend made 45+ API calls on page load. Batch endpoints collapsed that to 3. Response caching at 10-minute intervals keeps Supabase query volume manageable. The iOS app launches with 2 API calls. Images are served as AVIF/WebP with lazy loading.</p>
+
+        <hr>
+
+        <h2>Decisions</h2>
+
+        <h3>Why Supabase over Firebase?</h3>
+        <p>I needed real-time subscriptions, auth, and a relational database in one platform &mdash; without managing infrastructure for a side project. Supabase gave me Postgres (real SQL, not document queries), built-in auth with Apple Sign-In support, and auto-generated APIs. The tradeoff: those auto-generated APIs are fast to build against but you lose fine-grained control over query optimization when you hit 90 endpoints.</p>
+
+        <h3>Why scrape resort websites?</h3>
+        <p>No resort provides a usable API. Lift status, webcam URLs, parking lot capacity &mdash; it all lives on PHP pages last redesigned in 2014. Cheerio handles HTML parsing and Puppeteer covers JavaScript-rendered content. The downside is fragility: every time Crystal Mountain redesigns their snow report, a scraper breaks. I monitor scraper health with dedicated database tables and cron-based health checks.</p>
+
+        <h3>Why dual platform from day one?</h3>
+        <p>Ski conditions are checked at 5 AM from bed while deciding whether to make the drive. That's a phone experience. The web app is better for planning &mdash; bigger screen, map view, event coordination &mdash; but the iOS app is where the real usage happens. SwiftUI made it fast to build, and push notifications for powder alerts were table stakes.</p>
+
+        <h3>Why 90 API routes?</h3>
+        <p>Each route does one thing and is simple to reason about. I chose many small endpoints over fewer, more complex ones because it let me move fast &mdash; add a feature, add a route. The tradeoff is maintenance surface area. Refactoring touches a lot of files. Batch endpoints for the frontend helped offset the chattiness.</p>
+
+        <hr>
+
+        <h2>Tradeoffs</h2>
+        <p><strong>Scraping is inherently fragile.</strong> Resort websites change without notice. I've built monitoring to catch failures fast, but a broken scraper still means missing data until I fix the parser. There's no way around this without official APIs.</p>
+        <p><strong>Free tier constraints shape the architecture.</strong> Supabase and Vercel free tiers are generous but not infinite. Redis caching via Upstash keeps Supabase query volume under control. Batch API endpoints keep Vercel serverless invocations reasonable. If usage grew 10x, I'd need paid tiers or a different hosting strategy.</p>
+        <p><strong>Dual auth adds complexity for a side project.</strong> Supporting both email/password and Apple Sign-In means JWT rotation, token blacklisting, session tracking, and rate limiting across two flows. It's table stakes for an iOS app but it's more auth code than most side projects warrant.</p>
+
+        <hr>
+
+        <div class="tags">
+            <span class="tag">Next.js 16</span>
+            <span class="tag">React 19</span>
+            <span class="tag">Tailwind</span>
+            <span class="tag">Supabase</span>
+            <span class="tag">Upstash Redis</span>
+            <span class="tag">SwiftUI</span>
+            <span class="tag">Claude</span>
+            <span class="tag">GPT-4</span>
+            <span class="tag">Vercel</span>
+            <span class="tag">Cheerio</span>
+            <span class="tag">Puppeteer</span>
+        </div>
+
+        <div class="project-links">
+            <a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Visit &rarr;</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+    </footer>
+
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/theme.js"></script>
+</body>
+</html>

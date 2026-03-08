@@ -49,12 +49,29 @@ a:hover {
 /* ——— Header ——— */
 
 header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
     max-width: 620px;
     margin: 0 auto;
     padding: 15px 20px 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+header.scrolled {
+    background: rgba(240, 238, 230, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 0 rgba(31, 30, 29, 0.08);
+}
+
+[data-theme="dark"] header.scrolled {
+    background: rgba(31, 30, 29, 0.85);
+    box-shadow: 0 1px 0 rgba(240, 238, 230, 0.08);
 }
 
 header h1 {
@@ -65,6 +82,52 @@ header h1 {
 
 header h1 a {
     text-decoration: none !important;
+    display: inline-flex;
+    align-items: baseline;
+    white-space: nowrap;
+}
+
+.char-keep {
+    display: inline-block;
+}
+
+.char-collapse {
+    display: inline-block;
+    overflow: hidden;
+    max-width: 100px;
+    opacity: 1;
+    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+.char-space {
+    max-width: 0.3em;
+}
+
+/* Scroll-driven animation (Chrome, Edge, Safari 18+) */
+@supports (animation-timeline: scroll()) {
+    .char-collapse {
+        transition: none;
+        animation: collapse linear both;
+        animation-timeline: scroll();
+        animation-range: 0px 120px;
+    }
+    .char-space {
+        animation-name: collapseSpace;
+    }
+    @keyframes collapse {
+        to { max-width: 0; opacity: 0; }
+    }
+    @keyframes collapseSpace {
+        from { max-width: 0.3em; }
+        to { max-width: 0; opacity: 0; }
+    }
+}
+
+/* JS fallback collapsed state (Firefox, older browsers) */
+.site-title.collapsed .char-collapse {
+    max-width: 0;
+    opacity: 0;
+    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 }
 
 /* ——— Theme Toggle (pill slider) ——— */
@@ -188,10 +251,28 @@ footer p {
     }
 }
 
+/* ——— Section Entrance Animations ——— */
+
+@media (prefers-reduced-motion: no-preference) {
+    article section {
+        opacity: 0;
+        transform: translateY(12px);
+        animation: fadeUp 0.5s ease forwards;
+    }
+    article section:nth-child(1) { animation-delay: 0.1s; }
+    article section:nth-child(2) { animation-delay: 0.2s; }
+    article section:nth-child(3) { animation-delay: 0.3s; }
+    article section:nth-child(4) { animation-delay: 0.4s; }
+    @keyframes fadeUp {
+        to { opacity: 1; transform: translateY(0); }
+    }
+}
+
 /* ——— Reduced Motion ——— */
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
     }
 }

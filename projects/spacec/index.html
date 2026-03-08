@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPACEc — Kevin Lee</title>
+    <meta name="description" content="Case study: SPACEc — Stanford academic Python library for multiplexed imaging analysis.">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <script>
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || systemPreference);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --tag-bg: rgba(31, 30, 29, 0.08);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --tag-bg: rgba(240, 238, 230, 0.1);
+        }
+
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection { background: rgba(0, 100, 255, 0.26); color: inherit; }
+
+        a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s ease; }
+        a:hover { opacity: 0.6; }
+
+        header {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            font-size: 15px; font-weight: 400; text-decoration: none;
+            opacity: 0.4; transition: opacity 0.2s ease, color 0.3s ease;
+        }
+        .back-link:hover { opacity: 0.75; }
+
+        .toggle-wrap { display: flex; align-items: center; }
+        .toggle-wrap input { display: none; }
+        .toggle-wrap label {
+            position: relative; display: block; width: 40px; height: 20px;
+            background: var(--text); border-radius: 10px; cursor: pointer;
+        }
+        .toggle-wrap label::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 16px; height: 16px; background: var(--bg);
+            border-radius: 50%; transition: transform 0s;
+        }
+        .toggle-wrap label.has-transition::after { transition: transform 0.2s; }
+        .toggle-wrap input:checked + label::after { transform: translateX(20px); }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero { margin-top: 2rem; }
+
+        .page-title {
+            font-size: 38px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            font-size: 18px;
+            opacity: 0.6;
+            margin-bottom: 1.25rem;
+        }
+
+        .stats {
+            font-size: 16px;
+            opacity: 0.55;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+        .stats strong { font-weight: 600; opacity: 1; }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin: 2.5rem 0 1rem;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin: 1.75rem 0 0.5rem;
+        }
+
+        p { margin-bottom: 1rem; }
+        p:last-child { margin-bottom: 0; }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--text);
+            opacity: 0.15;
+            margin: 2.5rem 0;
+        }
+
+        /* Code block */
+        .code-block {
+            background: var(--tag-bg);
+            border-radius: 6px;
+            padding: 1.25rem 1.5rem;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .code-comment { opacity: 0.4; }
+        .code-fn { font-weight: 600; }
+
+        /* Architecture Diagram */
+        .diagram {
+            margin: 1.5rem 0 2rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .diagram-flow {
+            display: flex;
+            align-items: stretch;
+            min-width: max-content;
+        }
+
+        .diagram-node {
+            flex: 1;
+            min-width: 105px;
+            padding: 0.75rem 0.85rem;
+            background: var(--tag-bg);
+            border-radius: 6px;
+        }
+
+        .diagram-node-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.5;
+            margin-bottom: 0.35rem;
+        }
+
+        .diagram-node-body {
+            display: block;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .diagram-edge {
+            display: flex;
+            align-items: center;
+            padding: 0 0.4rem;
+            opacity: 0.25;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        /* Module layout */
+        .module-list {
+            list-style: none;
+            margin: 1rem 0 1.5rem;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .module-list li { padding-left: 0; }
+        .module-list li::before { content: none; }
+        .module-name { font-weight: 600; }
+        .module-lines { opacity: 0.45; font-size: 12px; }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 1.5rem 0;
+        }
+        .tag {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: var(--tag-bg);
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 16px;
+            margin-top: 1.5rem;
+        }
+        .project-links a { text-decoration: none; }
+        .project-links a:hover { text-decoration: underline; opacity: 1; }
+
+        footer {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 20px 2rem;
+        }
+        footer p { font-size: 14px; opacity: 0.5; }
+
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .back-link { font-size: 14px; }
+            .page-title { font-size: 30px; }
+            h2 { font-size: 21px; }
+            h3 { font-size: 17px; }
+            .diagram-flow { flex-direction: column; min-width: 0; }
+            .diagram-edge { justify-content: center; padding: 0.3rem 0; transform: rotate(90deg); }
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .hero, h2, .diagram, .code-block {
+                opacity: 0;
+                transform: translateY(12px);
+                animation: fadeUp 0.5s ease forwards;
+            }
+            .hero { animation-delay: 0.05s; }
+            @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/projects" class="back-link">&larr; Projects</a>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1 class="page-title">SPACEc</h1>
+            <p class="tagline">A Stanford academic library for multiplexed imaging analysis &mdash; from cell segmentation to spatial analysis.</p>
+            <p class="stats">
+                <strong>19,123</strong> lines of Python &middot;
+                <strong>6</strong> core modules &middot;
+                <strong>19</strong> notebooks &middot;
+                Published on <strong>PyPI</strong> &amp; <strong>bioRxiv</strong>
+            </p>
+        </div>
+
+        <div class="code-block">
+            <span class="code-comment"># From raw images to spatial analysis</span><br>
+            <span class="code-fn">sp.tl</span>.cellpose_segmentation(img, ...)<br>
+            <span class="code-fn">sp.pp</span>.filter_cells(adata, ...)<br>
+            <span class="code-fn">sp.tl</span>.leiden(adata, resolution=1.0)<br>
+            <span class="code-fn">sp.tl</span>.annotate(adata, method=<span style="opacity:0.7">'stellar'</span>)<br>
+            <span class="code-fn">sp.tl</span>.patch_proximity(adata, ...)<br>
+            <span class="code-fn">sp.pl</span>.spatial(adata, color=<span style="opacity:0.7">'cell_type'</span>)
+        </div>
+
+        <h2>The Problem</h2>
+        <p>Multiplexed imaging lets researchers see 40+ proteins in a single tissue section &mdash; a massive leap for understanding how cells interact in cancer, autoimmunity, and neuroscience. But the analysis pipeline is duct tape: Cellpose for segmentation, scanpy for clustering, custom scripts for spatial analysis, matplotlib for visualization.</p>
+        <p>Researchers were spending more time wrangling code than doing science. Each lab had its own fragile collection of notebooks that broke when dependencies updated.</p>
+
+        <h2>The Idea</h2>
+        <p>A unified library that handles the entire workflow &mdash; raw TIFF images to spatial analysis results &mdash; in a single, consistent API. SPACEc follows the scanpy convention: <code>sp.tl</code> (tools), <code>sp.pp</code> (preprocessing), <code>sp.pl</code> (plotting), <code>sp.hf</code> (helpers). Built on AnnData objects, the standard format in single-cell biology.</p>
+
+        <hr>
+
+        <h2>Architecture</h2>
+
+        <div class="diagram">
+            <div class="diagram-flow">
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Input</span>
+                    <span class="diagram-node-body">Multi-channel<br>TIFF images<br>CSV markers</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Segmentation</span>
+                    <span class="diagram-node-body">Cellpose<br>DeepCell (Mesmer)<br>QuPath import</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Preprocessing</span>
+                    <span class="diagram-node-body">Spillover comp<br>Noise removal<br>Normalization</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Clustering</span>
+                    <span class="diagram-node-body">Leiden / Louvain<br>FlowSOM<br>GPU (RAPIDS)</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Annotation</span>
+                    <span class="diagram-node-body">SVM / k-NN<br>STELLAR (GNN)<br>Hyperparameter tuning</span>
+                </div>
+                <span class="diagram-edge">&rarr;</span>
+                <div class="diagram-node">
+                    <span class="diagram-node-label">Spatial</span>
+                    <span class="diagram-node-body">Neighborhoods<br>Cell interactions<br>Patch Proximity*</span>
+                </div>
+            </div>
+        </div>
+
+        <p>*Patch Proximity Analysis is the novel research contribution.</p>
+
+        <h3>Module Structure</h3>
+        <ul class="module-list">
+            <li><span class="module-name">sp.tl._general</span> <span class="module-lines">5,446 lines</span> &mdash; core analysis, clustering, annotation, spatial</li>
+            <li><span class="module-name">sp.pl._general</span> <span class="module-lines">5,214 lines</span> &mdash; all visualization and plotting</li>
+            <li><span class="module-name">sp.tl._segmentation</span> <span class="module-lines">2,522 lines</span> &mdash; Cellpose, DeepCell, image processing</li>
+            <li><span class="module-name">sp.hf._general</span> <span class="module-lines">1,096 lines</span> &mdash; utilities and helper functions</li>
+            <li><span class="module-name">sp.pp._general</span> <span class="module-lines">762 lines</span> &mdash; preprocessing pipelines</li>
+            <li><span class="module-name">sp._shared.segmentation</span> &mdash; shared segmentation logic</li>
+        </ul>
+
+        <hr>
+
+        <h2>The Novel Contribution</h2>
+        <h3>Patch Proximity Analysis</h3>
+        <p>Traditional neighborhood analysis looks at individual cell-to-cell distances. It tells you that cell A is near cell B, but it misses the bigger picture: how are groups of cells organized at the tissue level?</p>
+        <p>Patch Proximity Analysis works differently. First, DBSCAN identifies spatial clusters of a given cell type &mdash; patches of tumor cells, immune cell aggregates, stromal clusters. Then concave hull algorithms draw tight boundaries around each patch. Finally, the analysis measures how other cell types relate to those boundaries: which cells are inside? Which are at the border? Which are nearby?</p>
+        <p>This captures tissue-level spatial organization that cell-level analysis misses entirely. A tumor microenvironment isn't just individual interactions &mdash; it's the architecture of which cell populations are adjacent to which other populations.</p>
+
+        <hr>
+
+        <h2>Decisions</h2>
+
+        <h3>Why AnnData?</h3>
+        <p>AnnData is the standard data structure in single-cell biology. By building on it, SPACEc integrates immediately with scanpy, the dominant analysis framework. Researchers don't learn a new format &mdash; they move between SPACEc and scanpy seamlessly. The <code>.obs</code>, <code>.var</code>, <code>.obsm</code> structure maps naturally to cell metadata, marker metadata, and spatial coordinates.</p>
+
+        <h3>Why support both Cellpose and DeepCell?</h3>
+        <p>Different imaging modalities need different segmentation approaches. Cellpose excels at cytoplasm segmentation with limited training data. DeepCell (Mesmer) is better for nuclear segmentation in whole-cell multiplex images. Supporting both means researchers pick the best tool for their data without leaving the library.</p>
+
+        <h3>Why GPU acceleration?</h3>
+        <p>Multiplexed imaging datasets are enormous &mdash; tens of thousands of cells per sample, hundreds of samples per study. CPU-based Leiden clustering that takes 20 minutes drops to under 2 minutes on GPU via RAPIDS. For iterative analysis, that's the difference between interactive exploration and going for coffee.</p>
+
+        <h3>Why the scanpy API convention?</h3>
+        <p>Familiarity reduces adoption friction. Every computational biologist already knows <code>sc.tl</code>, <code>sc.pp</code>, <code>sc.pl</code>. Using the same pattern (<code>sp.tl</code>, <code>sp.pp</code>, <code>sp.pl</code>) means the learning curve is the domain, not the API. It's a small decision that makes a large difference in whether people actually use the library.</p>
+
+        <hr>
+
+        <h2>Tradeoffs</h2>
+        <p><strong>Python 3.9&ndash;3.10 only.</strong> TensorFlow, PyTorch, and RAPIDS all have strict version requirements that don't overlap cleanly above 3.10. This is the single biggest friction point for adoption. Docker containers (CPU and GPU variants) are the recommended install path for a reason.</p>
+        <p><strong>Monolithic modules.</strong> <code>_general.py</code> at 5,446 lines is hard to navigate and contributes to. The scanpy convention prioritizes API consistency (<code>sp.tl.function()</code>) over file organization. This was a conscious tradeoff &mdash; the public API is clean even if the internals are dense.</p>
+        <p><strong>Dependency sprawl.</strong> Cellpose, DeepCell, RAPIDS, PyTorch Geometric, GeoPandas, TensorFlow &mdash; each brings transitive dependencies that conflict with each other. A fresh install without Docker is an afternoon project. This is the cost of wrapping the best tool for each step rather than reimplementing everything.</p>
+
+        <hr>
+
+        <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">AnnData</span>
+            <span class="tag">Cellpose</span>
+            <span class="tag">DeepCell</span>
+            <span class="tag">TensorFlow</span>
+            <span class="tag">PyTorch</span>
+            <span class="tag">RAPIDS</span>
+            <span class="tag">scanpy</span>
+            <span class="tag">GeoPandas</span>
+            <span class="tag">Docker</span>
+            <span class="tag">PyPI</span>
+        </div>
+
+        <div class="project-links">
+            <a href="https://pypi.org/project/spacec/" target="_blank" rel="noopener">PyPI &rarr;</a>
+            <a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">GitHub &rarr;</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+    </footer>
+
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+    <script src="/js/i18n.js"></script>
+    <script src="/js/theme.js"></script>
+</body>
+</html>

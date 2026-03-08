@@ -524,334 +524,116 @@
     <main>
         <div class="content">
             <h1 class="page-title" data-i18n="projects.heading">Projects</h1>
-            <p class="page-subtitle" data-i18n-html="projects.subtitle">Things I've built across web, iOS, and AI/ML. Most of these live under <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a>.</p>
+            <p class="page-subtitle" data-i18n-html="projects.subtitle">Things I've built under <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a> &mdash; across web, iOS, and AI/ML.</p>
 
-            <!-- ——— Featured Project (random rotation) ——— -->
+            <!-- ——— Case Studies ——— -->
 
-            <section class="featured" data-featured="shredders" style="display:none">
-                <h2 class="featured-name">Shredders</h2>
+            <section class="featured">
+                <a href="/projects/shredders" class="case-study-link">
+                    <h2 class="featured-name">Shredders</h2>
+                </a>
                 <div class="screenshot-pair">
                     <div class="browser-frame">
-                        <img src="/projects/images/shredders.jpg" alt="Shredders web app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
+                        <img src="/projects/images/shredders.jpg" alt="Shredders web app" onerror="this.closest('.browser-frame').style.display='none'">
                     </div>
                     <div class="phone-frame">
-                        <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS app screenshot" onerror="this.closest('.phone-frame').style.display='none'">
+                        <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS app" onerror="this.closest('.phone-frame').style.display='none'">
                     </div>
                 </div>
-                <p class="featured-desc" data-i18n="projects.shreddersDesc">Real-time snow conditions and powder scoring for PNW ski resorts.</p>
+                <p class="featured-desc">Real-time powder conditions for 53 ski resorts across 11 regions. 90 API routes, 7 data sources, 8-factor powder scoring, AI chat, social trip planning. Next.js, Supabase, SwiftUI.</p>
                 <div class="tags">
-                    <span class="tag">React</span>
-                    <span class="tag">SwiftUI</span>
-                    <span class="tag">Vercel</span>
-                    <span class="tag">Weather API</span>
-                </div>
-                <div class="featured-links">
-                    <a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Visit →</a>
-                </div>
-            </section>
-
-            <section class="featured" data-featured="daybyday" style="display:none">
-                <h2 class="featured-name">DayByDay</h2>
-                <div class="browser-frame">
-                    <img src="/projects/images/daybyday.jpg" alt="DayByDay app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
-                </div>
-                <p class="featured-desc" data-i18n="projects.daybydayDesc">Social journaling with photo uploads, streaks, and trip organization.</p>
-                <div class="tags">
-                    <span class="tag">Web App</span>
-                    <span class="tag">Supabase</span>
-                </div>
-                <div class="featured-links">
-                    <a href="https://daybyday.klee.page" target="_blank" rel="noopener">Visit →</a>
-                </div>
-            </section>
-
-            <section class="featured" data-featured="wilco" style="display:none">
-                <h2 class="featured-name">Wilco</h2>
-                <div class="browser-frame">
-                    <img src="/projects/images/wilco.jpg" alt="Wilco app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
-                </div>
-                <p class="featured-desc" data-i18n="projects.wilcoDesc">Aviation radio training simulator with voice I/O and ICAO phraseology scoring.</p>
-                <div class="tags">
-                    <span class="tag">AI/ML</span>
-                    <span class="tag">Web Audio</span>
-                    <span class="tag">Aviation</span>
-                </div>
-                <div class="featured-links">
-                    <a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener">Visit →</a>
-                </div>
-            </section>
-
-            <section class="featured" data-featured="colette" style="display:none">
-                <h2 class="featured-name">Colette</h2>
-                <div class="browser-frame">
-                    <img src="/projects/images/colette.jpg" alt="Colette app screenshot" onerror="this.closest('.browser-frame').style.display='none'">
-                </div>
-                <p class="featured-desc" data-i18n="projects.coletteDesc">AI language tutor with conversation practice, spaced repetition, and journal analysis.</p>
-                <div class="tags">
-                    <span class="tag">AI/ML</span>
                     <span class="tag">Next.js</span>
                     <span class="tag">Supabase</span>
+                    <span class="tag">SwiftUI</span>
+                    <span class="tag">Claude</span>
+                    <span class="tag">GPT-4</span>
                 </div>
                 <div class="featured-links">
-                    <a href="https://colette.pookiebco.com" target="_blank" rel="noopener">Visit →</a>
+                    <a href="/projects/shredders">Read the case study &rarr;</a>
+                    <a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Visit &rarr;</a>
                 </div>
             </section>
 
-            <!-- Pick random featured before paint -->
-            <script>
-            (function() {
-                var f = ['shredders', 'daybyday', 'wilco', 'colette'];
-                var pick = f[Math.floor(Math.random() * f.length)];
-                document.querySelector('.featured[data-featured="' + pick + '"]').style.display = '';
-            })();
-            </script>
+            <section class="featured">
+                <a href="/projects/spacec" class="case-study-link">
+                    <h2 class="featured-name">SPACEc</h2>
+                </a>
+                <p class="featured-desc">Stanford academic Python library for multiplexed imaging analysis. 19,123 lines covering the full pipeline from cell segmentation to spatial analysis, with a novel Patch Proximity Analysis method. Published on PyPI and bioRxiv.</p>
+                <div class="tags">
+                    <span class="tag">Python</span>
+                    <span class="tag">AnnData</span>
+                    <span class="tag">Cellpose</span>
+                    <span class="tag">PyTorch</span>
+                    <span class="tag">Stanford</span>
+                </div>
+                <div class="featured-links">
+                    <a href="/projects/spacec">Read the case study &rarr;</a>
+                    <a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">GitHub &rarr;</a>
+                </div>
+            </section>
 
             <hr class="separator">
 
-            <!-- ——— Project Index ——— -->
+            <!-- ——— Also Built ——— -->
+
+            <h2 class="featured-name" style="margin-bottom: 1.25rem;">Also Built</h2>
 
             <div class="project-index">
 
-                <!-- 01 Shredders -->
                 <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">01</span>
-                        <span class="row-name">Shredders</span>
-                        <span class="row-live">Live</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.shreddersDesc">Real-time snow conditions and powder scoring for PNW ski resorts.</p>
-                                <div class="tags">
-                                    <span class="tag">React</span>
-                                    <span class="tag">Vercel</span>
-                                    <span class="tag">Weather API</span>
-                                </div>
-                                <div class="row-screenshot">
-                                    <div class="screenshot-pair">
-                                        <div class="browser-frame">
-                                            <img src="/projects/images/shredders.jpg" alt="Shredders web screenshot" loading="lazy" onerror="this.closest('.browser-frame').style.display='none'">
-                                        </div>
-                                        <div class="phone-frame">
-                                            <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS screenshot" loading="lazy" onerror="this.closest('.phone-frame').style.display='none'">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Visit →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 02 Pookie B News Daily -->
-                <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">02</span>
-                        <span class="row-name">Pookie B News Daily</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.newsDesc">Automated news aggregation with AI summaries and podcast generation.</p>
-                                <div class="tags">
-                                    <span class="tag">AI/ML</span>
-                                    <span class="tag">Python</span>
-                                    <span class="tag">Automation</span>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://github.com/kevincorvallis/PookieBNews" target="_blank" rel="noopener">GitHub →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 03 SmartSpender -->
-                <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">03</span>
+                    <div class="row-summary" style="cursor: default;">
                         <span class="row-name">SmartSpender</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.smartspenderDesc">AI financial decision engine with plain-English analysis.</p>
-                                <div class="tags">
-                                    <span class="tag">AI/ML</span>
-                                    <span class="tag">Finance</span>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://github.com/kevincorvallis/SmartSpender" target="_blank" rel="noopener">GitHub →</a>
-                                </div>
-                            </div>
-                        </div>
+                        <span class="row-live"><a href="https://github.com/kevincorvallis/SmartSpender" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">GitHub &rarr;</a></span>
                     </div>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">AI financial decision engine with a 3-stage pipeline: natural language question &rarr; deterministic calculations &rarr; narrative explanation. 13 AWS Lambda functions orchestrated by Step Functions, Bedrock Claude for analysis, GPT-4o Vision for receipt OCR. SwiftUI companion app for expense splitting.</p>
                 </div>
 
-                <!-- 04 DayByDay -->
                 <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">04</span>
-                        <span class="row-name">DayByDay</span>
-                        <span class="row-live">Live</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.daybydayDesc">Social journaling with photo uploads, streaks, and trip organization.</p>
-                                <div class="tags">
-                                    <span class="tag">Web App</span>
-                                    <span class="tag">Supabase</span>
-                                </div>
-                                <div class="row-screenshot">
-                                    <div class="browser-frame">
-                                        <img src="/projects/images/daybyday.jpg" alt="DayByDay screenshot" loading="lazy" onerror="this.closest('.row-screenshot').style.display='none'">
-                                    </div>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://daybyday.klee.page" target="_blank" rel="noopener">Visit →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 05 Harmony Tracker -->
-                <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">05</span>
-                        <span class="row-name">Harmony Tracker</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.harmonyDesc">AI relationship coaching with habit tracking and communication analysis.</p>
-                                <div class="tags">
-                                    <span class="tag">AI/ML</span>
-                                    <span class="tag">iOS</span>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://github.com/kevincorvallis/IWBH" target="_blank" rel="noopener">GitHub →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 06 Wilco -->
-                <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">06</span>
-                        <span class="row-name">Wilco</span>
-                        <span class="row-live">Live</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.wilcoDesc">Aviation radio training simulator with voice I/O and ICAO phraseology scoring.</p>
-                                <div class="tags">
-                                    <span class="tag">AI/ML</span>
-                                    <span class="tag">Web Audio</span>
-                                    <span class="tag">Aviation</span>
-                                </div>
-                                <div class="row-screenshot">
-                                    <div class="browser-frame">
-                                        <img src="/projects/images/wilco.jpg" alt="Wilco screenshot" loading="lazy" onerror="this.closest('.row-screenshot').style.display='none'">
-                                    </div>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener">Visit →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 07 Colette -->
-                <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">07</span>
+                    <div class="row-summary" style="cursor: default;">
                         <span class="row-name">Colette</span>
-                        <span class="row-live">Live</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.coletteDesc">AI language tutor with conversation practice, spaced repetition, and journal analysis.</p>
-                                <div class="tags">
-                                    <span class="tag">AI/ML</span>
-                                    <span class="tag">Next.js</span>
-                                    <span class="tag">Supabase</span>
-                                </div>
-                                <div class="row-screenshot">
-                                    <div class="browser-frame">
-                                        <img src="/projects/images/colette.jpg" alt="Colette screenshot" loading="lazy" onerror="this.closest('.row-screenshot').style.display='none'">
-                                    </div>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://colette.pookiebco.com" target="_blank" rel="noopener">Visit →</a>
-                                </div>
-                            </div>
-                        </div>
+                        <span class="row-live"><a href="https://colette.pookiebco.com" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">Visit &rarr;</a></span>
                     </div>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">AI language tutor with conversation practice across 5 languages, FSRS spaced repetition, journal with real-time AI analysis, and a persistent learner memory that adapts to your mistakes and interests. Next.js, Supabase, dual AI providers.</p>
                 </div>
 
-                <!-- 08 SPACEc -->
                 <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">08</span>
-                        <span class="row-name">SPACEc</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.spacecDesc">Stanford library for multiplexed imaging and spatial analysis.</p>
-                                <div class="tags">
-                                    <span class="tag">Python</span>
-                                    <span class="tag">Research</span>
-                                    <span class="tag">Stanford</span>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">GitHub →</a>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="row-summary" style="cursor: default;">
+                        <span class="row-name">Wilco</span>
+                        <span class="row-live"><a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">Visit &rarr;</a></span>
                     </div>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">ATC radio trainer for student pilots. 20 scenarios across 4 categories, ICAO phraseology scoring (0&ndash;100), voice I/O, live METAR/TAF weather. Built for learning to talk to air traffic control.</p>
                 </div>
 
-                <!-- 09 ADU Checker -->
                 <div class="project-row">
-                    <button class="row-summary" aria-expanded="false">
-                        <span class="row-number">09</span>
+                    <div class="row-summary" style="cursor: default;">
+                        <span class="row-name">Pookie B News Daily</span>
+                        <span class="row-live"><a href="https://github.com/kevincorvallis/PookieBNews" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">GitHub &rarr;</a></span>
+                    </div>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Automated news aggregation from 9 sources with AI-generated summaries and NPR-style podcast episodes via custom ElevenLabs voice. iOS app with widgets.</p>
+                </div>
+
+                <div class="project-row">
+                    <div class="row-summary" style="cursor: default;">
+                        <span class="row-name">DayByDay</span>
+                        <span class="row-live"><a href="https://daybyday.klee.page" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">Visit &rarr;</a></span>
+                    </div>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Social journaling with photo uploads, streaks, accountability partners, and trip organization with MapKit on iOS.</p>
+                </div>
+
+                <div class="project-row">
+                    <div class="row-summary" style="cursor: default;">
+                        <span class="row-name">Harmony Tracker</span>
+                        <span class="row-live"><a href="https://github.com/kevincorvallis/IWBH" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">GitHub &rarr;</a></span>
+                    </div>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">iOS relationship coaching app with AI coach, custom habit trackers, partner pairing, communication analysis, and WidgetKit integration. 86 Swift files.</p>
+                </div>
+
+                <div class="project-row">
+                    <div class="row-summary" style="cursor: default;">
                         <span class="row-name">ADU Checker</span>
-                        <span class="row-arrow">→</span>
-                    </button>
-                    <div class="row-content" aria-hidden="true">
-                        <div class="row-inner">
-                            <div class="row-detail">
-                                <p class="row-desc" data-i18n="projects.aduDesc">Automates 17 ADU permit eligibility checks using government GIS APIs.</p>
-                                <div class="tags">
-                                    <span class="tag">Python</span>
-                                    <span class="tag">GIS</span>
-                                    <span class="tag">Automation</span>
-                                </div>
-                                <div class="row-links">
-                                    <a href="https://github.com/kevincorvallis/san-jose-adu-checker" target="_blank" rel="noopener">GitHub →</a>
-                                </div>
-                            </div>
-                        </div>
+                        <span class="row-live"><a href="https://github.com/kevincorvallis/san-jose-adu-checker" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">GitHub &rarr;</a></span>
                     </div>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Automates 17 ADU permit eligibility checks against San Jose regulations using 11 government GIS APIs. FEMA flood zones, fire severity, zoning, building footprints.</p>
                 </div>
 
             </div>
@@ -865,19 +647,6 @@
     <!-- Analytics -->
     <script defer src="/_vercel/insights/script.js"></script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
-
-    <!-- Expand/collapse -->
-    <script>
-    document.querySelectorAll('.row-summary').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var row = btn.closest('.project-row');
-            var content = row.querySelector('.row-content');
-            var isOpen = row.classList.toggle('open');
-            btn.setAttribute('aria-expanded', isOpen);
-            content.setAttribute('aria-hidden', !isOpen);
-        });
-    });
-    </script>
 
     <script src="/js/i18n.js"></script>
     <script src="/js/theme.js"></script>
