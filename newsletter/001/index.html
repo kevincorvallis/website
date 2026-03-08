@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatch 001: Week One in LA — Kevin Lee</title>
+    <meta name="description" content="First week at Paramount, apartment hunting in Hollywood, and film photos from the drive down.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <!-- Detect theme + language before first paint -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+
+            var params = new URLSearchParams(window.location.search);
+            var urlLang = params.get('lang');
+            var storedLang = localStorage.getItem('dispatch-lang');
+            var navLang = (navigator.language || '').slice(0, 2);
+            var lang = (urlLang === 'ko' || urlLang === 'en') ? urlLang
+                     : (storedLang === 'ko' || storedLang === 'en') ? storedLang
+                     : navLang === 'ko' ? 'ko'
+                     : 'en';
+            document.documentElement.setAttribute('data-lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+        }
+
+        [data-lang="ko"] {
+            --font: 'Noto Serif KR', 'Newsreader', Georgia, serif;
+        }
+
+        /* Language toggle */
+        [data-lang="en"] [data-l="ko"],
+        [data-lang="ko"] [data-l="en"] {
+            display: none !important;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection {
+            background: rgba(0, 100, 255, 0.26);
+            color: inherit;
+        }
+
+        a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+        /* ========== PASSWORD GATE ========== */
+        .gate {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            transition: opacity 0.6s ease, visibility 0.6s ease, background-color 0.3s ease;
+        }
+
+        .gate.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .gate-content {
+            max-width: 320px;
+        }
+
+        .gate-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .gate-subtitle {
+            font-size: 16px;
+            color: var(--caption);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .gate-input {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 18px;
+            padding: 12px 16px;
+            text-align: center;
+            outline: none;
+            letter-spacing: 0.1em;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .gate-input::placeholder {
+            color: var(--caption);
+            letter-spacing: 0;
+            font-size: 16px;
+        }
+
+        .gate-input:focus {
+            border-color: var(--accent);
+        }
+
+        .gate-input.shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .gate-hint {
+            font-size: 13px;
+            color: var(--caption);
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-hint.visible {
+            opacity: 1;
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--accent);
+            z-index: 60;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== NAVIGATION ========== */
+        .back-link {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 50;
+            font-size: 15px;
+            font-weight: 400;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, color 0.3s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.75;
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 1.15rem;
+            right: 1.25rem;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .lang-toggle {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, color 0.3s ease;
+            padding: 0;
+        }
+
+        .lang-toggle:hover {
+            opacity: 0.75;
+        }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-wrap input {
+            display: none;
+        }
+
+        .toggle-wrap label {
+            position: relative;
+            display: block;
+            width: 40px;
+            height: 20px;
+            background: var(--text);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0s, background-color 0.3s ease;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.2s, background-color 0.3s ease;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            transition: background 0.3s ease;
+        }
+
+        /* Light theme: lighter overlay */
+        .hero-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(240, 238, 230, 0.95) 0%,
+                rgba(240, 238, 230, 0.5) 35%,
+                rgba(240, 238, 230, 0.05) 100%
+            );
+        }
+
+        [data-theme="dark"] .hero-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(31, 30, 29, 0.95) 0%,
+                rgba(31, 30, 29, 0.4) 35%,
+                rgba(31, 30, 29, 0.05) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding-bottom: 3rem;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 10vw, 5.5rem);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            margin-bottom: 1rem;
+            opacity: 0;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+        }
+
+        .scroll-hint span {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to bottom, var(--caption), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ========== ISSUE HEADER ========== */
+        .issue-intro {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 1.5rem;
+        }
+
+        .issue-number {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .issue-date {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .issue-opener {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 440px;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SECTION HEADERS ========== */
+        .section-header {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        /* ========== TEXT BLOCKS ========== */
+        .text-block {
+            padding: 2rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .text-block p {
+            font-size: 20px;
+            line-height: 1.7;
+            margin-bottom: 1.25rem;
+        }
+
+        .text-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .text-block em { font-style: italic; }
+        .text-block strong { font-weight: 600; }
+
+        /* ========== PULL QUOTE ========== */
+        .pull-quote {
+            padding: 4rem 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pull-quote blockquote {
+            font-size: clamp(1.5rem, 5vw, 2.25rem);
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .pull-quote cite {
+            display: block;
+            margin-top: 1rem;
+            font-size: 14px;
+            font-style: normal;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== PHOTO LAYOUTS ========== */
+        .photo-full {
+            position: relative;
+            width: 100%;
+            height: 85vh;
+            overflow: hidden;
+        }
+
+        .photo-full img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .photo-full .photo-caption {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            z-index: 2;
+            color: #f0f0ec;
+        }
+
+        .photo-full::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to top, rgba(10,10,10,0.6), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .photo-inset {
+            padding: 1rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .photo-inset img,
+        .photo-inset .gif-wrap img {
+            width: 100%;
+            border-radius: 3px;
+            display: block;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            padding: 0 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .photo-grid img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        .photo-caption {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .photo-caption .caption-location {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .photo-full .photo-caption .caption-location {
+            color: #c4a882;
+        }
+
+        .photo-inset .photo-caption {
+            margin-top: 0.75rem;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SIGN OFF ========== */
+        .sign-off {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .sign-off-text {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .sign-off-name {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* ========== DIVIDER ========== */
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 0 auto;
+            opacity: 0.5;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== SPACERS ========== */
+        .spacer { height: 4rem; }
+        .spacer-sm { height: 2rem; }
+        .spacer-lg { height: 8rem; }
+
+        /* ========== FOOTER ========== */
+        .story-footer {
+            padding: 4rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .story-footer p {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .story-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== REVEAL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal-fade {
+            opacity: 0;
+        }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.97);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .back-link { font-size: 14px; }
+            .text-block p { font-size: 18px; }
+            .section-header { padding: 5rem 1.5rem 2.5rem; }
+            .photo-full { height: 70vh; }
+        }
+
+        @media (min-width: 768px) {
+            .photo-inset { padding: 2rem 3rem; max-width: 700px; }
+            .photo-grid { gap: 1rem; padding: 0 3rem; max-width: 900px; }
+            .text-block { padding: 2.5rem 3rem; }
+            .pull-quote { padding: 5rem 3rem; }
+        }
+
+        /* ========== REDUCED MOTION ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-fade, .reveal-scale {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .scroll-line { animation: none; }
+            .gate-input.shake { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== PASSWORD GATE ==================== -->
+    <div class="gate" id="gate">
+        <div class="gate-content">
+            <h1 class="gate-title">Dispatch</h1>
+            <p class="gate-subtitle">
+                <span data-l="en">This letter is for friends and family.</span>
+                <span data-l="ko">이 편지는 가족과 친구들을 위한 것입니다.</span>
+            </p>
+            <input
+                type="password"
+                class="gate-input"
+                id="gateInput"
+                autocomplete="off"
+                autofocus
+            >
+            <p class="gate-hint" id="gateHint">
+                <span data-l="en">Hmm, that's not it.</span>
+                <span data-l="ko">비밀번호가 맞지 않습니다.</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <a href="/newsletter" class="back-link">&larr; Dispatch</a>
+    <div class="top-controls">
+        <button class="lang-toggle" id="langToggle" aria-label="Switch language">EN/한</button>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </div>
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero">
+        <div class="hero-image">
+            <img src="/newsletter/001/images/kevi689-082.jpg" alt="Road through the redwoods on the drive down to LA" id="heroImg">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-label">
+                <span data-l="en">A weekly letter</span>
+                <span data-l="ko">매주 보내는 편지</span>
+            </div>
+            <h1 class="hero-title">Dispatch</h1>
+            <p class="hero-description">
+                <span data-l="en">Updates from my world — for the people I care about most.</span>
+                <span data-l="ko">내 세상의 소식들 — 가장 소중한 사람들에게.</span>
+            </p>
+        </div>
+        <div class="scroll-hint">
+            <span data-l="en">Scroll</span>
+            <span data-l="ko">스크롤</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ==================== ISSUE 001 ==================== -->
+
+    <div class="issue-intro reveal">
+        <p class="issue-number">No. 001</p>
+        <h2 class="issue-date">
+            <span data-l="en">Week One in LA</span>
+            <span data-l="ko">LA 첫째 주</span>
+        </h2>
+        <p class="issue-opener">
+            <span data-l="en">First week at Paramount is officially in the books. Here's how it's going.</span>
+            <span data-l="ko">Paramount에서의 첫 주가 공식적으로 끝났다. 어떻게 지내고 있는지 알려줄게.</span>
+        </p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— The Job ——— -->
+    <div class="section-header reveal">
+        <p class="section-label">
+            <span data-l="en">Paramount</span>
+            <span data-l="ko">파라마운트</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">The Job</span>
+            <span data-l="ko">일</span>
+        </h2>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-full reveal-scale">
+        <img src="/newsletter/001/images/paramountlot.jpg" alt="Paramount Pictures Melrose Gate">
+        <div class="photo-caption">
+            <span class="caption-location">Melrose Gate, Hollywood</span>
+            <span data-l="en">Walking through this every morning still doesn't feel real.</span>
+            <span data-l="ko">매일 아침 이 문을 지나가는 게 아직도 실감이 안 난다.</span>
+        </div>
+    </div>
+
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                Honestly, it's been great so far. Everyone on the team is really nice
+                and genuinely smart and dedicated — I was pleasantly surprised. The system
+                is way more complex than I expected which is exciting.
+            </p>
+            <p>
+                I'm working on short-form video content — think YouTube Reels but for Paramount —
+                and I'm already getting to apply a lot of what I learned at Microsoft. My skip-level
+                Adam actually told me I was already <strong>asking the right questions</strong>,
+                which felt good to hear in week one.
+            </p>
+            <p>
+                There's also a reorg happening where I'll likely become the tech lead of a
+                small team in the coming weeks. More on that soon.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                솔직히 지금까지 정말 좋다. 팀원들 모두 친절하고 진심으로 똑똑하고
+                열정적이어서 기분 좋게 놀랐다. 시스템이 예상보다 훨씬 복잡한데
+                오히려 그게 더 흥미롭다.
+            </p>
+            <p>
+                숏폼 비디오 콘텐츠 작업을 하고 있다 — Paramount 버전의 YouTube Reels 같은 거.
+                Microsoft에서 배운 것들을 이미 많이 활용하고 있다. 스킵 레벨 매니저인
+                Adam이 첫 주부터 <strong>좋은 질문을 하고 있다</strong>고 해줘서
+                기분이 좋았다.
+            </p>
+            <p>
+                조직 개편이 진행 중이라 곧 작은 팀의 테크 리드가 될 것 같다.
+                자세한 건 나중에 더 알려줄게.
+            </p>
+        </div>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-inset reveal">
+        <img src="/newsletter/001/images/mydesk.jpg" alt="My desk setup at Paramount">
+        <div class="photo-caption">
+            <span class="caption-location">
+                <span data-l="en">My Desk</span>
+                <span data-l="ko">내 자리</span>
+            </span>
+            <span data-l="en">Three Paramount screens and a photo of Brock. Essentials only.</span>
+            <span data-l="ko">파라마운트 모니터 세 대와 브록 사진. 필수품만.</span>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— The Apartment ——— -->
+    <div class="section-header reveal">
+        <p class="section-label">
+            <span data-l="en">Home Base</span>
+            <span data-l="ko">보금자리</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">The Apartment</span>
+            <span data-l="ko">아파트</span>
+        </h2>
+    </div>
+
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                After an overwhelming week of apartment hunting, I locked in a
+                2-bedroom 2-bathroom in Hollywood right next to the Paramount lot.
+                In-unit washer/dryer, AC, a nice kitchen, and it's spacious.
+                Really happy with it.
+            </p>
+            <p>
+                I've been driving around picking up furniture off Facebook Marketplace
+                this weekend, slowly making it feel like home.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                정신없는 일주일간의 집 구경 끝에 Paramount 바로 옆 할리우드에
+                방 2개 화장실 2개짜리를 잡았다. 세탁기/건조기 내장, 에어컨,
+                좋은 주방, 넓직하다. 정말 마음에 든다.
+            </p>
+            <p>
+                이번 주말에는 Facebook Marketplace에서 가구를 사러 돌아다니면서
+                조금씩 집 같은 느낌을 만들고 있다.
+            </p>
+        </div>
+    </div>
+
+    <div class="pull-quote reveal">
+        <blockquote>
+            <span data-l="en">I have a guest room now — come visit.</span>
+            <span data-l="ko">게스트룸 생겼어 — 놀러 와.</span>
+        </blockquote>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— LA Life ——— -->
+    <div class="section-header reveal">
+        <p class="section-label">
+            <span data-l="en">Getting Settled</span>
+            <span data-l="ko">정착 중</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">LA Life</span>
+            <span data-l="ko">LA 생활</span>
+        </h2>
+    </div>
+
+    <div class="photo-full reveal-scale">
+        <img src="/newsletter/001/images/hotel.jpg" alt="Rooftop pool in Hollywood">
+        <div class="photo-caption">
+            <span class="caption-location">Equinox, Hollywood</span>
+            <span data-l="en">Rooftop pool, steam room, sauna. Two minutes from everything. Very bougie, I know.</span>
+            <span data-l="ko">루프탑 수영장, 스팀룸, 사우나. 어디서든 2분 거리. 좀 럭셔리한 거 안다.</span>
+        </div>
+    </div>
+
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                I'm really enjoying it here. One thing I love is how easy it is to be
+                healthy — the food quality is insane and so diverse. Good Thai food,
+                great salads, you name it. Portions are big too so I can usually split
+                meals into two which is a nice bonus.
+            </p>
+            <p>
+                I joined Equinox for a free trial month and it's literally 2-3 minutes
+                from everywhere I go. Jet lag has me up at 3AM so I've been hitting the
+                gym at 4:30 and heading into work early — honestly not the worst routine.
+            </p>
+            <p>
+                I went to Los Feliz this weekend and fell in love with the neighborhood.
+                Super quaint, charming, great coffee shops. Actively trying to convince
+                Justin to move there.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                여기 정말 좋다. 제일 좋은 건 건강하게 먹기가 너무 쉽다는 것 —
+                음식 퀄리티가 미쳤고 종류도 엄청 다양하다. 좋은 태국 음식, 훌륭한
+                샐러드, 뭐든지 다 있다. 양도 많아서 보통 두 끼로 나눠 먹는다.
+            </p>
+            <p>
+                Equinox 무료 체험 한 달 등록했는데 어디서든 2-3분 거리다.
+                시차 때문에 새벽 3시에 깨서 4시 반에 운동하고 일찍 출근하는데 —
+                솔직히 나쁘지 않은 루틴이다.
+            </p>
+            <p>
+                주말에 Los Feliz에 갔다가 완전 반했다. 아기자기하고 매력적이고
+                커피숍도 좋다. Justin한테 거기로 이사 오라고 열심히 설득 중이다.
+            </p>
+        </div>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-inset reveal">
+        <img src="/newsletter/001/images/ayeshnaandIatequinox.jpg" alt="Ayeshna and I at Equinox">
+        <div class="photo-caption">
+            <span class="caption-location">Equinox</span>
+            <span data-l="en">Post-workout with Ayeshna. Already found a gym buddy.</span>
+            <span data-l="ko">운동 후 Ayeshna와. 벌써 운동 친구를 찾았다.</span>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— How I'm Feeling ——— -->
+    <div class="section-header reveal">
+        <p class="section-label">
+            <span data-l="en">Checking In</span>
+            <span data-l="ko">근황</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">How I'm Feeling</span>
+            <span data-l="ko">요즘 기분</span>
+        </h2>
+    </div>
+
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                Honestly? Really happy I made this move. The career, the weather,
+                the energy here — it all feels right. LA is huge and it can feel a
+                little daunting being here on my own, but I'm settling in and
+                excited for what's ahead.
+            </p>
+            <p>
+                The goal over the next 90 days is to be fully ramped up and actively
+                contributing at work, and to really make this city feel like mine.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                솔직히? 이사하길 정말 잘했다고 느끼고 있다. 커리어, 날씨,
+                여기의 에너지 — 다 맞는 느낌이다. LA는 크고 혼자서는 좀
+                막막할 수 있지만, 적응하고 있고 앞으로가 기대된다.
+            </p>
+            <p>
+                앞으로 90일 동안의 목표는 완전히 온보딩을 마치고 회사에서
+                적극적으로 기여하는 것, 그리고 이 도시를 내 것으로 만드는 것.
+            </p>
+        </div>
+    </div>
+
+    <div class="pull-quote reveal">
+        <blockquote>
+            <span data-l="en">It all feels right.</span>
+            <span data-l="ko">다 맞는 느낌이다.</span>
+        </blockquote>
+        <cite>
+            <span data-l="en">Week one, Hollywood</span>
+            <span data-l="ko">첫째 주, 할리우드</span>
+        </cite>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Film Photos ——— -->
+    <div class="section-header reveal">
+        <p class="section-label">
+            <span data-l="en">On Film</span>
+            <span data-l="ko">필름 사진</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">The Drive Down</span>
+            <span data-l="ko">남쪽으로</span>
+        </h2>
+    </div>
+
+    <div class="text-block reveal" style="text-align: center;">
+        <p style="color: var(--caption); font-size: 17px;">
+            <span data-l="en">Shot on film somewhere between Oregon and California.</span>
+            <span data-l="ko">오레곤에서 캘리포니아 사이 어딘가에서 필름으로 촬영.</span>
+        </p>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-full reveal-scale">
+        <img src="/newsletter/001/images/kevi689-092.jpg" alt="Foggy highway through Oregon">
+        <div class="photo-caption">
+            <span class="caption-location">
+                <span data-l="en">Somewhere in Oregon</span>
+                <span data-l="ko">오레곤 어딘가</span>
+            </span>
+            <span data-l="en">Fog and fir trees. The kind of drive where you don't turn on the radio.</span>
+            <span data-l="ko">안개와 전나무. 라디오를 켜지 않는 그런 드라이브.</span>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="photo-grid reveal">
+        <img src="/newsletter/001/images/kevi689-094.jpg" alt="Old-growth trees with moss">
+        <img src="/newsletter/001/images/kevi689-082.jpg" alt="Road through the redwoods">
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="photo-full reveal-scale">
+        <img src="/newsletter/001/images/kevi689-097.jpg" alt="Self-portrait in side mirror with film camera">
+        <div class="photo-caption">
+            <span class="caption-location">
+                <span data-l="en">I-5 South</span>
+                <span data-l="ko">I-5 남쪽</span>
+            </span>
+            <span data-l="en">Somewhere past Grants Pass. New chapter, same camera.</span>
+            <span data-l="ko">Grants Pass를 지나 어딘가. 새 챕터, 같은 카메라.</span>
+        </div>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <!-- ——— Birthday Party ——— -->
+    <div class="photo-inset reveal">
+        <img src="/newsletter/001/images/birthdayparty.gif" alt="Birthday party in LA">
+        <div class="photo-caption">
+            <span class="caption-location">Hollywood</span>
+            <span data-l="en">Already making friends. Not bad for week one.</span>
+            <span data-l="ko">벌써 친구를 사귀고 있다. 첫 주치고 나쁘지 않지.</span>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <!-- ——— Sign Off ——— -->
+    <div class="sign-off reveal">
+        <p class="sign-off-text">
+            <span data-l="en">Miss you all. Come visit — I have a guest room now.</span>
+            <span data-l="ko">다들 보고 싶어. 놀러 와 — 게스트룸 있어.</span>
+        </p>
+        <p class="sign-off-name">— Kevin</p>
+    </div>
+
+    <div class="spacer"></div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="story-footer">
+        <p>
+            <span data-l="en">Dispatch No. 001 &middot; Week One in LA &middot;</span>
+            <span data-l="ko">Dispatch 001호 &middot; LA 첫째 주 &middot;</span>
+            <a href="/">klee.page</a>
+        </p>
+    </footer>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- Scripts -->
+    <script src="/js/theme.js"></script>
+    <script>window.DISPATCH_PASS = 'melrosegate';</script>
+    <script src="/newsletter/gate.js"></script>
+    <script>
+        // ==================== LANGUAGE TOGGLE ====================
+        (function() {
+            var btn = document.getElementById('langToggle');
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+            btn.textContent = current === 'ko' ? '한/EN' : 'EN/한';
+
+            btn.addEventListener('click', function() {
+                current = current === 'en' ? 'ko' : 'en';
+                document.documentElement.setAttribute('data-lang', current);
+                document.documentElement.setAttribute('lang', current);
+                localStorage.setItem('dispatch-lang', current);
+                btn.textContent = current === 'ko' ? '한/EN' : 'EN/한';
+            });
+        })();
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js" integrity="sha384-O55L/6rhHr9CFvrxqv5luxOCcmVaBmETbZbJDP+Do8T0pztTACsFBD/IXCNkj7DV" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener('load', function() { initDispatch(); });
+        setTimeout(function() {
+            if (typeof gsap !== 'undefined' && !window._dispatchInit) initDispatch();
+        }, 4000);
+
+        function initDispatch() {
+            if (window._dispatchInit) return;
+            window._dispatchInit = true;
+
+            // Smooth scroll
+            var lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            // Progress bar
+            gsap.to('#progressBar', {
+                width: '100%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: 0.3,
+                }
+            });
+
+            // Hero animations
+            var heroTl = gsap.timeline({ delay: 0.3 });
+            heroTl
+                .to('.hero-label', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+                .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
+                .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+                .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+
+            // Hero Ken Burns
+            gsap.to('#heroImg', {
+                scale: 1.15,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Hero title parallax
+            gsap.to('.hero-title', {
+                yPercent: -20,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Fade scroll hint
+            gsap.to('.scroll-hint', {
+                opacity: 0,
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: '15% top',
+                    end: '30% top',
+                    scrub: true,
+                }
+            });
+
+            // Reveals
+            gsap.utils.toArray('.reveal').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, y: 0, duration: 0.9, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-fade').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, duration: 1, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-scale').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            // Ken Burns on full-bleed photos
+            gsap.utils.toArray('.photo-full img').forEach(function(img) {
+                gsap.fromTo(img,
+                    { scale: 1.03 },
+                    {
+                        scale: 1.1, ease: 'none',
+                        scrollTrigger: {
+                            trigger: img.closest('.photo-full'),
+                            start: 'top bottom',
+                            end: 'bottom top',
+                            scrub: true,
+                        }
+                    }
+                );
+            });
+
+            // Section title parallax
+            gsap.utils.toArray('.section-title').forEach(function(el) {
+                gsap.to(el, {
+                    yPercent: -10, ease: 'none',
+                    scrollTrigger: {
+                        trigger: el.closest('.section-header'),
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: true,
+                    }
+                });
+            });
+
+            // Pull quote scale
+            gsap.utils.toArray('.pull-quote blockquote').forEach(function(el) {
+                gsap.fromTo(el,
+                    { scale: 0.92, opacity: 0 },
+                    {
+                        scale: 1, opacity: 1, duration: 1, ease: 'power2.out',
+                        scrollTrigger: { trigger: el, start: 'top 80%', once: true }
+                    }
+                );
+            });
+        }
+    </script>
+</body>
+</html>
