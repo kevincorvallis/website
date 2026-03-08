@@ -72,8 +72,8 @@ ENGINEERING PHILOSOPHY:
 - The best engineers zoom between 10,000-foot architecture and line-by-line debugging in the same conversation.
 - Work on things that matter — Copilot reaching millions, short-form changing content discovery, or flying a patient to chemo.`;
 
-const SUPABASE_URL = 'https://nmkavdrvgjkolreoexfe.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ta2F2ZHJ2Z2prb2xyZW9leGZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNTEyMjEsImV4cCI6MjA4MjkyNzIyMX0.VlmkBrD3i7eFfMg7SuZHACqa29r0GHZiU4FFzfB6P7Q';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const ALLOWED_ORIGINS = ['https://klee.page', 'https://www.klee.page'];
 
@@ -118,8 +118,8 @@ function logChat(question, response, req) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
         },
         body: JSON.stringify(row),
     }).catch(err => console.error('Supabase log error:', err.message));
@@ -133,6 +133,7 @@ module.exports = async function handler(req, res) {
     }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Vary', 'Origin');
 
     if (req.method === 'OPTIONS') {
         return res.status(204).end();
@@ -149,8 +150,8 @@ module.exports = async function handler(req, res) {
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-        return res.status(500).json({ error: 'API key not configured' });
+    if (!apiKey || !SUPABASE_URL || !SUPABASE_KEY) {
+        return res.status(500).json({ error: 'Server configuration error' });
     }
 
     const { message, history } = req.body || {};
