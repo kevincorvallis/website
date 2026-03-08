@@ -127,23 +127,48 @@
             gap: 14px;
         }
 
-        .lang-toggle {
-            background: none;
-            border: none;
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
+        .lang-pill {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 52px;
+            height: 22px;
+            background: var(--text);
+            border-radius: 11px;
             cursor: pointer;
-            opacity: 0.4;
-            transition: opacity 0.2s ease, color 0.3s ease;
-            padding: 0;
+            user-select: none;
+            transition: background-color 0.3s ease;
         }
 
-        .lang-toggle:hover {
-            opacity: 0.75;
+        .lang-pill:hover { opacity: 0.75; }
+
+        .lang-pill-label {
+            flex: 1;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            line-height: 22px;
+            color: var(--bg);
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease, opacity 0.2s ease;
         }
+
+        .lang-pill-dot {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+
+        [data-lang="ko"] .lang-pill-dot { transform: translateX(30px); }
+        [data-lang="en"] .lang-pill-ko { opacity: 0.4; }
+        [data-lang="ko"] .lang-pill-en { opacity: 0.4; }
 
         .toggle-wrap {
             display: flex;
@@ -334,7 +359,11 @@
     <header>
         <a href="/" class="back-link">&larr; Kevin Lee</a>
         <div class="header-controls">
-            <button class="lang-toggle" id="langToggle" aria-label="Switch language">EN/한</button>
+            <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
+                <span class="lang-pill-label lang-pill-en">EN</span>
+                <span class="lang-pill-label lang-pill-ko">한</span>
+                <span class="lang-pill-dot"></span>
+            </div>
             <div class="toggle-wrap">
                 <input type="checkbox" id="theme-toggle">
                 <label for="theme-toggle"></label>
@@ -346,7 +375,7 @@
         <h1 class="page-title">Dispatch</h1>
         <p class="page-subtitle">
             <span data-l="en">A weekly letter for friends and family.</span>
-            <span data-l="ko">가족과 친구들을 위한 주간 편지.</span>
+            <span data-l="ko">가까운 사람들한테 매주 쓰는 근황 편지.</span>
         </p>
 
         <!--
@@ -376,7 +405,7 @@
                     </div>
                     <p class="issue-desc">
                         <span data-l="en">First week at Paramount, apartment hunting in Hollywood, and film photos from the drive down.</span>
-                        <span data-l="ko">Paramount 첫 주, 할리우드 집 구하기, 그리고 남쪽으로 드라이브하며 찍은 필름 사진.</span>
+                        <span data-l="ko">파라마운트 첫 주, 할리우드 집 구하기, 오레곤에서 내려오면서 찍은 필름 사진들.</span>
                     </p>
                 </a>
             </li>
@@ -397,15 +426,17 @@
 
         // Language toggle
         (function() {
-            var btn = document.getElementById('langToggle');
+            var pill = document.getElementById('langPill');
             var current = document.documentElement.getAttribute('data-lang') || 'en';
-            btn.textContent = current === 'ko' ? '한/EN' : 'EN/한';
-            btn.addEventListener('click', function() {
+            function toggle() {
                 current = current === 'en' ? 'ko' : 'en';
                 document.documentElement.setAttribute('data-lang', current);
                 document.documentElement.setAttribute('lang', current);
                 localStorage.setItem('dispatch-lang', current);
-                btn.textContent = current === 'ko' ? '한/EN' : 'EN/한';
+            }
+            pill.addEventListener('click', toggle);
+            pill.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
             });
         })();
     </script>
