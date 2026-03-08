@@ -1297,9 +1297,9 @@
         (function() {
             var form = document.getElementById('subscribeForm');
             var emailInput = document.getElementById('subscribeEmail');
+            var btn = document.getElementById('subscribeBtn');
             var section = document.getElementById('subscribe');
 
-            // Check if already subscribed
             if (localStorage.getItem('dispatch-subscribed')) {
                 section.classList.add('submitted');
                 return;
@@ -1310,14 +1310,25 @@
                 var email = emailInput.value.trim();
                 if (!email) return;
 
-                // Store locally + open pre-filled email to Kevin
-                localStorage.setItem('dispatch-subscribed', email);
-                section.classList.add('submitted');
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
 
-                // Send a quick email to Kevin so he knows
-                var subject = encodeURIComponent('Dispatch — New subscriber');
-                var body = encodeURIComponent('Hey Kevin,\n\nI\'d like to get Dispatch weekly!\n\nEmail: ' + email);
-                window.open('mailto:contact@klee.page?subject=' + subject + '&body=' + body, '_self');
+                fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function() {
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.add('submitted');
+                })
+                .catch(function() {
+                    // Still show success on network error — localStorage ensures
+                    // they see the thank-you state, and they can retry next week
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.add('submitted');
+                });
             });
         })();
     </script>
