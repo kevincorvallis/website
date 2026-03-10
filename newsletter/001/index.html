@@ -32,8 +32,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/vpx6nbc.css">
 
     <style>
         *, *::before, *::after {
@@ -48,7 +48,8 @@
             --caption: #8a8880;
             --accent: #a0826d;
             --rule: rgba(31, 30, 29, 0.1);
-            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font: 'adobe-jenson-pro', Georgia, 'Times New Roman', serif;
+            --font-display: 'rl-horizon', 'adobe-jenson-pro', Georgia, serif;
             color-scheme: light dark;
         }
 
@@ -61,7 +62,8 @@
         }
 
         [data-lang="ko"] {
-            --font: 'Noto Serif KR', 'Newsreader', Georgia, serif;
+            --font: 'Noto Serif KR', 'adobe-jenson-pro', Georgia, serif;
+            --font-display: 'rl-horizon', 'Noto Serif KR', 'adobe-jenson-pro', Georgia, serif;
         }
 
         /* Language toggle */
@@ -126,8 +128,9 @@
         }
 
         .gate-title {
+            font-family: var(--font-display);
             font-size: 28px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
@@ -390,8 +393,9 @@
         }
 
         .hero-title {
+            font-family: var(--font-display);
             font-size: clamp(2.5rem, 10vw, 5.5rem);
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: -0.03em;
             line-height: 0.9;
             margin-bottom: 1rem;
@@ -465,8 +469,9 @@
         }
 
         .issue-date {
+            font-family: var(--font-display);
             font-size: clamp(2rem, 8vw, 3.5rem);
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: -0.02em;
             line-height: 1;
             margin-bottom: 1rem;
@@ -497,8 +502,9 @@
         }
 
         .section-title {
+            font-family: var(--font-display);
             font-size: clamp(2rem, 8vw, 3.5rem);
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: -0.02em;
             line-height: 1;
         }
