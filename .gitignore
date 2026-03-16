@@ -1,78 +1,12 @@
-# Node.js dependencies
 node_modules/
-**/node_modules/
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 *.log
 
-# Build output
-build/
-dist/
-public/
-coverage/
-.nyc_output/
-
-# Operating system files
 .DS_Store
-Thumbs.db
-ehthumbs.db
-
-# IDE configuration
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Environment files
 .env
 .env.*.local
 
-# Temporary files
-.tmp/
-tmp/
-.temp/
-*.tmp
-*.bak
+.vscode/
+.idea/
 
-# Python cache
-__pycache__/
-*.py[cod]
-*.pyo
-
-# Packaging archives
-*.zip
-*.tgz
-
-# Firebase and secrets
-serviceAccountKey.json
-firebaseConfig.js
-firebase-debug.log
-.cache/
-
-# Lambda deployment artifacts
-function.zip
-**/function.zip
-
-# Secrets files
-secrets.js
-**/secrets.js
-
-# Large media files (videos)
-*.mov
-*.mp4
-
-# Local settings
-.claude/settings.local.json
-
-# iOS build artifacts
-ios/**/Pods/
-ios/**/*.xcworkspace
-ios/**/DerivedData/
-ios/**/.build/
 .vercel
+.claude/settings.local.json

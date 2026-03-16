@@ -1,14 +1,13 @@
 {
   "name": "kevin-lee-website",
   "version": "1.0.0",
-  "description": "Personal portfolio website for Kevin Lee.",
+  "description": "Personal portfolio — klee.page",
   "scripts": {
     "dev": "npx http-server . -p 8080 -o"
   },
   "dependencies": {
     "http-server": "^14.1.0"
   },
-  "keywords": [],
   "author": "Kevin Lee",
   "license": "ISC"
 }
