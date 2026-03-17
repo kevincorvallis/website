@@ -106,7 +106,7 @@ function sanitizeInput(text) {
 
 // Colette-style injection defense: wrap user input in data boundary tags
 function wrapUserInput(text) {
-    const stripped = text.replace(/<\/?(user_input|system|assistant|human)/gi, '');
+    const stripped = text.replace(/<\/?[a-zA-Z_][\w-]*(?:\s[^>]*)?\/?>/g, '');
     return `<user_input>\n${stripped}\n</user_input>`;
 }
 
@@ -208,7 +208,11 @@ module.exports = async function handler(req, res) {
         const trimmed = history.slice(-10);
         for (const msg of trimmed) {
             if (msg.role === 'user' || msg.role === 'assistant') {
-                messages.push({ role: msg.role, content: sanitizeInput(String(msg.content).slice(0, 500)) });
+                const clean = sanitizeInput(String(msg.content).slice(0, 500));
+                messages.push({
+                    role: msg.role,
+                    content: msg.role === 'user' ? wrapUserInput(clean) : clean,
+                });
             }
         }
     }
