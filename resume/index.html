@@ -38,12 +38,14 @@
     <link rel="stylesheet" href="https://use.typekit.net/vpx6nbc.css">
 
     <style>
+        /* ——— Reset ——— */
         *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* ——— Theme ——— */
         :root {
             --bg: #f0eee6;
             --text: #1f1e1d;
@@ -56,6 +58,7 @@
             --text: #f0eee6;
         }
 
+        /* ——— Base ——— */
         html {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -86,6 +89,7 @@
             opacity: 0.6;
         }
 
+        /* ——— Header ——— */
         header {
             max-width: 620px;
             margin: 0 auto;
@@ -107,13 +111,7 @@
             opacity: 0.75;
         }
 
-        .page-title {
-            font-size: 34px;
-            font-weight: 600;
-            line-height: 1.15;
-            margin-bottom: 0.75rem;
-        }
-
+        /* ——— Theme Toggle ——— */
         .toggle-wrap {
             display: flex;
             align-items: center;
@@ -153,77 +151,189 @@
             transform: translateX(20px);
         }
 
+        /* ——— Main ——— */
         main {
             max-width: 620px;
             margin: 0 auto;
             padding: 0 20px;
         }
 
+        /* ——— Resume ——— */
         .resume {
             margin-top: 2rem;
         }
 
+        /* Page title + accent line */
+        .page-title {
+            font-size: 34px;
+            font-weight: 600;
+            line-height: 1.15;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 1.5px;
+            background: var(--text);
+            opacity: 0.2;
+            margin-top: 0.75rem;
+        }
+
+        /* Contact */
         .resume .contact {
             margin-bottom: 2rem;
-            font-size: 16px;
+            font-size: 15px;
         }
 
-        .resume h2 {
-            font-size: 24px;
-            font-weight: 600;
-            line-height: 1.2;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
+        .contact .sep {
+            margin: 0 0.5em;
+            opacity: 0.25;
         }
 
-        .resume h2:first-child {
-            margin-top: 0;
-        }
-
-        .resume h3 {
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 1.4;
-            margin-top: 1.25rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .resume p {
-            margin-bottom: 0.75rem;
-        }
-
-        .resume ul {
-            list-style: none;
-            margin-bottom: 1rem;
-        }
-
-        .resume ul li {
-            margin-bottom: 0.4rem;
-            position: relative;
-            padding-left: 0.9em;
-        }
-
-        .resume ul li::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-        }
-
-        .resume ul li:last-child {
+        /* Intro */
+        .resume .intro {
+            line-height: 1.75;
             margin-bottom: 0;
         }
 
-        .resume hr {
-            border: none;
-            border-top: 1px solid var(--text);
-            opacity: 0.15;
-            margin: 2rem 0;
+        /* ——— Resume Sections ——— */
+        .resume-section {
+            padding-top: 2.25rem;
+            margin-top: 2.25rem;
+            border-top: 1px solid rgba(31, 30, 29, 0.12);
         }
 
-        .resume .skills p {
-            margin-bottom: 0.4rem;
+        [data-theme="dark"] .resume-section {
+            border-top-color: rgba(240, 238, 230, 0.12);
         }
 
+        /* Section headings — editorial label */
+        .resume h2 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            opacity: 0.4;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ——— Timeline ——— */
+        .timeline {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--text);
+            opacity: 0.1;
+        }
+
+        /* ——— Entry ——— */
+        .entry {
+            position: relative;
+            margin-bottom: 1.75rem;
+        }
+
+        .entry:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Timeline dot */
+        .timeline .entry::before {
+            content: '';
+            position: absolute;
+            left: -1.5rem;
+            top: 0.55em;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--text);
+            opacity: 0.2;
+        }
+
+        /* Entry heading */
+        .entry h3 {
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 0.35rem;
+        }
+
+        /* Entry + section descriptions */
+        .entry p,
+        .resume-section > p {
+            font-size: 16px;
+            line-height: 1.7;
+            opacity: 0.75;
+            margin-bottom: 0.75rem;
+        }
+
+        .entry p:last-child,
+        .resume-section > p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ——— Skills ——— */
+        .skills {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .skills p {
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 0 !important;
+            opacity: 0.75;
+        }
+
+        .skills strong {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.65;
+        }
+
+        /* ——— Entrance Animations ——— */
+        @media (prefers-reduced-motion: no-preference) {
+            .page-title,
+            .resume .contact,
+            .resume .intro {
+                opacity: 0;
+                transform: translateY(8px);
+                animation: fadeUp 0.4s ease forwards;
+            }
+
+            .page-title { animation-delay: 0.05s; }
+            .resume .contact { animation-delay: 0.1s; }
+            .resume .intro { animation-delay: 0.15s; }
+
+            .resume-section {
+                opacity: 0;
+                transform: translateY(12px);
+                animation: fadeUp 0.5s ease forwards;
+            }
+
+            .resume-section:nth-of-type(1) { animation-delay: 0.2s; }
+            .resume-section:nth-of-type(2) { animation-delay: 0.3s; }
+            .resume-section:nth-of-type(3) { animation-delay: 0.4s; }
+            .resume-section:nth-of-type(4) { animation-delay: 0.5s; }
+
+            @keyframes fadeUp {
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+
+        /* ——— Footer ——— */
         footer {
             max-width: 620px;
             margin: 0 auto;
@@ -235,6 +345,7 @@
             opacity: 0.5;
         }
 
+        /* ——— Responsive ——— */
         @media (max-width: 768px) {
             body {
                 font-size: 18px;
@@ -248,16 +359,16 @@
                 font-size: 28px;
             }
 
-            .resume h2 {
-                font-size: 21px;
+            .entry h3 {
+                font-size: 16px;
             }
 
-            .resume h3 {
-                font-size: 17px;
+            .resume h2 {
+                font-size: 10px;
             }
         }
 
-        /* Chat section */
+        /* ——— Chat Section ——— */
         .chat-section hr {
             border: none;
             border-top: 1px solid var(--text);
@@ -270,6 +381,9 @@
             font-weight: 600;
             line-height: 1.2;
             margin-bottom: 0.5rem;
+            text-transform: none;
+            letter-spacing: normal;
+            opacity: 1;
         }
 
         .chat-section .chat-subtitle {
@@ -431,6 +545,7 @@
             }
         }
 
+        /* ——— Reduced Motion ——— */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -441,7 +556,7 @@
 <body>
 
     <header>
-        <a href="/" class="back-link">← Kevin Lee</a>
+        <a href="/" class="back-link">&larr; Kevin Lee</a>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle">
             <label for="theme-toggle"></label>
@@ -452,54 +567,65 @@
         <div class="resume">
             <h1 class="page-title" data-i18n="resume.heading">Resume</h1>
             <p class="contact">
-                <a href="mailto:kevin@pookieb.com">kevin@pookieb.com</a> |
+                <a href="mailto:kevin@pookieb.com">kevin@pookieb.com</a>
+                <span class="sep" aria-hidden="true">&middot;</span>
                 <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">github.com/kevincorvallis</a>
             </p>
 
-            <p data-i18n="resume.intro">I build at both ends of the scale — leading applied ML at Paramount, 40TB/day data pipelines at Microsoft, consumer apps shipped to the App Store. Before that I served in the Army, interned at NASA JPL, and mapped brain regions at the Broad Institute. On weekends I fly medical transport for Angel Flight West.</p>
+            <p class="intro" data-i18n="resume.intro">I build at both ends of the scale — leading applied ML at Paramount, 40TB/day data pipelines at Microsoft, consumer apps shipped to the App Store. Before that I served in the Army, interned at NASA JPL, and mapped brain regions at the Broad Institute. On weekends I fly medical transport for Angel Flight West.</p>
 
-            <hr>
+            <section class="resume-section">
+                <h2 data-i18n="resume.experienceHeading">Experience</h2>
+                <div class="timeline">
+                    <div class="entry">
+                        <h3 data-i18n="resume.paramountTitle">Paramount — Senior Software Engineer, Applied ML · Mar 2025–Present</h3>
+                        <p data-i18n="resume.paramountDesc">Leading a team of ~5 engineers on the Video Gisting & Short Form platform in the Applied Machine Learning group.</p>
+                    </div>
+                    <div class="entry">
+                        <h3 data-i18n="resume.msftTitle">Microsoft AI — Software Engineer · Aug 2022–Feb 2025</h3>
+                        <p data-i18n="resume.msftDesc">Built and shipped the Copilot settings experience in C++ across backend and frontend. Owned large-scale Azure data pipelines processing 40TB+ daily for Copilot, Edge, and Windows — cut end-to-end latency from 72 to 24 hours, accelerating experimentation across the org. Reduced annual cloud spend by $240K through infrastructure optimization.</p>
+                    </div>
+                    <div class="entry">
+                        <h3 data-i18n="resume.aclTitle">PookieB — Founder · 2024–Present</h3>
+                        <p data-i18n-html="resume.aclDesc">Founded a software company shipping 10 products across web, iOS, and AI/ML. Highlights: <a href="/projects/shredders">Shredders</a> (real-time powder tracker, 53 resorts, 90 API routes), <a href="/projects/spacec">SPACEc</a> (Stanford-published Python library for imaging analysis, PyPI + bioRxiv), and SmartSpender (3-stage AI financial pipeline, 13 AWS Lambdas). <a href="/projects">See all projects.</a></p>
+                    </div>
+                    <div class="entry">
+                        <h3 data-i18n="resume.broadTitle">Broad Institute of MIT and Harvard — Researcher · 2022</h3>
+                        <p data-i18n="resume.broadDesc">Classified spatial scRNA-seq data (MERFISH) to subthalamic nuclei regions using machine learning, in the laboratory of Dr. Guoping Feng.</p>
+                    </div>
+                    <div class="entry">
+                        <h3 data-i18n="resume.nasaTitle">NASA Jet Propulsion Laboratory — Intern · 2019</h3>
+                        <p data-i18n="resume.nasaDesc">Improved Curiosity rover operational efficiency by 8–12% through mission-critical software development. Presented at the 2020 NASA conference.</p>
+                    </div>
+                    <div class="entry">
+                        <h3 data-i18n="resume.armyTitle">U.S. Army — 2017–2022</h3>
+                        <p data-i18n="resume.armyDesc">Five years of service. Trained at West Point, led small-unit operations, managed battalion logistics. Full ROTC scholarship to USC.</p>
+                    </div>
+                </div>
+            </section>
 
-            <h2 data-i18n="resume.experienceHeading">Experience</h2>
+            <section class="resume-section">
+                <h2 data-i18n="resume.educationHeading">Education</h2>
+                <p data-i18n-html="resume.uscDegree"><strong>University of Southern California</strong> — B.S. Computer Science, Viterbi School of Engineering · 2022</p>
+            </section>
 
-            <h3 data-i18n="resume.paramountTitle">Paramount — Senior Software Engineer, Applied ML · Mar 2025–Present</h3>
-            <p data-i18n="resume.paramountDesc">Leading a team of ~5 engineers on the Video Gisting & Short Form platform in the Applied Machine Learning group.</p>
+            <section class="resume-section">
+                <h2 data-i18n="resume.volunteerHeading">Volunteer</h2>
+                <div class="entry">
+                    <h3 data-i18n="resume.afwTitle">Angel Flight West — Pilot · 2024–Present</h3>
+                    <p data-i18n="resume.afwDesc">Volunteer pilot providing medical transport flights across the Pacific Northwest.</p>
+                </div>
+            </section>
 
-            <h3 data-i18n="resume.msftTitle">Microsoft AI — Software Engineer · Aug 2022–Feb 2025</h3>
-            <p data-i18n="resume.msftDesc">Built and shipped the Copilot settings experience in C++ across backend and frontend. Owned large-scale Azure data pipelines processing 40TB+ daily for Copilot, Edge, and Windows — cut end-to-end latency from 72 to 24 hours, accelerating experimentation across the org. Reduced annual cloud spend by $240K through infrastructure optimization.</p>
-
-            <h3 data-i18n="resume.aclTitle">PookieB — Founder · 2024–Present</h3>
-            <p data-i18n-html="resume.aclDesc">Founded a software company shipping 10 products across web, iOS, and AI/ML. Highlights: <a href="/projects/shredders">Shredders</a> (real-time powder tracker, 53 resorts, 90 API routes), <a href="/projects/spacec">SPACEc</a> (Stanford-published Python library for imaging analysis, PyPI + bioRxiv), and SmartSpender (3-stage AI financial pipeline, 13 AWS Lambdas). <a href="/projects">See all projects.</a></p>
-
-            <h3 data-i18n="resume.broadTitle">Broad Institute of MIT and Harvard — Researcher · 2022</h3>
-            <p data-i18n="resume.broadDesc">Classified spatial scRNA-seq data (MERFISH) to subthalamic nuclei regions using machine learning, in the laboratory of Dr. Guoping Feng.</p>
-
-            <h3 data-i18n="resume.nasaTitle">NASA Jet Propulsion Laboratory — Intern · 2019</h3>
-            <p data-i18n="resume.nasaDesc">Improved Curiosity rover operational efficiency by 8–12% through mission-critical software development. Presented at the 2020 NASA conference.</p>
-
-            <h3 data-i18n="resume.armyTitle">U.S. Army — 2017–2022</h3>
-            <p data-i18n="resume.armyDesc">Five years of service. Trained at West Point, led small-unit operations, managed battalion logistics. Full ROTC scholarship to USC.</p>
-
-            <hr>
-
-            <h2 data-i18n="resume.educationHeading">Education</h2>
-            <p data-i18n-html="resume.uscDegree"><strong>University of Southern California</strong> — B.S. Computer Science, Viterbi School of Engineering · 2022</p>
-
-            <hr>
-
-            <h2 data-i18n="resume.volunteerHeading">Volunteer</h2>
-            <h3 data-i18n="resume.afwTitle">Angel Flight West — Pilot · 2024–Present</h3>
-            <p data-i18n="resume.afwDesc">Volunteer pilot providing medical transport flights across the Pacific Northwest.</p>
-
-            <hr>
-
-            <h2 data-i18n="resume.skillsHeading">Skills</h2>
-            <div class="skills">
-                <p data-i18n-html="resume.skillsLanguages"><strong>Languages:</strong> Python, TypeScript, Swift, C++, Java</p>
-                <p data-i18n-html="resume.skillsSystems"><strong>Systems:</strong> Azure, AWS (Lambda, DynamoDB, Step Functions, Bedrock), Supabase, Docker, Kubernetes</p>
-                <p data-i18n-html="resume.skillsFrameworks"><strong>Frameworks:</strong> Next.js, React, SwiftUI, Flask, Node.js</p>
-                <p data-i18n-html="resume.skillsAI"><strong>AI/ML:</strong> Claude, GPT-4, TensorFlow, PyTorch, ElevenLabs</p>
-            </div>
+            <section class="resume-section">
+                <h2 data-i18n="resume.skillsHeading">Skills</h2>
+                <div class="skills">
+                    <p data-i18n-html="resume.skillsLanguages"><strong>Languages:</strong> Python, TypeScript, Swift, C++, Java</p>
+                    <p data-i18n-html="resume.skillsSystems"><strong>Systems:</strong> Azure, AWS (Lambda, DynamoDB, Step Functions, Bedrock), Supabase, Docker, Kubernetes</p>
+                    <p data-i18n-html="resume.skillsFrameworks"><strong>Frameworks:</strong> Next.js, React, SwiftUI, Flask, Node.js</p>
+                    <p data-i18n-html="resume.skillsAI"><strong>AI/ML:</strong> Claude, GPT-4, TensorFlow, PyTorch, ElevenLabs</p>
+                </div>
+            </section>
         </div>
     </main>
 
