@@ -516,13 +516,14 @@
 
         /* Streaming cursor */
         .chat-message .chat-body.streaming::after {
-            content: '\258C';
-            animation: blink 0.8s step-end infinite;
-            opacity: 0.5;
+            content: '\25B8';
+            animation: pulse-cursor 1.2s ease-in-out infinite;
+            margin-left: 2px;
         }
 
-        @keyframes blink {
-            50% { opacity: 0; }
+        @keyframes pulse-cursor {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.7; }
         }
 
         .chat-input-wrap {
