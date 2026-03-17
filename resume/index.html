@@ -516,7 +516,7 @@
 
         /* Streaming cursor */
         .chat-message .chat-body.streaming::after {
-            content: '\u258c';
+            content: '\258C';
             animation: blink 0.8s step-end infinite;
             opacity: 0.5;
         }
@@ -838,6 +838,15 @@
                 return d.innerHTML;
             }
 
+            function renderMarkdown(text) {
+                var html = escapeHtml(text);
+                html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+                html = html.replace(/\n\n/g, '<br><br>');
+                html = html.replace(/\n/g, '<br>');
+                return html;
+            }
+
             async function sendMessage(text) {
                 if (isLoading || !text.trim()) return;
                 isLoading = true;
@@ -882,7 +891,7 @@
                                 var parsed = JSON.parse(data);
                                 if (parsed.text) {
                                     fullReply += parsed.text;
-                                    bodyEl.textContent = fullReply;
+                                    bodyEl.innerHTML = renderMarkdown(fullReply);
                                     bodyEl.parentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                                 }
                             } catch (e) { /* skip */ }
