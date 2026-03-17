@@ -453,6 +453,12 @@
 
         .chat-message {
             margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-message.user-msg {
+            align-items: flex-end;
         }
 
         .chat-message .chat-role {
@@ -460,18 +466,63 @@
             font-weight: 600;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            opacity: 0.5;
-            margin-bottom: 0.25rem;
+            opacity: 0.4;
+            margin-bottom: 0.35rem;
         }
 
         .chat-message .chat-body {
-            font-size: 18px;
-            line-height: 1.6;
+            font-size: 17px;
+            line-height: 1.65;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 90%;
         }
 
+        .chat-message.user-msg .chat-body {
+            background: var(--text);
+            color: var(--bg);
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.assistant-msg .chat-body {
+            background: color-mix(in oklch, var(--text) 8%, var(--bg));
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Thinking indicator — animated dots */
         .chat-message .chat-body.thinking {
-            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 14px 20px;
+        }
+
+        .thinking-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text);
+            opacity: 0.35;
+            animation: thinking-pulse 1.4s ease-in-out infinite;
+        }
+
+        .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes thinking-pulse {
+            0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 0.7; transform: scale(1); }
+        }
+
+        /* Streaming cursor */
+        .chat-message .chat-body.streaming::after {
+            content: '\u258c';
+            animation: blink 0.8s step-end infinite;
             opacity: 0.5;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
         }
 
         .chat-input-wrap {
@@ -482,34 +533,40 @@
 
         .chat-input-wrap input {
             flex: 1;
-            background: none;
-            border: 1px solid var(--text);
-            border-radius: 8px;
+            background: color-mix(in oklch, var(--text) 5%, var(--bg));
+            border: 1px solid color-mix(in oklch, var(--text) 15%, var(--bg));
+            border-radius: 22px;
             color: var(--text);
             font-family: var(--font);
             font-size: 16px;
-            padding: 10px 14px;
+            padding: 12px 18px;
             outline: none;
             transition: border-color 0.2s ease, color 0.3s ease, background-color 0.3s ease;
         }
 
+        .chat-input-wrap input:focus {
+            border-color: color-mix(in oklch, var(--text) 40%, var(--bg));
+        }
+
         .chat-input-wrap input::placeholder {
             color: var(--text);
-            opacity: 0.4;
+            opacity: 0.35;
         }
 
         .chat-input-wrap button {
             background: var(--text);
             border: none;
-            border-radius: 8px;
+            border-radius: 50%;
             color: var(--bg);
-            font-size: 18px;
+            font-size: 16px;
             width: 44px;
+            height: 44px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+            flex-shrink: 0;
         }
 
         .chat-input-wrap button:hover {
@@ -517,13 +574,14 @@
         }
 
         .chat-input-wrap button:disabled {
-            opacity: 0.3;
+            opacity: 0.2;
             cursor: not-allowed;
         }
 
         .chat-disclaimer {
             font-size: 13px;
-            opacity: 0.4;
+            opacity: 0.35;
+            text-align: center;
         }
 
         @media (max-width: 768px) {
@@ -541,7 +599,8 @@
             }
 
             .chat-message .chat-body {
-                font-size: 16px;
+                font-size: 15px;
+                padding: 10px 14px;
             }
         }
 
@@ -642,10 +701,31 @@
 
         <div class="chat-input-wrap">
             <input type="text" id="chat-input" data-i18n-placeholder="resume.chatPlaceholder" placeholder="Ask about my skills..." maxlength="500" autocomplete="off">
-            <button type="button" id="chat-send" aria-label="Send" disabled>&rarr;</button>
+            <button type="button" id="chat-send" aria-label="Send" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
         </div>
 
         <p class="chat-disclaimer" data-i18n="resume.chatDisclaimer">Powered by AI · Responses based on Kevin's resume</p>
+    </div>
+
+    <div style="max-width:620px;margin:2rem auto;padding:0 20px;text-align:center;">
+        <hr>
+        <h2>Let's chat</h2>
+        <p style="margin-bottom:1.5rem;opacity:0.7;">Want to connect? Book a time that works for you.</p>
+        <link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
+        <script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
+        <script>
+        (function() {
+            var target = document.currentScript;
+            window.addEventListener('load', function() {
+                calendar.schedulingButton.load({
+                    url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ0lsiOVD3Cv9SR7O0Pp8y2PILR4zYaKCvaZ5zirsYavh0Mkos01gQ77h_Pfg4XGFJFX58-hjXpG?gv=true',
+                    color: '#039BE5',
+                    label: 'Book an appointment',
+                    target,
+                });
+            });
+        })();
+        </script>
     </div>
 
     <footer>
@@ -728,18 +808,30 @@
 
             function addMessage(role, text) {
                 var div = document.createElement('div');
-                div.className = 'chat-message';
+                div.className = 'chat-message ' + (role === 'user' ? 'user-msg' : 'assistant-msg');
                 div.innerHTML = '<div class="chat-role">' + getLabel(role) + '</div><div class="chat-body">' + escapeHtml(text) + '</div>';
                 messagesEl.appendChild(div);
                 div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 return div;
             }
 
+            function addStreamingMessage() {
+                var div = document.createElement('div');
+                div.className = 'chat-message assistant-msg';
+                var body = document.createElement('div');
+                body.className = 'chat-body streaming';
+                div.innerHTML = '<div class="chat-role">' + getLabel('assistant') + '</div>';
+                div.appendChild(body);
+                messagesEl.appendChild(div);
+                div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                return body;
+            }
+
             function addThinking() {
                 var div = document.createElement('div');
-                div.className = 'chat-message';
+                div.className = 'chat-message assistant-msg';
                 div.id = 'chat-thinking';
-                div.innerHTML = '<div class="chat-role">' + getLabel('assistant') + '</div><div class="chat-body thinking">Thinking\u2026</div>';
+                div.innerHTML = '<div class="chat-role">' + getLabel('assistant') + '</div><div class="chat-body thinking"><span class="thinking-dot"></span><span class="thinking-dot"></span><span class="thinking-dot"></span></div>';
                 messagesEl.appendChild(div);
                 div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
@@ -771,17 +863,46 @@
                         body: JSON.stringify({ message: text.trim(), history: history })
                     });
 
-                    removeThinking();
-
                     if (!res.ok) throw new Error('Request failed');
 
-                    var data = await res.json();
-                    var reply = data.reply || 'Sorry, something went wrong.';
-                    addMessage('assistant', reply);
+                    removeThinking();
 
+                    // Stream SSE response
+                    var bodyEl = addStreamingMessage();
+                    var reader = res.body.getReader();
+                    var decoder = new TextDecoder();
+                    var buffer = '';
+                    var fullReply = '';
+
+                    while (true) {
+                        var chunk = await reader.read();
+                        if (chunk.done) break;
+
+                        buffer += decoder.decode(chunk.value, { stream: true });
+                        var lines = buffer.split('\n');
+                        buffer = lines.pop() || '';
+
+                        for (var i = 0; i < lines.length; i++) {
+                            var line = lines[i];
+                            if (!line.startsWith('data: ')) continue;
+                            var data = line.slice(6);
+                            if (data === '[DONE]') continue;
+                            try {
+                                var parsed = JSON.parse(data);
+                                if (parsed.text) {
+                                    fullReply += parsed.text;
+                                    bodyEl.textContent = fullReply;
+                                    bodyEl.parentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                }
+                            } catch (e) { /* skip */ }
+                        }
+                    }
+
+                    bodyEl.classList.remove('streaming');
+
+                    if (!fullReply) fullReply = 'Sorry, something went wrong.';
                     history.push({ role: 'user', content: text.trim() });
-                    history.push({ role: 'assistant', content: reply });
-
+                    history.push({ role: 'assistant', content: fullReply });
                     if (history.length > 20) history.splice(0, 2);
                 } catch (err) {
                     removeThinking();

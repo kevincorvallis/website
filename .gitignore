@@ -10,3 +10,4 @@ node_modules/
 
 .vercel
 .claude/settings.local.json
+.env*.local
