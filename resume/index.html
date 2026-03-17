@@ -708,24 +708,15 @@
     </div>
 
     <div style="max-width:620px;margin:2rem auto;padding:0 20px;text-align:center;">
-        <hr>
-        <h2>Let's chat</h2>
-        <p style="margin-bottom:1.5rem;opacity:0.7;">Want to connect? Book a time that works for you.</p>
-        <link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
-        <script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
-        <script>
-        (function() {
-            var target = document.currentScript;
-            window.addEventListener('load', function() {
-                calendar.schedulingButton.load({
-                    url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ0lsiOVD3Cv9SR7O0Pp8y2PILR4zYaKCvaZ5zirsYavh0Mkos01gQ77h_Pfg4XGFJFX58-hjXpG?gv=true',
-                    color: '#039BE5',
-                    label: 'Book an appointment',
-                    target,
-                });
-            });
-        })();
-        </script>
+        <hr style="border:none;border-top:1px solid var(--text);opacity:0.15;margin:0 0 2rem;">
+        <h2 style="font-size:24px;font-weight:600;line-height:1.2;margin-bottom:0.5rem;" data-i18n="resume.connectHeading">Let's connect</h2>
+        <p style="margin-bottom:1.5rem;opacity:0.6;font-size:18px;" data-i18n="resume.connectSubtitle">Want to connect? Book a time that works for you.</p>
+        <a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0lsiOVD3Cv9SR7O0Pp8y2PILR4zYaKCvaZ5zirsYavh0Mkos01gQ77h_Pfg4XGFJFX58-hjXpG?gv=true"
+           target="_blank"
+           rel="noopener noreferrer"
+           style="display:inline-block;border:1px solid var(--text);border-radius:20px;color:var(--text);font-family:var(--font);font-size:15px;padding:8px 16px;text-decoration:none;transition:opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;line-height:1.4;"
+           onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'"
+           data-i18n="resume.bookAppointment">Book an appointment</a>
     </div>
 
     <footer>
