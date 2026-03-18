@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brock — A Year in the Life</title>
+    <title>Brock — A Year in the Life | Kevin Lee</title>
+    <meta name="description" content="From city sidewalks to coastal cliffs — one little golden doodle, one very big year. A photo story by Kevin Lee.">
+    <meta name="author" content="Kevin Lee">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://klee.page/brock">
+    <meta property="og:title" content="Brock — A Year in the Life">
+    <meta property="og:description" content="From city sidewalks to coastal cliffs — one little golden doodle, one very big year.">
+    <meta property="og:image" content="https://klee.page/brock/images/01-prologue-portrait.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Brock — A Year in the Life">
+    <meta name="twitter:description" content="From city sidewalks to coastal cliffs — one little golden doodle, one very big year.">
+    <meta name="twitter:image" content="https://klee.page/brock/images/01-prologue-portrait.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
     <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
     <link rel="dns-prefetch" href="https://api.fontshare.com">
@@ -547,6 +566,7 @@
             }
         }
     </style>
+    <noscript><style>.loader{display:none!important}.reveal,.reveal-fade,.reveal-scale,.hero-subtitle,.hero-title,.hero-description,.scroll-hint{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body>
     <!-- Loader -->
@@ -854,6 +874,24 @@
         // ==================== INIT ====================
         function initStory() {
             loader.classList.add('hidden');
+
+            if (typeof Lenis === 'undefined' || typeof gsap === 'undefined') {
+                // CDN scripts failed — degrade gracefully
+                document.querySelectorAll('.reveal, .reveal-fade, .reveal-scale, .hero-subtitle, .hero-title, .hero-description, .scroll-hint').forEach(function(el) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'none';
+                });
+                return;
+            }
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                // Skip all GSAP animations, just show content
+                document.querySelectorAll('.reveal, .reveal-fade, .reveal-scale, .hero-subtitle, .hero-title, .hero-description, .scroll-hint').forEach(function(el) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'none';
+                });
+                return;
+            }
 
             // Init Lenis
             const lenis = new Lenis({

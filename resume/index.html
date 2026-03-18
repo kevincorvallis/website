@@ -103,7 +103,7 @@
             font-size: 15px;
             font-weight: 400;
             text-decoration: none;
-            opacity: 0.4;
+            opacity: 0.65;
             transition: opacity 0.2s ease, color 0.3s ease;
         }
 
@@ -118,7 +118,28 @@
         }
 
         .toggle-wrap input {
-            display: none;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .toggle-wrap input:focus-visible + label {
+            outline: 2px solid var(--text);
+            outline-offset: 3px;
+            border-radius: 10px;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--text);
+            outline-offset: 3px;
+            border-radius: 2px;
         }
 
         .toggle-wrap label {
@@ -215,7 +236,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.2em;
-            opacity: 0.4;
+            opacity: 0.65;
             margin-bottom: 1.5rem;
         }
 
@@ -342,7 +363,7 @@
 
         footer p {
             font-size: 14px;
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
         /* ——— Responsive ——— */
@@ -466,7 +487,7 @@
             font-weight: 600;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            opacity: 0.4;
+            opacity: 0.55;
             margin-bottom: 0.35rem;
         }
 
@@ -485,8 +506,14 @@
         }
 
         .chat-message.assistant-msg .chat-body {
+            background: rgba(31, 30, 29, 0.08);
             background: color-mix(in oklch, var(--text) 8%, var(--bg));
             border-bottom-left-radius: 4px;
+        }
+
+        [data-theme="dark"] .chat-message.assistant-msg .chat-body {
+            background: rgba(240, 238, 230, 0.08);
+            background: color-mix(in oklch, var(--text) 8%, var(--bg));
         }
 
         /* Thinking indicator — animated dots */
@@ -534,7 +561,9 @@
 
         .chat-input-wrap input {
             flex: 1;
+            background: rgba(31, 30, 29, 0.05);
             background: color-mix(in oklch, var(--text) 5%, var(--bg));
+            border: 1px solid rgba(31, 30, 29, 0.15);
             border: 1px solid color-mix(in oklch, var(--text) 15%, var(--bg));
             border-radius: 22px;
             color: var(--text);
@@ -581,7 +610,7 @@
 
         .chat-disclaimer {
             font-size: 13px;
-            opacity: 0.35;
+            opacity: 0.55;
             text-align: center;
         }
 
@@ -605,25 +634,59 @@
             }
         }
 
+        /* ——— Accessibility ——— */
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            padding: 8px 16px;
+            background: var(--text);
+            color: var(--bg);
+            z-index: 100;
+            font-size: 14px;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
         /* ——— Reduced Motion ——— */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
 
+    <a href="#main" class="skip-link">Skip to content</a>
+
     <header>
         <a href="/" class="back-link">&larr; Kevin Lee</a>
         <div class="toggle-wrap">
-            <input type="checkbox" id="theme-toggle">
-            <label for="theme-toggle"></label>
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
         </div>
     </header>
 
-    <main>
+    <main id="main">
         <div class="resume">
             <h1 class="page-title" data-i18n="resume.heading">Resume</h1>
             <p class="contact">
@@ -687,9 +750,8 @@
                 </div>
             </section>
         </div>
-    </main>
 
-    <div class="chat-section" style="max-width:620px;margin:0 auto;padding:0 20px;">
+        <div class="chat-section">
         <hr>
         <h2 data-i18n="resume.chatHeading">Ask me anything</h2>
         <p class="chat-subtitle" data-i18n="resume.chatSubtitle">Curious about my experience? Ask below.</p>
@@ -698,27 +760,29 @@
             <div class="chat-suggestions" id="chat-suggestions"></div>
         </div>
 
-        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
 
         <div class="chat-input-wrap">
+            <label for="chat-input" class="sr-only">Ask about my skills</label>
             <input type="text" id="chat-input" data-i18n-placeholder="resume.chatPlaceholder" placeholder="Ask about my skills..." maxlength="500" autocomplete="off">
             <button type="button" id="chat-send" aria-label="Send" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
         </div>
 
         <p class="chat-disclaimer" data-i18n="resume.chatDisclaimer">Powered by AI · Responses based on Kevin's resume</p>
-    </div>
+        </div>
 
-    <div style="max-width:620px;margin:2rem auto;padding:0 20px;text-align:center;">
-        <hr style="border:none;border-top:1px solid var(--text);opacity:0.15;margin:0 0 2rem;">
-        <h2 style="font-size:24px;font-weight:600;line-height:1.2;margin-bottom:0.5rem;" data-i18n="resume.connectHeading">Let's connect</h2>
-        <p style="margin-bottom:1.5rem;opacity:0.6;font-size:18px;" data-i18n="resume.connectSubtitle">Want to connect? Book a time that works for you.</p>
-        <a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0lsiOVD3Cv9SR7O0Pp8y2PILR4zYaKCvaZ5zirsYavh0Mkos01gQ77h_Pfg4XGFJFX58-hjXpG?gv=true"
-           target="_blank"
-           rel="noopener noreferrer"
-           style="display:inline-block;border:1px solid var(--text);border-radius:20px;color:var(--text);font-family:var(--font);font-size:15px;padding:8px 16px;text-decoration:none;transition:opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;line-height:1.4;"
-           onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'"
-           data-i18n="resume.bookAppointment">Book an appointment</a>
-    </div>
+        <div style="margin-top:2rem;text-align:center;">
+            <hr style="border:none;border-top:1px solid var(--text);opacity:0.15;margin:0 0 2rem;">
+            <h2 style="font-size:24px;font-weight:600;line-height:1.2;margin-bottom:0.5rem;" data-i18n="resume.connectHeading">Let's connect</h2>
+            <p style="margin-bottom:1.5rem;opacity:0.6;font-size:18px;" data-i18n="resume.connectSubtitle">Want to connect? Book a time that works for you.</p>
+            <a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0lsiOVD3Cv9SR7O0Pp8y2PILR4zYaKCvaZ5zirsYavh0Mkos01gQ77h_Pfg4XGFJFX58-hjXpG?gv=true"
+               target="_blank"
+               rel="noopener noreferrer"
+               style="display:inline-block;border:1px solid var(--text);border-radius:20px;color:var(--text);font-family:var(--font);font-size:15px;padding:8px 16px;text-decoration:none;transition:opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;line-height:1.4;"
+               onmouseover="this.style.opacity='0.6'" onmouseout="this.style.opacity='1'"
+               data-i18n="resume.bookAppointment">Book an appointment</a>
+        </div>
+    </main>
 
     <footer>
         <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
@@ -864,7 +928,10 @@
                         body: JSON.stringify({ message: text.trim(), history: history })
                     });
 
-                    if (!res.ok) throw new Error('Request failed');
+                    if (!res.ok) {
+                        if (res.status === 429) throw new Error('rate-limit');
+                        throw new Error('Request failed');
+                    }
 
                     removeThinking();
 
@@ -907,7 +974,11 @@
                     if (history.length > 20) history.splice(0, 2);
                 } catch (err) {
                     removeThinking();
-                    addMessage('assistant', 'Sorry, I couldn\'t respond right now. Please try again.');
+                    if (err.message === 'rate-limit') {
+                        addMessage('assistant', 'You\'re sending messages too fast. Please wait a minute before trying again.');
+                    } else {
+                        addMessage('assistant', 'Sorry, I couldn\'t respond right now. Please try again.');
+                    }
                 }
 
                 isLoading = false;

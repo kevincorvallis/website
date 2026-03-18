@@ -108,12 +108,19 @@
             font-size: 15px;
             font-weight: 400;
             text-decoration: none;
-            opacity: 0.4;
+            opacity: 0.65;
             transition: opacity 0.2s ease, color 0.3s ease;
         }
 
         .back-link:hover {
-            opacity: 0.75;
+            opacity: 0.85;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--text);
+            outline-offset: 3px;
+            border-radius: 2px;
         }
 
         /* ——— Theme Toggle ——— */
@@ -124,7 +131,21 @@
         }
 
         .toggle-wrap input {
-            display: none;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .toggle-wrap input:focus-visible + label {
+            outline: 2px solid var(--text);
+            outline-offset: 3px;
+            border-radius: 10px;
         }
 
         .toggle-wrap label {
@@ -438,7 +459,7 @@
 
         footer p {
             font-size: 14px;
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
         /* ——— Responsive ——— */
@@ -514,6 +535,37 @@
             }
         }
 
+        /* ——— Accessibility ——— */
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            padding: 8px 16px;
+            background: var(--text);
+            color: var(--bg);
+            z-index: 100;
+            font-size: 14px;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
         /* ——— Reduced Motion ——— */
 
         @media (prefers-reduced-motion: reduce) {
@@ -526,15 +578,17 @@
 </head>
 <body>
 
+    <a href="#main" class="skip-link">Skip to content</a>
+
     <header>
         <a href="/" class="back-link">← Kevin Lee</a>
         <div class="toggle-wrap">
-            <input type="checkbox" id="theme-toggle">
-            <label for="theme-toggle"></label>
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
         </div>
     </header>
 
-    <main>
+    <main id="main">
         <div class="content">
             <h1 class="page-title" data-i18n="projects.heading">Projects</h1>
             <p class="page-subtitle" data-i18n-html="projects.subtitle">Things I've built under <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a> &mdash; across web, iOS, and AI/ML.</p>

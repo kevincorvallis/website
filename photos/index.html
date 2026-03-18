@@ -98,12 +98,19 @@
             font-size: 15px;
             font-weight: 400;
             text-decoration: none;
-            opacity: 0.4;
+            opacity: 0.65;
             transition: opacity 0.2s ease, color 0.3s ease;
         }
 
         .back-link:hover {
-            opacity: 0.75;
+            opacity: 0.85;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--text);
+            outline-offset: 3px;
+            border-radius: 2px;
         }
 
         .page-title {
@@ -124,7 +131,21 @@
         }
 
         .toggle-wrap input {
-            display: none;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .toggle-wrap input:focus-visible + label {
+            outline: 2px solid var(--text);
+            outline-offset: 3px;
+            border-radius: 10px;
         }
 
         .toggle-wrap label {
@@ -181,7 +202,7 @@
 
         footer p {
             font-size: 14px;
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
         @media (max-width: 600px) {
@@ -198,23 +219,58 @@
             }
         }
 
+        /* ——— Accessibility ——— */
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            padding: 8px 16px;
+            background: var(--text);
+            color: var(--bg);
+            z-index: 100;
+            font-size: 14px;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
 
+    <a href="#main" class="skip-link">Skip to content</a>
+
     <header>
         <a href="/" class="back-link">← Kevin Lee</a>
         <div class="toggle-wrap">
-            <input type="checkbox" id="theme-toggle">
-            <label for="theme-toggle"></label>
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
         </div>
     </header>
 
+    <main id="main">
     <div class="page-header">
         <h1 class="page-title" data-i18n="photos.heading">Photos</h1>
     </div>
@@ -230,6 +286,7 @@
         <img src="/images/kevi742-070.jpg" alt="Two friends sitting together on a city bridge at night" loading="lazy" width="1200" height="806">
         <img src="/images/kevi742-073.jpg" alt="Group selfie of six friends outdoors at night with string lights behind" loading="lazy" width="1200" height="806">
     </div>
+    </main>
 
     <footer>
         <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
