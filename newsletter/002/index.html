@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatch 002: Spring on the Mountain — Kevin Lee</title>
+    <meta name="description" content="Skiing Mammoth as winter lets go, starting to produce at Paramount, and settling into the apartment.">
+    <meta name="author" content="Kevin Lee">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://klee.page/newsletter/002/">
+    <meta property="og:title" content="Dispatch 002: Spring on the Mountain — Kevin Lee">
+    <meta property="og:description" content="Skiing Mammoth as winter lets go, starting to produce at Paramount, and settling into the apartment.">
+    <meta property="og:image" content="https://klee.page/newsletter/002/images/mammoth-crew.jpeg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dispatch 002: Spring on the Mountain — Kevin Lee">
+    <meta name="twitter:description" content="Skiing Mammoth as winter lets go, starting to produce at Paramount, and settling into the apartment.">
+    <meta name="twitter:image" content="https://klee.page/newsletter/002/images/mammoth-crew.jpeg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <!-- Detect theme + language before first paint -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+
+            var params = new URLSearchParams(window.location.search);
+            var urlLang = params.get('lang');
+            var storedLang = localStorage.getItem('dispatch-lang');
+            var navLang = (navigator.language || '').slice(0, 2);
+            var lang = (urlLang === 'ko' || urlLang === 'en') ? urlLang
+                     : (storedLang === 'ko' || storedLang === 'en') ? storedLang
+                     : navLang === 'ko' ? 'ko'
+                     : 'en';
+            document.documentElement.setAttribute('data-lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+        }
+
+        [data-lang="ko"] {
+            --font: 'Noto Serif KR', 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
+        }
+
+        /* Language toggle */
+        [data-lang="en"] [data-l="ko"],
+        [data-lang="ko"] [data-l="en"] {
+            display: none !important;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection {
+            background: rgba(0, 100, 255, 0.26);
+            color: inherit;
+        }
+
+        a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+        /* ========== PASSWORD GATE ========== */
+        .gate {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            transition: opacity 0.6s ease, visibility 0.6s ease, background-color 0.3s ease;
+        }
+
+        .gate.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .gate-content {
+            max-width: 320px;
+        }
+
+        .gate-title {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.75rem;
+        }
+
+        .gate-subtitle {
+            font-size: 16px;
+            color: var(--caption);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .gate-input {
+            width: 100%;
+            max-width: 240px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--accent);
+            border-radius: 0;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 18px;
+            padding: 12px 0;
+            text-align: center;
+            outline: none;
+            letter-spacing: 0.12em;
+            transition: border-color 0.4s ease, color 0.3s ease;
+        }
+
+        .gate-input::placeholder {
+            color: transparent;
+        }
+
+        .gate-input:focus {
+            border-color: var(--text);
+        }
+
+        .gate-input.shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .gate-hint {
+            font-size: 13px;
+            color: var(--caption);
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-hint.visible {
+            opacity: 1;
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--accent);
+            z-index: 60;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== NAVIGATION ========== */
+        .back-link {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 50;
+            font-size: 15px;
+            font-weight: 400;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, color 0.3s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.75;
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 1.15rem;
+            right: 1.25rem;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .lang-pill {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 52px;
+            height: 22px;
+            background: var(--text);
+            border-radius: 11px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .lang-pill:hover { opacity: 0.75; }
+
+        .lang-pill-label {
+            flex: 1;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            line-height: 22px;
+            color: var(--bg);
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        .lang-pill-dot {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+
+        [data-lang="ko"] .lang-pill-dot { transform: translateX(30px); }
+        [data-lang="en"] .lang-pill-ko { opacity: 0.4; }
+        [data-lang="ko"] .lang-pill-en { opacity: 0.4; }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-wrap input { display: none; }
+
+        .toggle-wrap label {
+            position: relative;
+            display: block;
+            width: 40px;
+            height: 20px;
+            background: var(--text);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0s, background-color 0.3s ease;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.2s, background-color 0.3s ease;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(
+                to top,
+                rgba(240, 238, 230, 0.95) 0%,
+                rgba(240, 238, 230, 0.5) 35%,
+                rgba(240, 238, 230, 0.05) 100%
+            );
+            transition: background 0.3s ease;
+        }
+
+        [data-theme="dark"] .hero-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(31, 30, 29, 0.95) 0%,
+                rgba(31, 30, 29, 0.4) 35%,
+                rgba(31, 30, 29, 0.05) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding-bottom: 3rem;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 10vw, 5.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            margin-bottom: 1rem;
+            opacity: 0;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+        }
+
+        .scroll-hint span {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to bottom, var(--caption), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ========== TABLE OF CONTENTS (NEW IN 002) ========== */
+        .toc {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .toc-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem 1.25rem;
+        }
+
+        .toc-list a {
+            font-size: 14px;
+            color: var(--caption);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .toc-list a:hover {
+            color: var(--accent);
+            opacity: 1;
+        }
+
+        /* ========== ISSUE HEADER ========== */
+        .issue-intro {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 1.5rem;
+        }
+
+        .issue-number {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .issue-date {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .issue-opener {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 440px;
+            transition: color 0.3s ease;
+        }
+
+        /* Reading time (NEW IN 002) */
+        .reading-time {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--caption);
+            margin-top: 1rem;
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SECTION HEADERS ========== */
+        .section-header {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        /* ========== TEXT BLOCKS ========== */
+        .text-block {
+            padding: 2rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .text-block p {
+            font-size: 20px;
+            line-height: 1.7;
+            margin-bottom: 1.25rem;
+        }
+
+        .text-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .text-block em { font-style: italic; }
+        .text-block strong { font-weight: 600; }
+
+        /* ========== PULL QUOTE ========== */
+        .pull-quote {
+            padding: 4rem 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pull-quote blockquote {
+            font-size: clamp(1.5rem, 5vw, 2.25rem);
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .pull-quote cite {
+            display: block;
+            margin-top: 1rem;
+            font-size: 14px;
+            font-style: normal;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* Pull quote variant with accent sidebar (NEW IN 002) */
+        .pull-quote-side {
+            padding: 3rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .pull-quote-side blockquote {
+            border-left: 2px solid var(--accent);
+            padding-left: 1.5rem;
+            font-size: clamp(1.25rem, 4vw, 1.75rem);
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            transition: border-color 0.3s ease;
+        }
+
+        .pull-quote-side cite {
+            display: block;
+            margin-top: 0.75rem;
+            padding-left: 1.5rem;
+            font-size: 14px;
+            font-style: normal;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== PHOTO LAYOUTS ========== */
+        .photo-full {
+            position: relative;
+            width: 100%;
+            height: 85vh;
+            overflow: hidden;
+        }
+
+        .photo-full img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .photo-full .photo-caption {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            z-index: 2;
+            color: #f0f0ec;
+        }
+
+        .photo-full::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to top, rgba(10,10,10,0.6), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .photo-inset {
+            padding: 1rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .photo-inset img,
+        .photo-inset .gif-wrap img {
+            width: 100%;
+            border-radius: 3px;
+            display: block;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            padding: 0 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .photo-grid img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        .photo-caption {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .photo-caption .caption-location {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .photo-full .photo-caption .caption-location {
+            color: #c4a882;
+        }
+
+        .photo-inset .photo-caption {
+            margin-top: 0.75rem;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SIGN OFF ========== */
+        .sign-off {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .sign-off-text {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .sign-off-name {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* ========== DIVIDER ========== */
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 0 auto;
+            opacity: 0.5;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== SPACERS ========== */
+        .spacer { height: 4rem; }
+        .spacer-sm { height: 2rem; }
+        .spacer-lg { height: 8rem; }
+
+        /* ========== FOOTER ========== */
+        .story-footer {
+            padding: 4rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .story-footer p {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .story-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SUBSCRIBE ========== */
+        .subscribe {
+            padding: 5rem 1.5rem 3rem;
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .subscribe-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-desc {
+            font-size: 16px;
+            color: var(--caption);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .subscribe-input::placeholder { color: var(--caption); }
+        .subscribe-input:focus { border-color: var(--accent); }
+
+        .subscribe-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .subscribe-btn:hover { opacity: 0.7; }
+
+        .subscribe-success {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent);
+            display: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe.submitted .subscribe-form { display: none; }
+        .subscribe.submitted .subscribe-success { display: block; }
+
+        .subscribe-note {
+            font-size: 13px;
+            color: var(--caption);
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .subscribe-form { flex-direction: column; }
+            .subscribe-btn { padding: 14px 24px; }
+        }
+
+        /* ========== COMMENTS ========== */
+        .comments {
+            padding: 3rem 1.5rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .comments-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .comments-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .comments-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .comments-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 2.5rem;
+        }
+
+        .comments-input {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .comments-input::placeholder { color: var(--caption); }
+        .comments-input:focus { border-color: var(--accent); }
+
+        .comments-textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .comments-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            align-self: flex-end;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .comments-btn:hover { opacity: 0.7; }
+
+        .comments-list { list-style: none; }
+
+        .comment-item {
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-item:first-child {
+            border-top: 1px solid var(--rule);
+        }
+
+        .comment-meta {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .comment-name { font-size: 15px; font-weight: 600; }
+
+        .comment-time {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .comment-body {
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .comments-empty {
+            font-size: 16px;
+            color: var(--caption);
+            text-align: center;
+            padding: 2rem 0;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .comments-btn { align-self: stretch; padding: 14px 24px; }
+        }
+
+        /* ========== REVEAL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal-fade { opacity: 0; }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.97);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .back-link { font-size: 14px; }
+            .text-block p { font-size: 18px; }
+            .section-header { padding: 5rem 1.5rem 2.5rem; }
+            .photo-full { height: 70vh; }
+            .toc-list { gap: 0.25rem 1rem; }
+        }
+
+        @media (min-width: 768px) {
+            .photo-inset { padding: 2rem 3rem; max-width: 700px; }
+            .photo-grid { gap: 1rem; padding: 0 3rem; max-width: 900px; }
+            .text-block { padding: 2.5rem 3rem; }
+            .pull-quote { padding: 5rem 3rem; }
+            .pull-quote-side { padding: 3rem 3rem; }
+        }
+
+        /* ========== KOMOREBI INTERSTITIAL ========== */
+        .komorebi {
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 1s ease, visibility 0s;
+        }
+
+        .komorebi.exiting {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+
+        .komorebi-content {
+            max-width: 480px;
+            position: relative;
+        }
+
+        .komorebi-kanji {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(3.5rem, 14vw, 7rem);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            opacity: 0;
+            transform: translateY(20px) scale(0.96);
+            line-height: 1.2;
+        }
+
+        .komorebi-romaji {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--accent);
+            margin-top: 0.75rem;
+            letter-spacing: 0.04em;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-noun {
+            font-family: var(--font);
+            font-size: 12px;
+            font-style: italic;
+            color: var(--caption);
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-meaning {
+            font-family: var(--font);
+            font-size: 17px;
+            color: var(--caption);
+            line-height: 1.8;
+            margin-top: 2.5rem;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 2rem auto;
+            opacity: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi-tagline {
+            font-size: 14px;
+            color: var(--caption);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        /* Dappled light system — mix-blend-mode: plus-lighter for true sunlight */
+        .komorebi-light {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            mix-blend-mode: plus-lighter;
+            transition: opacity 2.5s ease;
+        }
+
+        /* Gate ambient — barely perceptible hint of light */
+        .gate-light {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 199;
+            opacity: 0.02;
+            mix-blend-mode: plus-lighter;
+            background: radial-gradient(ellipse at 50% 30%, rgba(160,130,109,0.3) 0%, transparent 60%);
+            transition: opacity 2s ease;
+        }
+
+        .gate-light.awakening {
+            opacity: 0.15;
+        }
+
+        /* Leaf shadow SVG overlay */
+        .komorebi-leaves {
+            position: absolute;
+            inset: -20%;
+            pointer-events: none;
+            opacity: 0;
+            filter: blur(8px);
+            animation: leafSway 12s ease-in-out infinite;
+        }
+
+        @keyframes leafSway {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(1%, -0.5%) rotate(0.3deg); }
+            66% { transform: translate(-0.5%, 0.5%) rotate(-0.2deg); }
+        }
+
+        /* Warm sun gradient from top */
+        .komorebi-sun {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            background: radial-gradient(
+                ellipse at 50% -10%,
+                rgba(160,130,109,0.25) 0%,
+                rgba(160,130,109,0.08) 30%,
+                transparent 65%
+            );
+            transition: opacity 3s ease;
+        }
+
+        /* Dappled light spots */
+        .komorebi-spots {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .komorebi-spot {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(200,175,140,0.15);
+            filter: blur(20px);
+            animation: spotPulse 8s ease-in-out infinite;
+        }
+
+        .komorebi-spot:nth-child(1) { width: 120px; height: 80px; top: 8%; left: 15%; animation-delay: 0s; transform: rotate(-15deg); }
+        .komorebi-spot:nth-child(2) { width: 90px; height: 60px; top: 25%; right: 20%; animation-delay: 2.5s; transform: rotate(10deg); }
+        .komorebi-spot:nth-child(3) { width: 140px; height: 90px; bottom: 30%; left: 25%; animation-delay: 1.2s; transform: rotate(-8deg); }
+        .komorebi-spot:nth-child(4) { width: 70px; height: 50px; bottom: 15%; right: 30%; animation-delay: 4s; transform: rotate(20deg); }
+        .komorebi-spot:nth-child(5) { width: 100px; height: 70px; top: 50%; left: 55%; animation-delay: 3s; transform: rotate(-5deg); }
+
+        @keyframes spotPulse {
+            0%, 100% { opacity: 0.3; transform: rotate(-15deg) scale(0.9); }
+            50% { opacity: 0.7; transform: rotate(-12deg) scale(1.1); }
+        }
+
+        /* ========== REDUCED MOTION ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-fade, .reveal-scale {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .scroll-line { animation: none; }
+            .gate-input.shake { animation: none; }
+            .komorebi-spot, .komorebi-leaves { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== PASSWORD GATE ==================== -->
+    <div class="gate" id="gate">
+        <div class="gate-content">
+            <h1 class="gate-title">Dispatch</h1>
+            <p class="gate-subtitle">
+                <span data-l="en">This letter is for friends and family.</span>
+                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
+            </p>
+            <input
+                type="password"
+                class="gate-input"
+                id="gateInput"
+                autocomplete="off"
+                autofocus
+            >
+            <p class="gate-hint" id="gateHint">
+                <span data-l="en">Hmm, that's not it.</span>
+                <span data-l="ko">음, 아닌데?</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Ambient gate light — barely visible on password screen, intensifies on correct entry -->
+    <div class="gate-light" id="gateLight"></div>
+
+    <!-- ==================== KOMOREBI INTERSTITIAL ==================== -->
+    <div class="komorebi" id="komorebi">
+        <!-- SVG leaf shadow layer -->
+        <svg class="komorebi-leaves" id="komorebiLeaves" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <filter id="leafBlur"><feGaussianBlur stdDeviation="3"/></filter>
+            </defs>
+            <g fill="rgba(160,130,109,0.12)" filter="url(#leafBlur)">
+                <ellipse cx="120" cy="100" rx="45" ry="22" transform="rotate(-30 120 100)"/>
+                <ellipse cx="350" cy="80" rx="35" ry="18" transform="rotate(15 350 80)"/>
+                <ellipse cx="600" cy="150" rx="50" ry="25" transform="rotate(-20 600 150)"/>
+                <ellipse cx="200" cy="300" rx="40" ry="20" transform="rotate(25 200 300)"/>
+                <ellipse cx="500" cy="350" rx="55" ry="28" transform="rotate(-10 500 350)"/>
+                <ellipse cx="700" cy="400" rx="38" ry="19" transform="rotate(30 700 400)"/>
+                <ellipse cx="150" cy="550" rx="48" ry="24" transform="rotate(-15 150 550)"/>
+                <ellipse cx="400" cy="600" rx="42" ry="21" transform="rotate(20 400 600)"/>
+                <ellipse cx="650" cy="650" rx="35" ry="17" transform="rotate(-25 650 650)"/>
+                <ellipse cx="300" cy="750" rx="52" ry="26" transform="rotate(10 300 750)"/>
+            </g>
+        </svg>
+        <!-- Warm sun gradient -->
+        <div class="komorebi-sun" id="komorebiSun"></div>
+        <!-- Dappled light spots -->
+        <div class="komorebi-spots" id="komorebiSpots">
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+        </div>
+        <div class="komorebi-content">
+            <p class="komorebi-kanji" id="komorebiKanji">木漏れ日</p>
+            <p class="komorebi-romaji" id="komorebiRomaji">komorebi</p>
+            <p class="komorebi-noun" id="komorebiNoun">noun &middot; Japanese</p>
+            <p class="komorebi-meaning" id="komorebiMeaning">
+                <span data-l="en">Sunlight filtering through the leaves of trees &mdash; the interplay of light and shadow when sunshine passes through foliage.</span>
+                <span data-l="ko">나뭇잎 사이로 스며드는 햇빛 &mdash; 햇살이 나뭇잎을 통과하며 만드는 빛과 그림자의 춤.</span>
+            </p>
+            <div class="komorebi-divider" id="komorebiDivider"></div>
+            <p class="komorebi-tagline" id="komorebiTagline">
+                <span data-l="en">A letter for friends and family.</span>
+                <span data-l="ko">가까운 사람들한테 보내는 편지.</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <a href="/newsletter" class="back-link">&larr; Dispatch</a>
+    <div class="top-controls">
+        <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
+            <span class="lang-pill-label lang-pill-en">EN</span>
+            <span class="lang-pill-label lang-pill-ko">한</span>
+            <span class="lang-pill-dot"></span>
+        </div>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </div>
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero">
+        <div class="hero-image">
+            <img src="/newsletter/002/images/mammoth-crew.jpeg" alt="The crew at Mammoth Mountain" id="heroImg">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-label">
+                <span data-l="en">A weekly letter</span>
+                <span data-l="ko">매주 쓰는 편지</span>
+            </div>
+            <h1 class="hero-title">Dispatch</h1>
+            <p class="hero-description">
+                <span data-l="en">Updates from my world — for the people I care about most.</span>
+                <span data-l="ko">요즘 뭐 하고 사는지 — 가까운 사람들한테 보내는 근황.</span>
+            </p>
+        </div>
+        <div class="scroll-hint">
+            <span data-l="en">Scroll</span>
+            <span data-l="ko">스크롤</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ==================== ISSUE 002 ==================== -->
+
+    <div class="issue-intro reveal">
+        <p class="issue-number">No. 002</p>
+        <h2 class="issue-date">
+            <span data-l="en">Spring on the Mountain</span>
+            <span data-l="ko">산 위의 봄</span>
+        </h2>
+        <p class="issue-opener">
+            <span data-l="en">Skiing Mammoth as winter lets go, starting to produce at Paramount, and settling into the apartment.</span>
+            <span data-l="ko">겨울이 떠나는 매머드에서 스키, 파라마운트에서 첫 프로듀싱, 그리고 아파트 꾸미기.</span>
+        </p>
+        <p class="reading-time">
+            <span data-l="en">4 min read</span>
+            <span data-l="ko">4분 읽기</span>
+        </p>
+    </div>
+
+    <!-- Table of Contents -->
+    <nav class="toc reveal-fade" aria-label="Table of contents">
+        <p class="toc-label">
+            <span data-l="en">In This Issue</span>
+            <span data-l="ko">이번 호</span>
+        </p>
+        <ul class="toc-list">
+            <li><a href="#mammoth">
+                <span data-l="en">Mammoth</span>
+                <span data-l="ko">매머드</span>
+            </a></li>
+            <li><a href="#work">
+                <span data-l="en">The Work</span>
+                <span data-l="ko">일</span>
+            </a></li>
+            <li><a href="#home">
+                <span data-l="en">Home Base</span>
+                <span data-l="ko">보금자리</span>
+            </a></li>
+            <li><a href="#life">
+                <span data-l="en">LA Life</span>
+                <span data-l="ko">LA 생활</span>
+            </a></li>
+        </ul>
+    </nav>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Section 1: Mammoth ——— -->
+    <div class="section-header reveal" id="mammoth">
+        <p class="section-label">
+            <span data-l="en">The Mountain</span>
+            <span data-l="ko">산</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">Mammoth</span>
+            <span data-l="ko">매머드</span>
+        </h2>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-full reveal-scale">
+        <img src="/newsletter/002/images/mammoth-crew.jpeg" alt="The crew at Mammoth Mountain base">
+        <div class="photo-caption">
+            <span class="caption-location">Mammoth Mountain</span>
+            <span data-l="en">The crew. End-of-season energy. One guy showed up in a onesie.</span>
+            <span data-l="ko">크루. 시즌 마무리 분위기. 한 명은 원지 입고 옴.</span>
+        </div>
+    </div>
+
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                In a series of unfortunate events, although I got an Epic <em>and</em> Ikon pass this year, I wasn't able to use either one until this past weekend. Life kept getting in the way &mdash; the move, the new job, apartment hunting. But I finally made it up to Mammoth.
+            </p>
+            <p>
+                On my last run, the snow had almost all melted away. I was skiing down and I could feel the warmer breeze hit my face, and then &mdash; the smell. The mountain letting go of winter. Warm bark exhaling sweetness into thin air, a quiet announcement that the season is turning beneath your skis.
+            </p>
+            <p>
+                It smelled sweet. It smelled full of life. And it smelled hopeful.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                올해 Epic 패스 <em>그리고</em> Ikon 패스 둘 다 샀는데, 이번 주말까지 한 번도 못 썼어. 이사, 새 직장, 집 구하기 &mdash; 계속 뭔가 있었음. 근데 드디어 매머드 갔다.
+            </p>
+            <p>
+                마지막 런에서 눈이 거의 다 녹아 있었어. 내려오는데 따뜻한 바람이 얼굴에 닿고 그 다음 &mdash; 냄새. 산이 겨울을 놓아주는 냄새. 따뜻한 나무껍질에서 달콤함이 배어 나오는, 스키 밑에서 계절이 바뀌고 있다는 조용한 알림.
+            </p>
+            <p>
+                달콤했고. 생명력이 넘쳤고. 희망적이었어.
+            </p>
+        </div>
+    </div>
+
+    <div class="pull-quote-side reveal">
+        <blockquote>
+            <span data-l="en">The mountain letting go of winter &mdash; warm bark exhaling sweetness into thin air.</span>
+            <span data-l="ko">산이 겨울을 놓아주는 중 &mdash; 따뜻한 나무껍질에서 달콤함이 배어나온다.</span>
+        </blockquote>
+        <cite>
+            <span data-l="en">Last run, Mammoth Mountain</span>
+            <span data-l="ko">마지막 런, 매머드 마운틴</span>
+        </cite>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Section 2: The Work ——— -->
+    <div class="section-header reveal" id="work">
+        <p class="section-label">
+            <span data-l="en">Paramount</span>
+            <span data-l="ko">파라마운트</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">The Work</span>
+            <span data-l="ko">일</span>
+        </h2>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-full reveal-scale">
+        <img src="/newsletter/002/images/team-dinner.jpeg" alt="Team dinner at a restaurant in LA">
+        <div class="photo-caption">
+            <span class="caption-location">
+                <span data-l="en">Team Dinner, Hollywood</span>
+                <span data-l="ko">팀 저녁, 할리우드</span>
+            </span>
+            <span data-l="en">The Content Engineering crew. Good food, good people.</span>
+            <span data-l="ko">콘텐츠 엔지니어링 팀. 좋은 음식, 좋은 사람들.</span>
+        </div>
+    </div>
+
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                Big news: I started producing at work. My first task was comparing nudity detection models across what we have in the pipeline. It's surprisingly fascinating stuff &mdash; the tradeoffs between precision and recall, how different models handle edge cases, and the implications for content moderation at scale.
+            </p>
+            <p>
+                I put together a full analysis with interactive charts. If you're curious (or just want to see some D3 visualizations), you can <a href="/newsletter/002/findings.html">check out the findings here</a>.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                큰 소식: 회사에서 프로듀싱 시작했어. 첫 번째 과제는 우리 파이프라인에 있는 노출 감지 모델들 비교. 생각보다 엄청 흥미로운 작업이야 &mdash; 정밀도와 재현율 사이의 트레이드오프, 각 모델이 엣지 케이스를 어떻게 처리하는지, 대규모 콘텐츠 모더레이션에 미치는 영향까지.
+            </p>
+            <p>
+                인터랙티브 차트 포함해서 전체 분석 정리했어. 궁금하면 (아니면 D3 시각화가 보고 싶으면) <a href="/newsletter/002/findings.html">여기서 볼 수 있어</a>.
+            </p>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Section 3: Home Base ——— -->
+    <div class="section-header reveal" id="home">
+        <p class="section-label">
+            <span data-l="en">Home Base</span>
+            <span data-l="ko">보금자리</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">The Apartment</span>
+            <span data-l="ko">아파트</span>
+        </h2>
+    </div>
+
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                The place is finally starting to feel like home. Furniture's in, curtains are up, and I've got a little reading corner by the window that gets the best morning light. Still a work in progress, but it's getting there.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                드디어 집 같은 느낌이 나기 시작했어. 가구 다 들어오고, 커튼 달고, 창가에 아침 햇살 잘 드는 독서 코너도 만들었어. 아직 진행 중이지만 점점 되어가는 중.
+            </p>
+        </div>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-inset reveal">
+        <img src="/newsletter/002/images/bedroom.jpeg" alt="Bedroom with warm lighting and linen bedding">
+        <div class="photo-caption">
+            <span class="caption-location">
+                <span data-l="en">The Bedroom</span>
+                <span data-l="ko">침실</span>
+            </span>
+            <span data-l="en">Warm wood, white linen, soft light. The essentials.</span>
+            <span data-l="ko">따뜻한 원목, 화이트 린넨, 부드러운 조명. 이것만 있으면 됨.</span>
+        </div>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-grid reveal">
+        <img src="/newsletter/002/images/office.jpeg" alt="Desk and living area">
+        <img src="/newsletter/002/images/reading-nook.jpeg" alt="Reading nook by the window">
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Section 4: LA Life ——— -->
+    <div class="section-header reveal" id="life">
+        <p class="section-label">
+            <span data-l="en">Out & About</span>
+            <span data-l="ko">이것저것</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">LA Life</span>
+            <span data-l="ko">LA 생활</span>
+        </h2>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-inset reveal">
+        <img src="/newsletter/002/images/shopping.jpeg" alt="Shopping in LA">
+        <div class="photo-caption">
+            <span class="caption-location">
+                <span data-l="en">Shopping, LA</span>
+                <span data-l="ko">쇼핑, LA</span>
+            </span>
+            <span data-l="en">Trench coat weather. Or trying to make it trench coat weather.</span>
+            <span data-l="ko">트렌치코트 날씨. 아니면 트렌치코트 날씨인 척하는 중.</span>
+        </div>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="photo-inset reveal">
+        <img src="/newsletter/002/images/kanye-tweet.png" alt="A tweet that made me laugh" style="max-width: 400px; margin: 0 auto; display: block; border-radius: 12px;">
+        <div class="photo-caption" style="text-align: center;">
+            <span data-l="en">Sharing this without comment.</span>
+            <span data-l="ko">노코멘트.</span>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="pull-quote reveal">
+        <blockquote>
+            <span data-l="en">It smelled sweet, it smelled full of life, and it smelled hopeful.</span>
+            <span data-l="ko">달콤했고, 생명력이 넘쳤고, 희망적이었어.</span>
+        </blockquote>
+        <cite>
+            <span data-l="en">March 21, Mammoth</span>
+            <span data-l="ko">3월 21일, 매머드</span>
+        </cite>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Sign Off ——— -->
+    <div class="sign-off reveal">
+        <p class="sign-off-text">
+            <span data-l="en">Miss you all. Spring is here and I'm settling in. Come visit.</span>
+            <span data-l="ko">보고 싶다 다들. 봄이 왔고 나도 자리 잡는 중. 놀러 와.</span>
+        </p>
+        <p class="sign-off-name">— Kevin</p>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Subscribe ——— -->
+    <div class="subscribe reveal" id="subscribe">
+        <p class="subscribe-label">
+            <span data-l="en">Stay in the Loop</span>
+            <span data-l="ko">소식 받기</span>
+        </p>
+        <h2 class="subscribe-title">
+            <span data-l="en">Want this weekly?</span>
+            <span data-l="ko">매주 받고 싶다면?</span>
+        </h2>
+        <p class="subscribe-desc">
+            <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
+            <span data-l="ko">이메일 남겨주면 매주 보내줄게. 스팸 같은 거 없고 그냥 내 근황.</span>
+        </p>
+        <form class="subscribe-form" id="subscribeForm">
+            <input type="email" class="subscribe-input" id="subscribeEmail" placeholder="your@email.com" required autocomplete="email">
+            <button type="submit" class="subscribe-btn" id="subscribeBtn">
+                <span data-l="en">Subscribe</span>
+                <span data-l="ko">구독</span>
+            </button>
+        </form>
+        <p class="subscribe-success" id="subscribeSuccess">
+            <span data-l="en">You're in. See you next week.</span>
+            <span data-l="ko">등록됨. 다음 주에 보자.</span>
+        </p>
+        <p class="subscribe-note">
+            <span data-l="en">Just between us — no third parties, ever.</span>
+            <span data-l="ko">우리끼리만. 어디 넘기거나 그런 거 절대 없음.</span>
+        </p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ==================== COMMENTS ==================== -->
+    <div class="comments reveal" id="comments">
+        <div class="comments-header">
+            <p class="comments-label">
+                <span data-l="en">Discussion</span>
+                <span data-l="ko">댓글</span>
+            </p>
+            <h2 class="comments-title">
+                <span data-l="en">Leave a note</span>
+                <span data-l="ko">한마디 남기기</span>
+            </h2>
+        </div>
+        <form class="comments-form" id="commentsForm">
+            <input type="text" class="comments-input" id="commentName" placeholder="Your name" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <button type="submit" class="comments-btn" id="commentBtn">
+                <span data-l="en">Post</span>
+                <span data-l="ko">게시</span>
+            </button>
+        </form>
+        <div class="comments-list" id="commentsList"></div>
+        <p class="comments-empty" id="commentsEmpty" style="display:none;">
+            <span data-l="en">No comments yet. Be the first.</span>
+            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨 주세요.</span>
+        </p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="story-footer">
+        <p>
+            <span data-l="en">Dispatch No. 002 &middot; Spring on the Mountain &middot;</span>
+            <span data-l="ko">Dispatch 002호 &middot; 산 위의 봄 &middot;</span>
+            <a href="/">klee.page</a>
+        </p>
+    </footer>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- Scripts -->
+    <script src="/js/theme.js"></script>
+    <script>
+        // ==================== KOMOREBI GATE ====================
+        (function() {
+            var gate = document.getElementById('gate');
+            var input = document.getElementById('gateInput');
+            var hint = document.getElementById('gateHint');
+            var komorebi = document.getElementById('komorebi');
+            if (!gate || !input) return;
+
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            var issueKey = 'dispatch-auth-' + path;
+
+            function animateKomorebi(callback) {
+                // First: gate light intensifies (the password summons the light)
+                var gateLight = document.getElementById('gateLight');
+                gateLight.classList.add('awakening');
+
+                // After light builds, transition to komorebi
+                setTimeout(function() {
+                    komorebi.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    gateLight.style.display = 'none';
+
+                    var leaves = document.getElementById('komorebiLeaves');
+                    var sun = document.getElementById('komorebiSun');
+                    var spots = document.getElementById('komorebiSpots');
+                    var kanji = document.getElementById('komorebiKanji');
+                    var romaji = document.getElementById('komorebiRomaji');
+                    var noun = document.getElementById('komorebiNoun');
+                    var meaning = document.getElementById('komorebiMeaning');
+                    var divider = document.getElementById('komorebiDivider');
+                    var tagline = document.getElementById('komorebiTagline');
+
+                    var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+
+                    function animate(el, d, dur) {
+                        dur = dur || 1;
+                        setTimeout(function() {
+                            el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0) scale(1)';
+                        }, d);
+                    }
+
+                    // Light arrives first — sun, leaves, spots fade in
+                    setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
+                    setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
+                    setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
+
+                    // Text reveals — kanji first, alone for a beat (Ma)
+                    animate(kanji, 800, 1.4);
+                    // Then the rest, staggered
+                    animate(romaji, 1800, 1);
+                    animate(noun, 2200, 0.8);
+                    animate(meaning, 2800, 1.1);
+                    setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
+                    animate(tagline, 3800, 0.9);
+
+                    // Auto-advance after 6s — let it breathe
+                    setTimeout(function() {
+                        komorebi.classList.add('exiting');
+                        document.body.style.overflow = '';
+                        setTimeout(callback, 1200);
+                    }, 6000);
+                }, 800); // Wait for gate light to build
+            }
+
+            function unlock() {
+                sessionStorage.setItem(issueKey, '1');
+                gate.classList.add('unlocked');
+                animateKomorebi(function() {
+                    komorebi.style.display = 'none';
+                });
+            }
+
+            function unlockQuiet() {
+                sessionStorage.setItem(issueKey, '1');
+                gate.classList.add('unlocked');
+                // Skip komorebi for returning visitors
+            }
+
+            function showGate() {
+                document.body.style.overflow = 'hidden';
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        var val = input.value.trim();
+                        if (!val) return;
+                        input.disabled = true;
+                        checkPassword(val, function(ok) {
+                            input.disabled = false;
+                            if (ok) {
+                                gate.classList.add('unlocked');
+                                unlock();
+                            } else {
+                                input.value = '';
+                                input.classList.remove('shake');
+                                void input.offsetWidth;
+                                input.classList.add('shake');
+                                if (hint) hint.classList.add('visible');
+                            }
+                        });
+                    }
+                });
+            }
+
+            function checkPassword(val, callback) {
+                fetch('/api/gate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: val }),
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { callback(data.ok === true); })
+                .catch(function() {
+                    // Fallback for local dev (no API)
+                    callback(val.toLowerCase() === 'komorebi');
+                });
+            }
+
+            // Already authenticated this session
+            if (sessionStorage.getItem(issueKey) === '1') {
+                gate.classList.add('unlocked');
+                return;
+            }
+
+            // Check URL bypass (?key=)
+            var params = new URLSearchParams(window.location.search);
+            var urlKey = params.get('key');
+            if (urlKey) {
+                gate.style.opacity = '0';
+                checkPassword(urlKey, function(ok) {
+                    if (ok) {
+                        unlock();
+                        params.delete('key');
+                        var clean = window.location.pathname + (params.toString() ? '?' + params : '');
+                        window.history.replaceState({}, '', clean);
+                    } else {
+                        gate.style.opacity = '';
+                        showGate();
+                    }
+                });
+                return;
+            }
+
+            showGate();
+        })();
+    </script>
+    <script>
+        // ==================== LANGUAGE TOGGLE ====================
+        (function() {
+            var pill = document.getElementById('langPill');
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+
+            function toggle() {
+                current = current === 'en' ? 'ko' : 'en';
+                document.documentElement.setAttribute('data-lang', current);
+                document.documentElement.setAttribute('lang', current);
+                localStorage.setItem('dispatch-lang', current);
+            }
+
+            pill.addEventListener('click', toggle);
+            pill.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+            });
+        })();
+
+        // ==================== SUBSCRIBE ====================
+        (function() {
+            var form = document.getElementById('subscribeForm');
+            var emailInput = document.getElementById('subscribeEmail');
+            var btn = document.getElementById('subscribeBtn');
+            var section = document.getElementById('subscribe');
+
+            if (localStorage.getItem('dispatch-subscribed')) {
+                section.classList.add('submitted');
+                return;
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = emailInput.value.trim();
+                if (!email) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function() {
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.add('submitted');
+                })
+                .catch(function() {
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.add('submitted');
+                });
+            });
+        })();
+
+        // ==================== COMMENTS ====================
+        (function() {
+            var form = document.getElementById('commentsForm');
+            var nameInput = document.getElementById('commentName');
+            var textInput = document.getElementById('commentText');
+            var btn = document.getElementById('commentBtn');
+            var list = document.getElementById('commentsList');
+            var empty = document.getElementById('commentsEmpty');
+            var issue = '002';
+
+            function escapeHtml(str) {
+                var div = document.createElement('div');
+                div.appendChild(document.createTextNode(str));
+                return div.innerHTML;
+            }
+
+            function timeAgo(dateStr) {
+                var seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+                if (seconds < 60) return 'just now';
+                var intervals = [
+                    [31536000, 'y'], [2592000, 'mo'], [86400, 'd'],
+                    [3600, 'h'], [60, 'm']
+                ];
+                for (var i = 0; i < intervals.length; i++) {
+                    var count = Math.floor(seconds / intervals[i][0]);
+                    if (count >= 1) return count + intervals[i][1] + ' ago';
+                }
+                return 'just now';
+            }
+
+            function renderComment(c) {
+                var div = document.createElement('div');
+                div.className = 'comment-item';
+                div.innerHTML = '<div class="comment-meta">'
+                    + '<span class="comment-name">' + escapeHtml(c.name) + '</span>'
+                    + '<span class="comment-time">' + timeAgo(c.created_at) + '</span>'
+                    + '</div>'
+                    + '<p class="comment-body">' + escapeHtml(c.comment) + '</p>';
+                return div;
+            }
+
+            function loadComments() {
+                fetch('/api/comments?issue=' + issue)
+                    .then(function(r) { return r.json(); })
+                    .then(function(comments) {
+                        list.innerHTML = '';
+                        if (!comments.length) {
+                            empty.style.display = '';
+                            return;
+                        }
+                        empty.style.display = 'none';
+                        comments.forEach(function(c) {
+                            list.appendChild(renderComment(c));
+                        });
+                    })
+                    .catch(function() {});
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = nameInput.value.trim();
+                var comment = textInput.value.trim();
+                if (!name || !comment) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issue: issue, name: name, comment: comment })
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error();
+                    localStorage.setItem('dispatch-comment-name', name);
+                    textInput.value = '';
+                    loadComments();
+                })
+                .catch(function() {})
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                });
+            });
+
+            var savedName = localStorage.getItem('dispatch-comment-name');
+            if (savedName) nameInput.value = savedName;
+
+            loadComments();
+        })();
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js" integrity="sha384-O55L/6rhHr9CFvrxqv5luxOCcmVaBmETbZbJDP+Do8T0pztTACsFBD/IXCNkj7DV" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener('load', function() { initDispatch(); });
+        setTimeout(function() {
+            if (typeof gsap !== 'undefined' && !window._dispatchInit) initDispatch();
+        }, 4000);
+
+        function initDispatch() {
+            if (window._dispatchInit) return;
+            window._dispatchInit = true;
+
+            // Smooth scroll
+            var lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            // Progress bar
+            gsap.to('#progressBar', {
+                width: '100%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: 0.3,
+                }
+            });
+
+            // Hero animations
+            var heroTl = gsap.timeline({ delay: 0.3 });
+            heroTl
+                .to('.hero-label', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+                .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
+                .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+                .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+
+            // Hero Ken Burns
+            gsap.to('#heroImg', {
+                scale: 1.15,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Hero title parallax
+            gsap.to('.hero-title', {
+                yPercent: -20,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Fade scroll hint
+            gsap.to('.scroll-hint', {
+                opacity: 0,
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: '15% top',
+                    end: '30% top',
+                    scrub: true,
+                }
+            });
+
+            // Reveals
+            gsap.utils.toArray('.reveal').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, y: 0, duration: 0.9, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-fade').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, duration: 1, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-scale').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            // Ken Burns on full-bleed photos
+            gsap.utils.toArray('.photo-full img').forEach(function(img) {
+                gsap.fromTo(img,
+                    { scale: 1.03 },
+                    {
+                        scale: 1.1, ease: 'none',
+                        scrollTrigger: {
+                            trigger: img.closest('.photo-full'),
+                            start: 'top bottom',
+                            end: 'bottom top',
+                            scrub: true,
+                        }
+                    }
+                );
+            });
+
+            // Section title parallax
+            gsap.utils.toArray('.section-title').forEach(function(el) {
+                gsap.to(el, {
+                    yPercent: -10, ease: 'none',
+                    scrollTrigger: {
+                        trigger: el.closest('.section-header'),
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: true,
+                    }
+                });
+            });
+
+            // Pull quote scale (both centered and side variants)
+            gsap.utils.toArray('.pull-quote blockquote, .pull-quote-side blockquote').forEach(function(el) {
+                gsap.fromTo(el,
+                    { scale: 0.92, opacity: 0 },
+                    {
+                        scale: 1, opacity: 1, duration: 1, ease: 'power2.out',
+                        scrollTrigger: { trigger: el, start: 'top 80%', once: true }
+                    }
+                );
+            });
+
+            // Smooth anchor scrolling for TOC links
+            document.querySelectorAll('.toc-list a').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    var target = document.querySelector(link.getAttribute('href'));
+                    if (target) {
+                        e.preventDefault();
+                        lenis.scrollTo(target, { offset: -40, duration: 1.2 });
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

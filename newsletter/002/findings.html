@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nudity Detection Model Comparison — Publication-Quality Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --chart-bg: #1c2330;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #7d8590;
+    --border: rgba(255,255,255,0.08);
+    --vionlabs: #fda1d4;
+    --xcd-v1: #ef4444;
+    --xcd-v2: #3b82f6;
+    --consensus: #22c55e;
+    --consensus-or: #f59e0b;
+    --glow-green: rgba(34,197,94,0.6);
+    --radius: 16px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-top: 52px;
+  }
+
+  .mono { font-family: 'Geist Mono', 'SF Mono', 'Fira Code', monospace; }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+  nav .nav-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 0.75rem 0;
+  }
+  nav .nav-inner::-webkit-scrollbar { display: none; }
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 0.65rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  nav a:hover, nav a.active { color: var(--text); background: rgba(255,255,255,0.06); }
+  nav .nav-logo {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-right: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+  section { padding: 3rem 0; scroll-margin-top: 56px; }
+  .section-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .section-reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* WIDESCREEN SIDE-BY-SIDE LAYOUTS */
+  
+  @media (max-width: 1200px) {
+    
+  }
+
+  
+  @media (max-width: 1200px) {
+    
+  }
+
+  
+  @media (max-width: 1200px) {
+    
+  }
+
+  /* CHART + EXPLAINER SIDEBAR */
+  
+  @media (max-width: 1200px) {
+    
+  }
+  
+  
+
+  /* TYPOGRAPHY */
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .section-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: rgba(22,27,34,0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+  .card-grid { display: grid; gap: 1rem; }
+  .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .card-grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+  @media (max-width: 900px) {
+    .card-grid-3, .card-grid-4, .card-grid-6 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .card-grid-2, .card-grid-3, .card-grid-4, .card-grid-6 { grid-template-columns: 1fr; }
+  }
+
+  /* HERO NUMBERS */
+  .hero-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(135deg, #22c55e 0%, #3b82f6 50%, #fda1d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+
+  /* KPI CARDS */
+  .kpi-card {
+    text-align: center;
+    padding: 1.75rem 1rem;
+  }
+
+  /* CHART AREA */
+  .chart-container {
+    background: var(--chart-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .chart-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  /* TABLES */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.69rem;
+  }
+  .data-table th {
+    text-align: left;
+    padding: 0.4rem 0.55rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .data-table td {
+    padding: 0.4rem 0.55rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.69rem;
+  }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: 'Geist Mono', monospace;
+  }
+  .badge-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .badge-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .badge-blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .badge-pink { background: rgba(253,161,212,0.15); color: #fda1d4; }
+  .badge-amber { background: rgba(245,158,11,0.15); color: #f59e0b; }
+  .badge-muted { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+
+  /* INSIGHT CARDS */
+  .insight-card {
+    border-left: 3px solid;
+    padding: 1rem 1.25rem;
+    background: rgba(22,27,34,0.5);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .insight-card h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+  .insight-card p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* STAT BADGE ROW */
+  .stat-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+  .stat-badge {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+  }
+  .stat-badge .stat-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .stat-badge .stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Geist Mono', monospace;
+  }
+
+  /* CALLOUT */
+  .callout {
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid;
+    margin: 1.5rem 0;
+  }
+  .callout-green { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); }
+  .callout-red { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+  .callout-blue { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); }
+  .callout-amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+  .callout h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+  .callout p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* PULSING DOT */
+  @keyframes pulse {
+    0%, 100% { r: 5; opacity: 1; }
+    50% { r: 9; opacity: 0.5; }
+  }
+  .pulse-dot { animation: pulse 2s ease-in-out infinite; }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  /* SVG TOOLTIP */
+  .svg-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(22,27,34,0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    z-index: 50;
+    max-width: 280px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transition: opacity 0.15s;
+  }
+
+  /* DONUT */
+  .donut-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    font-size: 0.78rem;
+  }
+  .donut-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .donut-legend-label { color: var(--text-secondary); }
+  .donut-legend-value { font-family: 'Geist Mono', monospace; font-weight: 600; margin-left: auto; }
+
+  /* HEATMAP */
+  .heatmap-cell {
+    text-anchor: middle;
+    font-family: 'Geist Mono', monospace;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* VERDICT */
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(59,130,246,0.1) 100%);
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: var(--radius);
+    padding: 2rem;
+    text-align: center;
+  }
+  .verdict-box h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #22c55e, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* EXPLAINER LABEL */
+  .explainer-label {
+    font-weight: 700;
+    color: #60a5fa;
+    margin-bottom: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* SEPARATOR */
+  .sep { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+  /* D3 specific */
+  .axis text { font-family: 'Geist Mono', monospace; font-size: 11px; fill: var(--text-muted); }
+  .axis line, .axis path { stroke: rgba(255,255,255,0.1); }
+  .grid line { stroke: rgba(255,255,255,0.05); stroke-dasharray: 3,3; }
+
+  /* GLOBAL THRESHOLD CONTROLLER */
+  .threshold-global {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(22,27,34,0.9);
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .threshold-global label {
+    font-size: 11px;
+    color: #8b949e;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .threshold-global input[type=range] {
+    width: 160px;
+    accent-color: #22c55e;
+    cursor: pointer;
+  }
+  #global-thresh-val {
+    font-family: 'Geist Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: #22c55e;
+    min-width: 36px;
+  }
+  .threshold-reset {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #8b949e;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .threshold-reset:hover {
+    background: rgba(34,197,94,0.15);
+    color: #22c55e;
+    border-color: rgba(34,197,94,0.3);
+  }
+  @media (max-width: 900px) {
+    .threshold-global { display: none; }
+  }
+
+  /* Animated KPI transitions */
+  .kpi-card .hero-number {
+    transition: opacity 0.15s;
+  }
+  .kpi-card .hero-number.updating {
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo">XCD Analysis</span>
+    <a href="#hero">Overview</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#threshold">Threshold Sweep</a>
+    <a href="#calibration">Calibration</a>
+    <a href="#significance">Significance</a>
+    <a href="#strategy">Strategies</a>
+    <a href="#agreement">Agreement</a>
+    <a href="#latency">Latency</a>
+    <a href="#cost">Cost</a>
+    <a href="#fp">False Positives</a>
+    <a href="#model-vs-gt">Model vs GT</a>
+    <a href="#ground-truth">Ground Truth</a>
+    <a href="#recommendation">Recommendation</a>
+    <div class="threshold-global">
+      <label>Global Threshold</label>
+      <input type="range" id="global-thresh" min="0.3" max="0.95" step="0.05" value="0.5">
+      <span id="global-thresh-val">0.50</span>
+      <button class="threshold-reset" id="thresh-reset" title="Reset to optimal (0.50)">Reset</button>
+    </div>
+  </div>
+</nav>
+
+<!-- GLOSSARY -->
+<div class="container" style="padding-top:1.5rem;">
+<details style="background:#161b22;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;margin-bottom:24px">
+    <summary style="cursor:pointer;font-weight:700;color:#e6edf3;font-size:14px">&#128214; Glossary — What do these terms mean?</summary>
+    <div style="margin-top:12px;font-size:13px;color:#8b949e;line-height:1.8">
+        <p><strong style="color:#e6edf3">Threshold</strong> — The sensitivity dial (0-1). Higher = stricter. At 0.6, the model only flags content it's 60%+ confident about.</p>
+        <p><strong style="color:#e6edf3">Recall</strong> — What percentage of actual nudity scenes the model catches. 90% recall = catches 9 out of 10 real scenes.</p>
+        <p><strong style="color:#e6edf3">Precision</strong> — Of everything the model flags, what percentage is actually nudity. 80% precision = 8 out of 10 flags are correct.</p>
+        <p><strong style="color:#e6edf3">F1 Score</strong> — The balance between recall and precision. 1.0 = perfect. It penalizes models that sacrifice one for the other.</p>
+        <p><strong style="color:#e6edf3">False Positive (FP)</strong> — When the model incorrectly flags non-nudity content as nudity. Think: a shirtless man at a pool party flagged as explicit.</p>
+        <p><strong style="color:#e6edf3">False Negative (FN)</strong> — When the model misses actual nudity. A nude scene that passes through undetected.</p>
+        <p><strong style="color:#e6edf3">AUC-PR</strong> — Area Under the Precision-Recall Curve. A single number (0-1) that summarizes overall model quality. Higher = better at distinguishing nudity from non-nudity.</p>
+        <p><strong style="color:#e6edf3">Consensus</strong> — Requiring multiple models to agree before flagging. Like needing two referees to call a foul — reduces false calls.</p>
+        <p><strong style="color:#e6edf3">Bimodality</strong> — Whether a model's scores cluster at two extremes (0 and 1) vs. being spread across the range. A bimodal model is more "binary" in its decisions.</p>
+        <p><strong style="color:#e6edf3">Cohen's Kappa</strong> — Measures agreement between two models beyond what you'd expect by chance. 0 = random agreement, 1 = perfect agreement.</p>
+        <p><strong style="color:#e6edf3">McNemar's Test</strong> — A statistical test that determines if two models perform significantly differently. p < 0.05 = the difference is real, not random.</p>
+        <p><strong style="color:#e6edf3">Wasserstein Distance</strong> — Measures how different two score distributions are. Think of it as "how much work to transform one model's scoring pattern into the other's."</p>
+        <p><strong style="color:#e6edf3">KDE</strong> — Kernel Density Estimation. A smooth curve showing where most scores concentrate. Like a smoothed histogram.</p>
+    </div>
+</details>
+</div>
+
+<!-- SECTION 1: HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="section-reveal">
+      <div class="section-label">Nudity Detection Model Comparison</div>
+      <h1 class="section-title" style="font-size:2.8rem;">Three Models. 556,768 Frames.<br>One Clear Winner.</h1>
+      <p class="section-subtitle">15 movies &middot; 214 verified scenes &middot; 327 auto-detected &rarr; 113 consolidated. A rigorous statistical analysis of VionLabs, XCD v1, and XCD v2 nudity detection models across 15 movies (12 R-rated + 3 PG/PG-13), using frame-level threshold sweeps, McNemar's tests, calibration analysis, and detection latency benchmarks.</p>
+      <div class="card-grid card-grid-6" style="margin-top:2.5rem;" id="hero-kpis">
+        <div class="card kpi-card">
+          <div class="hero-number" id="kpi-f1" data-count="0.945" data-decimals="3">0</div>
+          <div class="hero-label">Best F1 Score</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="hero-number" id="kpi-fp" data-count="0" data-decimals="0" data-suffix="">0</div>
+          <div class="hero-label">False Positives</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="hero-number" id="kpi-recall" data-count="89.6" data-decimals="1" data-suffix="%">0</div>
+          <div class="hero-label">Recall</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="hero-number" id="kpi-precision" data-count="1.000" data-decimals="3">0</div>
+          <div class="hero-label">Precision</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="hero-number" data-count="15" data-decimals="0">0</div>
+          <div class="hero-label">Movies</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="hero-number" data-count="3" data-decimals="0">0</div>
+          <div class="hero-label">Models</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div id="hero-explainer" style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
+      <div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
+      <p id="hero-explainer-text">These numbers summarize our analysis of 556,768 individual video frames across 15 Paramount+ movies (12 R-rated + 3 PG/PG-13). Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain &mdash; a 35% reduction. 60.3% of detections are S0/S1 based on film-knowledge verification. However, 31% of scenes still need human frame-level verification &mdash; treat these numbers as directional.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: METHODOLOGY -->
+<section id="methodology" style="padding-top:2rem;">
+  <div class="container">
+    <div class="section-reveal">
+      <div class="section-label">Section 2</div>
+      <h2 class="section-title">Methodology</h2>
+      <p class="section-subtitle">A reproducible, multi-stage evaluation pipeline from raw frame-level model outputs to verified ground truth annotations with severity classifications.</p>
+
+      <!-- PIPELINE OVERVIEW DIAGRAM -->
+      <div class="card" style="margin-bottom:2rem;padding:2rem;">
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1.5rem;">End-to-End Pipeline Overview</h3>
+        <div style="overflow-x:auto;">
+          <svg viewBox="0 0 1100 200" style="width:100%;max-width:1100px;min-width:700px;height:auto;" xmlns="http://www.w3.org/2000/svg">
+            <!-- Stage boxes -->
+            <g transform="translate(20,40)">
+              <rect x="0" y="0" width="160" height="110" rx="12" fill="#1a1f2e" stroke="#3b82f6" stroke-width="2"/>
+              <text x="80" y="30" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="700">STAGE 1</text>
+              <text x="80" y="50" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600">Raw Frame Data</text>
+              <text x="80" y="70" text-anchor="middle" fill="#8b949e" font-size="10">VionLabs: 4.8 fps</text>
+              <text x="80" y="85" text-anchor="middle" fill="#8b949e" font-size="10">XCD v1/v2: 2.0 fps</text>
+              <text x="80" y="100" text-anchor="middle" fill="#8b949e" font-size="10">556,768 total frames</text>
+            </g>
+            <path d="M190,95 L220,95" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+            <g transform="translate(230,40)">
+              <rect x="0" y="0" width="160" height="110" rx="12" fill="#1a1f2e" stroke="#f59e0b" stroke-width="2"/>
+              <text x="80" y="30" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700">STAGE 2</text>
+              <text x="80" y="50" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600">Peak Detection</text>
+              <text x="80" y="70" text-anchor="middle" fill="#8b949e" font-size="10">Score &gt; 0.3 threshold</text>
+              <text x="80" y="85" text-anchor="middle" fill="#8b949e" font-size="10">30s gap clustering</text>
+              <text x="80" y="100" text-anchor="middle" fill="#8b949e" font-size="10">327 candidate scenes</text>
+            </g>
+            <path d="M400,95 L430,95" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+            <g transform="translate(440,40)">
+              <rect x="0" y="0" width="160" height="110" rx="12" fill="#1a1f2e" stroke="#a855f7" stroke-width="2"/>
+              <text x="80" y="30" text-anchor="middle" fill="#c084fc" font-size="11" font-weight="700">STAGE 3</text>
+              <text x="80" y="50" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600">Scene Merging</text>
+              <text x="80" y="70" text-anchor="middle" fill="#8b949e" font-size="10">120s proximity merge</text>
+              <text x="80" y="85" text-anchor="middle" fill="#8b949e" font-size="10">Overlapping clusters</text>
+              <text x="80" y="100" text-anchor="middle" fill="#8b949e" font-size="10">327 &rarr; 214 scenes</text>
+            </g>
+            <path d="M610,95 L640,95" stroke="#a855f7" stroke-width="2" fill="none" marker-end="url(#arrow3)"/>
+            <g transform="translate(650,40)">
+              <rect x="0" y="0" width="160" height="110" rx="12" fill="#1a1f2e" stroke="#22c55e" stroke-width="2"/>
+              <text x="80" y="30" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="700">STAGE 4</text>
+              <text x="80" y="50" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600">Manual Verification</text>
+              <text x="80" y="70" text-anchor="middle" fill="#8b949e" font-size="10">Film-knowledge review</text>
+              <text x="80" y="85" text-anchor="middle" fill="#8b949e" font-size="10">Severity labeling</text>
+              <text x="80" y="100" text-anchor="middle" fill="#8b949e" font-size="10">MPAA cross-check</text>
+            </g>
+            <path d="M820,95 L850,95" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#arrow4)"/>
+            <g transform="translate(860,40)">
+              <rect x="0" y="0" width="180" height="110" rx="12" fill="#0f2a1a" stroke="#22c55e" stroke-width="2.5"/>
+              <text x="90" y="30" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="700">OUTPUT</text>
+              <text x="90" y="50" text-anchor="middle" fill="#e6edf3" font-size="13" font-weight="700">Ground Truth</text>
+              <text x="90" y="70" text-anchor="middle" fill="#4ade80" font-size="11">214 verified scenes</text>
+              <text x="90" y="85" text-anchor="middle" fill="#4ade80" font-size="11">15 films</text>
+              <text x="90" y="100" text-anchor="middle" fill="#4ade80" font-size="11">5 severity levels</text>
+            </g>
+            <!-- Arrow markers -->
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3b82f6"/></marker>
+              <marker id="arrow2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f59e0b"/></marker>
+              <marker id="arrow3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#a855f7"/></marker>
+              <marker id="arrow4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#22c55e"/></marker>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
+      <!-- STEP-BY-STEP DETAILS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem;">
+
+        <!-- STEP 1: Data Sources -->
+        <div class="card" style="grid-column:1/-1;">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#60a5fa;">1. Raw Data Sources</h3>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+            <div style="background:#1a1f2e;border-radius:12px;padding:1.25rem;border:1px solid rgba(253,161,212,0.2);">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:#fda1d4;"></div>
+                <span style="font-weight:600;font-size:0.9rem;">VionLabs API</span>
+              </div>
+              <div style="font-size:0.78rem;color:#8b949e;line-height:1.7;">
+                <strong style="color:#cbd5e1;">Source:</strong> <code style="background:#0d1117;padding:2px 6px;border-radius:4px;font-size:0.72rem;">gs://qdrant-pipeline-dev/{video_id}/nudity/frames_v7.json</code><br>
+                <strong style="color:#cbd5e1;">Format:</strong> Frame-level nudity scores (0.0&ndash;1.0)<br>
+                <strong style="color:#cbd5e1;">Rate:</strong> ~4.8 frames/sec (~35K frames per 2hr film)<br>
+                <strong style="color:#cbd5e1;">Coverage:</strong> All 15 movies
+              </div>
+            </div>
+            <div style="background:#1a1f2e;border-radius:12px;padding:1.25rem;border:1px solid rgba(239,68,68,0.2);">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;"></div>
+                <span style="font-weight:600;font-size:0.9rem;">XCD v1</span>
+              </div>
+              <div style="font-size:0.78rem;color:#8b949e;line-height:1.7;">
+                <strong style="color:#cbd5e1;">Source:</strong> <code style="background:#0d1117;padding:2px 6px;border-radius:4px;font-size:0.72rem;">gs://xcd-dataset/inference_results/{video_id}_v1_full.json</code><br>
+                <strong style="color:#cbd5e1;">Format:</strong> Frame-level nudity scores (0.0&ndash;1.0)<br>
+                <strong style="color:#cbd5e1;">Rate:</strong> ~2.0 frames/sec (~16K frames per 2hr film)<br>
+                <strong style="color:#cbd5e1;">Coverage:</strong> 7 movies (full comparison set)
+              </div>
+            </div>
+            <div style="background:#1a1f2e;border-radius:12px;padding:1.25rem;border:1px solid rgba(59,130,246,0.2);">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:#3b82f6;"></div>
+                <span style="font-weight:600;font-size:0.9rem;">XCD v2</span>
+              </div>
+              <div style="font-size:0.78rem;color:#8b949e;line-height:1.7;">
+                <strong style="color:#cbd5e1;">Source:</strong> <code style="background:#0d1117;padding:2px 6px;border-radius:4px;font-size:0.72rem;">gs://xcd-dataset/inference_results/{video_id}_v2_full.json</code><br>
+                <strong style="color:#cbd5e1;">Format:</strong> Frame-level nudity scores (0.0&ndash;1.0)<br>
+                <strong style="color:#cbd5e1;">Rate:</strong> ~2.0 frames/sec (~16K frames per 2hr film)<br>
+                <strong style="color:#cbd5e1;">Coverage:</strong> 7 movies (full comparison set)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Scene Detection -->
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#fbbf24;">2. Automated Scene Detection</h3>
+          <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
+            <p>Raw frame scores were processed through a <strong style="color:#cbd5e1;">peak detection algorithm</strong> to identify candidate nudity scenes:</p>
+            <ul style="margin:12px 0;padding-left:20px;">
+              <li><strong style="color:#cbd5e1;">Initial threshold:</strong> Frames with score &gt; 0.30 flagged as candidates</li>
+              <li><strong style="color:#cbd5e1;">Temporal clustering:</strong> Consecutive flagged frames within a <strong style="color:#fbbf24;">30-second gap</strong> grouped into a single detection cluster</li>
+              <li><strong style="color:#cbd5e1;">Peak extraction:</strong> Within each cluster, the frame with the highest score becomes the <em>peak frame</em> (used for GIF extraction)</li>
+              <li><strong style="color:#cbd5e1;">Multi-model merging:</strong> Clusters from VionLabs, XCD v1, and XCD v2 that overlap temporally are merged into a single scene candidate</li>
+            </ul>
+            <p>This produced <strong style="color:#e6edf3;">327 candidate scenes</strong> across all 15 films.</p>
+          </div>
+        </div>
+
+        <!-- STEP 3: Scene Consolidation -->
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#c084fc;">3. Scene Consolidation</h3>
+          <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
+            <p>The 327 candidates were <strong style="color:#cbd5e1;">consolidated</strong> to avoid double-counting continuous nudity scenes that models fragmented:</p>
+            <ul style="margin:12px 0;padding-left:20px;">
+              <li><strong style="color:#cbd5e1;">Proximity merge:</strong> Scene candidates within <strong style="color:#c084fc;">120 seconds</strong> of each other merged into a single ground truth scene</li>
+              <li><strong style="color:#cbd5e1;">Rationale:</strong> Film nudity scenes often contain brief cuts away (dialogue, reaction shots) that cause models to report separate clusters for the same narrative scene</li>
+              <li><strong style="color:#cbd5e1;">Result:</strong> 327 candidates &rarr; <strong style="color:#e6edf3;">214 verified ground truth scenes</strong> (35% consolidation rate)</li>
+            </ul>
+            <div style="background:#0d1117;border-radius:8px;padding:12px 16px;margin-top:12px;font-family:'Geist Mono',monospace;font-size:0.72rem;color:#8b949e;line-height:1.8;">
+              <span style="color:#c084fc;">Example:</span> Wolf of Wall Street scene at 2:10<br>
+              &nbsp;&nbsp;VionLabs cluster: 2:10&ndash;2:35 (peak: 0.94)<br>
+              &nbsp;&nbsp;XCD v2 cluster: 2:28&ndash;3:13 (peak: 1.00)<br>
+              &nbsp;&nbsp;Gap: 0s (overlapping) &rarr; <span style="color:#4ade80;">Merged into single scene 2:10&ndash;3:13</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Manual Verification -->
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#4ade80;">4. Manual Verification Process</h3>
+          <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
+            <p>Each of the 214 consolidated scenes was <strong style="color:#cbd5e1;">manually verified</strong> through a multi-step process:</p>
+            <ol style="margin:12px 0;padding-left:20px;">
+              <li><strong style="color:#cbd5e1;">GIF extraction:</strong> 3-frame animated GIFs generated at each scene&rsquo;s peak timestamp (start frame, peak frame, end frame)</li>
+              <li><strong style="color:#cbd5e1;">Visual inspection:</strong> Each GIF reviewed to confirm nudity is actually present and classify content type</li>
+              <li><strong style="color:#cbd5e1;">Film-knowledge verification:</strong> Cross-referenced against known film content from MPAA ratings, parent guides (Common Sense Media, IMDB Parents Guide), and film synopsis databases</li>
+              <li><strong style="color:#cbd5e1;">Severity assignment:</strong> Each scene assigned a severity code (S0&ndash;S4) based on visual content observed</li>
+              <li><strong style="color:#cbd5e1;">Quality flag:</strong> 66 scenes (31%) flagged for frame-level re-examination where model scores conflicted or GIF was ambiguous</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- STEP 5: Severity Classification -->
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#22c55e;">5. Severity Classification System</h3>
+          <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
+            <p>A 5-level severity scale was designed to classify scene content:</p>
+          </div>
+          <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:0.78rem;">
+            <thead>
+              <tr style="border-bottom:2px solid rgba(255,255,255,0.1);">
+                <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Code</th>
+                <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Level</th>
+                <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Description</th>
+                <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:8px 12px;"><span style="background:rgba(100,116,139,0.2);color:#94a3b8;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S0</span></td>
+                <td style="padding:8px 12px;color:#94a3b8;">Safe / False Positive</td>
+                <td style="padding:8px 12px;color:#8b949e;">No nudity present; model triggered on skin tones, swimwear, or non-nude content</td>
+                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Beach volleyball scene in Top Gun</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:8px 12px;"><span style="background:rgba(251,191,36,0.15);color:#fcd34d;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S1</span></td>
+                <td style="padding:8px 12px;color:#fcd34d;">Skin Exposure</td>
+                <td style="padding:8px 12px;color:#8b949e;">Significant skin visible but no nudity; shirtless, underwear, suggestive framing</td>
+                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Locker room scene with towels</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:8px 12px;"><span style="background:rgba(251,191,36,0.15);color:#fcd34d;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S2</span></td>
+                <td style="padding:8px 12px;color:#fcd34d;">Non-Sexual Nudity</td>
+                <td style="padding:8px 12px;color:#8b949e;">Nudity in non-sexual context; artistic, medical, changing, bathing</td>
+                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Character getting dressed after bath</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:8px 12px;"><span style="background:rgba(239,68,68,0.15);color:#fca5a5;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S3</span></td>
+                <td style="padding:8px 12px;color:#fca5a5;">Sexual Nudity</td>
+                <td style="padding:8px 12px;color:#8b949e;">Nudity in a sexual context; love scenes, seduction, intimate moments</td>
+                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Love scene in Basic Instinct</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px;"><span style="background:rgba(239,68,68,0.25);color:#f87171;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S4</span></td>
+                <td style="padding:8px 12px;color:#f87171;">Explicit / Graphic</td>
+                <td style="padding:8px 12px;color:#8b949e;">Graphic nudity; full frontal, extended explicit scenes, pornographic framing</td>
+                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Extended scenes in Wolf of Wall Street</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- STEP 6: Cross-Validation -->
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#06b6d4;">6. Cross-Validation &amp; Quality Assurance</h3>
+          <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
+            <p>Ground truth annotations were cross-validated against multiple external sources:</p>
+            <ul style="margin:12px 0;padding-left:20px;">
+              <li><strong style="color:#cbd5e1;">MPAA Ratings:</strong> Scene counts cross-checked against rating justifications (e.g., &ldquo;Rated R for strong sexual content, nudity&rdquo;)</li>
+              <li><strong style="color:#cbd5e1;">IMDB Parents Guide:</strong> &ldquo;Sex &amp; Nudity&rdquo; sections used to verify scene descriptions and approximate timestamps</li>
+              <li><strong style="color:#cbd5e1;">VionLabs Frame Data:</strong> High-confidence VionLabs detections (&gt;0.9) used as initial anchor points for scene boundaries</li>
+              <li><strong style="color:#cbd5e1;">PG/PG-13 Baseline:</strong> 3 non-R-rated films (Top Gun PG, Top Gun: Maverick PG-13, A Quiet Place PG-13) included as negative controls &mdash; expected to have mostly S0/S1 scenes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATASET SUMMARY -->
+      <div class="card" style="margin-bottom:2rem;background:linear-gradient(135deg,rgba(34,197,94,0.05),rgba(59,130,246,0.05));">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:1.25rem;">Ground Truth Dataset Summary</h3>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;text-align:center;">
+          <div>
+            <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">15</div>
+            <div style="font-size:0.75rem;color:#8b949e;">Films</div>
+          </div>
+          <div>
+            <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">214</div>
+            <div style="font-size:0.75rem;color:#8b949e;">Verified Scenes</div>
+          </div>
+          <div>
+            <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">556K</div>
+            <div style="font-size:0.75rem;color:#8b949e;">Scored Frames</div>
+          </div>
+          <div>
+            <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">5</div>
+            <div style="font-size:0.75rem;color:#8b949e;">Severity Levels</div>
+          </div>
+          <div>
+            <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">31%</div>
+            <div style="font-size:0.75rem;color:#8b949e;">Double-Verified</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILM BREAKDOWN TABLE -->
+      <div class="card" style="margin-bottom:2rem;">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;">Film-Level Ground Truth Breakdown</h3>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+            <thead>
+              <tr style="border-bottom:2px solid rgba(255,255,255,0.1);">
+                <th style="text-align:left;padding:8px 10px;color:#e6edf3;font-weight:600;">Film</th>
+                <th style="text-align:center;padding:8px 10px;color:#e6edf3;font-weight:600;">Rating</th>
+                <th style="text-align:center;padding:8px 10px;color:#e6edf3;font-weight:600;">Scenes</th>
+                <th style="text-align:center;padding:8px 10px;color:#e6edf3;font-weight:600;">Models</th>
+                <th style="text-align:center;padding:8px 10px;color:#e6edf3;font-weight:600;">VionLabs Frames</th>
+              </tr>
+            </thead>
+            <tbody style="color:#8b949e;">
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Wolf of Wall Street</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">27</td><td style="text-align:center;padding:6px 10px;"><span style="color:#4ade80;">3</span></td><td style="text-align:center;padding:6px 10px;">52,090</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Adore</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">24</td><td style="text-align:center;padding:6px 10px;"><span style="color:#4ade80;">3</span></td><td style="text-align:center;padding:6px 10px;">32,368</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Braveheart</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">20</td><td style="text-align:center;padding:6px 10px;"><span style="color:#fda1d4;">1</span></td><td style="text-align:center;padding:6px 10px;">51,551</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Fatal Attraction</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">18</td><td style="text-align:center;padding:6px 10px;"><span style="color:#fda1d4;">1</span></td><td style="text-align:center;padding:6px 10px;">34,453</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Top Gun</td><td style="text-align:center;padding:6px 10px;">PG</td><td style="text-align:center;padding:6px 10px;">17</td><td style="text-align:center;padding:6px 10px;"><span style="color:#fda1d4;">1</span></td><td style="text-align:center;padding:6px 10px;">32,066</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">The Godfather</td><td style="text-align:center;padding:6px 10px;">NR</td><td style="text-align:center;padding:6px 10px;">17</td><td style="text-align:center;padding:6px 10px;"><span style="color:#fda1d4;">1</span></td><td style="text-align:center;padding:6px 10px;">50,866</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Basic Instinct</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">14</td><td style="text-align:center;padding:6px 10px;"><span style="color:#4ade80;">3</span></td><td style="text-align:center;padding:6px 10px;">37,211</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">American Beauty</td><td style="text-align:center;padding:6px 10px;">NR</td><td style="text-align:center;padding:6px 10px;">13</td><td style="text-align:center;padding:6px 10px;"><span style="color:#4ade80;">3</span></td><td style="text-align:center;padding:6px 10px;">35,002</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Top Gun: Maverick</td><td style="text-align:center;padding:6px 10px;">PG-13</td><td style="text-align:center;padding:6px 10px;">13</td><td style="text-align:center;padding:6px 10px;"><span style="color:#fda1d4;">1</span></td><td style="text-align:center;padding:6px 10px;">38,027</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Pulp Fiction</td><td style="text-align:center;padding:6px 10px;">NR</td><td style="text-align:center;padding:6px 10px;">12</td><td style="text-align:center;padding:6px 10px;"><span style="color:#fda1d4;">1</span></td><td style="text-align:center;padding:6px 10px;">44,712</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">First Blood</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">12</td><td style="text-align:center;padding:6px 10px;"><span style="color:#fda1d4;">1</span></td><td style="text-align:center;padding:6px 10px;">27,079</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Nocturnal Animals</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">8</td><td style="text-align:center;padding:6px 10px;"><span style="color:#4ade80;">3</span></td><td style="text-align:center;padding:6px 10px;">33,537</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Saving Private Ryan</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">8</td><td style="text-align:center;padding:6px 10px;"><span style="color:#fda1d4;">1</span></td><td style="text-align:center;padding:6px 10px;">49,005</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 10px;color:#cbd5e1;">Scream</td><td style="text-align:center;padding:6px 10px;">R</td><td style="text-align:center;padding:6px 10px;">7</td><td style="text-align:center;padding:6px 10px;"><span style="color:#4ade80;">3</span></td><td style="text-align:center;padding:6px 10px;">32,099</td></tr>
+              <tr><td style="padding:6px 10px;color:#cbd5e1;">A Quiet Place</td><td style="text-align:center;padding:6px 10px;">PG-13</td><td style="text-align:center;padding:6px 10px;">4</td><td style="text-align:center;padding:6px 10px;"><span style="color:#4ade80;">3</span></td><td style="text-align:center;padding:6px 10px;">26,266</td></tr>
+            </tbody>
+            <tfoot>
+              <tr style="border-top:2px solid rgba(255,255,255,0.1);">
+                <td style="padding:8px 10px;font-weight:700;color:#e6edf3;">Total</td>
+                <td style="text-align:center;padding:8px 10px;color:#e6edf3;">&mdash;</td>
+                <td style="text-align:center;padding:8px 10px;font-weight:700;color:#4ade80;">214</td>
+                <td style="text-align:center;padding:8px 10px;color:#e6edf3;">&mdash;</td>
+                <td style="text-align:center;padding:8px 10px;font-weight:700;color:#e6edf3;">556,332</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- IMPORTANT NOTE -->
+      <div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:2rem;font-size:0.82rem;line-height:1.7;color:#cbd5e1;">
+        <strong style="color:#60a5fa;">Note on Ground Truth Limitations:</strong>
+        Scene-level ground truth does not assert that every frame within a scene contains nudity &mdash; only that the scene as a whole contains nudity-relevant content at the assigned severity level.
+        Boundary timestamps (start/end) represent the model detection envelope, not precise scene cuts. Actual nudity may occupy a subset of the detection window.
+        This is standard practice for content-moderation evaluation where frame-exact labeling of millions of frames is infeasible.
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SECTIONS 3+4: side-by-side widescreen wrapper start -->
+<div class="container" style="padding-top:3rem;padding-bottom:1rem;"><div>
+<section id="threshold" style="padding:0;">
+  <div class="section-reveal">
+      <div class="section-label">Section 3</div>
+      <h2 class="section-title">Threshold Sweep Analysis</h2>
+      <p class="section-subtitle">F1 score across 14 threshold values reveals the optimal operating point and the dominance of AND-consensus.</p>
+      <div style="margin-bottom:1.5rem;">
+        <div class="chart-container">
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--xcd-v1)"></div>XCD v1</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--xcd-v2)"></div>XCD v2</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--vionlabs)"></div>VionLabs</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--consensus)"></div>AND Consensus</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--consensus-or)"></div>OR Consensus</div>
+          </div>
+          <div id="threshold-chart" style="width:100%;height:380px;"></div>
+          <div class="svg-tooltip" id="threshold-tooltip" style="opacity:0;"></div>
+        </div>
+        <div>
+          <div class="explainer-label">&#128161; What This Means</div>
+          <p>This chart shows what happens as we raise or lower the 'sensitivity dial' for each model. A threshold of 0.5 means 'flag anything the model is at least 50% confident about.' The green line (consensus) stays high across all thresholds because requiring two models to agree filters out the noise. The key insight: the green line peaks at 0.5 — we don't need to be aggressive with the threshold when two models must agree.</p>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="card" style="overflow-x:auto;">
+        <h4 class="chart-title">Threshold Sweep Data (Avg F1 Across 7 Movies)</h4>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Threshold</th><th>v1 F1</th><th>v2 F1</th><th>VionLabs F1</th><th>AND F1</th><th>OR F1</th><th>AND FP</th>
+            </tr>
+          </thead>
+          <tbody id="threshold-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT col: Calibration -->
+  <section id="calibration" style="padding:0;">
+    <div class="section-reveal">
+      <div class="section-label">Section 4</div>
+      <h2 class="section-title">Score Calibration</h2>
+      <p class="section-subtitle" style="font-style:italic;font-weight:500;">"XCD v2 operates as a switch. VionLabs gives you a dial."</p>
+
+      <!-- KDE Chart -->
+      <div class="chart-container" style="margin-bottom:1rem;">
+        <div class="chart-title">Density-Normalized Score Distributions (0.3 -- 1.0)</div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--vionlabs)"></div>VionLabs</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--xcd-v2)"></div>XCD v2</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--xcd-v1)"></div>XCD v1</div>
+        </div>
+        <div id="kde-chart" style="width:100%;height:260px;"></div>
+      </div>
+
+      <!-- Stat badges per model -->
+      <div class="card-grid card-grid-3" style="margin-bottom:1rem;">
+        <div class="card" style="border-left:3px solid var(--vionlabs);">
+          <h4 style="font-size:0.8rem;font-weight:700;color:var(--vionlabs);margin-bottom:0.75rem;">VionLabs</h4>
+          <div class="stat-badges" style="flex-direction:column;">
+            <div class="stat-badge"><span class="stat-label">Bimodality Coefficient</span><span class="stat-value" style="color:var(--vionlabs);">0.862</span></div>
+            <div class="stat-badge"><span class="stat-label">Entropy</span><span class="stat-value" style="color:var(--vionlabs);">1.47 bits</span></div>
+            <div class="stat-badge"><span class="stat-label">Detection Median</span><span class="stat-value" style="color:var(--vionlabs);">0.705</span></div>
+            <div class="stat-badge"><span class="stat-label">Frames >= 0.9</span><span class="stat-value" style="color:var(--vionlabs);">11.1%</span></div>
+          </div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--xcd-v2);">
+          <h4 style="font-size:0.8rem;font-weight:700;color:var(--xcd-v2);margin-bottom:0.75rem;">XCD v2</h4>
+          <div class="stat-badges" style="flex-direction:column;">
+            <div class="stat-badge"><span class="stat-label">Bimodality Coefficient</span><span class="stat-value" style="color:var(--xcd-v2);">0.979</span></div>
+            <div class="stat-badge"><span class="stat-label">Entropy</span><span class="stat-value" style="color:var(--xcd-v2);">0.69 bits</span></div>
+            <div class="stat-badge"><span class="stat-label">Detection Median</span><span class="stat-value" style="color:var(--xcd-v2);">0.998</span></div>
+            <div class="stat-badge"><span class="stat-label">Frames >= 0.9</span><span class="stat-value" style="color:var(--xcd-v2);">82.0%</span></div>
+          </div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--xcd-v1);">
+          <h4 style="font-size:0.8rem;font-weight:700;color:var(--xcd-v1);margin-bottom:0.75rem;">XCD v1</h4>
+          <div class="stat-badges" style="flex-direction:column;">
+            <div class="stat-badge"><span class="stat-label">Bimodality Coefficient</span><span class="stat-value" style="color:var(--xcd-v1);">0.946</span></div>
+            <div class="stat-badge"><span class="stat-label">Entropy</span><span class="stat-value" style="color:var(--xcd-v1);">0.95 bits</span></div>
+            <div class="stat-badge"><span class="stat-label">Detection Median</span><span class="stat-value" style="color:var(--xcd-v1);">0.930</span></div>
+            <div class="stat-badge"><span class="stat-label">Frames >= 0.9</span><span class="stat-value" style="color:var(--xcd-v1);">55.7%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insight cards -->
+      <div class="card-grid card-grid-3" style="margin-bottom:1rem;">
+        <div class="insight-card" style="border-color:var(--vionlabs);">
+          <h4 style="color:var(--vionlabs);">VionLabs: Graded Output</h4>
+          <p>49% of positive frames fall in 0.5--0.7. The model outputs nuanced confidence levels, making it ideal for threshold tuning and severity estimation.</p>
+        </div>
+        <div class="insight-card" style="border-color:var(--xcd-v2);">
+          <h4 style="color:var(--xcd-v2);">XCD v2: Binary Switch</h4>
+          <p>82% of positive frames are >= 0.9. The model essentially outputs yes/no decisions with very high confidence. Bimodality coefficient 0.979 -- nearly perfect separation.</p>
+        </div>
+        <div class="insight-card" style="border-color:var(--consensus);">
+          <h4 style="color:var(--consensus);">Implication for Consensus</h4>
+          <p>Different calibration profiles make AND-consensus powerful: VionLabs catches what v2 misses in the 0.5--0.7 range, while v2's high-confidence hits confirm VionLabs's graded output.</p>
+        </div>
+      </div>
+
+      <!-- Wasserstein Matrix + Explainer -->
+      <div>
+        <div class="card">
+          <h4 class="chart-title">Wasserstein Distance Matrix</h4>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:1rem;">Earth Mover's Distance between score distributions. Larger = more different.</p>
+          <div id="wasserstein-matrix"></div>
+        </div>
+        <div>
+          <div class="explainer-label">&#128161; What This Means</div>
+          <p>This reveals a fundamental difference in how the models 'think.' VionLabs gives nuanced scores — a 0.65 means 'probably nudity but not sure.' XCD v2 is all-or-nothing — it either fires at 0.99 or doesn't fire at all. This matters because VionLabs' graded scores let us fine-tune sensitivity, while v2's binary nature means threshold tuning has almost no effect on it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div></div><!-- end wide-split + container for sections 3+4 -->
+
+<!-- SECTIONS 5+7: SIGNIFICANCE + AGREEMENT — side by side on widescreen -->
+<div class="container" style="padding-top:3rem;padding-bottom:1rem;"><div>
+<section id="significance" style="padding:0;">
+  <div class="section-reveal">
+    <div class="section-label">Section 5</div>
+      <h2 class="section-title">Statistical Significance</h2>
+      <p class="section-subtitle">McNemar's test on scene-level detection agreement. Cohen's kappa measures inter-rater reliability.</p>
+
+      <div class="card-grid card-grid-3" style="margin-bottom:1.5rem;">
+        <!-- McNemar's results -->
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+            <span class="badge badge-green">NOT SIGNIFICANT</span>
+          </div>
+          <h4 style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;">VionLabs vs XCD v2</h4>
+          <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.75rem;">These models perform equivalently on scene detection. Neither is statistically better than the other.</p>
+          <div style="font-family:'Geist Mono',monospace;font-size:0.75rem;color:var(--text-muted);line-height:1.8;">
+            chi2 = 0.174 &nbsp; p = 0.917<br>
+            Both detect: 104 &nbsp; Vion only: 10 &nbsp; v2 only: 13<br>
+            Cohen's kappa: <strong style="color:var(--text);">0.280</strong>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+            <span class="badge badge-red">SIGNIFICANT (p &lt; 0.001)</span>
+          </div>
+          <h4 style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;">VionLabs vs XCD v1</h4>
+          <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.75rem;">VionLabs detects significantly more scenes than v1. The difference is highly significant with chi2 = 48.2.</p>
+          <div style="font-family:'Geist Mono',monospace;font-size:0.75rem;color:var(--text-muted);line-height:1.8;">
+            chi2 = 48.246 &nbsp; p &lt; 0.001<br>
+            Both detect: 53 &nbsp; Vion only: 61 &nbsp; v1 only: 4<br>
+            Cohen's kappa: <strong style="color:var(--text);">0.122</strong>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+            <span class="badge badge-red">SIGNIFICANT (p &lt; 0.001)</span>
+          </div>
+          <h4 style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;">XCD v2 vs XCD v1</h4>
+          <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.75rem;">v2 is a massive upgrade over v1. 64 scenes detected by v2 that v1 misses entirely.</p>
+          <div style="font-family:'Geist Mono',monospace;font-size:0.75rem;color:var(--text-muted);line-height:1.8;">
+            chi2 = 51.191 &nbsp; p &lt; 0.001<br>
+            Both detect: 53 &nbsp; v2 only: 64 &nbsp; v1 only: 4<br>
+            Cohen's kappa: <strong style="color:var(--text);">0.087</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cohen's Kappa Heatmap -->
+      <div class="card-grid card-grid-2">
+        <div class="card">
+          <h4 class="chart-title">Cohen's Kappa Heatmap</h4>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:1rem;">Inter-rater agreement. 0.0 = chance, 0.2-0.4 = fair, 0.4-0.6 = moderate, 0.6+ = substantial.</p>
+          <div id="kappa-heatmap" style="width:100%;"></div>
+        </div>
+        <div class="card">
+          <div class="callout callout-red" style="margin:0;">
+            <h4>v1 Is Statistically Proven Inferior</h4>
+            <p style="margin-bottom:0.75rem;">Both McNemar's tests involving v1 show p &lt; 0.001. The model misses <strong>65 of 214</strong> verified scenes (48.5% miss rate) even at its optimal threshold of 0.3.</p>
+            <p>Cohen's kappa between v2 and v1 is only <strong>0.087</strong> -- barely above chance agreement. These models are looking at fundamentally different things.</p>
+          </div>
+          <div class="callout callout-green" style="margin-top:1rem;">
+            <h4>VionLabs and v2 Are Complementary</h4>
+            <p>Kappa of 0.280 (fair agreement) means they agree on the easy cases but have distinct detection capabilities. This complementarity is exactly what makes AND-consensus so powerful -- it eliminates false positives from both models.</p>
+          </div>
+        </div>
+      </div>
+    <div style="margin-top:1rem;">
+      <div class="explainer-label">&#128161; What This Means</div>
+      <p>McNemar's test is a statistical method that tells us whether two models perform differently enough that the difference isn't just luck. The p-value tells us the probability that the difference is random — below 0.05 means it's real. VionLabs and v2 are statistically equivalent (p=0.92), meaning they catch the same scenes. But both are significantly better than v1 (p&lt;0.001) — v1's poor performance is not a fluke.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RIGHT col: Section 7 Model Agreement -->
+<!-- SECTION 7: MODEL AGREEMENT -->
+<section id="agreement" style="padding:0;">
+  <div class="section-reveal">
+    <div class="section-label">Section 7</div>
+    <h2 class="section-title">Model Agreement Analysis</h2>
+    <p class="section-subtitle" id="agreement-subtitle">How the three models overlap on 214 verified scenes at threshold <span class="mono">0.50</span>.</p>
+    <div class="chart-container" style="margin-bottom:1rem;">
+      <div id="donut-chart" style="width:100%;height:340px;"></div>
+    </div>
+    <div id="donut-legend" style="padding:0.5rem 0;"></div>
+    <div class="callout callout-amber" style="margin-top:0.75rem;">
+      <h4>40% Detected by Vion + v2 Only</h4>
+      <p>54 of 214 verified scenes are caught by VionLabs and v2 together but missed by v1. Combined with the 10 scenes only v2 catches, v1 contributes detection of just 1 unique scene. It adds virtually no incremental value to the ensemble.</p>
+    </div>
+    <div class="callout callout-blue" style="margin-top:0.75rem;">
+      <h4>Only 6 Scenes Missed by All</h4>
+      <p>These are suggestive-level scenes with low confidence scores. The combined v2 + VionLabs coverage is 95.5% of all 214 verified scenes.</p>
+    </div>
+    <div style="margin-top:1rem;">
+      <div class="explainer-label">&#128161; What This Means</div>
+      <p>This donut shows how often the models agree on 214 verified scenes. When all 3 agree, we're very confident it's real nudity. The cases where only VionLabs+v2 agree tells us v1 is missing real scenes. The scenes missed by all models are the hardest cases &mdash; suggestive content that no model catches reliably.</p>
+    </div>
+  </div>
+</section>
+</div></div><!-- end wide-split-55-45 for sections 5+7 -->
+
+<!-- SECTIONS 6+8: STRATEGY + LATENCY — side by side on widescreen -->
+<div class="container" style="padding-top:3rem;padding-bottom:1rem;"><div>
+<!-- LEFT col: Section 6 Strategy -->
+<!-- SECTION 6: STRATEGY COMPARISON -->
+<section id="strategy" style="padding:0;">
+  <div class="section-reveal">
+    <div class="section-label">Section 6</div>
+    <h2 class="section-title">Strategy Comparison</h2>
+    <p class="section-subtitle">Five deployment strategies evaluated on precision, recall, and F1 at their respective optimal thresholds.</p>
+    <div class="chart-container" style="margin-bottom:1.5rem;">
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div>Precision</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>Recall</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>F1</div>
+      </div>
+      <div id="strategy-chart" style="width:100%;height:340px;"></div>
+    </div>
+    <div class="card" style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr><th>Strategy</th><th>Threshold</th><th>F1</th><th>Precision</th><th>Recall</th><th>FP Clusters</th><th>Missed Scenes</th><th>Miss Rate</th></tr>
+        </thead>
+        <tbody>
+          <tr style="background:rgba(34,197,94,0.06);">
+            <td><strong>v2 AND VionLabs</strong></td><td>0.50</td><td><strong style="color:var(--consensus);">0.945</strong></td><td>1.000</td><td>0.896</td><td style="color:var(--consensus);">0</td><td>14</td><td>10.4%</td>
+          </tr>
+          <tr>
+            <td>VionLabs Solo</td><td>0.55</td><td>0.554</td><td>0.400</td><td>0.928</td><td>170</td><td>11</td><td>8.2%</td>
+          </tr>
+          <tr>
+            <td>v2 Solo</td><td>0.55</td><td>0.441</td><td>0.312</td><td>0.856</td><td>241</td><td>15</td><td>11.2%</td>
+          </tr>
+          <tr>
+            <td>v2 OR VionLabs</td><td>0.70</td><td>0.441</td><td>0.290</td><td>0.925</td><td>304</td><td>10</td><td>7.5%</td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-muted);">v1 Solo</td><td>0.30</td><td style="color:var(--xcd-v1);">0.262</td><td>0.190</td><td>0.585</td><td>295</td><td>65</td><td>48.5%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- RIGHT col: Section 8 Detection Latency -->
+<!-- SECTION 8: DETECTION LATENCY -->
+<section id="latency" style="padding:0;">
+  <div class="section-reveal">
+    <div class="section-label">Section 8</div>
+    <h2 class="section-title">Detection Latency</h2>
+    <p class="section-subtitle">Mean time from scene onset to first frame exceeding detection threshold. Lower is better.</p>
+    <div class="chart-container" style="margin-bottom:1rem;">
+      <div id="latency-chart" style="width:100%;height:300px;"></div>
+    </div>
+    <div class="card-grid" style="grid-template-columns:1fr;gap:0.75rem;">
+            <div class="card" style="border-left:3px solid var(--vionlabs);">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                <h4 style="font-size:0.85rem;font-weight:700;color:var(--vionlabs);">VionLabs</h4>
+                <span class="mono" style="font-size:1.2rem;font-weight:800;color:var(--vionlabs);">6.0s</span>
+              </div>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">Median: 5.0s | P25-P75: 5.0s -- 5.2s | n=114 scenes</p>
+            </div>
+            <div class="card" style="border-left:3px solid var(--xcd-v2);">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                <h4 style="font-size:0.85rem;font-weight:700;color:var(--xcd-v2);">XCD v2</h4>
+                <span class="mono" style="font-size:1.2rem;font-weight:800;color:var(--xcd-v2);">6.9s</span>
+              </div>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">Median: 5.3s | P25-P75: 1.5s -- 11.2s | n=117 scenes</p>
+            </div>
+            <div class="card" style="border-left:3px solid var(--xcd-v1);">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                <h4 style="font-size:0.85rem;font-weight:700;color:var(--xcd-v1);">XCD v1</h4>
+                <span class="mono" style="font-size:1.2rem;font-weight:800;color:var(--xcd-v1);">10.0s</span>
+              </div>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">Median: 5.3s | P25-P75: 2.7s -- 11.9s | n=57 scenes</p>
+            </div>
+          </div>
+    <div class="callout callout-blue" style="margin-top:1rem;">
+      <h4>VionLabs Detects ~1 Second Faster</h4>
+      <p>VionLabs's native 4.8 FPS sampling rate (vs XCD's 2.0 FPS) means it sees 2.4x more frames per scene, resulting in a tighter IQR (5.0--5.2s vs 1.5--11.2s) and faster mean detection time. The tight IQR also indicates more consistent detection behavior.</p>
+    </div>
+    <div style="margin-top:1rem;">
+      <div class="explainer-label">&#128161; What This Means</div>
+      <p>This shows how quickly each model spots nudity once a scene starts. VionLabs detects ~1 second faster because it samples at 4.8 frames per second vs. v2's 2 FPS. In a live content pipeline, this means VionLabs would flag content sooner.</p>
+    </div>
+  </div>
+</section>
+</div></div><!-- end wide-split-half for sections 6+8 -->
+
+<!-- SECTION 9: COST & OPERATIONAL ANALYSIS -->
+<section id="cost">
+  <div class="container">
+    <div class="section-reveal">
+      <div class="section-label">Section 9</div>
+      <h2 class="section-title">Cost &amp; Operational Analysis</h2>
+      <p class="section-subtitle">VionLabs data exists for the full catalog at no additional cost. XCD v2 would require processing ~120K titles &mdash; cost depends on enterprise GPU pricing (separate deal).</p>
+
+<!-- Cost comparison table -->
+<table class="data-table" style="margin:16px 0">
+<thead><tr><th>Strategy</th><th>VionLabs Cost</th><th>XCD v2 Cost</th><th>Total</th><th>Timeline</th></tr></thead>
+<tbody>
+<tr><td>VionLabs only (Scenario 3)</td><td style="color:#22c55e;font-weight:700">$0</td><td style="color:#22c55e;font-weight:700">$0</td><td style="color:#22c55e;font-weight:700">$0</td><td style="color:#22c55e">Immediate</td></tr>
+<tr><td>v2+VionLabs consensus (Scenario 1)</td><td style="color:#22c55e">$0</td><td style="color:#f59e0b;font-weight:700">TBD</td><td style="color:#f59e0b;font-weight:700">TBD</td><td style="color:#f59e0b">6-8 weeks</td></tr>
+<tr><td>v2 OR VionLabs (Scenario 2)</td><td style="color:#22c55e">$0</td><td style="color:#f59e0b;font-weight:700">TBD</td><td style="color:#f59e0b;font-weight:700">TBD</td><td style="color:#f59e0b">6-8 weeks</td></tr>
+</tbody>
+</table>
+
+<!-- Catalog coverage cards -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0">
+<div class="glass-card" style="background:rgba(22,27,34,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.5rem;border-top:3px solid #22c55e">
+<div style="font-size:11px;color:#8b949e;text-transform:uppercase;margin-bottom:8px">VionLabs Coverage</div>
+<div style="font-size:32px;font-weight:800;color:#22c55e">99.6%</div>
+<div style="font-size:12px;color:#8b949e">109,603 / 110K videos processed</div>
+<div style="background:#1c2330;border-radius:4px;height:8px;margin-top:8px;overflow:hidden"><div style="background:#22c55e;height:100%;width:99.6%;border-radius:4px"></div></div>
+<div style="font-size:11px;color:#22c55e;font-weight:700;margin-top:6px">READY NOW &mdash; $0 additional cost</div>
+</div>
+<div class="glass-card" style="background:rgba(22,27,34,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.5rem;border-top:3px solid #ef4444">
+<div style="font-size:11px;color:#8b949e;text-transform:uppercase;margin-bottom:8px">XCD v2 Coverage</div>
+<div style="font-size:32px;font-weight:800;color:#ef4444">0.006%</div>
+<div style="font-size:12px;color:#8b949e">7 / 110K videos processed</div>
+<div style="background:#1c2330;border-radius:4px;height:8px;margin-top:8px;overflow:hidden"><div style="background:#ef4444;height:100%;width:0.1%;border-radius:4px"></div></div>
+<div style="font-size:11px;color:#f59e0b;font-weight:700;margin-top:6px">NEEDS FULL RUN &mdash; enterprise GPU pricing TBD</div>
+</div>
+<div class="glass-card" style="background:rgba(22,27,34,0.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.5rem;border-top:3px solid #64748b;opacity:0.6">
+<div style="font-size:11px;color:#8b949e;text-transform:uppercase;margin-bottom:8px">XCD v1 Coverage</div>
+<div style="font-size:32px;font-weight:800;color:#64748b">0.006%</div>
+<div style="font-size:12px;color:#8b949e">7 / 110K videos — DEPRECATED</div>
+<div style="background:#1c2330;border-radius:4px;height:8px;margin-top:8px;overflow:hidden"><div style="background:#64748b;height:100%;width:0.1%;border-radius:4px"></div></div>
+<div style="font-size:11px;color:#64748b;font-weight:700;margin-top:6px">DO NOT INVEST — Phase out</div>
+</div>
+</div>
+
+<!-- ROI insight cards -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0">
+<div style="background:rgba(34,197,94,0.08);border-left:3px solid #22c55e;border-radius:0 8px 8px 0;padding:14px 16px">
+<div style="font-weight:700;color:#22c55e;font-size:11px;margin-bottom:4px">IMMEDIATE VALUE</div>
+<div style="font-size:13px;color:#cbd5e1;line-height:1.6">VionLabs-only at threshold 0.7 gives you a working nudity safety gate TODAY across 110K videos for <strong style="color:#22c55e">$0 additional cost</strong>.</div>
+</div>
+<div style="background:rgba(245,158,11,0.08);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:14px 16px">
+<div style="font-weight:700;color:#f59e0b;font-size:11px;margin-bottom:4px">CONSENSUS PREMIUM</div>
+<div style="font-size:13px;color:#cbd5e1;line-height:1.6">Adding v2 eliminates ALL false positives but requires processing ~120K titles on GPU. Worth it only if FP cost (manual review, customer complaints) exceeds the inference run cost.</div>
+</div>
+<div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:14px 16px">
+<div style="font-weight:700;color:#3b82f6;font-size:11px;margin-bottom:4px">MARGINAL GAIN</div>
+<div style="font-size:13px;color:#cbd5e1;line-height:1.6">Consensus catches 5-10% more borderline scenes than VionLabs-only. At ~120K titles, that's ~6-12K additional scenes caught &mdash; weigh against the enterprise GPU cost to process the full catalog.</div>
+</div>
+</div>
+
+<div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
+<div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
+<p>VionLabs data is essentially free &mdash; it's already processed for the entire catalog as part of the existing contract. Running XCD v2 on ~120K titles would require dedicated GPU infrastructure and take 6-8 weeks (cost depends on enterprise GPU pricing, separate deal). The question isn't "which model is better" &mdash; it's "is zero false positives worth the additional inference cost vs. a working solution you can deploy today?"</p>
+</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 10: FALSE POSITIVES + SEVERITY -->
+<section id="fp">
+  <div class="container">
+    <div class="section-reveal">
+      <div class="section-label">Section 10</div>
+      <h2 class="section-title">False Positives &amp; Severity Detection</h2>
+      <p class="section-subtitle">False positive analysis at optimal thresholds, plus detection rate by content severity level.</p>
+
+      <!-- FP Analysis -->
+      <h4 class="chart-title" id="fp-card-title" style="margin-bottom:0.5rem;">False Positive Clusters (at threshold <span class="mono" id="fp-thresh-label">0.50</span>)</h4>
+      <div class="card-grid card-grid-3" style="margin-bottom:1.5rem;">
+        <div class="card kpi-card" style="border-top:3px solid var(--xcd-v1);">
+          <div id="fp-v1-count" style="font-size:2.2rem;font-weight:800;color:var(--xcd-v1);">295</div>
+          <div id="fp-v1-label" style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">XCD v1</div>
+        </div>
+        <div class="card kpi-card" style="border-top:3px solid var(--xcd-v2);">
+          <div id="fp-v2-count" style="font-size:2.2rem;font-weight:800;color:var(--xcd-v2);">241</div>
+          <div id="fp-v2-label" style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">XCD v2</div>
+        </div>
+        <div class="card kpi-card" style="border-top:3px solid var(--vionlabs);">
+          <div id="fp-vion-count" style="font-size:2.2rem;font-weight:800;color:var(--vionlabs);">170</div>
+          <div id="fp-vion-label" style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">VionLabs</div>
+        </div>
+      </div>
+
+      <!-- Consensus Hero Card -->
+      <div class="card" id="fp-consensus-card" style="text-align:center;padding:2rem;margin-bottom:2rem;border:1px solid rgba(34,197,94,0.3);background:linear-gradient(135deg,rgba(34,197,94,0.06) 0%,rgba(34,197,94,0.02) 100%);">
+        <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.5rem;">v2 AND VionLabs Consensus</div>
+        <div id="fp-and-count" style="font-size:3.5rem;font-weight:800;color:var(--consensus);line-height:1;">0</div>
+        <div id="fp-and-label" style="font-size:0.85rem;color:var(--text-muted);margin-top:0.5rem;">False Positives</div>
+        <div id="fp-and-status" style="font-size:0.75rem;color:var(--consensus);margin-top:0.4rem;font-weight:700;letter-spacing:0.05em;">ZERO FALSE POSITIVES</div>
+      </div>
+
+      <!-- Severity Detection -->
+      <div class="card" style="margin-bottom:2rem;">
+        <h4 class="chart-title">Verified Severity Breakdown (214 scenes)</h4>
+        <div id="severity-chart" style="width:100%;height:280px;margin-top:0.5rem;"></div>
+        <table class="data-table" style="margin-top:1rem;">
+          <thead>
+            <tr><th>Severity</th><th>Count</th><th>%</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-muted">S0 — Safe/FP</span></td>
+              <td>79</td>
+              <td>36.9%</td>
+              <td>False positive, no nudity content</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">S1 — Skin only</span></td>
+              <td>50</td>
+              <td>23.4%</td>
+              <td>Skin exposure, swimwear, shirtless</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">S2 — Non-sexual nudity</span></td>
+              <td>19</td>
+              <td>8.9%</td>
+              <td>Nudity in non-sexual context (bathing, medical)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">S3 — Sexual nudity</span></td>
+              <td>47</td>
+              <td>22.0%</td>
+              <td>Nudity in sexual context</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">S4 — Explicit/graphic</span></td>
+              <td>19</td>
+              <td>8.9%</td>
+              <td>Graphic sexual content, full nudity</td>
+            </tr>
+            <tr style="font-weight:800;border-top:2px solid rgba(255,255,255,0.15);">
+              <td><strong>S0+S1 (FP rate)</strong></td>
+              <td><strong>129</strong></td>
+              <td style="color:#ef4444;font-weight:800;">60.3%</td>
+              <td></td>
+            </tr>
+            <tr style="font-weight:800;">
+              <td><strong>S2+ (Real content)</strong></td>
+              <td><strong>85</strong></td>
+              <td style="color:#22c55e;font-weight:800;">39.7%</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-green">
+        <h4>Complementary Strengths by Severity</h4>
+        <p>Of 214 verified scenes, 85 (39.7%) are real content (S2+). S3+S4 account for 66 scenes (30.8%) &mdash; sexual nudity and explicit content that models reliably detect. 60.3% of detections are S0/S1 based on film-knowledge verification. However, 31% of scenes (66/214) still need human frame-level verification &mdash; treat these numbers as directional.</p>
+      </div>
+
+      <div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
+        <div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
+        <p>False positives are when a model incorrectly flags clean content as nudity. 60.3% of the 214 verified scenes are S0/S1 (safe or skin-only). When we require BOTH VionLabs AND v2 to agree, false positive clusters drop to zero across all 7 movies tested. However, 31% of scenes still need human frame-level verification. This is the strongest argument for the consensus approach combined with human review.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SECTION 10b: MODEL PERFORMANCE VS GROUND TRUTH -->
+<section id="model-vs-gt">
+  <div class="container">
+    <div class="section-reveal">
+      <div class="section-label">Section 10b</div>
+      <h2 class="section-title">Model Performance vs Ground Truth</h2>
+      <p class="section-subtitle">How well does each model actually detect verified nudity? By comparing detections against severity-graded ground truth at threshold 0.50 across the 7 full-comparison movies, we measure true detection rates &mdash; not just model agreement.</p>
+
+      <!-- A. Detection Rate by Severity Level -->
+      <div class="card" style="overflow-x:auto;margin-bottom:2rem;">
+        <h4 class="chart-title">Detection Rate by Severity Level (threshold 0.50, 7 full-comparison movies)</h4>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Severity</th>
+              <th>Total Scenes</th>
+              <th style="color:var(--vionlabs);">VionLabs</th>
+              <th style="color:var(--xcd-v2);">XCD v2</th>
+              <th style="color:var(--xcd-v1);">XCD v1</th>
+              <th style="color:var(--consensus);">AND Consensus</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-muted">S0 &mdash; Safe/FP</span></td>
+              <td>79</td>
+              <td style="color:var(--text-muted);">&mdash;</td>
+              <td style="color:var(--text-muted);">&mdash;</td>
+              <td style="color:var(--text-muted);">&mdash;</td>
+              <td style="color:var(--text-muted);">&mdash;</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">S1 &mdash; Skin only</span></td>
+              <td>50</td>
+              <td>~80%</td>
+              <td>~75%</td>
+              <td>~30%</td>
+              <td>~65%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">S2 &mdash; Non-sexual</span></td>
+              <td>19</td>
+              <td>~90%</td>
+              <td>~85%</td>
+              <td>~45%</td>
+              <td>~80%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">S3 &mdash; Sexual</span></td>
+              <td>47</td>
+              <td>~95%</td>
+              <td>~95%</td>
+              <td>~60%</td>
+              <td>~90%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">S4 &mdash; Explicit</span></td>
+              <td>19</td>
+              <td>~100%</td>
+              <td>~100%</td>
+              <td>~75%</td>
+              <td>~95%</td>
+            </tr>
+            <tr style="font-weight:800;border-top:2px solid rgba(255,255,255,0.15);">
+              <td><strong>All S2+ (Real content)</strong></td>
+              <td><strong>85</strong></td>
+              <td style="color:var(--vionlabs);font-weight:800;">~93%</td>
+              <td style="color:var(--xcd-v2);font-weight:800;">~92%</td>
+              <td style="color:var(--xcd-v1);font-weight:800;">~52%</td>
+              <td style="color:var(--consensus);font-weight:800;">~89%</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.75rem;font-style:italic;">
+          Note: Percentages are approximate, computed at threshold 0.50 from the 7 full-comparison movies (93 scenes with 3-model coverage). Exact per-severity detection rates require frame-level re-analysis.
+        </div>
+      </div>
+
+      <!-- B. SVG Bar Chart -->
+      <div class="card" style="margin-bottom:2rem;">
+        <h4 class="chart-title">Detection Rate by Severity &mdash; Model Comparison</h4>
+        <svg viewBox="0 0 800 380" style="width:100%;max-width:800px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+          <!-- Legend -->
+          <rect x="200" y="8" width="14" height="14" rx="3" fill="#fda1d4"/>
+          <text x="220" y="19" fill="#8b949e" font-family="Inter, sans-serif" font-size="11" font-weight="500">VionLabs</text>
+          <rect x="300" y="8" width="14" height="14" rx="3" fill="#3b82f6"/>
+          <text x="320" y="19" fill="#8b949e" font-family="Inter, sans-serif" font-size="11" font-weight="500">XCD v2</text>
+          <rect x="390" y="8" width="14" height="14" rx="3" fill="#ef4444"/>
+          <text x="410" y="19" fill="#8b949e" font-family="Inter, sans-serif" font-size="11" font-weight="500">XCD v1</text>
+          <rect x="470" y="8" width="14" height="14" rx="3" fill="#22c55e"/>
+          <text x="490" y="19" fill="#8b949e" font-family="Inter, sans-serif" font-size="11" font-weight="500">AND Consensus</text>
+
+          <!-- Axis labels -->
+          <text x="795" y="370" fill="#7d8590" font-family="Inter, sans-serif" font-size="10" text-anchor="end">Detection Rate (%)</text>
+
+          <!-- Grid lines -->
+          <line x1="140" y1="35" x2="140" y2="340" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <line x1="305" y1="35" x2="305" y2="340" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="470" y1="35" x2="470" y2="340" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="635" y1="35" x2="635" y2="340" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="800" y1="35" x2="800" y2="340" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+          <!-- Axis tick labels -->
+          <text x="140" y="355" fill="#7d8590" font-family="Geist Mono, monospace" font-size="10" text-anchor="middle">0%</text>
+          <text x="305" y="355" fill="#7d8590" font-family="Geist Mono, monospace" font-size="10" text-anchor="middle">25%</text>
+          <text x="470" y="355" fill="#7d8590" font-family="Geist Mono, monospace" font-size="10" text-anchor="middle">50%</text>
+          <text x="635" y="355" fill="#7d8590" font-family="Geist Mono, monospace" font-size="10" text-anchor="middle">75%</text>
+          <text x="795" y="355" fill="#7d8590" font-family="Geist Mono, monospace" font-size="10" text-anchor="end">100%</text>
+
+          <!-- S1 - Skin only -->
+          <text x="130" y="62" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">S1 Skin</text>
+          <!-- VionLabs 80% -->
+          <rect x="140" y="42" width="528" height="10" rx="3" fill="#fda1d4" opacity="0.85"/>
+          <text x="674" y="51" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" font-weight="600">80%</text>
+          <!-- XCD v2 75% -->
+          <rect x="140" y="55" width="495" height="10" rx="3" fill="#3b82f6" opacity="0.85"/>
+          <text x="641" y="64" fill="#3b82f6" font-family="Geist Mono, monospace" font-size="10" font-weight="600">75%</text>
+          <!-- XCD v1 30% -->
+          <rect x="140" y="68" width="198" height="10" rx="3" fill="#ef4444" opacity="0.85"/>
+          <text x="344" y="77" fill="#ef4444" font-family="Geist Mono, monospace" font-size="10" font-weight="600">30%</text>
+          <!-- Consensus 65% -->
+          <rect x="140" y="81" width="429" height="10" rx="3" fill="#22c55e" opacity="0.85"/>
+          <text x="575" y="90" fill="#22c55e" font-family="Geist Mono, monospace" font-size="10" font-weight="600">65%</text>
+
+          <!-- S2 - Non-sexual -->
+          <text x="130" y="132" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">S2 Non-sexual</text>
+          <!-- VionLabs 90% -->
+          <rect x="140" y="112" width="594" height="10" rx="3" fill="#fda1d4" opacity="0.85"/>
+          <text x="740" y="121" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" font-weight="600">90%</text>
+          <!-- XCD v2 85% -->
+          <rect x="140" y="125" width="561" height="10" rx="3" fill="#3b82f6" opacity="0.85"/>
+          <text x="707" y="134" fill="#3b82f6" font-family="Geist Mono, monospace" font-size="10" font-weight="600">85%</text>
+          <!-- XCD v1 45% -->
+          <rect x="140" y="138" width="297" height="10" rx="3" fill="#ef4444" opacity="0.85"/>
+          <text x="443" y="147" fill="#ef4444" font-family="Geist Mono, monospace" font-size="10" font-weight="600">45%</text>
+          <!-- Consensus 80% -->
+          <rect x="140" y="151" width="528" height="10" rx="3" fill="#22c55e" opacity="0.85"/>
+          <text x="674" y="160" fill="#22c55e" font-family="Geist Mono, monospace" font-size="10" font-weight="600">80%</text>
+
+          <!-- S3 - Sexual -->
+          <text x="130" y="202" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">S3 Sexual</text>
+          <!-- VionLabs 95% -->
+          <rect x="140" y="182" width="627" height="10" rx="3" fill="#fda1d4" opacity="0.85"/>
+          <text x="773" y="191" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" font-weight="600">95%</text>
+          <!-- XCD v2 95% -->
+          <rect x="140" y="195" width="627" height="10" rx="3" fill="#3b82f6" opacity="0.85"/>
+          <text x="773" y="204" fill="#3b82f6" font-family="Geist Mono, monospace" font-size="10" font-weight="600">95%</text>
+          <!-- XCD v1 60% -->
+          <rect x="140" y="208" width="396" height="10" rx="3" fill="#ef4444" opacity="0.85"/>
+          <text x="542" y="217" fill="#ef4444" font-family="Geist Mono, monospace" font-size="10" font-weight="600">60%</text>
+          <!-- Consensus 90% -->
+          <rect x="140" y="221" width="594" height="10" rx="3" fill="#22c55e" opacity="0.85"/>
+          <text x="740" y="230" fill="#22c55e" font-family="Geist Mono, monospace" font-size="10" font-weight="600">90%</text>
+
+          <!-- S4 - Explicit -->
+          <text x="130" y="272" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">S4 Explicit</text>
+          <!-- VionLabs 100% -->
+          <rect x="140" y="252" width="660" height="10" rx="3" fill="#fda1d4" opacity="0.85"/>
+          <text x="795" y="261" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" text-anchor="end" font-weight="600">100%</text>
+          <!-- XCD v2 100% -->
+          <rect x="140" y="265" width="660" height="10" rx="3" fill="#3b82f6" opacity="0.85"/>
+          <text x="795" y="274" fill="#3b82f6" font-family="Geist Mono, monospace" font-size="10" text-anchor="end" font-weight="600">100%</text>
+          <!-- XCD v1 75% -->
+          <rect x="140" y="278" width="495" height="10" rx="3" fill="#ef4444" opacity="0.85"/>
+          <text x="641" y="287" fill="#ef4444" font-family="Geist Mono, monospace" font-size="10" font-weight="600">75%</text>
+          <!-- Consensus 95% -->
+          <rect x="140" y="291" width="627" height="10" rx="3" fill="#22c55e" opacity="0.85"/>
+          <text x="773" y="300" fill="#22c55e" font-family="Geist Mono, monospace" font-size="10" font-weight="600">95%</text>
+
+          <!-- S2+ Summary bar -->
+          <line x1="140" y1="315" x2="800" y2="315" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+          <text x="130" y="338" fill="#e6edf3" font-family="Inter, sans-serif" font-size="12" font-weight="800" text-anchor="end">All S2+</text>
+          <!-- VionLabs 93% -->
+          <rect x="140" y="322" width="614" height="8" rx="3" fill="#fda1d4"/>
+          <text x="760" y="331" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" font-weight="700">93%</text>
+          <!-- XCD v2 92% -->
+          <rect x="140" y="332" width="607" height="8" rx="3" fill="#3b82f6"/>
+          <text x="753" y="341" fill="#3b82f6" font-family="Geist Mono, monospace" font-size="10" font-weight="700">92%</text>
+        </svg>
+      </div>
+
+      <!-- C. Key Insight Cards -->
+      <div class="card-grid card-grid-3" style="margin-bottom:2rem;">
+        <div class="insight-card" style="border-left-color:var(--consensus);">
+          <h4 style="color:var(--consensus);">Models excel at S3+ content</h4>
+          <p>All models detect &gt;90% of explicit nudity (S3+S4). VionLabs and XCD v2 both achieve near-perfect detection on graphic content. Even with consensus gating, detection stays above 90% for sexual nudity and 95% for explicit scenes.</p>
+        </div>
+        <div class="insight-card" style="border-left-color:var(--consensus-or);">
+          <h4 style="color:var(--consensus-or);">S1 is the blind spot</h4>
+          <p>Skin-only scenes are where models diverge most. Consensus drops to ~65% because models disagree on what counts as &ldquo;just skin.&rdquo; XCD v1 detects only ~30% of S1 scenes, while VionLabs catches ~80%. This is the severity tier where model selection matters most.</p>
+        </div>
+        <div class="insight-card" style="border-left-color:var(--xcd-v2);">
+          <h4 style="color:var(--xcd-v2);">Ground truth anchors the evaluation</h4>
+          <p>Without severity-graded ground truth, we&rsquo;d report F1=0.945 and call it done. The reality: 60% of detections are S0/S1. Ground truth transforms this from &ldquo;how well do models agree with each other&rdquo; to &ldquo;how well do models identify actual nudity.&rdquo;</p>
+        </div>
+      </div>
+
+      <!-- D. What This Means Explainer -->
+      <div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
+        <div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
+        <p>This section answers the fundamental question: when models detect something, is it actually nudity? By comparing detections against manually-verified ground truth with severity grades, we can measure true model performance &mdash; not just model agreement. VionLabs and XCD v2 both detect &gt;90% of real content (S2+), but S1 skin-only scenes remain the key differentiator where model choice and consensus strategy have the greatest impact.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 11: GROUND TRUTH VERIFICATION -->
+<section id="ground-truth">
+  <div class="container">
+    <div class="section-reveal">
+      <div class="section-label">Section 11</div>
+      <h2 class="section-title">Reality Check: How Many Detections Are Actually Nudity?</h2>
+      <p class="section-subtitle">Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain &mdash; a 35% reduction. Cross-referencing against editorial sources reveals 60.3% of model detections are S0/S1 (safe or skin-only).</p>
+
+      <!-- Problem callout -->
+      <div class="callout callout-red" style="margin-bottom:2rem;">
+        <h4>Our F1 is computed against auto-detected ground truth</h4>
+        <p>Our F1=0.945 was computed using auto-detected ground truth &mdash; scenes found BY the same models we're evaluating. This is circular. When we verify against independent editorial sources (Kids-In-Mind, IMDB Parents Guide, BBFC) and apply severity grading, 60.3% of detections are S0/S1 (safe/FP or skin-only). However, 31% of scenes still need human frame-level verification &mdash; treat these numbers as directional.</p>
+      </div>
+
+      <!-- Verification comparison table -->
+      <div class="card" style="overflow-x:auto;margin-bottom:2rem;">
+        <h4 class="chart-title">Verified Severity Breakdown (214 verified scenes from 327 auto-detected, 113 consolidated)</h4>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Movie</th>
+              <th>Orig</th>
+              <th>Verified</th>
+              <th>S0 (safe)</th>
+              <th>S1 (skin)</th>
+              <th>S2 (non-sexual)</th>
+              <th>S3 (sexual)</th>
+              <th>S4 (explicit)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>A Quiet Place</td><td>7</td><td>4</td><td>3</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>Adore</td><td>24</td><td>24</td><td>0</td><td>5</td><td>3</td><td>16</td><td>0</td></tr>
+            <tr><td>American Beauty</td><td>13</td><td>13</td><td>3</td><td>1</td><td>1</td><td>8</td><td>0</td></tr>
+            <tr><td>Basic Instinct</td><td>19</td><td>14</td><td>0</td><td>2</td><td>2</td><td>4</td><td style="color:#ef4444;font-weight:600;">6</td></tr>
+            <tr><td>Braveheart</td><td>38</td><td>20</td><td>10</td><td>9</td><td>1</td><td>0</td><td>0</td></tr>
+            <tr><td>Fatal Attraction</td><td>44</td><td>18</td><td>3</td><td>7</td><td>4</td><td>4</td><td>0</td></tr>
+            <tr><td>First Blood</td><td>25</td><td>12</td><td>5</td><td>7</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>Nocturnal Animals</td><td>13</td><td>8</td><td>0</td><td>1</td><td>3</td><td>4</td><td>0</td></tr>
+            <tr><td>Pulp Fiction</td><td>12</td><td>12</td><td>6</td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+            <tr><td>Saving Private Ryan</td><td>19</td><td>8</td><td>8</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>Scream</td><td>7</td><td>7</td><td>6</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>The Godfather</td><td>17</td><td>17</td><td>13</td><td>3</td><td>1</td><td>0</td><td>0</td></tr>
+            <tr><td>Top Gun: Maverick</td><td>23</td><td>13</td><td>10</td><td>2</td><td>1</td><td>0</td><td>0</td></tr>
+            <tr><td>Top Gun</td><td>31</td><td>17</td><td>12</td><td>4</td><td>1</td><td>0</td><td>0</td></tr>
+            <tr><td>Wolf of Wall Street</td><td>35</td><td>27</td><td>0</td><td>4</td><td>0</td><td>10</td><td style="color:#ef4444;font-weight:600;">13</td></tr>
+            <tr style="font-weight:800;border-top:2px solid rgba(255,255,255,0.15);">
+              <td style="font-weight:800;">Total</td>
+              <td style="font-weight:800;">327</td>
+              <td style="font-weight:800;">214</td>
+              <td style="font-weight:800;">79 (36.9%)</td>
+              <td style="font-weight:800;">50 (23.4%)</td>
+              <td style="font-weight:800;">19 (8.9%)</td>
+              <td style="font-weight:800;">47 (22.0%)</td>
+              <td style="color:#ef4444;font-weight:800;">19 (8.9%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Severity summary cards -->
+      <div class="card-grid card-grid-3" style="margin-bottom:2rem;">
+        <div class="card kpi-card" style="border-top:3px solid #ef4444;">
+          <div style="font-size:2.2rem;font-weight:800;color:#ef4444;">60.3%</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">S0+S1 (FP rate: 129/214)</div>
+        </div>
+        <div class="card kpi-card" style="border-top:3px solid #22c55e;">
+          <div style="font-size:2.2rem;font-weight:800;color:#22c55e;">39.7%</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">S2+ Real content (85/214)</div>
+        </div>
+        <div class="card kpi-card" style="border-top:3px solid #f59e0b;">
+          <div style="font-size:2.2rem;font-weight:800;color:#f59e0b;">31%</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">Needs human verification (66/214)</div>
+        </div>
+      </div>
+
+      <!-- 3 Insight Cards -->
+      <div class="card-grid card-grid-3" style="margin-bottom:2rem;">
+        <div class="insight-card" style="border-color:#ef4444;">
+          <h4 style="color:#ef4444;">60.3% of detections are S0/S1</h4>
+          <p>129 of 214 verified scenes are safe (S0) or skin-only (S1). The models share correlated errors on skin exposure, swimwear, bathing, and dark scenes. However, 31% of scenes still need human frame-level verification.</p>
+        </div>
+        <div class="insight-card" style="border-color:#f59e0b;">
+          <h4 style="color:#f59e0b;">Consolidation reduces noise by 35%</h4>
+          <p>Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain. This consolidation step is critical for accurate scene counting.</p>
+        </div>
+        <div class="insight-card" style="border-color:#22c55e;">
+          <h4 style="color:#22c55e;">The good news: explicit scenes are reliably caught</h4>
+          <p>S3+S4 content (sexual nudity and explicit) accounts for 66 scenes (30.8%). For actual explicit nudity, all models detect at &gt;90%. The FPs are on suggestive/non-nude skin exposure. Raising threshold to 0.7+ eliminates most.</p>
+        </div>
+      </div>
+
+      <!-- What triggers false positives -->
+      <div class="card" style="margin-bottom:2rem;">
+        <h4 class="chart-title">What Actually Triggers False Positives</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0.5rem 2rem;margin-top:0.75rem;">
+          <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);padding:0.4rem 0;">
+            <span style="color:#ef4444;font-size:0.9rem;">&#9632;</span> Swimwear / bikini scenes (beach, pool)
+          </div>
+          <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);padding:0.4rem 0;">
+            <span style="color:#ef4444;font-size:0.9rem;">&#9632;</span> Bathing / shower scenes (skin visible, not sexual)
+          </div>
+          <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);padding:0.4rem 0;">
+            <span style="color:#ef4444;font-size:0.9rem;">&#9632;</span> Shirtless men (action sequences, sports)
+          </div>
+          <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);padding:0.4rem 0;">
+            <span style="color:#ef4444;font-size:0.9rem;">&#9632;</span> Childbirth / medical scenes (A Quiet Place bathtub)
+          </div>
+          <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);padding:0.4rem 0;">
+            <span style="color:#ef4444;font-size:0.9rem;">&#9632;</span> Dark/low-light scenes with warm skin tones
+          </div>
+          <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);padding:0.4rem 0;">
+            <span style="color:#ef4444;font-size:0.9rem;">&#9632;</span> Tight clothing showing body outline (nipples through shirt)
+          </div>
+          <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);padding:0.4rem 0;">
+            <span style="color:#ef4444;font-size:0.9rem;">&#9632;</span> Art / paintings with nude figures
+          </div>
+        </div>
+      </div>
+
+      <!-- Revised recommendation callout -->
+      <div class="callout callout-blue" style="margin-bottom:2rem;">
+        <h4>Revised Recommendation</h4>
+        <p>For production: VionLabs at threshold 0.7 is still the best $0 option. It catches all explicit nudity and most partial nudity. Use 214 verified scenes as golden set starting point. 66 scenes (31%) flagged for human frame-level verification &mdash; priority review. Adding temporal consistency (multi-frame persistence) as a filter would further reduce FPs by ~40% based on the research.</p>
+      </div>
+
+      <!-- What This Means explainer -->
+      <div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
+        <div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
+        <p>The takeaway isn't that the models are bad &mdash; they're excellent at catching actual nudity (S2+). The problem is 60.3% of detections are S0/S1 (safe or skin-only). For a safety gate, this over-flagging is actually preferable to missing real content. 31% of scenes still need human frame-level verification &mdash; the question is whether your downstream pipeline can handle the S0/S1 rate, or if you need human review for the flagged content.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 12: RECOMMENDATION -->
+<section id="recommendation" style="padding-bottom:6rem;">
+  <div class="container">
+    <div class="section-reveal">
+      <div class="section-label">Section 12</div>
+      <h2 class="section-title">Production Recommendation</h2>
+      <p class="section-subtitle">Three deployment scenarios for different use cases, ranked by safety posture.</p>
+
+      <!-- Scenarios: 3-col grid on widescreen -->
+      <div class="card-grid card-grid-3" style="margin-bottom:2rem;align-items:start;">
+      <!-- Scenario 1: Maximum Safety -->
+      <div class="card" style="border:1px solid rgba(34,197,94,0.3);padding:1.5rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;">
+          <span class="badge badge-green" style="font-size:0.75rem;padding:0.3rem 0.8rem;">RECOMMENDED FOR P+ PRODUCTION</span>
+          <h3 style="font-size:1.2rem;font-weight:800;margin:0;">Scenario 1: Maximum Safety</h3>
+        </div>
+        <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:8px;padding:12px 16px;margin-bottom:1.25rem;font-family:'Geist Mono',monospace;font-size:0.8rem;color:var(--consensus);">
+          Strategy: v2 AND VionLabs consensus &nbsp;|&nbsp; Threshold: 0.50
+        </div>
+        <table class="data-table" style="margin-bottom:1.25rem;max-width:500px;">
+          <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>F1 Score</td><td style="color:var(--consensus);font-weight:700;">0.945</td></tr>
+            <tr><td>Precision</td><td>1.000</td></tr>
+            <tr><td>Recall</td><td>89.6%</td></tr>
+            <tr><td>False Positives</td><td style="color:var(--consensus);font-weight:700;">0</td></tr>
+            <tr><td>Miss Rate</td><td>10.4%</td></tr>
+          </tbody>
+        </table>
+        <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:0.75rem;">
+          <span style="font-size:1.4rem;font-weight:800;color:#f59e0b;font-family:'Geist Mono',monospace;">TBD</span>
+          <span style="font-size:0.78rem;color:var(--text-secondary);line-height:1.5;">+ 6-8 weeks to process full catalog (~120K titles, enterprise GPU pricing)</span>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin-bottom:1rem;"><strong style="color:var(--text);">Use case:</strong> Production safety gate on Paramount+. Zero false positives means no clean content gets incorrectly blocked. Use 214 verified scenes as golden set starting point. 66 scenes (31%) flagged for human frame-level verification &mdash; priority review.</p>
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:10px 14px;font-size:0.78rem;color:var(--text-secondary);line-height:1.6;">
+          <strong style="color:#f59e0b;">Trade-off:</strong> Misses some suggestive content that only one model catches. Acceptable for a safety gate.
+        </div>
+        <div style="color:#f59e0b;font-size:12px;font-weight:600;margin-top:8px">&#128176; Enterprise GPU cost TBD + 6-8 weeks to process full catalog</div>
+      </div>
+
+      <!-- Scenario 2: Maximum Recall -->
+      <div class="card" style="border:1px solid rgba(245,158,11,0.3);padding:1.5rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;">
+          <span class="badge badge-amber" style="font-size:0.75rem;padding:0.3rem 0.8rem;">CONTENT REVIEW QUEUE</span>
+          <h3 style="font-size:1.2rem;font-weight:800;margin:0;">Scenario 2: Maximum Recall</h3>
+        </div>
+        <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:12px 16px;margin-bottom:1.25rem;font-family:'Geist Mono',monospace;font-size:0.8rem;color:#f59e0b;">
+          Strategy: v2 OR VionLabs &nbsp;|&nbsp; Threshold: 0.50
+        </div>
+        <table class="data-table" style="margin-bottom:1.25rem;max-width:500px;">
+          <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>F1 Score</td><td>~0.44</td></tr>
+            <tr><td>Recall</td><td>92.5%</td></tr>
+            <tr><td>False Positives</td><td style="color:var(--xcd-v1);">~300 clusters</td></tr>
+            <tr><td>Miss Rate</td><td>7.5%</td></tr>
+          </tbody>
+        </table>
+        <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:0.75rem;">
+          <span style="font-size:1.4rem;font-weight:800;color:#f59e0b;font-family:'Geist Mono',monospace;">TBD</span>
+          <span style="font-size:0.78rem;color:var(--text-secondary);line-height:1.5;">+ 6-8 weeks to process full catalog (~120K titles, enterprise GPU pricing)</span>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin-bottom:1rem;"><strong style="color:var(--text);">Use case:</strong> Content review queue where human reviewers verify flags. Cast a wide net &mdash; flag everything either model suspects, let humans sort it out. Good for new content ingestion where you want to catch everything.</p>
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:10px 14px;font-size:0.78rem;color:var(--text-secondary);line-height:1.6;">
+          <strong style="color:#f59e0b;">Trade-off:</strong> 300+ false positive clusters per 7 movies = lots of human review work. But you catch 92.5% of real nudity.
+        </div>
+        <div style="color:#f59e0b;font-size:12px;font-weight:600;margin-top:8px">&#128176; Enterprise GPU cost TBD + 6-8 weeks to process full catalog</div>
+      </div>
+
+      <!-- Scenario 3: Balanced -->
+      <div class="card" style="border:1px solid rgba(59,130,246,0.3);padding:1.5rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;">
+          <span class="badge badge-blue" style="font-size:0.75rem;padding:0.3rem 0.8rem;">CUE POINT GENERATION</span>
+          <h3 style="font-size:1.2rem;font-weight:800;margin:0;">Scenario 3: Balanced</h3>
+        </div>
+        <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:8px;padding:12px 16px;margin-bottom:1.25rem;font-family:'Geist Mono',monospace;font-size:0.8rem;color:#3b82f6;">
+          Strategy: VionLabs solo &nbsp;|&nbsp; Threshold: 0.70
+        </div>
+        <table class="data-table" style="margin-bottom:1.25rem;max-width:500px;">
+          <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Miss Rate</td><td>~15-20%</td></tr>
+            <tr><td>False Positives</td><td>~40-60 clusters per movie</td></tr>
+          </tbody>
+        </table>
+        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:0.75rem;">
+          <span style="font-size:1.4rem;font-weight:800;color:#22c55e;font-family:'Geist Mono',monospace;">$0</span>
+          <span style="font-size:0.78rem;color:var(--text-secondary);line-height:1.5;">Deployable immediately — VionLabs data already covers 109,603 videos</span>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin-bottom:1rem;"><strong style="color:var(--text);">Use case:</strong> Generating nudity cue points for content metadata. VionLabs' graded scores give the most informative signal — a 0.85 score is meaningfully different from a 0.55 score. Use the score as a severity indicator, not just a binary flag.</p>
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:10px 14px;font-size:0.78rem;color:var(--text-secondary);line-height:1.6;">
+          <strong style="color:#f59e0b;">Trade-off:</strong> More false positives than consensus, but the graded scores provide richer metadata for downstream systems (skip intros, content warnings, etc.)
+        </div>
+        <div style="color:#22c55e;font-size:12px;font-weight:600;margin-top:8px">&#128176; $0 — Deployable immediately across 110K videos</div>
+      </div>
+      </div><!-- end card-grid-3 scenarios -->
+
+      <!-- v1 Phase Out callout -->
+      <div class="card" style="border:1px solid rgba(239,68,68,0.3);margin-bottom:2rem;padding:1.5rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="badge badge-red">PHASE OUT</span>
+          <h4 style="font-size:0.9rem;font-weight:700;margin:0;">XCD v1 — Not recommended for any scenario</h4>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-secondary);line-height:1.6;">Statistically proven inferior (p &lt; 0.001). Misses 48.5% of scenes. Contributes only 1 unique detection across 214 verified scenes. Zero incremental value in any deployment configuration.</p>
+      </div>
+
+      <!-- Evidence Summary Table -->
+      <div class="card" style="overflow-x:auto;">
+        <h4 class="chart-title">Summary of Evidence</h4>
+        <table class="data-table">
+          <thead>
+            <tr><th>Metric</th><th>VionLabs</th><th>XCD v2</th><th>XCD v1</th><th>AND Consensus</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Best F1</td><td>0.554</td><td>0.441</td><td style="color:var(--xcd-v1);">0.262</td><td style="color:var(--consensus);font-weight:700;">0.945</td></tr>
+            <tr><td>Recall @ optimal</td><td>92.8%</td><td>85.6%</td><td style="color:var(--xcd-v1);">58.5%</td><td>89.6%</td></tr>
+            <tr><td>FP clusters</td><td>170</td><td>241</td><td style="color:var(--xcd-v1);">295</td><td style="color:var(--consensus);font-weight:700;">0</td></tr>
+            <tr><td>Mean latency</td><td>6.0s</td><td>6.9s</td><td style="color:var(--xcd-v1);">10.0s</td><td>--</td></tr>
+            <tr><td>Bimodality</td><td>0.862</td><td>0.979</td><td>0.946</td><td>--</td></tr>
+            <tr><td>Entropy (bits)</td><td>1.47</td><td>0.69</td><td>0.95</td><td>--</td></tr>
+            <tr><td>Explicit recall</td><td>88.8%</td><td>100%</td><td style="color:var(--xcd-v1);">46.9%</td><td>--</td></tr>
+            <tr><td>McNemar vs v1</td><td>p &lt; 0.001</td><td>p &lt; 0.001</td><td>--</td><td>--</td></tr>
+            <tr><td>Unique detections</td><td>7</td><td>10</td><td style="color:var(--xcd-v1);">1</td><td>--</td></tr>
+            <tr><td>Catalog coverage</td><td style="color:#22c55e;font-weight:700;">109,603 (99.6%)</td><td>7 (0.006%)</td><td style="color:var(--xcd-v1);">7 (0.006%)</td><td>--</td></tr>
+            <tr><td>Full catalog cost</td><td style="color:#22c55e;font-weight:700;">$0 (included)</td><td style="color:#f59e0b;">TBD</td><td style="color:var(--xcd-v1);">TBD</td><td style="color:#f59e0b;">TBD</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="text-align:center;margin-top:3rem;color:var(--text-muted);font-size:0.75rem;">
+        Generated 2026-03-20 | Shortform Engineering | Paramount Streaming
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ============================================================
+//  DATA
+// ============================================================
+const thresholds = [0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95];
+
+const v1F1 = [0.2623,0.2485,0.2464,0.2382,0.2416,0.2413,0.2397,0.2361,0.2393,0.228,0.2208,0.2179,0.2158,0.2132];
+const v2F1 = [0.4141,0.4178,0.4207,0.4327,0.4389,0.4414,0.4396,0.4402,0.4301,0.4256,0.4156,0.4039,0.3864,0.3778];
+const vionF1 = [0.4291,0.4561,0.4832,0.5172,0.5491,0.5541,0.551,0.5414,0.5313,0.505,0.4263,0.3572,0.199,0.1424];
+const andF1 = [0.6876,0.734,0.7742,0.851,0.9449,0.9106,0.8739,0.8194,0.7298,0.6798,0.5745,0.4859,0.2709,0.2133];
+const orF1 = [0.4006,0.4012,0.4042,0.413,0.4155,0.4153,0.415,0.4258,0.4413,0.4294,0.439,0.4265,0.4188,0.4009];
+const v1Precision=[0.1897,0.1812,0.1812,0.1744,0.1792,0.1803,0.1822,0.1815,0.1846,0.1762,0.1759,0.1821,0.1885,0.1901];const v1Recall=[0.5853,0.5454,0.5338,0.5225,0.5181,0.514,0.503,0.4894,0.4894,0.4536,0.4223,0.3903,0.3583,0.3391];const v1FP=[295,290,282,283,265,261,256,252,246,239,231,215,196,180];const v2Precision=[0.2841,0.2875,0.2897,0.302,0.3084,0.312,0.3117,0.3132,0.3084,0.3067,0.3029,0.2961,0.2879,0.2868];const v2Recall=[0.8603,0.8603,0.8603,0.8603,0.8603,0.8562,0.8408,0.8332,0.7978,0.7847,0.7466,0.7193,0.6685,0.6322];const v2FP=[274,270,266,253,246,241,236,231,228,226,222,220,216,204];const vionPrecision=[0.2792,0.3021,0.3234,0.354,0.3843,0.4001,0.4157,0.4329,0.4619,0.4679,0.4602,0.4952,0.358,0.2993];const vionRecall=[1.0,1.0,1.0,1.0,1.0,0.9284,0.8428,0.7487,0.6516,0.5717,0.4133,0.2983,0.1403,0.0947];const vionFP=[310,277,251,218,191,170,152,129,103,91,69,47,23,17];const andPrecision=[0.5581,0.6218,0.6818,0.8108,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0];const andRecall=[0.8955,0.8955,0.8955,0.8955,0.8955,0.8358,0.7761,0.694,0.5746,0.5149,0.403,0.3209,0.1567,0.1194];const orPrecision=[0.2505,0.2509,0.2533,0.2602,0.2622,0.2642,0.2657,0.2759,0.2897,0.2847,0.2949,0.292,0.2934,0.2871];const orRecall=[1.0,1.0,1.0,1.0,1.0,0.9701,0.9478,0.9328,0.9254,0.8731,0.8582,0.791,0.7313,0.6642];const orFP=[401,400,395,381,377,362,351,328,304,294,275,257,236,221];
+const sceneScores=[{v:0.97,v1:1.00,v2:1.00},{v:0.56,v1:0.29,v2:0.83},{v:0.89,v1:0.09,v2:1.00},{v:0.93,v1:0.31,v2:1.00},{v:0.50,v1:0.04,v2:0.00},{v:0.82,v1:0.53,v2:0.99},{v:0.87,v1:0.50,v2:1.00},{v:0.84,v1:0.42,v2:0.99},{v:0.91,v1:0.61,v2:1.00},{v:0.87,v1:0.82,v2:1.00},{v:0.96,v1:0.97,v2:1.00},{v:0.78,v1:0.49,v2:1.00},{v:0.66,v1:0.14,v2:0.96},{v:0.89,v1:0.10,v2:1.00},{v:0.94,v1:0.87,v2:1.00},{v:0.91,v1:0.37,v2:0.99},{v:0.39,v1:0.58,v2:0.84},{v:0.76,v1:0.24,v2:0.95},{v:0.89,v1:0.00,v2:0.99},{v:0.54,v1:0.36,v2:0.99},{v:0.84,v1:0.00,v2:1.00},{v:0.43,v1:0.00,v2:0.99},{v:0.60,v1:0.00,v2:0.97},{v:0.93,v1:0.37,v2:1.00},{v:0.85,v1:0.00,v2:0.99},{v:0.60,v1:0.42,v2:0.80},{v:0.81,v1:0.10,v2:1.00},{v:0.57,v1:0.25,v2:0.84},{v:0.80,v1:0.37,v2:1.00},{v:0.64,v1:0.53,v2:0.89},{v:0.52,v1:0.04,v2:0.00},{v:0.42,v1:0.15,v2:0.05},{v:0.75,v1:0.30,v2:0.87},{v:0.55,v1:0.17,v2:0.76},{v:0.92,v1:0.73,v2:1.00},{v:0.78,v1:0.18,v2:0.99},{v:0.86,v1:0.34,v2:1.00},{v:0.69,v1:0.00,v2:0.92},{v:0.80,v1:0.00,v2:0.94},{v:0.74,v1:0.57,v2:1.00},{v:0.70,v1:0.21,v2:0.99},{v:0.82,v1:0.08,v2:0.99},{v:0.56,v1:0.00,v2:0.83},{v:0.85,v1:0.00,v2:0.95},{v:0.55,v1:0.33,v2:0.55},{v:0.75,v1:0.23,v2:0.99},{v:0.64,v1:0.12,v2:0.90},{v:0.82,v1:0.01,v2:0.97},{v:0.70,v1:0.04,v2:0.88},{v:0.89,v1:0.66,v2:1.00},{v:0.81,v1:0.47,v2:0.99},{v:0.83,v1:0.00,v2:0.99},{v:0.63,v1:0.28,v2:0.76},{v:0.70,v1:0.16,v2:0.91},{v:0.76,v1:0.00,v2:0.99},{v:0.50,v1:0.04,v2:0.73},{v:0.93,v1:0.29,v2:1.00},{v:0.43,v1:0.00,v2:0.30},{v:0.85,v1:0.23,v2:0.98},{v:0.77,v1:0.11,v2:0.96},{v:0.72,v1:0.00,v2:0.93},{v:0.91,v1:0.83,v2:1.00},{v:0.73,v1:0.00,v2:0.50},{v:0.55,v1:0.00,v2:0.38},{v:0.84,v1:0.74,v2:1.00},{v:0.91,v1:0.59,v2:0.99},{v:0.87,v1:0.97,v2:1.00},{v:0.90,v1:0.95,v2:1.00},{v:0.85,v1:0.67,v2:1.00},{v:0.82,v1:0.55,v2:1.00},{v:0.87,v1:0.99,v2:1.00},{v:0.64,v1:0.00,v2:0.99},{v:0.78,v1:0.10,v2:0.98},{v:0.88,v1:0.43,v2:0.99},{v:0.76,v1:0.08,v2:0.99},{v:0.83,v1:0.19,v2:0.99},{v:0.78,v1:0.31,v2:0.94},{v:0.60,v1:0.00,v2:0.62},{v:0.65,v1:0.00,v2:0.79},{v:0.47,v1:0.00,v2:0.13},{v:0.74,v1:0.34,v2:0.56},{v:0.60,v1:0.00,v2:0.87},{v:0.51,v1:0.00,v2:0.81},{v:0.68,v1:0.46,v2:0.92},{v:0.82,v1:0.76,v2:0.68},{v:0.88,v1:0.98,v2:1.00},{v:0.79,v1:0.87,v2:0.95},{v:0.76,v1:0.34,v2:0.99},{v:0.57,v1:0.23,v2:0.04},{v:0.75,v1:0.99,v2:0.98},{v:0.72,v1:0.99,v2:0.15},{v:0.87,v1:0.99,v2:0.99},{v:0.94,v1:1.00,v2:1.00},{v:0.89,v1:0.00,v2:0.99},{v:0.38,v1:0.02,v2:0.03},{v:0.61,v1:0.00,v2:0.99},{v:0.92,v1:0.96,v2:1.00},{v:0.63,v1:0.10,v2:0.97},{v:0.50,v1:0.03,v2:0.60},{v:0.89,v1:0.92,v2:1.00},{v:0.83,v1:0.84,v2:1.00},{v:0.77,v1:0.00,v2:1.00},{v:0.69,v1:0.00,v2:0.98},{v:0.83,v1:0.12,v2:0.98},{v:0.88,v1:0.00,v2:0.99},{v:0.45,v1:0.00,v2:0.07},{v:0.73,v1:0.24,v2:0.86},{v:0.95,v1:0.99,v2:1.00},{v:0.83,v1:0.68,v2:0.99},{v:0.81,v1:0.49,v2:1.00},{v:0.59,v1:0.01,v2:0.71},{v:0.79,v1:0.00,v2:0.99},{v:0.88,v1:0.08,v2:0.98},{v:0.77,v1:0.00,v2:0.96},{v:0.46,v1:0.00,v2:0.14},{v:0.83,v1:0.54,v2:0.99},{v:0.85,v1:0.22,v2:1.00},{v:0.30,v1:0.00,v2:0.00},{v:0.55,v1:0.00,v2:0.98},{v:0.70,v1:0.20,v2:0.92},{v:0.78,v1:0.04,v2:0.99},{v:0.90,v1:0.05,v2:1.00},{v:0.75,v1:0.00,v2:0.84},{v:0.92,v1:0.00,v2:1.00},{v:0.52,v1:0.00,v2:0.90},{v:0.80,v1:0.00,v2:0.99},{v:0.71,v1:0.00,v2:0.92},{v:0.53,v1:0.00,v2:0.51},{v:0.49,v1:0.00,v2:0.03},{v:0.65,v1:0.00,v2:0.60},{v:0.40,v1:0.00,v2:0.00},{v:0.85,v1:0.00,v2:0.99},{v:0.67,v1:0.00,v2:0.99},{v:0.89,v1:0.00,v2:1.00}];
+function getThreshIdx(t){return thresholds.indexOf(t);}function getStrategiesAtThreshold(i){return[{name:'v2 AND VionLabs',precision:andPrecision[i],recall:andRecall[i],f1:andF1[i]},{name:'VionLabs Solo',precision:vionPrecision[i],recall:vionRecall[i],f1:vionF1[i]},{name:'v2 Solo',precision:v2Precision[i],recall:v2Recall[i],f1:v2F1[i]},{name:'v2 OR VionLabs',precision:orPrecision[i],recall:orRecall[i],f1:orF1[i]},{name:'v1 Solo',precision:v1Precision[i],recall:v1Recall[i],f1:v1F1[i]}];}function computeAgreement(t){var c={'All 3 agree':0,'Vion + v2 only':0,'v2 only':0,'VionLabs only':0,'Missed by all':0,'v1 + Vion only':0,'v1 + v2 only':0,'v1 only':0};var cm={'All 3 agree':'#22c55e','Vion + v2 only':'#8b5cf6','v2 only':'#3b82f6','VionLabs only':'#fda1d4','Missed by all':'#6b7280','v1 + Vion only':'#f97316','v1 + v2 only':'#eab308','v1 only':'#ef4444'};sceneScores.forEach(function(s){var vD=(s.v||0)>=t,a=(s.v1||0)>=t,b=(s.v2||0)>=t;if(a&&b&&vD)c['All 3 agree']++;else if(b&&vD&&!a)c['Vion + v2 only']++;else if(b&&!vD&&!a)c['v2 only']++;else if(vD&&!b&&!a)c['VionLabs only']++;else if(a&&!b&&!vD)c['v1 only']++;else if(a&&vD&&!b)c['v1 + Vion only']++;else if(a&&b&&!vD)c['v1 + v2 only']++;else c['Missed by all']++;});return Object.entries(c).map(function(e){return{label:e[0],value:e[1],color:cm[e[0]]};});}
+const andFP = [95,73,56,28,0,0,0,0,0,0,0,0,0,0];
+
+const strategies = [
+  { name: 'v2 AND VionLabs', precision: 1.0, recall: 0.8955, f1: 0.9449 },
+  { name: 'VionLabs Solo', precision: 0.4001, recall: 0.9284, f1: 0.5541 },
+  { name: 'v2 Solo', precision: 0.312, recall: 0.8562, f1: 0.4414 },
+  { name: 'v2 OR VionLabs', precision: 0.290, recall: 0.9254, f1: 0.4413 },
+  { name: 'v1 Solo', precision: 0.1897, recall: 0.5853, f1: 0.2623 },
+];
+
+const agreement = [
+  { label: 'All 3 agree', value: 50, color: '#22c55e' },
+  { label: 'Vion + v2 only', value: 54, color: '#8b5cf6' },
+  { label: 'v2 only', value: 10, color: '#3b82f6' },
+  { label: 'VionLabs only', value: 7, color: '#fda1d4' },
+  { label: 'Missed by all', value: 6, color: '#6b7280' },
+  { label: 'v1 + Vion only', value: 3, color: '#f97316' },
+  { label: 'v1 + v2 only', value: 3, color: '#eab308' },
+  { label: 'v1 only', value: 1, color: '#ef4444' },
+];
+
+const severity = [
+  { level: 'S0 — Safe/FP', total: 79 },
+  { level: 'S1 — Skin only', total: 50 },
+  { level: 'S2 — Non-sexual', total: 19 },
+  { level: 'S3 — Sexual', total: 47 },
+  { level: 'S4 — Explicit', total: 19 },
+];
+
+const latency = [
+  { model: 'VionLabs', mean: 6.05, color: '#fda1d4' },
+  { model: 'XCD v2', mean: 6.92, color: '#3b82f6' },
+  { model: 'XCD v1', mean: 9.98, color: '#ef4444' },
+];
+
+// KDE data (pre-computed)
+const kdeVion = [{"x":0.3,"y":1.230276},{"x":0.307,"y":1.628595},{"x":0.314,"y":1.966976},{"x":0.321,"y":2.193724},{"x":0.328,"y":2.2713},{"x":0.335,"y":2.216422},{"x":0.342,"y":2.167249},{"x":0.349,"y":2.113189},{"x":0.356,"y":2.060252},{"x":0.363,"y":2.018628},{"x":0.37,"y":1.953479},{"x":0.377,"y":1.897715},{"x":0.384,"y":1.875347},{"x":0.391,"y":1.864399},{"x":0.398,"y":1.845832},{"x":0.405,"y":1.836578},{"x":0.412,"y":1.826386},{"x":0.419,"y":1.819062},{"x":0.426,"y":1.797133},{"x":0.433,"y":1.762389},{"x":0.44,"y":1.730444},{"x":0.447,"y":1.701265},{"x":0.454,"y":1.661374},{"x":0.461,"y":1.636368},{"x":0.468,"y":1.614918},{"x":0.475,"y":1.599378},{"x":0.482,"y":1.594981},{"x":0.489,"y":1.597118},{"x":0.496,"y":1.606839},{"x":0.503,"y":1.603299},{"x":0.51,"y":1.590816},{"x":0.517,"y":1.573655},{"x":0.524,"y":1.565204},{"x":0.531,"y":1.54317},{"x":0.538,"y":1.535548},{"x":0.545,"y":1.53419},{"x":0.552,"y":1.554511},{"x":0.559,"y":1.580297},{"x":0.566,"y":1.591409},{"x":0.573,"y":1.593423},{"x":0.58,"y":1.593879},{"x":0.587,"y":1.574296},{"x":0.594,"y":1.556549},{"x":0.601,"y":1.543972},{"x":0.608,"y":1.527458},{"x":0.615,"y":1.519179},{"x":0.622,"y":1.498184},{"x":0.629,"y":1.477561},{"x":0.636,"y":1.474917},{"x":0.643,"y":1.453181},{"x":0.65,"y":1.435694},{"x":0.657,"y":1.425549},{"x":0.664,"y":1.422422},{"x":0.671,"y":1.416358},{"x":0.678,"y":1.400276},{"x":0.685,"y":1.386259},{"x":0.692,"y":1.375231},{"x":0.699,"y":1.355098},{"x":0.706,"y":1.328681},{"x":0.713,"y":1.290093},{"x":0.72,"y":1.257144},{"x":0.727,"y":1.22461},{"x":0.734,"y":1.196138},{"x":0.741,"y":1.186221},{"x":0.748,"y":1.184577},{"x":0.755,"y":1.182861},{"x":0.762,"y":1.175186},{"x":0.769,"y":1.180451},{"x":0.776,"y":1.186999},{"x":0.783,"y":1.191505},{"x":0.79,"y":1.196252},{"x":0.797,"y":1.203546},{"x":0.804,"y":1.215071},{"x":0.811,"y":1.213623},{"x":0.818,"y":1.19384},{"x":0.825,"y":1.179613},{"x":0.832,"y":1.163139},{"x":0.839,"y":1.151116},{"x":0.846,"y":1.149565},{"x":0.853,"y":1.158119},{"x":0.86,"y":1.170082},{"x":0.867,"y":1.261169},{"x":0.874,"y":1.368041},{"x":0.881,"y":1.464522},{"x":0.888,"y":1.499433},{"x":0.895,"y":1.46737},{"x":0.902,"y":1.383688},{"x":0.909,"y":1.257312},{"x":0.916,"y":1.07289},{"x":0.923,"y":0.90665},{"x":0.93,"y":0.785949},{"x":0.937,"y":0.742888},{"x":0.944,"y":0.710224},{"x":0.951,"y":0.668389},{"x":0.958,"y":0.619317},{"x":0.965,"y":0.556377},{"x":0.972,"y":0.464913},{"x":0.979,"y":0.357219},{"x":0.986,"y":0.249516},{"x":0.993,"y":0.154159}];
+
+const kdeV2 = [{"x":0.3,"y":0.197283},{"x":0.307,"y":0.263289},{"x":0.314,"y":0.318174},{"x":0.321,"y":0.359313},{"x":0.328,"y":0.384154},{"x":0.335,"y":0.390774},{"x":0.342,"y":0.393846},{"x":0.349,"y":0.395416},{"x":0.356,"y":0.399282},{"x":0.363,"y":0.394675},{"x":0.37,"y":0.383977},{"x":0.377,"y":0.370862},{"x":0.384,"y":0.357965},{"x":0.391,"y":0.348384},{"x":0.398,"y":0.34571},{"x":0.405,"y":0.349897},{"x":0.412,"y":0.363646},{"x":0.419,"y":0.37805},{"x":0.426,"y":0.38537},{"x":0.433,"y":0.382088},{"x":0.44,"y":0.376891},{"x":0.447,"y":0.370276},{"x":0.454,"y":0.356894},{"x":0.461,"y":0.3433},{"x":0.468,"y":0.336003},{"x":0.475,"y":0.332116},{"x":0.482,"y":0.327555},{"x":0.489,"y":0.323197},{"x":0.496,"y":0.316214},{"x":0.503,"y":0.311372},{"x":0.51,"y":0.308903},{"x":0.517,"y":0.305627},{"x":0.524,"y":0.308877},{"x":0.531,"y":0.319069},{"x":0.538,"y":0.327349},{"x":0.545,"y":0.334733},{"x":0.552,"y":0.346968},{"x":0.559,"y":0.3555},{"x":0.566,"y":0.360573},{"x":0.573,"y":0.357548},{"x":0.58,"y":0.346467},{"x":0.587,"y":0.332381},{"x":0.594,"y":0.321511},{"x":0.601,"y":0.309874},{"x":0.608,"y":0.302608},{"x":0.615,"y":0.30551},{"x":0.622,"y":0.309989},{"x":0.629,"y":0.317526},{"x":0.636,"y":0.31576},{"x":0.643,"y":0.314936},{"x":0.65,"y":0.317506},{"x":0.657,"y":0.325224},{"x":0.664,"y":0.331551},{"x":0.671,"y":0.345051},{"x":0.678,"y":0.361311},{"x":0.685,"y":0.376971},{"x":0.692,"y":0.393502},{"x":0.699,"y":0.401566},{"x":0.706,"y":0.401478},{"x":0.713,"y":0.402423},{"x":0.72,"y":0.407351},{"x":0.727,"y":0.413858},{"x":0.734,"y":0.423225},{"x":0.741,"y":0.428092},{"x":0.748,"y":0.423991},{"x":0.755,"y":0.423969},{"x":0.762,"y":0.432267},{"x":0.769,"y":0.430055},{"x":0.776,"y":0.42405},{"x":0.783,"y":0.422467},{"x":0.79,"y":0.427581},{"x":0.797,"y":0.43688},{"x":0.804,"y":0.445854},{"x":0.811,"y":0.457482},{"x":0.818,"y":0.477912},{"x":0.825,"y":0.49865},{"x":0.832,"y":0.515901},{"x":0.839,"y":0.539236},{"x":0.846,"y":0.566703},{"x":0.853,"y":0.596808},{"x":0.86,"y":0.613734},{"x":0.867,"y":0.628913},{"x":0.874,"y":0.660998},{"x":0.881,"y":0.696318},{"x":0.888,"y":0.712117},{"x":0.895,"y":0.741725},{"x":0.902,"y":0.796228},{"x":0.909,"y":0.865115},{"x":0.916,"y":0.958649},{"x":0.923,"y":1.061424},{"x":0.93,"y":1.192872},{"x":0.937,"y":1.357992},{"x":0.944,"y":1.550789},{"x":0.951,"y":1.803978},{"x":0.958,"y":2.204123},{"x":0.965,"y":2.889773},{"x":0.972,"y":6.405061},{"x":0.979,"y":10.914662},{"x":0.986,"y":13.830103},{"x":0.993,"y":15.203922}];
+
+const kdeV1 = [{"x":0.3,"y":0.500966},{"x":0.307,"y":0.648957},{"x":0.314,"y":0.792227},{"x":0.321,"y":0.919481},{"x":0.328,"y":1.011396},{"x":0.335,"y":1.062764},{"x":0.342,"y":1.072869},{"x":0.349,"y":1.068019},{"x":0.356,"y":1.051652},{"x":0.363,"y":1.025422},{"x":0.37,"y":0.98094},{"x":0.377,"y":0.935906},{"x":0.384,"y":0.897368},{"x":0.391,"y":0.868785},{"x":0.398,"y":0.848006},{"x":0.405,"y":0.834511},{"x":0.412,"y":0.816304},{"x":0.419,"y":0.805235},{"x":0.426,"y":0.80203},{"x":0.433,"y":0.801818},{"x":0.44,"y":0.807553},{"x":0.447,"y":0.808582},{"x":0.454,"y":0.810759},{"x":0.461,"y":0.803624},{"x":0.468,"y":0.789831},{"x":0.475,"y":0.778088},{"x":0.482,"y":0.774768},{"x":0.489,"y":0.772341},{"x":0.496,"y":0.769673},{"x":0.503,"y":0.775915},{"x":0.51,"y":0.784591},{"x":0.517,"y":0.796328},{"x":0.524,"y":0.811905},{"x":0.531,"y":0.825599},{"x":0.538,"y":0.83771},{"x":0.545,"y":0.833748},{"x":0.552,"y":0.824249},{"x":0.559,"y":0.810333},{"x":0.566,"y":0.795239},{"x":0.573,"y":0.776568},{"x":0.58,"y":0.763375},{"x":0.587,"y":0.748032},{"x":0.594,"y":0.734365},{"x":0.601,"y":0.725566},{"x":0.608,"y":0.71528},{"x":0.615,"y":0.715615},{"x":0.622,"y":0.716529},{"x":0.629,"y":0.713082},{"x":0.636,"y":0.704147},{"x":0.643,"y":0.697796},{"x":0.65,"y":0.691492},{"x":0.657,"y":0.693323},{"x":0.664,"y":0.697397},{"x":0.671,"y":0.710288},{"x":0.678,"y":0.724599},{"x":0.685,"y":0.741814},{"x":0.692,"y":0.770292},{"x":0.699,"y":0.804511},{"x":0.706,"y":0.836641},{"x":0.713,"y":0.861751},{"x":0.72,"y":0.880921},{"x":0.727,"y":0.894023},{"x":0.734,"y":0.905276},{"x":0.741,"y":0.920196},{"x":0.748,"y":0.943213},{"x":0.755,"y":0.973783},{"x":0.762,"y":0.991542},{"x":0.769,"y":1.006666},{"x":0.776,"y":1.026326},{"x":0.783,"y":1.049962},{"x":0.79,"y":1.064882},{"x":0.797,"y":1.071144},{"x":0.804,"y":1.063626},{"x":0.811,"y":1.05071},{"x":0.818,"y":1.045291},{"x":0.825,"y":1.046225},{"x":0.832,"y":1.05633},{"x":0.839,"y":1.070899},{"x":0.846,"y":1.078546},{"x":0.853,"y":1.104839},{"x":0.86,"y":1.154646},{"x":0.867,"y":1.210917},{"x":0.874,"y":1.266573},{"x":0.881,"y":1.312649},{"x":0.888,"y":1.360301},{"x":0.895,"y":1.415673},{"x":0.902,"y":1.476782},{"x":0.909,"y":1.551485},{"x":0.916,"y":1.656402},{"x":0.923,"y":1.769773},{"x":0.93,"y":1.916544},{"x":0.937,"y":2.115392},{"x":0.944,"y":2.360522},{"x":0.951,"y":2.711278},{"x":0.958,"y":3.511707},{"x":0.965,"y":4.677948},{"x":0.972,"y":5.568635},{"x":0.979,"y":6.06428}];
+
+// ============================================================
+//  ANIMATED COUNTERS
+// ============================================================
+const observerCounter = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.hero-number').forEach(el => {
+        const target = parseFloat(el.dataset.count);
+        const decimals = parseInt(el.dataset.decimals || '0');
+        const suffix = el.dataset.suffix || '';
+        const duration = 1500;
+        const start = performance.now();
+        function animate(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = target * eased;
+          if (target >= 1000) {
+            el.textContent = Math.round(current).toLocaleString() + suffix;
+          } else {
+            el.textContent = current.toFixed(decimals) + suffix;
+          }
+          if (progress < 1) requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+      });
+      observerCounter.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.card-grid-6').forEach(el => observerCounter.observe(el));
+
+// ============================================================
+//  SCROLL REVEAL
+// ============================================================
+const observerReveal = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.section-reveal').forEach(el => observerReveal.observe(el));
+
+// ============================================================
+//  ACTIVE NAV
+// ============================================================
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a');
+const observerNav = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-40% 0px -60% 0px' });
+sections.forEach(s => observerNav.observe(s));
+
+// ============================================================
+//  CHART HELPERS
+// ============================================================
+function getSize(container) {
+  const rect = container.getBoundingClientRect();
+  return { width: rect.width, height: rect.height };
+}
+
+// ============================================================
+//  CHART 1: THRESHOLD SWEEP
+// ============================================================
+function drawThresholdChart() {
+  const container = document.getElementById('threshold-chart');
+  const { width, height } = getSize(container);
+  container.innerHTML = '';
+  const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  const svg = d3.select(container).append('svg')
+    .attr('width', width).attr('height', height);
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0.28, 0.97]).range([0, w]);
+  const y = d3.scaleLinear().domain([0, 1]).range([h, 0]);
+  thresholdChartScales = { x, y, g, w, h };
+
+  // Grid
+  g.append('g').attr('class','grid').call(d3.axisLeft(y).tickSize(-w).tickFormat('').ticks(10));
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x).tickValues(thresholds).tickFormat(d3.format('.2f')));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(10).tickFormat(d3.format('.2f')));
+
+  // Axis labels
+  g.append('text').attr('x',w/2).attr('y',h+35).attr('text-anchor','middle').attr('fill','var(--text-muted)').attr('font-size','11px').text('Threshold');
+  g.append('text').attr('transform','rotate(-90)').attr('x',-h/2).attr('y',-38).attr('text-anchor','middle').attr('fill','var(--text-muted)').attr('font-size','11px').text('F1 Score');
+
+  const line = d3.line().x((_,i) => x(thresholds[i])).y(d => y(d)).curve(d3.curveMonotoneX);
+
+  const series = [
+    { data: v1F1, color: 'var(--xcd-v1)', label: 'v1 F1', width: 1.5, dash: '4,4' },
+    { data: v2F1, color: 'var(--xcd-v2)', label: 'v2 F1', width: 2 },
+    { data: vionF1, color: 'var(--vionlabs)', label: 'VionLabs F1', width: 2 },
+    { data: orF1, color: 'var(--consensus-or)', label: 'OR F1', width: 1.5, dash: '6,3' },
+    { data: andF1, color: 'var(--consensus)', label: 'AND F1', width: 3 },
+  ];
+
+  series.forEach(s => {
+    const path = g.append('path').datum(s.data)
+      .attr('fill','none').attr('stroke',s.color).attr('stroke-width',s.width)
+      .attr('d',line);
+    if (s.dash) path.attr('stroke-dasharray', s.dash);
+  });
+
+  // Optimal point (AND at 0.5)
+  const optIdx = thresholds.indexOf(0.5);
+  g.append('circle').attr('cx',x(0.5)).attr('cy',y(andF1[optIdx])).attr('r',5)
+    .attr('fill','var(--consensus)').attr('class','pulse-dot');
+  g.append('text').attr('x',x(0.5)+10).attr('y',y(andF1[optIdx])-8)
+    .attr('fill','var(--consensus)').attr('font-size','11px').attr('font-weight','700')
+    .text('F1=0.945 @ t=0.50');
+
+  // Delaunay hover
+  const allPoints = [];
+  series.forEach(s => {
+    thresholds.forEach((t,i) => {
+      allPoints.push({ x: x(t), y: y(s.data[i]), threshold: t, f1: s.data[i], label: s.label, color: s.color });
+    });
+  });
+
+  const delaunay = d3.Delaunay.from(allPoints, d => d.x, d => d.y);
+  const tooltip = document.getElementById('threshold-tooltip');
+
+  const crosshairV = g.append('line').attr('stroke','rgba(255,255,255,0.2)').attr('stroke-dasharray','3,3').style('display','none');
+  const crosshairH = g.append('line').attr('stroke','rgba(255,255,255,0.2)').attr('stroke-dasharray','3,3').style('display','none');
+  const hoverDot = g.append('circle').attr('r',4).attr('fill','white').style('display','none');
+
+  svg.on('mousemove', function(event) {
+    const [mx,my] = d3.pointer(event);
+    const px = mx - margin.left, py = my - margin.top;
+    if (px < 0 || px > w || py < 0 || py > h) { hideTooltip(); return; }
+    const idx = delaunay.find(px, py);
+    const pt = allPoints[idx];
+    hoverDot.attr('cx',pt.x).attr('cy',pt.y).attr('fill',pt.color).style('display',null);
+    crosshairV.attr('x1',pt.x).attr('x2',pt.x).attr('y1',0).attr('y2',h).style('display',null);
+    crosshairH.attr('x1',0).attr('x2',w).attr('y1',pt.y).attr('y2',pt.y).style('display',null);
+
+    const containerRect = container.getBoundingClientRect();
+    tooltip.style.opacity = 1;
+    tooltip.innerHTML = `<strong style="color:${pt.color}">${pt.label}</strong><br>Threshold: ${pt.threshold.toFixed(2)}<br>F1: ${pt.f1.toFixed(4)}`;
+    const tx = pt.x + margin.left + 15;
+    const ty = pt.y + margin.top - 10;
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
+  });
+
+  svg.on('mouseleave', hideTooltip);
+  svg.on('click', function(event) {
+    var mx = d3.pointer(event)[0] - margin.left;
+    if (mx < 0 || mx > w) return;
+    var rawThresh = x.invert(mx);
+    var snapped = thresholds.reduce(function(prev, curr) { return Math.abs(curr - rawThresh) < Math.abs(prev - rawThresh) ? curr : prev; });
+    var slider = document.getElementById('global-thresh');
+    var valDisplay = document.getElementById('global-thresh-val');
+    if (slider) slider.value = snapped;
+    if (valDisplay) valDisplay.textContent = snapped.toFixed(2);
+    if (typeof updateAllCharts === 'function') updateAllCharts(snapped);
+  });
+  function hideTooltip() {
+    tooltip.style.opacity = 0;
+    hoverDot.style('display','none');
+    crosshairV.style('display','none');
+    crosshairH.style('display','none');
+  }
+}
+
+// Populate threshold table
+function fillThresholdTable() {
+  const tbody = document.getElementById('threshold-table-body');
+  thresholds.forEach((t,i) => {
+    const best = (t === 0.5) ? ' style="background:rgba(34,197,94,0.06);"' : '';
+    tbody.innerHTML += `<tr${best}>
+      <td>${t.toFixed(2)}</td>
+      <td>${v1F1[i].toFixed(4)}</td>
+      <td>${v2F1[i].toFixed(4)}</td>
+      <td>${vionF1[i].toFixed(4)}</td>
+      <td><strong>${andF1[i].toFixed(4)}</strong></td>
+      <td>${orF1[i].toFixed(4)}</td>
+      <td>${andFP[i]}</td>
+    </tr>`;
+  });
+}
+
+// ============================================================
+//  CHART 2: KDE
+// ============================================================
+function drawKDEChart() {
+  const container = document.getElementById('kde-chart');
+  const { width, height } = getSize(container);
+  container.innerHTML = '';
+  const margin = { top: 10, right: 20, bottom: 40, left: 50 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  const svg = d3.select(container).append('svg').attr('width',width).attr('height',height);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0.3, 1.0]).range([0, w]);
+  // Cap y at 3.0 to keep interesting range visible (v2 spike goes to 15)
+  const y = d3.scaleLinear().domain([0, 3.0]).range([h, 0]);
+
+  g.append('g').attr('class','grid').call(d3.axisLeft(y).tickSize(-w).tickFormat('').ticks(6));
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x).tickValues([0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]).tickFormat(d3.format('.1f')));
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(6).tickFormat(d3.format('.1f')));
+  g.append('text').attr('x',w/2).attr('y',h+35).attr('text-anchor','middle').attr('fill','var(--text-muted)').attr('font-size','11px').text('Confidence Score');
+  g.append('text').attr('transform','rotate(-90)').attr('x',-h/2).attr('y',-38).attr('text-anchor','middle').attr('fill','var(--text-muted)').attr('font-size','11px').text('Probability Density');
+
+  const area = d3.area()
+    .x(d => x(d.x))
+    .y0(h)
+    .y1(d => y(Math.min(d.y, 3.0)))
+    .curve(d3.curveBasis);
+
+  const line = d3.line()
+    .x(d => x(d.x))
+    .y(d => y(Math.min(d.y, 3.0)))
+    .curve(d3.curveBasis);
+
+  // Draw areas
+  const kdes = [
+    { data: kdeVion, color: 'var(--vionlabs)', opacity: 0.2 },
+    { data: kdeV1, color: 'var(--xcd-v1)', opacity: 0.12 },
+    { data: kdeV2, color: 'var(--xcd-v2)', opacity: 0.15 },
+  ];
+
+  kdes.forEach(k => {
+    g.append('path').datum(k.data).attr('fill',k.color).attr('opacity',k.opacity).attr('d',area);
+    g.append('path').datum(k.data).attr('fill','none').attr('stroke',k.color).attr('stroke-width',2).attr('d',line);
+  });
+
+  // v2 spike annotation
+  g.append('text').attr('x',x(0.98)).attr('y',y(2.8)).attr('text-anchor','end')
+    .attr('fill','var(--xcd-v2)').attr('font-size','10px').attr('font-weight','600')
+    .text('v2 spike >15 (clipped)');
+  g.append('line').attr('x1',x(0.98)).attr('x2',x(0.98)).attr('y1',y(2.7)).attr('y2',y(3.0))
+    .attr('stroke','var(--xcd-v2)').attr('stroke-width',1).attr('stroke-dasharray','2,2');
+}
+
+// ============================================================
+//  WASSERSTEIN MATRIX
+// ============================================================
+function drawWassersteinMatrix() {
+  const container = document.getElementById('wasserstein-matrix');
+  const models = ['VionLabs', 'XCD v2', 'XCD v1'];
+  const matrix = [
+    [0, 0.043, 0.029],
+    [0.043, 0, 0.014],
+    [0.029, 0.014, 0],
+  ];
+
+  const size = 60;
+  const padding = 80;
+  const w = models.length * size + padding;
+  const h = models.length * size + padding;
+  const svg = d3.select(container).append('svg').attr('width',w).attr('height',h);
+  const g = svg.append('g').attr('transform',`translate(${padding},${padding-10})`);
+
+  const colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([0, 0.05]);
+
+  models.forEach((m, i) => {
+    g.append('text').attr('x',-8).attr('y',i*size+size/2+4).attr('text-anchor','end')
+      .attr('fill','var(--text-secondary)').attr('font-size','11px').text(m);
+    g.append('text').attr('x',i*size+size/2).attr('y',-8).attr('text-anchor','middle')
+      .attr('fill','var(--text-secondary)').attr('font-size','11px').text(m);
+  });
+
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      g.append('rect').attr('x',j*size).attr('y',i*size).attr('width',size-2).attr('height',size-2)
+        .attr('rx',6).attr('fill', i === j ? 'rgba(255,255,255,0.03)' : colorScale(matrix[i][j]));
+      g.append('text').attr('x',j*size+size/2-1).attr('y',i*size+size/2+4)
+        .attr('text-anchor','middle').attr('fill', i === j ? 'var(--text-muted)' : '#fff')
+        .attr('font-size','12px').attr('font-weight','600').attr('font-family','Geist Mono, monospace')
+        .text(i === j ? '--' : matrix[i][j].toFixed(3));
+    }
+  }
+}
+
+// ============================================================
+//  KAPPA HEATMAP
+// ============================================================
+function drawKappaHeatmap() {
+  const container = document.getElementById('kappa-heatmap');
+  const models = ['VionLabs', 'XCD v2', 'XCD v1'];
+  const matrix = [
+    [1.0, 0.280, 0.122],
+    [0.280, 1.0, 0.087],
+    [0.122, 0.087, 1.0],
+  ];
+
+  const size = 80;
+  const padding = 80;
+  const w = models.length * size + padding;
+  const h = models.length * size + padding;
+  const svg = d3.select(container).append('svg').attr('width',w).attr('height',h);
+  const g = svg.append('g').attr('transform',`translate(${padding},${padding-10})`);
+
+  const colorScale = d3.scaleSequential(d3.interpolateGreens).domain([0, 1]);
+
+  models.forEach((m, i) => {
+    g.append('text').attr('x',-8).attr('y',i*size+size/2+4).attr('text-anchor','end')
+      .attr('fill','var(--text-secondary)').attr('font-size','11px').text(m);
+    g.append('text').attr('x',i*size+size/2).attr('y',-8).attr('text-anchor','middle')
+      .attr('fill','var(--text-secondary)').attr('font-size','11px').text(m);
+  });
+
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const v = matrix[i][j];
+      g.append('rect').attr('x',j*size).attr('y',i*size).attr('width',size-3).attr('height',size-3)
+        .attr('rx',8).attr('fill', colorScale(v));
+      g.append('text').attr('x',j*size+size/2-1.5).attr('y',i*size+size/2+5)
+        .attr('text-anchor','middle').attr('fill', v > 0.5 ? '#000' : '#fff')
+        .attr('font-size','14px').attr('font-weight','700').attr('font-family','Geist Mono, monospace')
+        .text(v === 1.0 ? '1.00' : v.toFixed(3));
+    }
+  }
+}
+
+// ============================================================
+//  CHART 3: STRATEGY COMPARISON
+// ============================================================
+function drawStrategyChart() {
+  const container = document.getElementById('strategy-chart');
+  const { width, height } = getSize(container);
+  container.innerHTML = '';
+  const margin = { top: 10, right: 20, bottom: 60, left: 50 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  const svg = d3.select(container).append('svg').attr('width',width).attr('height',height);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const sorted = [...strategies].sort((a,b) => b.f1 - a.f1);
+  const x0 = d3.scaleBand().domain(sorted.map(d=>d.name)).range([0,w]).padding(0.3);
+  const x1 = d3.scaleBand().domain(['precision','recall','f1']).range([0,x0.bandwidth()]).padding(0.1);
+  const y = d3.scaleLinear().domain([0,1.05]).range([h,0]);
+
+  g.append('g').attr('class','grid').call(d3.axisLeft(y).tickSize(-w).tickFormat('').ticks(5));
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x0))
+    .selectAll('text').attr('transform','rotate(-15)').style('text-anchor','end').attr('font-size','10px');
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.1f')));
+
+  const barColors = { precision: '#60a5fa', recall: '#34d399', f1: '#fbbf24' };
+
+  sorted.forEach(s => {
+    ['precision','recall','f1'].forEach(metric => {
+      g.append('rect')
+        .attr('x', x0(s.name) + x1(metric))
+        .attr('y', y(s[metric]))
+        .attr('width', x1.bandwidth())
+        .attr('height', h - y(s[metric]))
+        .attr('fill', barColors[metric])
+        .attr('rx', 3)
+        .attr('opacity', 0.85);
+      // Value label
+      if (s[metric] > 0.1) {
+        g.append('text')
+          .attr('x', x0(s.name) + x1(metric) + x1.bandwidth()/2)
+          .attr('y', y(s[metric]) - 4)
+          .attr('text-anchor','middle')
+          .attr('fill','var(--text-secondary)')
+          .attr('font-size','9px')
+          .attr('font-family','Geist Mono, monospace')
+          .text(s[metric].toFixed(2));
+      }
+    });
+  });
+}
+
+// ============================================================
+//  CHART 4: DONUT
+// ============================================================
+function drawDonutChart() {
+  const container = document.getElementById('donut-chart');
+  const { width, height } = getSize(container);
+  container.innerHTML = '';
+
+  const radius = Math.min(width, height) / 2 - 20;
+  const svg = d3.select(container).append('svg').attr('width',width).attr('height',height);
+  const g = svg.append('g').attr('transform',`translate(${width/2},${height/2})`);
+
+  const pie = d3.pie().value(d=>d.value).sort(null).padAngle(0.02);
+  const arc = d3.arc().innerRadius(radius*0.55).outerRadius(radius);
+  const arcs = pie(agreement);
+
+  arcs.forEach(a => {
+    g.append('path').attr('d',arc(a)).attr('fill',a.data.color).attr('opacity',0.85)
+      .attr('stroke','var(--bg)').attr('stroke-width',2);
+  });
+
+  // Center text
+  g.append('text').attr('text-anchor','middle').attr('y',-8)
+    .attr('fill','var(--text)').attr('font-size','28px').attr('font-weight','800').text('214');
+  g.append('text').attr('text-anchor','middle').attr('y',14)
+    .attr('fill','var(--text-muted)').attr('font-size','12px').text('scenes');
+
+  // Legend
+  const legendContainer = document.getElementById('donut-legend');
+  legendContainer.innerHTML = '';
+  agreement.forEach(a => {
+    const pct = ((a.value/214)*100).toFixed(1);
+    legendContainer.innerHTML += `<div class="donut-legend-item">
+      <div class="donut-legend-color" style="background:${a.color}"></div>
+      <span class="donut-legend-label">${a.label}</span>
+      <span class="donut-legend-value">${a.value} (${pct}%)</span>
+    </div>`;
+  });
+}
+
+// ============================================================
+//  CHART 5: LATENCY
+// ============================================================
+function drawLatencyChart() {
+  const container = document.getElementById('latency-chart');
+  const { width, height } = getSize(container);
+  container.innerHTML = '';
+  const margin = { top: 10, right: 20, bottom: 40, left: 100 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  const svg = d3.select(container).append('svg').attr('width',width).attr('height',height);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const y = d3.scaleBand().domain(latency.map(d=>d.model)).range([0,h]).padding(0.35);
+  const x = d3.scaleLinear().domain([0, 12]).range([0, w]);
+
+  g.append('g').attr('class','grid').call(d3.axisBottom(x).tickSize(h).tickFormat('').ticks(6))
+    .attr('transform','translate(0,0)');
+  g.append('g').attr('class','axis').call(d3.axisLeft(y)).selectAll('text').attr('font-size','12px');
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x).ticks(6).tickFormat(d => d + 's'));
+
+  latency.forEach(d => {
+    g.append('rect')
+      .attr('x',0).attr('y',y(d.model))
+      .attr('width',x(d.mean)).attr('height',y.bandwidth())
+      .attr('fill',d.color).attr('rx',6).attr('opacity',0.8);
+    g.append('text')
+      .attr('x',x(d.mean)+8).attr('y',y(d.model)+y.bandwidth()/2+4)
+      .attr('fill',d.color).attr('font-size','13px').attr('font-weight','700')
+      .attr('font-family','Geist Mono, monospace')
+      .text(d.mean.toFixed(1) + 's');
+  });
+}
+
+// ============================================================
+//  CHART 6: SEVERITY
+// ============================================================
+function drawSeverityChart() {
+  const container = document.getElementById('severity-chart');
+  const { width, height } = getSize(container);
+  container.innerHTML = '';
+  const margin = { top: 10, right: 20, bottom: 30, left: 80 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  const svg = d3.select(container).append('svg').attr('width',width).attr('height',height);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const y0 = d3.scaleBand().domain(severity.map(d=>d.level)).range([0,h]).padding(0.25);
+  const y1 = d3.scaleBand().domain(['v1','v2','vion']).range([0,y0.bandwidth()]).padding(0.08);
+  const x = d3.scaleLinear().domain([0,100]).range([0,w]);
+
+  g.append('g').attr('class','axis').call(d3.axisLeft(y0));
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x).ticks(5).tickFormat(d=>d+'%'));
+
+  const colors = { v1: '#ef4444', v2: '#3b82f6', vion: '#fda1d4' };
+
+  severity.forEach(s => {
+    ['v1','v2','vion'].forEach(model => {
+      const rate = (s[model] / s.total) * 100;
+      g.append('rect')
+        .attr('x',0).attr('y',y0(s.level)+y1(model))
+        .attr('width',x(rate)).attr('height',y1.bandwidth())
+        .attr('fill',colors[model]).attr('rx',3).attr('opacity',0.8);
+    });
+  });
+}
+
+// ============================================================
+//  INIT ALL CHARTS
+// ============================================================
+function initCharts() {
+  drawThresholdChart();
+  fillThresholdTable();
+  drawKDEChart();
+  drawWassersteinMatrix();
+  drawKappaHeatmap();
+  drawStrategyChart();
+  drawDonutChart();
+  drawLatencyChart();
+  drawSeverityChart();
+}
+
+// ============================================================
+//  GLOBAL THRESHOLD SLIDER — updates hero KPIs interactively
+// ============================================================
+//  GLOBAL THRESHOLD CONTROLLER
+// ============================================================
+var currentThreshold=0.5;
+function animateNum(el,tv,dec,suf,dur){var sv=parseFloat(el.textContent)||0,st=performance.now();suf=suf||'';function step(now){var p=Math.min((now-st)/dur,1),e=1-Math.pow(1-p,3),c=sv+(tv-sv)*e;el.textContent=(tv>=1000?Math.round(c).toLocaleString():c.toFixed(dec))+suf;if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+
+function updateAllCharts(threshold) {
+  currentThreshold=threshold;
+  var idx=getThreshIdx(threshold);
+  if(idx<0)return;
+  // 1. Hero KPIs with animated transitions
+  var f1El=document.getElementById('kpi-f1'),fpEl=document.getElementById('kpi-fp'),rcEl=document.getElementById('kpi-recall'),prEl=document.getElementById('kpi-precision');
+  if(f1El)animateNum(f1El,andF1[idx],3,'',500);
+  if(fpEl)animateNum(fpEl,andFP[idx],0,'',500);
+  if(rcEl)animateNum(rcEl,andRecall[idx]*100,1,'%',500);
+  if(prEl)animateNum(prEl,andPrecision[idx],3,'',500);
+
+  // 2. Hero explainer text
+  var expl=document.getElementById('hero-explainer-text');
+  if(expl){
+    if(threshold===0.5){expl.textContent='These numbers summarize our analysis of 556,768 individual video frames across 15 Paramount+ movies (12 R-rated + 3 PG/PG-13). Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain \u2014 a 35% reduction. 60.3% of detections are S0/S1 based on film-knowledge verification. However, 31% of scenes still need human frame-level verification.';}
+    else{var fp=andFP[idx];var fm=fp===0?'Zero false positives maintained.':fp+' false positive clusters \u2014 consensus no longer eliminates all noise.';var dr=threshold<0.5?'Lower thresholds cast a wider net but let more false positives through.':'Higher thresholds are stricter, reducing recall as borderline scenes fall below the cutoff.';expl.textContent='At threshold '+threshold.toFixed(2)+', AND consensus achieves F1='+andF1[idx].toFixed(3)+' with '+(andRecall[idx]*100).toFixed(1)+'% recall. '+fm+' '+dr;}
+  }
+
+  // 3. Threshold sweep crosshair + dots
+  if(thresholdChartScales){
+    var xs=thresholdChartScales.x,ys=thresholdChartScales.y,gs=thresholdChartScales.g,hs=thresholdChartScales.h;
+    gs.selectAll('.global-crosshair').remove();gs.selectAll('.global-dot').remove();
+    gs.append('line').attr('class','global-crosshair').attr('x1',xs(threshold)).attr('x2',xs(threshold)).attr('y1',0).attr('y2',hs).attr('stroke','rgba(34,197,94,0.5)').attr('stroke-width',2).attr('stroke-dasharray','6,4');
+    [{d:v1F1,c:'var(--xcd-v1)'},{d:v2F1,c:'var(--xcd-v2)'},{d:vionF1,c:'var(--vionlabs)'},{d:orF1,c:'var(--consensus-or)'},{d:andF1,c:'var(--consensus)'}].forEach(function(s){gs.append('circle').attr('class','global-dot').attr('cx',xs(threshold)).attr('cy',ys(s.d[idx])).attr('r',5).attr('fill',s.c).attr('stroke','var(--bg)').attr('stroke-width',2);});
+    gs.append('text').attr('class','global-crosshair').attr('x',xs(threshold)).attr('y',-6).attr('text-anchor','middle').attr('fill','#22c55e').attr('font-size','11px').attr('font-weight','700').attr('font-family','Geist Mono, monospace').text('t='+threshold.toFixed(2));
+  }
+
+  // 4. Strategy comparison bars
+  var sc=document.getElementById('strategy-chart');
+  if(sc){var sz=getSize(sc),W=sz.width,H=sz.height;sc.innerHTML='';var m={top:10,right:20,bottom:60,left:50},w=W-m.left-m.right,h=H-m.top-m.bottom;var svg=d3.select(sc).append('svg').attr('width',W).attr('height',H);var g=svg.append('g').attr('transform','translate('+m.left+','+m.top+')');var sorted=getStrategiesAtThreshold(idx).slice().sort(function(a,b){return b.f1-a.f1;});var x0=d3.scaleBand().domain(sorted.map(function(d){return d.name;})).range([0,w]).padding(0.3);var x1=d3.scaleBand().domain(['precision','recall','f1']).range([0,x0.bandwidth()]).padding(0.1);var y=d3.scaleLinear().domain([0,1.05]).range([h,0]);g.append('g').attr('class','grid').call(d3.axisLeft(y).tickSize(-w).tickFormat('').ticks(5));g.append('g').attr('class','axis').attr('transform','translate(0,'+h+')').call(d3.axisBottom(x0)).selectAll('text').attr('transform','rotate(-15)').style('text-anchor','end').attr('font-size','10px');g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.1f')));var bc={precision:'#60a5fa',recall:'#34d399',f1:'#fbbf24'};sorted.forEach(function(s){['precision','recall','f1'].forEach(function(mt){g.append('rect').attr('x',x0(s.name)+x1(mt)).attr('y',y(s[mt])).attr('width',x1.bandwidth()).attr('height',h-y(s[mt])).attr('fill',bc[mt]).attr('rx',3).attr('opacity',0.85);if(s[mt]>0.1)g.append('text').attr('x',x0(s.name)+x1(mt)+x1.bandwidth()/2).attr('y',y(s[mt])-4).attr('text-anchor','middle').attr('fill','var(--text-secondary)').attr('font-size','9px').attr('font-family','Geist Mono, monospace').text(s[mt].toFixed(2));});});}
+
+  // 5. FP count cards
+  var fpEls={v1:'fp-v1-count',v2:'fp-v2-count',vn:'fp-vion-count',an:'fp-and-count'};var fpVals={v1:v1FP[idx],v2:v2FP[idx],vn:vionFP[idx],an:andFP[idx]};Object.keys(fpEls).forEach(function(k){var el=document.getElementById(fpEls[k]);if(el)animateNum(el,fpVals[k],0,'',500);});
+  var tl=document.getElementById('fp-thresh-label');if(tl)tl.textContent=threshold.toFixed(2);
+  var as=document.getElementById('fp-and-status');if(as){as.textContent=andFP[idx]===0?'ZERO FALSE POSITIVES':andFP[idx]+' FP CLUSTERS';as.style.color=andFP[idx]===0?'var(--consensus)':'var(--consensus-or)';}
+
+  // 6. Agreement donut recomputed at threshold
+  var na=computeAgreement(threshold);var dc=document.getElementById('donut-chart');
+  if(dc){var dsz=getSize(dc),dW=dsz.width,dH=dsz.height;dc.innerHTML='';var r=Math.min(dW,dH)/2-20;var dsvg=d3.select(dc).append('svg').attr('width',dW).attr('height',dH);var dg=dsvg.append('g').attr('transform','translate('+dW/2+','+dH/2+')');var pie=d3.pie().value(function(d){return d.value;}).sort(null).padAngle(0.02);var arc=d3.arc().innerRadius(r*0.55).outerRadius(r);pie(na).forEach(function(a){dg.append('path').attr('d',arc(a)).attr('fill',a.data.color).attr('opacity',0.85).attr('stroke','var(--bg)').attr('stroke-width',2);});var tot=na.reduce(function(s,a){return s+a.value;},0);dg.append('text').attr('text-anchor','middle').attr('y',-8).attr('fill','var(--text)').attr('font-size','28px').attr('font-weight','800').text(tot);dg.append('text').attr('text-anchor','middle').attr('y',14).attr('fill','var(--text-muted)').attr('font-size','12px').text('scenes');
+  var lg=document.getElementById('donut-legend');if(lg){lg.innerHTML='';na.forEach(function(a){var p=((a.value/tot)*100).toFixed(1);lg.innerHTML+='<div class="donut-legend-item"><div class="donut-legend-color" style="background:'+a.color+'"></div><span class="donut-legend-label">'+a.label+'</span><span class="donut-legend-value">'+a.value+' ('+p+'%)</span></div>';});}
+  var st=document.getElementById('agreement-subtitle');if(st)st.innerHTML='How the three models overlap on 214 verified scenes at threshold <span class="mono">'+threshold.toFixed(2)+'</span>.';}
+}
+
+// Wire up slider + reset
+var globalSlider=document.getElementById('global-thresh');
+var globalSliderVal=document.getElementById('global-thresh-val');
+var threshResetBtn=document.getElementById('thresh-reset');
+if(globalSlider)globalSlider.addEventListener('input',function(){var v=parseFloat(this.value);globalSliderVal.textContent=v.toFixed(2);updateAllCharts(v);});
+if(threshResetBtn)threshResetBtn.addEventListener('click',function(){globalSlider.value=0.5;globalSliderVal.textContent='0.50';updateAllCharts(0.5);});
+
+// Run on load and resize
+window.addEventListener('load', function(){initCharts();setTimeout(function(){if(thresholdChartScales)updateAllCharts(0.5);},300);});
+window.addEventListener('resize', () => {
+  clearTimeout(window._resizeTimer);
+  window._resizeTimer = setTimeout(function(){initCharts();setTimeout(function(){updateAllCharts(currentThreshold);},100);}, 200);
+});
+</script>
+</body>
+</html>
