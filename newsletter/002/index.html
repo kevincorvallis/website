@@ -182,6 +182,23 @@
             border-color: var(--text);
         }
 
+        .gate-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-family: var(--font);
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            padding: 8px 24px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-btn:hover {
+            opacity: 1;
+        }
+
         .gate-input.shake {
             animation: shake 0.4s ease;
         }
@@ -687,7 +704,7 @@
 
         .photo-grid img {
             width: 100%;
-            aspect-ratio: 3/4;
+            height: 100%;
             object-fit: cover;
             border-radius: 3px;
         }
@@ -1234,13 +1251,16 @@
                 <span data-l="en">This letter is for friends and family.</span>
                 <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
             </p>
-            <input
-                type="password"
-                class="gate-input"
-                id="gateInput"
-                autocomplete="off"
-                autofocus
-            >
+            <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
+                <input
+                    type="password"
+                    class="gate-input"
+                    id="gateInput"
+                    autocomplete="off"
+                    autofocus
+                >
+                <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
+            </form>
             <p class="gate-hint" id="gateHint">
                 <span data-l="en">Hmm, that's not it.</span>
                 <span data-l="ko">음, 아닌데?</span>
@@ -1947,24 +1967,26 @@
 
             function showGate() {
                 document.body.style.overflow = 'hidden';
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        var val = input.value.trim();
-                        if (!val) return;
-                        input.disabled = true;
-                        checkPassword(val, function(ok) {
-                            input.disabled = false;
-                            if (ok) {
-                                unlock();
-                            } else {
-                                input.value = '';
-                                input.classList.remove('shake');
-                                void input.offsetWidth;
-                                input.classList.add('shake');
-                                if (hint) hint.classList.add('visible');
-                            }
-                        });
-                    }
+                var form = document.getElementById('gateForm');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var val = input.value.trim();
+                    if (!val) return;
+                    input.disabled = true;
+                    document.getElementById('gateBtn').disabled = true;
+                    checkPassword(val, function(ok) {
+                        input.disabled = false;
+                        document.getElementById('gateBtn').disabled = false;
+                        if (ok) {
+                            unlock();
+                        } else {
+                            input.value = '';
+                            input.classList.remove('shake');
+                            void input.offsetWidth;
+                            input.classList.add('shake');
+                            if (hint) hint.classList.add('visible');
+                        }
+                    });
                 });
             }
 
