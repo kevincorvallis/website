@@ -1872,10 +1872,13 @@
                 var gateLight = document.getElementById('gateLight');
                 gateLight.classList.add('awakening');
 
-                // After light builds, transition to komorebi
+                // Activate komorebi immediately (behind gate at z-index 150)
+                komorebi.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
+                // After light builds, fade gate out — komorebi is already underneath
                 setTimeout(function() {
-                    komorebi.classList.add('active');
-                    document.body.style.overflow = 'hidden';
+                    gate.classList.add('unlocked');
                     gateLight.style.display = 'none';
 
                     var leaves = document.getElementById('komorebiLeaves');
@@ -1924,7 +1927,8 @@
 
             function unlock() {
                 sessionStorage.setItem(issueKey, '1');
-                gate.classList.add('unlocked');
+                // Activate komorebi BEHIND the gate first, then fade gate out
+                // This prevents the article from flashing through
                 animateKomorebi(function() {
                     komorebi.style.display = 'none';
                 });
@@ -1946,7 +1950,6 @@
                         checkPassword(val, function(ok) {
                             input.disabled = false;
                             if (ok) {
-                                gate.classList.add('unlocked');
                                 unlock();
                             } else {
                                 input.value = '';
