@@ -246,6 +246,7 @@
   .badge-blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
   .badge-pink { background: rgba(253,161,212,0.15); color: #fda1d4; }
   .badge-amber { background: rgba(245,158,11,0.15); color: #f59e0b; }
+  .badge-orange { background: rgba(249,115,22,0.15); color: #f97316; }
   .badge-muted { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
 
   /* INSIGHT CARDS */
@@ -569,7 +570,38 @@
   <div class="container">
     <div id="hero-explainer" style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
       <div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
-      <p id="hero-explainer-text">These numbers summarize our analysis of 556,768 individual video frames across 15 Paramount+ movies (12 R-rated + 3 PG/PG-13). Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain &mdash; a 35% reduction. 60.3% of detections are S0/S1 based on film-knowledge verification. However, 31% of scenes still need human frame-level verification &mdash; treat these numbers as directional.</p>
+      <p id="hero-explainer-text">These numbers summarize our analysis of 556,768 individual video frames across 15 Paramount+ movies (12 R-rated + 3 PG/PG-13). Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain &mdash; a 35% reduction. 60.3% of detections are SAFE/SUGGESTIVE based on film-knowledge verification. However, 31% of scenes still need human frame-level verification &mdash; treat these numbers as directional.</p>
+    </div>
+
+    <!-- CONTEXT DISCLAIMER -->
+    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:20px 24px;margin:20px 0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:1.2rem;">&#9888;&#65039;</span>
+        <span style="font-size:0.85rem;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:0.05em;">Important Context</span>
+      </div>
+      <p style="font-size:0.85rem;color:#e6edf3;line-height:1.8;margin-bottom:10px;">
+        This analysis evaluates three nudity detection models against each other and against a verified ground truth dataset. The models have different production statuses:
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
+        <div style="background:#0d1117;border-radius:8px;padding:12px 14px;border-left:3px solid #fda1d4;">
+          <div style="font-size:0.78rem;font-weight:700;color:#fda1d4;">VionLabs</div>
+          <div style="font-size:0.72rem;color:#4ade80;font-weight:600;margin:4px 0;">IN PRODUCTION</div>
+          <div style="font-size:0.72rem;color:#8b949e;line-height:1.6;">Data exists for 110K+ titles. No additional inference cost.</div>
+        </div>
+        <div style="background:#0d1117;border-radius:8px;padding:12px 14px;border-left:3px solid #ef4444;">
+          <div style="font-size:0.78rem;font-weight:700;color:#ef4444;">XCD v1 <span style="color:#8b949e;font-weight:400;">(OpenNSFW2)</span></div>
+          <div style="font-size:0.72rem;color:#4ade80;font-weight:600;margin:4px 0;">IN PRODUCTION</div>
+          <div style="font-size:0.72rem;color:#8b949e;line-height:1.6;">Currently serving. This analysis reveals significant performance gaps.</div>
+        </div>
+        <div style="background:#0d1117;border-radius:8px;padding:12px 14px;border-left:3px solid #3b82f6;">
+          <div style="font-size:0.78rem;font-weight:700;color:#3b82f6;">XCD v2 <span style="color:#8b949e;font-weight:400;">(SigLIP2 + MLP)</span></div>
+          <div style="font-size:0.72rem;color:#f59e0b;font-weight:600;margin:4px 0;">NOT YET IN PRODUCTION</div>
+          <div style="font-size:0.72rem;color:#8b949e;line-height:1.6;">Evaluated on 7 films only. This report informs the decision to deploy at scale.</div>
+        </div>
+      </div>
+      <p style="font-size:0.82rem;color:#cbd5e1;line-height:1.7;">
+        <strong style="color:#fbbf24;">The purpose of this evaluation</strong> is to determine whether investing in XCD v2 deployment (GPU infrastructure + 6&ndash;8 week processing of ~120K titles) is justified based on expected improvements in false positive rates, recall, and precision compared to the existing VionLabs and XCD v1 models already in production.
+      </p>
     </div>
   </div>
 </section>
@@ -630,7 +662,7 @@
               <text x="90" y="50" text-anchor="middle" fill="#e6edf3" font-size="13" font-weight="700">Ground Truth</text>
               <text x="90" y="70" text-anchor="middle" fill="#4ade80" font-size="11">214 verified scenes</text>
               <text x="90" y="85" text-anchor="middle" fill="#4ade80" font-size="11">15 films</text>
-              <text x="90" y="100" text-anchor="middle" fill="#4ade80" font-size="11">5 severity levels</text>
+              <text x="90" y="100" text-anchor="middle" fill="#4ade80" font-size="11">5 content labels</text>
             </g>
             <!-- Arrow markers -->
             <defs>
@@ -693,14 +725,29 @@
         <div class="card">
           <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#fbbf24;">2. Automated Scene Detection</h3>
           <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
-            <p>Raw frame scores were processed through a <strong style="color:#cbd5e1;">peak detection algorithm</strong> to identify candidate nudity scenes:</p>
-            <ul style="margin:12px 0;padding-left:20px;">
-              <li><strong style="color:#cbd5e1;">Initial threshold:</strong> Frames with score &gt; 0.30 flagged as candidates</li>
-              <li><strong style="color:#cbd5e1;">Temporal clustering:</strong> Consecutive flagged frames within a <strong style="color:#fbbf24;">30-second gap</strong> grouped into a single detection cluster</li>
-              <li><strong style="color:#cbd5e1;">Peak extraction:</strong> Within each cluster, the frame with the highest score becomes the <em>peak frame</em> (used for GIF extraction)</li>
-              <li><strong style="color:#cbd5e1;">Multi-model merging:</strong> Clusters from VionLabs, XCD v1, and XCD v2 that overlap temporally are merged into a single scene candidate</li>
-            </ul>
-            <p>This produced <strong style="color:#e6edf3;">327 candidate scenes</strong> across all 15 films.</p>
+            <p>Each model outputs a raw JSON file with per-frame nudity scores. These were downloaded from GCS and processed through a <strong style="color:#cbd5e1;">peak detection + temporal clustering algorithm</strong> (<code style="background:#0d1117;padding:2px 6px;border-radius:4px;font-size:0.72rem;">analyze_movie.py</code>) to identify candidate nudity scenes:</p>
+
+            <div style="background:#0d1117;border-radius:8px;padding:14px 16px;margin:12px 0;font-size:0.75rem;line-height:1.8;">
+              <div style="color:#fbbf24;font-weight:600;margin-bottom:6px;">Input: Raw frame-level JSON per model</div>
+              <div style="font-family:'Geist Mono',monospace;color:#8b949e;">
+                <span style="color:#fda1d4;">VionLabs:</span> <code>{frame_number, frame_timestamp, score, label}</code> &times; ~35K frames<br>
+                <span style="color:#ef4444;">XCD v1:</span>&nbsp;&nbsp; <code>{frame_timestamp, score}</code> &times; ~16K frames &mdash; model: OpenNSFW2<br>
+                <span style="color:#3b82f6;">XCD v2:</span>&nbsp;&nbsp; <code>{frame_timestamp, score}</code> &times; ~16K frames &mdash; model: SigLIP2 + MLP
+              </div>
+            </div>
+
+            <p style="margin-top:12px;"><strong style="color:#cbd5e1;">Algorithm steps:</strong></p>
+            <ol style="margin:8px 0;padding-left:20px;">
+              <li><strong style="color:#cbd5e1;">Threshold filter:</strong> Frames with score &gt; 0.30 flagged as candidates. This low threshold ensures we don&rsquo;t miss borderline content &mdash; precision is handled downstream by consensus.</li>
+              <li><strong style="color:#cbd5e1;">Temporal clustering:</strong> Consecutive flagged frames within a <strong style="color:#fbbf24;">30-second gap</strong> are grouped into a single detection cluster. <em>Why 30s?</em> Nudity scenes in film rarely have clean-cut boundaries &mdash; cameras pan away briefly, cut to reaction shots, then return. A 30s gap tolerates these brief interruptions without merging unrelated scenes.</li>
+              <li><strong style="color:#cbd5e1;">Peak extraction:</strong> Within each cluster, the frame with the highest score becomes the <em>peak frame</em>. This timestamp is used for GIF extraction (visual evidence) and as the cluster&rsquo;s representative score.</li>
+              <li><strong style="color:#cbd5e1;">Per-model clustering:</strong> Each model is clustered independently first, then clusters from all available models that overlap temporally are cross-referenced to build a unified scene candidate list.</li>
+            </ol>
+            <p style="margin-top:8px;">This produced <strong style="color:#e6edf3;">327 candidate scenes</strong> across all 15 films.</p>
+
+            <div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:0.78rem;color:#cbd5e1;line-height:1.7;">
+              <strong style="color:#fbbf24;">Why process raw JSON instead of using model APIs?</strong> The raw frame data gives us full control over threshold selection and clustering behavior. Model APIs often apply their own internal thresholds and return only summary results &mdash; we needed frame-level granularity to compare models at identical operating points.
+            </div>
           </div>
         </div>
 
@@ -708,46 +755,157 @@
         <div class="card">
           <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#c084fc;">3. Scene Consolidation</h3>
           <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
-            <p>The 327 candidates were <strong style="color:#cbd5e1;">consolidated</strong> to avoid double-counting continuous nudity scenes that models fragmented:</p>
-            <ul style="margin:12px 0;padding-left:20px;">
-              <li><strong style="color:#cbd5e1;">Proximity merge:</strong> Scene candidates within <strong style="color:#c084fc;">120 seconds</strong> of each other merged into a single ground truth scene</li>
-              <li><strong style="color:#cbd5e1;">Rationale:</strong> Film nudity scenes often contain brief cuts away (dialogue, reaction shots) that cause models to report separate clusters for the same narrative scene</li>
+            <p>The 327 candidates were <strong style="color:#cbd5e1;">consolidated</strong> because each model fragments scenes differently due to their underlying architectures:</p>
+
+            <div style="background:#0d1117;border-radius:8px;padding:14px 16px;margin:12px 0;font-size:0.75rem;line-height:1.9;">
+              <div style="color:#c084fc;font-weight:600;margin-bottom:6px;">Why models fragment scenes differently</div>
+              <div style="color:#8b949e;">
+                <span style="color:#fda1d4;font-weight:600;">VionLabs</span> uses a <strong style="color:#cbd5e1;">90-second sliding window</strong> internally &mdash; it aggregates scores over a temporal neighborhood, which smooths detections but can merge nearby-but-distinct scenes into one long detection or split a single scene at window boundaries. When a scene crosses a window boundary, VionLabs may report it as two separate detections.<br><br>
+                <span style="color:#ef4444;font-weight:600;">XCD v1</span> (OpenNSFW2) is a <strong style="color:#cbd5e1;">per-frame classifier</strong> with no temporal awareness &mdash; each frame is scored independently. This means it fragments a single continuous scene into multiple clusters whenever the camera briefly cuts away (e.g., to a reaction shot or dialogue), producing many small clusters for what is narratively one scene.<br><br>
+                <span style="color:#3b82f6;font-weight:600;">XCD v2</span> (SigLIP2 + MLP) is also per-frame but with <strong style="color:#cbd5e1;">much higher confidence</strong> (82% of positive frames &ge; 0.9) &mdash; it produces cleaner clusters but still fragments on camera cuts.
+              </div>
+            </div>
+
+            <p style="margin-top:12px;"><strong style="color:#cbd5e1;">Consolidation rules:</strong></p>
+            <ul style="margin:8px 0;padding-left:20px;">
+              <li><strong style="color:#cbd5e1;">Proximity merge:</strong> Scene candidates within <strong style="color:#c084fc;">120 seconds</strong> of each other merged into a single ground truth scene. <em>Why 120s?</em> Film scenes often intercut between nudity and non-nudity content (dialogue, establishing shots) for 1&ndash;2 minutes while the same narrative scene continues. The 120s window was empirically chosen to capture full narrative scenes without merging truly separate scenes.</li>
+              <li><strong style="color:#cbd5e1;">Cross-model alignment:</strong> If VionLabs reports one long cluster and XCD reports three short clusters in the same timeframe, consolidation merges them into a single scene. This corrects for each model&rsquo;s fragmentation behavior.</li>
               <li><strong style="color:#cbd5e1;">Result:</strong> 327 candidates &rarr; <strong style="color:#e6edf3;">214 verified ground truth scenes</strong> (35% consolidation rate)</li>
             </ul>
+
             <div style="background:#0d1117;border-radius:8px;padding:12px 16px;margin-top:12px;font-family:'Geist Mono',monospace;font-size:0.72rem;color:#8b949e;line-height:1.8;">
               <span style="color:#c084fc;">Example:</span> Wolf of Wall Street scene at 2:10<br>
-              &nbsp;&nbsp;VionLabs cluster: 2:10&ndash;2:35 (peak: 0.94)<br>
-              &nbsp;&nbsp;XCD v2 cluster: 2:28&ndash;3:13 (peak: 1.00)<br>
-              &nbsp;&nbsp;Gap: 0s (overlapping) &rarr; <span style="color:#4ade80;">Merged into single scene 2:10&ndash;3:13</span>
+              &nbsp;&nbsp;<span style="color:#fda1d4;">VionLabs:</span> single cluster 2:10&ndash;3:13 (sliding window smoothed)<br>
+              &nbsp;&nbsp;<span style="color:#3b82f6;">XCD v2:</span>&nbsp;&nbsp; two clusters: 2:10&ndash;2:35, 2:50&ndash;3:13 (split on camera cut at 2:35)<br>
+              &nbsp;&nbsp;<span style="color:#ef4444;">XCD v1:</span>&nbsp;&nbsp; three clusters: 2:10&ndash;2:20, 2:25&ndash;2:35, 2:50&ndash;3:00 (heavily fragmented)<br>
+              &nbsp;&nbsp;After consolidation &rarr; <span style="color:#4ade80;">Single scene: 2:10&ndash;3:13</span>
+            </div>
+
+            <div style="background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.15);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:0.78rem;color:#cbd5e1;line-height:1.7;">
+              <strong style="color:#c084fc;">Without consolidation, scene counts would be inflated by ~50%.</strong> Fatal Attraction, for example, drops from 44 auto-detected clusters to 18 ground truth scenes &mdash; many of those 44 were XCD v1 fragments of the same love scene, plus VionLabs window-boundary splits.
             </div>
           </div>
         </div>
 
-        <!-- STEP 4: Manual Verification -->
-        <div class="card">
-          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#4ade80;">4. Manual Verification Process</h3>
+        <!-- STEP 4: Verification & Labeling Pipeline -->
+        <div class="card" style="grid-column:1/-1;">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#4ade80;">4. Verification &amp; Labeling Pipeline</h3>
           <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
-            <p>Each of the 214 consolidated scenes was <strong style="color:#cbd5e1;">manually verified</strong> through a multi-step process:</p>
-            <ol style="margin:12px 0;padding-left:20px;">
-              <li><strong style="color:#cbd5e1;">GIF extraction:</strong> 3-frame animated GIFs generated at each scene&rsquo;s peak timestamp (start frame, peak frame, end frame)</li>
-              <li><strong style="color:#cbd5e1;">Visual inspection:</strong> Each GIF reviewed to confirm nudity is actually present and classify content type</li>
-              <li><strong style="color:#cbd5e1;">Film-knowledge verification:</strong> Cross-referenced against known film content from MPAA ratings, parent guides (Common Sense Media, IMDB Parents Guide), and film synopsis databases</li>
-              <li><strong style="color:#cbd5e1;">Severity assignment:</strong> Each scene assigned a severity code (S0&ndash;S4) based on visual content observed</li>
-              <li><strong style="color:#cbd5e1;">Quality flag:</strong> 66 scenes (31%) flagged for frame-level re-examination where model scores conflicted or GIF was ambiguous</li>
-            </ol>
+            <p>Each of the 214 consolidated scenes was verified and labeled through an <strong style="color:#cbd5e1;">LLM-assisted pipeline</strong> &mdash; not purely manual annotation:</p>
+          </div>
+
+          <!-- Sub-pipeline diagram -->
+          <div style="overflow-x:auto;margin:16px 0;">
+            <svg viewBox="0 0 1000 80" style="width:100%;max-width:1000px;min-width:600px;height:auto;" xmlns="http://www.w3.org/2000/svg">
+              <g transform="translate(10,10)">
+                <rect x="0" y="0" width="170" height="60" rx="10" fill="#1a1f2e" stroke="#4ade80" stroke-width="1.5"/>
+                <text x="85" y="25" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="700">STEP 4a</text>
+                <text x="85" y="42" text-anchor="middle" fill="#e6edf3" font-size="10">GIF Extraction</text>
+              </g>
+              <path d="M185,40 L205,40" stroke="#4ade80" stroke-width="1.5" fill="none" marker-end="url(#arr-g)"/>
+              <g transform="translate(210,10)">
+                <rect x="0" y="0" width="170" height="60" rx="10" fill="#1a1f2e" stroke="#06b6d4" stroke-width="1.5"/>
+                <text x="85" y="25" text-anchor="middle" fill="#22d3ee" font-size="10" font-weight="700">STEP 4b</text>
+                <text x="85" y="42" text-anchor="middle" fill="#e6edf3" font-size="10">Scrape Editorial Sources</text>
+              </g>
+              <path d="M385,40 L405,40" stroke="#06b6d4" stroke-width="1.5" fill="none" marker-end="url(#arr-c)"/>
+              <g transform="translate(410,10)">
+                <rect x="0" y="0" width="170" height="60" rx="10" fill="#1a1f2e" stroke="#a855f7" stroke-width="1.5"/>
+                <text x="85" y="25" text-anchor="middle" fill="#c084fc" font-size="10" font-weight="700">STEP 4c</text>
+                <text x="85" y="42" text-anchor="middle" fill="#e6edf3" font-size="10">LLM Scene Matching</text>
+              </g>
+              <path d="M585,40 L605,40" stroke="#a855f7" stroke-width="1.5" fill="none" marker-end="url(#arr-p)"/>
+              <g transform="translate(610,10)">
+                <rect x="0" y="0" width="170" height="60" rx="10" fill="#1a1f2e" stroke="#f59e0b" stroke-width="1.5"/>
+                <text x="85" y="25" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">STEP 4d</text>
+                <text x="85" y="42" text-anchor="middle" fill="#e6edf3" font-size="10">LLM Label Assignment</text>
+              </g>
+              <path d="M785,40 L805,40" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#arr-y)"/>
+              <g transform="translate(810,10)">
+                <rect x="0" y="0" width="170" height="60" rx="10" fill="#0f2a1a" stroke="#22c55e" stroke-width="2"/>
+                <text x="85" y="25" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="700">STEP 4e</text>
+                <text x="85" y="42" text-anchor="middle" fill="#e6edf3" font-size="10">Human Review</text>
+              </g>
+              <defs>
+                <marker id="arr-g" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#4ade80"/></marker>
+                <marker id="arr-c" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#06b6d4"/></marker>
+                <marker id="arr-p" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#a855f7"/></marker>
+                <marker id="arr-y" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#f59e0b"/></marker>
+              </defs>
+            </svg>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:8px;">
+            <!-- 4a: GIF Extraction -->
+            <div style="background:#0d1117;border-radius:10px;padding:16px;border:1px solid rgba(74,222,128,0.15);">
+              <div style="font-size:0.78rem;font-weight:700;color:#4ade80;margin-bottom:8px;">4a. GIF Extraction</div>
+              <div style="font-size:0.78rem;color:#8b949e;line-height:1.7;">
+                3-frame animated GIFs extracted at each scene&rsquo;s peak detection timestamp (start frame, peak frame, end frame). These serve as <strong style="color:#cbd5e1;">visual evidence</strong> for every scene in the interactive movie reports.
+              </div>
+            </div>
+
+            <!-- 4b: Scrape Sources -->
+            <div style="background:#0d1117;border-radius:10px;padding:16px;border:1px solid rgba(6,182,212,0.15);">
+              <div style="font-size:0.78rem;font-weight:700;color:#22d3ee;margin-bottom:8px;">4b. Scrape Editorial Sources</div>
+              <div style="font-size:0.78rem;color:#8b949e;line-height:1.7;">
+                Scraped mature-content descriptions from open sources:<br>
+                <span style="color:#cbd5e1;">&bull; IMDB Parents Guide</span> &mdash; &ldquo;Sex &amp; Nudity&rdquo; sections with scene descriptions and approximate timestamps<br>
+                <span style="color:#cbd5e1;">&bull; Kids-In-Mind</span> &mdash; Detailed scene-by-scene content breakdowns with severity ratings<br>
+                <span style="color:#cbd5e1;">&bull; MPAA rating justifications</span> &mdash; Official rating reasons (e.g., &ldquo;Rated R for strong sexual content, nudity, and language&rdquo;)<br>
+                <span style="color:#cbd5e1;">&bull; Common Sense Media</span> &mdash; Age-appropriate content advisories
+              </div>
+            </div>
+
+            <!-- 4c: LLM Scene Matching -->
+            <div style="background:#0d1117;border-radius:10px;padding:16px;border:1px solid rgba(168,85,247,0.15);">
+              <div style="font-size:0.78rem;font-weight:700;color:#c084fc;margin-bottom:8px;">4c. LLM Scene Matching</div>
+              <div style="font-size:0.78rem;color:#8b949e;line-height:1.7;">
+                An LLM cross-referenced each detected scene against the scraped editorial descriptions: <em style="color:#cbd5e1;">&ldquo;Does the scene at timestamp 44:30&ndash;46:00 with peak scores of v2=0.99, VionLabs=0.87 match the IMDB description &lsquo;brief nudity during a love scene around the 45-minute mark&rsquo;?&rdquo;</em><br><br>
+                This step validates that model detections correspond to <strong style="color:#cbd5e1;">real, documented content</strong> &mdash; not just model hallucinations or noise. Scenes that couldn&rsquo;t be matched to any editorial source were flagged for additional review.
+              </div>
+            </div>
+
+            <!-- 4d: LLM Label Assignment -->
+            <div style="background:#0d1117;border-radius:10px;padding:16px;border:1px solid rgba(245,158,11,0.15);">
+              <div style="font-size:0.78rem;font-weight:700;color:#fbbf24;margin-bottom:8px;">4d. LLM Label Assignment</div>
+              <div style="font-size:0.78rem;color:#8b949e;line-height:1.7;">
+                Using the matched editorial context + model scores + GIF visual evidence, the LLM assigned content labels from the taxonomy:<br><br>
+                <em style="color:#cbd5e1;">Input: &ldquo;Scene at 44:30, IMDB says &lsquo;brief love scene with partial nudity&rsquo;, VionLabs peak 0.87, v2 peak 0.99, GIF shows two people in bed&rdquo;</em><br>
+                <em style="color:#fbbf24;">Output: SEXUAL_ACTIVITY_NUDITY</em><br><br>
+                The LLM considers the editorial description, model confidence levels, and visual content together &mdash; not just one signal in isolation.
+              </div>
+            </div>
+          </div>
+
+          <!-- 4e: Human Review -->
+          <div style="background:#0d1117;border-radius:10px;padding:16px;margin-top:1rem;border:1px solid rgba(34,197,94,0.2);">
+            <div style="font-size:0.78rem;font-weight:700;color:#4ade80;margin-bottom:8px;">4e. Human Review &amp; Correction</div>
+            <div style="font-size:0.78rem;color:#8b949e;line-height:1.7;">
+              All LLM-assigned labels were reviewed for correctness. <strong style="color:#cbd5e1;">66 scenes (31%)</strong> were flagged for additional frame-level re-examination where:
+              <ul style="margin:6px 0;padding-left:18px;">
+                <li>Model scores conflicted (e.g., v2 high but VionLabs low)</li>
+                <li>Editorial descriptions were vague or didn&rsquo;t specify timestamps</li>
+                <li>GIF evidence was ambiguous (e.g., dark scenes, partial framing)</li>
+                <li>LLM classification disagreed with the editorial source severity</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style="background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.15);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:0.78rem;color:#cbd5e1;line-height:1.7;">
+            <strong style="color:#4ade80;">Why LLM-assisted instead of fully manual?</strong> Manually annotating 214 scenes across 15 films with editorial cross-referencing would take weeks. The LLM pipeline processes a film in minutes &mdash; scraping sources, matching timestamps to descriptions, and assigning labels. Human review then focuses on the 31% of ambiguous cases rather than annotating from scratch.
           </div>
         </div>
 
         <!-- STEP 5: Severity Classification -->
         <div class="card">
-          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#22c55e;">5. Severity Classification System</h3>
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:#22c55e;">5. Content Taxonomy (Zach&rsquo;s 5-Label System)</h3>
           <div style="font-size:0.82rem;color:#8b949e;line-height:1.8;">
-            <p>A 5-level severity scale was designed to classify scene content:</p>
+            <p>A 5-label taxonomy was designed to classify scene content:</p>
           </div>
           <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:0.78rem;">
             <thead>
               <tr style="border-bottom:2px solid rgba(255,255,255,0.1);">
-                <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Code</th>
+                <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Label</th>
                 <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Level</th>
                 <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Description</th>
                 <th style="text-align:left;padding:8px 12px;color:#e6edf3;font-weight:600;">Example</th>
@@ -755,34 +913,34 @@
             </thead>
             <tbody>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                <td style="padding:8px 12px;"><span style="background:rgba(100,116,139,0.2);color:#94a3b8;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S0</span></td>
-                <td style="padding:8px 12px;color:#94a3b8;">Safe / False Positive</td>
-                <td style="padding:8px 12px;color:#8b949e;">No nudity present; model triggered on skin tones, swimwear, or non-nude content</td>
+                <td style="padding:8px 12px;"><span style="background:rgba(100,116,139,0.2);color:#94a3b8;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">SAFE</span></td>
+                <td style="padding:8px 12px;color:#94a3b8;">No content concern</td>
+                <td style="padding:8px 12px;color:#8b949e;">No content concern, false positive. Model triggered on skin tones, swimwear, or non-nude content</td>
                 <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Beach volleyball scene in Top Gun</td>
               </tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                <td style="padding:8px 12px;"><span style="background:rgba(251,191,36,0.15);color:#fcd34d;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S1</span></td>
-                <td style="padding:8px 12px;color:#fcd34d;">Skin Exposure</td>
-                <td style="padding:8px 12px;color:#8b949e;">Significant skin visible but no nudity; shirtless, underwear, suggestive framing</td>
+                <td style="padding:8px 12px;"><span style="background:rgba(251,191,36,0.15);color:#fcd34d;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">SEXUALLY_SUGGESTIVE</span></td>
+                <td style="padding:8px 12px;color:#fcd34d;">Suggestive content</td>
+                <td style="padding:8px 12px;color:#8b949e;">Bikinis, provocative poses, significant skin exposure. No nudity but suggestive framing</td>
                 <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Locker room scene with towels</td>
               </tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                <td style="padding:8px 12px;"><span style="background:rgba(251,191,36,0.15);color:#fcd34d;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S2</span></td>
-                <td style="padding:8px 12px;color:#fcd34d;">Non-Sexual Nudity</td>
-                <td style="padding:8px 12px;color:#8b949e;">Nudity in non-sexual context; artistic, medical, changing, bathing</td>
-                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Character getting dressed after bath</td>
+                <td style="padding:8px 12px;"><span style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">SEXUAL_ACTIVITY_NO_NUDITY</span></td>
+                <td style="padding:8px 12px;color:#f97316;">Implied sexual activity</td>
+                <td style="padding:8px 12px;color:#8b949e;">Sexual activity implied &mdash; cutaway, silhouettes, clothed. No visible nudity but sexual context</td>
+                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Implied love scene with cutaway shots</td>
               </tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                <td style="padding:8px 12px;"><span style="background:rgba(239,68,68,0.15);color:#fca5a5;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S3</span></td>
-                <td style="padding:8px 12px;color:#fca5a5;">Sexual Nudity</td>
-                <td style="padding:8px 12px;color:#8b949e;">Nudity in a sexual context; love scenes, seduction, intimate moments</td>
-                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Love scene in Basic Instinct</td>
+                <td style="padding:8px 12px;"><span style="background:rgba(239,68,68,0.15);color:#fca5a5;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">SEXUAL_ACTIVITY_NUDITY</span></td>
+                <td style="padding:8px 12px;color:#fca5a5;">Sexual nudity</td>
+                <td style="padding:8px 12px;color:#8b949e;">Visible nudity in sexual context; love scenes, seduction, explicit/graphic scenes, full frontal</td>
+                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Love scene in Basic Instinct; extended scenes in Wolf of Wall Street</td>
               </tr>
               <tr>
-                <td style="padding:8px 12px;"><span style="background:rgba(239,68,68,0.25);color:#f87171;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">S4</span></td>
-                <td style="padding:8px 12px;color:#f87171;">Explicit / Graphic</td>
-                <td style="padding:8px 12px;color:#8b949e;">Graphic nudity; full frontal, extended explicit scenes, pornographic framing</td>
-                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Extended scenes in Wolf of Wall Street</td>
+                <td style="padding:8px 12px;"><span style="background:rgba(59,130,246,0.15);color:#60a5fa;padding:2px 8px;border-radius:6px;font-weight:600;font-size:0.72rem;">NUDITY_NON_SEXUAL</span></td>
+                <td style="padding:8px 12px;color:#60a5fa;">Non-sexual nudity</td>
+                <td style="padding:8px 12px;color:#8b949e;">Nudity in non-sexual context; medical, artistic, bathing, changing</td>
+                <td style="padding:8px 12px;color:#7d8590;font-style:italic;">Character getting dressed after bath</td>
               </tr>
             </tbody>
           </table>
@@ -797,7 +955,7 @@
               <li><strong style="color:#cbd5e1;">MPAA Ratings:</strong> Scene counts cross-checked against rating justifications (e.g., &ldquo;Rated R for strong sexual content, nudity&rdquo;)</li>
               <li><strong style="color:#cbd5e1;">IMDB Parents Guide:</strong> &ldquo;Sex &amp; Nudity&rdquo; sections used to verify scene descriptions and approximate timestamps</li>
               <li><strong style="color:#cbd5e1;">VionLabs Frame Data:</strong> High-confidence VionLabs detections (&gt;0.9) used as initial anchor points for scene boundaries</li>
-              <li><strong style="color:#cbd5e1;">PG/PG-13 Baseline:</strong> 3 non-R-rated films (Top Gun PG, Top Gun: Maverick PG-13, A Quiet Place PG-13) included as negative controls &mdash; expected to have mostly S0/S1 scenes</li>
+              <li><strong style="color:#cbd5e1;">PG/PG-13 Baseline:</strong> 3 non-R-rated films (Top Gun PG, Top Gun: Maverick PG-13, A Quiet Place PG-13) included as negative controls &mdash; expected to have mostly SAFE/SUGGESTIVE scenes</li>
             </ul>
           </div>
         </div>
@@ -821,7 +979,7 @@
           </div>
           <div>
             <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">5</div>
-            <div style="font-size:0.75rem;color:#8b949e;">Severity Levels</div>
+            <div style="font-size:0.75rem;color:#8b949e;">Content Labels</div>
           </div>
           <div>
             <div style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">31%</div>
@@ -1307,43 +1465,43 @@
           </thead>
           <tbody>
             <tr>
-              <td><span class="badge badge-muted">S0 — Safe/FP</span></td>
+              <td><span class="badge badge-muted">SAFE</span></td>
               <td>79</td>
               <td>36.9%</td>
               <td>False positive, no nudity content</td>
             </tr>
             <tr>
-              <td><span class="badge badge-blue">S1 — Skin only</span></td>
+              <td><span class="badge badge-amber">SEXUALLY_SUGGESTIVE</span></td>
               <td>50</td>
               <td>23.4%</td>
-              <td>Skin exposure, swimwear, shirtless</td>
+              <td>Bikinis, provocative poses, significant skin exposure</td>
             </tr>
             <tr>
-              <td><span class="badge badge-amber">S2 — Non-sexual nudity</span></td>
+              <td><span class="badge badge-orange">SEXUAL_ACTIVITY_NO_NUDITY</span></td>
+              <td>0</td>
+              <td>0.0%</td>
+              <td>Not separately tracked in original annotation</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">SEXUAL_ACTIVITY_NUDITY</span></td>
+              <td>66</td>
+              <td>30.8%</td>
+              <td>Visible nudity in sexual context (merged S3+S4)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">NUDITY_NON_SEXUAL</span></td>
               <td>19</td>
               <td>8.9%</td>
-              <td>Nudity in non-sexual context (bathing, medical)</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-red">S3 — Sexual nudity</span></td>
-              <td>47</td>
-              <td>22.0%</td>
-              <td>Nudity in sexual context</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-red">S4 — Explicit/graphic</span></td>
-              <td>19</td>
-              <td>8.9%</td>
-              <td>Graphic sexual content, full nudity</td>
+              <td>Nudity in non-sexual context (bathing, medical, artistic)</td>
             </tr>
             <tr style="font-weight:800;border-top:2px solid rgba(255,255,255,0.15);">
-              <td><strong>S0+S1 (FP rate)</strong></td>
+              <td><strong>SAFE + SEXUALLY_SUGGESTIVE (FP rate)</strong></td>
               <td><strong>129</strong></td>
               <td style="color:#ef4444;font-weight:800;">60.3%</td>
               <td></td>
             </tr>
             <tr style="font-weight:800;">
-              <td><strong>S2+ (Real content)</strong></td>
+              <td><strong>NUDITY+ (Real content)</strong></td>
               <td><strong>85</strong></td>
               <td style="color:#22c55e;font-weight:800;">39.7%</td>
               <td></td>
@@ -1354,12 +1512,12 @@
 
       <div class="callout callout-green">
         <h4>Complementary Strengths by Severity</h4>
-        <p>Of 214 verified scenes, 85 (39.7%) are real content (S2+). S3+S4 account for 66 scenes (30.8%) &mdash; sexual nudity and explicit content that models reliably detect. 60.3% of detections are S0/S1 based on film-knowledge verification. However, 31% of scenes (66/214) still need human frame-level verification &mdash; treat these numbers as directional.</p>
+        <p>Of 214 verified scenes, 85 (39.7%) are real content (NUDITY+). SEXUAL_ACTIVITY_NUDITY accounts for 66 scenes (30.8%) &mdash; nudity in sexual context that models reliably detect. 60.3% of detections are SAFE/SUGGESTIVE based on film-knowledge verification. However, 31% of scenes (66/214) still need human frame-level verification &mdash; treat these numbers as directional.</p>
       </div>
 
       <div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
         <div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
-        <p>False positives are when a model incorrectly flags clean content as nudity. 60.3% of the 214 verified scenes are S0/S1 (safe or skin-only). When we require BOTH VionLabs AND v2 to agree, false positive clusters drop to zero across all 7 movies tested. However, 31% of scenes still need human frame-level verification. This is the strongest argument for the consensus approach combined with human review.</p>
+        <p>False positives are when a model incorrectly flags clean content as nudity. 60.3% of the 214 verified scenes are SAFE/SUGGESTIVE. When we require BOTH VionLabs AND v2 to agree, false positive clusters drop to zero across all 7 movies tested. However, 31% of scenes still need human frame-level verification. This is the strongest argument for the consensus approach combined with human review.</p>
       </div>
     </div>
   </div>
@@ -1390,7 +1548,7 @@
           </thead>
           <tbody>
             <tr>
-              <td><span class="badge badge-muted">S0 &mdash; Safe/FP</span></td>
+              <td><span class="badge badge-muted">SAFE</span></td>
               <td>79</td>
               <td style="color:var(--text-muted);">&mdash;</td>
               <td style="color:var(--text-muted);">&mdash;</td>
@@ -1398,7 +1556,7 @@
               <td style="color:var(--text-muted);">&mdash;</td>
             </tr>
             <tr>
-              <td><span class="badge badge-blue">S1 &mdash; Skin only</span></td>
+              <td><span class="badge badge-amber">SEXUALLY_SUGGESTIVE</span></td>
               <td>50</td>
               <td>~80%</td>
               <td>~75%</td>
@@ -1406,31 +1564,31 @@
               <td>~65%</td>
             </tr>
             <tr>
-              <td><span class="badge badge-amber">S2 &mdash; Non-sexual</span></td>
+              <td><span class="badge badge-orange">SEXUAL_ACTIVITY_NO_NUDITY</span></td>
+              <td>0</td>
+              <td style="color:var(--text-muted);">&mdash;</td>
+              <td style="color:var(--text-muted);">&mdash;</td>
+              <td style="color:var(--text-muted);">&mdash;</td>
+              <td style="color:var(--text-muted);">&mdash;</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">SEXUAL_ACTIVITY_NUDITY</span></td>
+              <td>66</td>
+              <td>~96%</td>
+              <td>~96%</td>
+              <td>~64%</td>
+              <td>~91%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">NUDITY_NON_SEXUAL</span></td>
               <td>19</td>
               <td>~90%</td>
               <td>~85%</td>
               <td>~45%</td>
               <td>~80%</td>
             </tr>
-            <tr>
-              <td><span class="badge badge-red">S3 &mdash; Sexual</span></td>
-              <td>47</td>
-              <td>~95%</td>
-              <td>~95%</td>
-              <td>~60%</td>
-              <td>~90%</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-red">S4 &mdash; Explicit</span></td>
-              <td>19</td>
-              <td>~100%</td>
-              <td>~100%</td>
-              <td>~75%</td>
-              <td>~95%</td>
-            </tr>
             <tr style="font-weight:800;border-top:2px solid rgba(255,255,255,0.15);">
-              <td><strong>All S2+ (Real content)</strong></td>
+              <td><strong>All NUDITY+ (Real content)</strong></td>
               <td><strong>85</strong></td>
               <td style="color:var(--vionlabs);font-weight:800;">~93%</td>
               <td style="color:var(--xcd-v2);font-weight:800;">~92%</td>
@@ -1475,8 +1633,8 @@
           <text x="635" y="355" fill="#7d8590" font-family="Geist Mono, monospace" font-size="10" text-anchor="middle">75%</text>
           <text x="795" y="355" fill="#7d8590" font-family="Geist Mono, monospace" font-size="10" text-anchor="end">100%</text>
 
-          <!-- S1 - Skin only -->
-          <text x="130" y="62" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">S1 Skin</text>
+          <!-- SEXUALLY_SUGGESTIVE -->
+          <text x="130" y="62" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">SUGGESTIVE</text>
           <!-- VionLabs 80% -->
           <rect x="140" y="42" width="528" height="10" rx="3" fill="#fda1d4" opacity="0.85"/>
           <text x="674" y="51" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" font-weight="600">80%</text>
@@ -1490,8 +1648,8 @@
           <rect x="140" y="81" width="429" height="10" rx="3" fill="#22c55e" opacity="0.85"/>
           <text x="575" y="90" fill="#22c55e" font-family="Geist Mono, monospace" font-size="10" font-weight="600">65%</text>
 
-          <!-- S2 - Non-sexual -->
-          <text x="130" y="132" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">S2 Non-sexual</text>
+          <!-- NUDITY_NON_SEXUAL -->
+          <text x="130" y="132" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">NON_SEXUAL</text>
           <!-- VionLabs 90% -->
           <rect x="140" y="112" width="594" height="10" rx="3" fill="#fda1d4" opacity="0.85"/>
           <text x="740" y="121" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" font-weight="600">90%</text>
@@ -1505,8 +1663,8 @@
           <rect x="140" y="151" width="528" height="10" rx="3" fill="#22c55e" opacity="0.85"/>
           <text x="674" y="160" fill="#22c55e" font-family="Geist Mono, monospace" font-size="10" font-weight="600">80%</text>
 
-          <!-- S3 - Sexual -->
-          <text x="130" y="202" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">S3 Sexual</text>
+          <!-- SEXUAL_ACTIVITY_NUDITY -->
+          <text x="130" y="202" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">SEXUAL_NUDITY</text>
           <!-- VionLabs 95% -->
           <rect x="140" y="182" width="627" height="10" rx="3" fill="#fda1d4" opacity="0.85"/>
           <text x="773" y="191" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" font-weight="600">95%</text>
@@ -1520,8 +1678,8 @@
           <rect x="140" y="221" width="594" height="10" rx="3" fill="#22c55e" opacity="0.85"/>
           <text x="740" y="230" fill="#22c55e" font-family="Geist Mono, monospace" font-size="10" font-weight="600">90%</text>
 
-          <!-- S4 - Explicit -->
-          <text x="130" y="272" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">S4 Explicit</text>
+          <!-- SEXUAL_ACTIVITY_NUDITY (explicit) -->
+          <text x="130" y="272" fill="#8b949e" font-family="Inter, sans-serif" font-size="12" font-weight="600" text-anchor="end">EXPLICIT</text>
           <!-- VionLabs 100% -->
           <rect x="140" y="252" width="660" height="10" rx="3" fill="#fda1d4" opacity="0.85"/>
           <text x="795" y="261" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" text-anchor="end" font-weight="600">100%</text>
@@ -1535,9 +1693,9 @@
           <rect x="140" y="291" width="627" height="10" rx="3" fill="#22c55e" opacity="0.85"/>
           <text x="773" y="300" fill="#22c55e" font-family="Geist Mono, monospace" font-size="10" font-weight="600">95%</text>
 
-          <!-- S2+ Summary bar -->
+          <!-- NUDITY+ Summary bar -->
           <line x1="140" y1="315" x2="800" y2="315" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-          <text x="130" y="338" fill="#e6edf3" font-family="Inter, sans-serif" font-size="12" font-weight="800" text-anchor="end">All S2+</text>
+          <text x="130" y="338" fill="#e6edf3" font-family="Inter, sans-serif" font-size="12" font-weight="800" text-anchor="end">All NUDITY+</text>
           <!-- VionLabs 93% -->
           <rect x="140" y="322" width="614" height="8" rx="3" fill="#fda1d4"/>
           <text x="760" y="331" fill="#fda1d4" font-family="Geist Mono, monospace" font-size="10" font-weight="700">93%</text>
@@ -1550,23 +1708,23 @@
       <!-- C. Key Insight Cards -->
       <div class="card-grid card-grid-3" style="margin-bottom:2rem;">
         <div class="insight-card" style="border-left-color:var(--consensus);">
-          <h4 style="color:var(--consensus);">Models excel at S3+ content</h4>
-          <p>All models detect &gt;90% of explicit nudity (S3+S4). VionLabs and XCD v2 both achieve near-perfect detection on graphic content. Even with consensus gating, detection stays above 90% for sexual nudity and 95% for explicit scenes.</p>
+          <h4 style="color:var(--consensus);">Models excel at SEXUAL_ACTIVITY_NUDITY</h4>
+          <p>All models detect &gt;90% of SEXUAL_ACTIVITY_NUDITY content. VionLabs and XCD v2 both achieve near-perfect detection on graphic content. Even with consensus gating, detection stays above 90% for sexual nudity.</p>
         </div>
         <div class="insight-card" style="border-left-color:var(--consensus-or);">
-          <h4 style="color:var(--consensus-or);">S1 is the blind spot</h4>
-          <p>Skin-only scenes are where models diverge most. Consensus drops to ~65% because models disagree on what counts as &ldquo;just skin.&rdquo; XCD v1 detects only ~30% of S1 scenes, while VionLabs catches ~80%. This is the severity tier where model selection matters most.</p>
+          <h4 style="color:var(--consensus-or);">SEXUALLY_SUGGESTIVE is the blind spot</h4>
+          <p>Suggestive scenes are where models diverge most. Consensus drops to ~65% because models disagree on what counts as suggestive content. XCD v1 detects only ~30% of SEXUALLY_SUGGESTIVE scenes, while VionLabs catches ~80%. This is the category where model selection matters most.</p>
         </div>
         <div class="insight-card" style="border-left-color:var(--xcd-v2);">
           <h4 style="color:var(--xcd-v2);">Ground truth anchors the evaluation</h4>
-          <p>Without severity-graded ground truth, we&rsquo;d report F1=0.945 and call it done. The reality: 60% of detections are S0/S1. Ground truth transforms this from &ldquo;how well do models agree with each other&rdquo; to &ldquo;how well do models identify actual nudity.&rdquo;</p>
+          <p>Without severity-graded ground truth, we&rsquo;d report F1=0.945 and call it done. The reality: 60% of detections are SAFE/SUGGESTIVE. Ground truth transforms this from &ldquo;how well do models agree with each other&rdquo; to &ldquo;how well do models identify actual nudity.&rdquo;</p>
         </div>
       </div>
 
       <!-- D. What This Means Explainer -->
       <div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
         <div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
-        <p>This section answers the fundamental question: when models detect something, is it actually nudity? By comparing detections against manually-verified ground truth with severity grades, we can measure true model performance &mdash; not just model agreement. VionLabs and XCD v2 both detect &gt;90% of real content (S2+), but S1 skin-only scenes remain the key differentiator where model choice and consensus strategy have the greatest impact.</p>
+        <p>This section answers the fundamental question: when models detect something, is it actually nudity? By comparing detections against manually-verified ground truth with severity grades, we can measure true model performance &mdash; not just model agreement. VionLabs and XCD v2 both detect &gt;90% of real content (NUDITY+), but SEXUALLY_SUGGESTIVE scenes remain the key differentiator where model choice and consensus strategy have the greatest impact.</p>
       </div>
     </div>
   </div>
@@ -1578,12 +1736,12 @@
     <div class="section-reveal">
       <div class="section-label">Section 11</div>
       <h2 class="section-title">Reality Check: How Many Detections Are Actually Nudity?</h2>
-      <p class="section-subtitle">Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain &mdash; a 35% reduction. Cross-referencing against editorial sources reveals 60.3% of model detections are S0/S1 (safe or skin-only).</p>
+      <p class="section-subtitle">Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain &mdash; a 35% reduction. Cross-referencing against editorial sources reveals 60.3% of model detections are SAFE/SUGGESTIVE.</p>
 
       <!-- Problem callout -->
       <div class="callout callout-red" style="margin-bottom:2rem;">
         <h4>Our F1 is computed against auto-detected ground truth</h4>
-        <p>Our F1=0.945 was computed using auto-detected ground truth &mdash; scenes found BY the same models we're evaluating. This is circular. When we verify against independent editorial sources (Kids-In-Mind, IMDB Parents Guide, BBFC) and apply severity grading, 60.3% of detections are S0/S1 (safe/FP or skin-only). However, 31% of scenes still need human frame-level verification &mdash; treat these numbers as directional.</p>
+        <p>Our F1=0.945 was computed using auto-detected ground truth &mdash; scenes found BY the same models we're evaluating. This is circular. When we verify against independent editorial sources (Kids-In-Mind, IMDB Parents Guide, BBFC) and apply severity grading, 60.3% of detections are SAFE/SUGGESTIVE. However, 31% of scenes still need human frame-level verification &mdash; treat these numbers as directional.</p>
       </div>
 
       <!-- Verification comparison table -->
@@ -1595,11 +1753,11 @@
               <th>Movie</th>
               <th>Orig</th>
               <th>Verified</th>
-              <th>S0 (safe)</th>
-              <th>S1 (skin)</th>
-              <th>S2 (non-sexual)</th>
-              <th>S3 (sexual)</th>
-              <th>S4 (explicit)</th>
+              <th>SAFE</th>
+              <th>SUGGESTIVE</th>
+              <th>NON_SEXUAL</th>
+              <th>SEXUAL (S3)</th>
+              <th>SEXUAL (S4)</th>
             </tr>
           </thead>
           <tbody>
@@ -1636,11 +1794,11 @@
       <div class="card-grid card-grid-3" style="margin-bottom:2rem;">
         <div class="card kpi-card" style="border-top:3px solid #ef4444;">
           <div style="font-size:2.2rem;font-weight:800;color:#ef4444;">60.3%</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">S0+S1 (FP rate: 129/214)</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">SAFE + SUGGESTIVE (FP rate: 129/214)</div>
         </div>
         <div class="card kpi-card" style="border-top:3px solid #22c55e;">
           <div style="font-size:2.2rem;font-weight:800;color:#22c55e;">39.7%</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">S2+ Real content (85/214)</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">NUDITY+ Real content (85/214)</div>
         </div>
         <div class="card kpi-card" style="border-top:3px solid #f59e0b;">
           <div style="font-size:2.2rem;font-weight:800;color:#f59e0b;">31%</div>
@@ -1651,8 +1809,8 @@
       <!-- 3 Insight Cards -->
       <div class="card-grid card-grid-3" style="margin-bottom:2rem;">
         <div class="insight-card" style="border-color:#ef4444;">
-          <h4 style="color:#ef4444;">60.3% of detections are S0/S1</h4>
-          <p>129 of 214 verified scenes are safe (S0) or skin-only (S1). The models share correlated errors on skin exposure, swimwear, bathing, and dark scenes. However, 31% of scenes still need human frame-level verification.</p>
+          <h4 style="color:#ef4444;">60.3% of detections are SAFE/SUGGESTIVE</h4>
+          <p>129 of 214 verified scenes are SAFE or SEXUALLY_SUGGESTIVE. The models share correlated errors on skin exposure, swimwear, bathing, and dark scenes. However, 31% of scenes still need human frame-level verification.</p>
         </div>
         <div class="insight-card" style="border-color:#f59e0b;">
           <h4 style="color:#f59e0b;">Consolidation reduces noise by 35%</h4>
@@ -1660,7 +1818,7 @@
         </div>
         <div class="insight-card" style="border-color:#22c55e;">
           <h4 style="color:#22c55e;">The good news: explicit scenes are reliably caught</h4>
-          <p>S3+S4 content (sexual nudity and explicit) accounts for 66 scenes (30.8%). For actual explicit nudity, all models detect at &gt;90%. The FPs are on suggestive/non-nude skin exposure. Raising threshold to 0.7+ eliminates most.</p>
+          <p>SEXUAL_ACTIVITY_NUDITY content accounts for 66 scenes (30.8%). For actual nudity in sexual context, all models detect at &gt;90%. The FPs are on suggestive content. Raising threshold to 0.7+ eliminates most.</p>
         </div>
       </div>
 
@@ -1701,7 +1859,7 @@
       <!-- What This Means explainer -->
       <div style="background:rgba(59,130,246,0.08);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:16px 20px;margin:16px 0;font-size:13px;line-height:1.7;color:#cbd5e1">
         <div style="font-weight:700;color:#60a5fa;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.05em">&#128161; What This Means</div>
-        <p>The takeaway isn't that the models are bad &mdash; they're excellent at catching actual nudity (S2+). The problem is 60.3% of detections are S0/S1 (safe or skin-only). For a safety gate, this over-flagging is actually preferable to missing real content. 31% of scenes still need human frame-level verification &mdash; the question is whether your downstream pipeline can handle the S0/S1 rate, or if you need human review for the flagged content.</p>
+        <p>The takeaway isn't that the models are bad &mdash; they're excellent at catching actual nudity (NUDITY+). The problem is 60.3% of detections are SAFE/SUGGESTIVE. For a safety gate, this over-flagging is actually preferable to missing real content. 31% of scenes still need human frame-level verification &mdash; the question is whether your downstream pipeline can handle the SAFE/SUGGESTIVE rate, or if you need human review for the flagged content.</p>
       </div>
     </div>
   </div>
@@ -1879,11 +2037,11 @@ const agreement = [
 ];
 
 const severity = [
-  { level: 'S0 — Safe/FP', total: 79 },
-  { level: 'S1 — Skin only', total: 50 },
-  { level: 'S2 — Non-sexual', total: 19 },
-  { level: 'S3 — Sexual', total: 47 },
-  { level: 'S4 — Explicit', total: 19 },
+  { level: 'SAFE', total: 79 },
+  { level: 'SEXUALLY_SUGGESTIVE', total: 50 },
+  { level: 'SEXUAL_ACTIVITY_NO_NUDITY', total: 0 },
+  { level: 'SEXUAL_ACTIVITY_NUDITY', total: 66 },
+  { level: 'NUDITY_NON_SEXUAL', total: 19 },
 ];
 
 const latency = [
@@ -2423,7 +2581,7 @@ function updateAllCharts(threshold) {
   // 2. Hero explainer text
   var expl=document.getElementById('hero-explainer-text');
   if(expl){
-    if(threshold===0.5){expl.textContent='These numbers summarize our analysis of 556,768 individual video frames across 15 Paramount+ movies (12 R-rated + 3 PG/PG-13). Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain \u2014 a 35% reduction. 60.3% of detections are S0/S1 based on film-knowledge verification. However, 31% of scenes still need human frame-level verification.';}
+    if(threshold===0.5){expl.textContent='These numbers summarize our analysis of 556,768 individual video frames across 15 Paramount+ movies (12 R-rated + 3 PG/PG-13). Auto-detection produced 327 scenes. After merging fragmented detections from the same sequence (scenes within 120s of each other), 214 distinct scenes remain \u2014 a 35% reduction. 60.3% of detections are SAFE/SUGGESTIVE based on film-knowledge verification. However, 31% of scenes still need human frame-level verification.';}
     else{var fp=andFP[idx];var fm=fp===0?'Zero false positives maintained.':fp+' false positive clusters \u2014 consensus no longer eliminates all noise.';var dr=threshold<0.5?'Lower thresholds cast a wider net but let more false positives through.':'Higher thresholds are stricter, reducing recall as borderline scenes fall below the cutoff.';expl.textContent='At threshold '+threshold.toFixed(2)+', AND consensus achieves F1='+andF1[idx].toFixed(3)+' with '+(andRecall[idx]*100).toFixed(1)+'% recall. '+fm+' '+dr;}
   }
 
