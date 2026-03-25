@@ -16,6 +16,15 @@
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎞</text></svg>">
 
+    <!-- Theme flash prevention -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -378,6 +387,94 @@
             color: var(--caption);
         }
 
+        /* ========== LIGHT THEME ========== */
+        [data-theme="light"] {
+            --bg: #f0eee6;
+            --surface: #e8e6de;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+        }
+
+        [data-theme="light"] .hero-bg img { opacity: 0.25; }
+        [data-theme="light"] .lightbox { background: rgba(240,238,230,0.97); }
+        [data-theme="light"] .lightbox-close,
+        [data-theme="light"] .lightbox-nav { color: var(--text); }
+
+        /* ========== TOP CONTROLS ========== */
+        .top-controls {
+            position: fixed;
+            top: 1.15rem;
+            right: 1.25rem;
+            z-index: 50;
+        }
+
+        .toggle-wrap { display: flex; align-items: center; }
+        .toggle-wrap input { display: none; }
+
+        .toggle-wrap label {
+            position: relative;
+            display: block;
+            width: 44px;
+            height: 24px;
+            background: var(--caption);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.5s ease;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0s, background-color 0.5s ease;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        /* ========== LIGHTBOX NAV ========== */
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--caption);
+            font-family: var(--font-body);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 1.5rem;
+            z-index: 2;
+            opacity: 0.4;
+            transition: opacity 0.2s ease;
+        }
+
+        .lightbox-nav:hover { opacity: 0.9; }
+        .lightbox-prev { left: 0; }
+        .lightbox-next { right: 0; }
+
+        .lightbox-meta-count {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--caption);
+            margin-top: 6px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .lightbox-nav { display: none; }
+        }
+
         /* ========== BACK NAV ========== */
         .back-link {
             position: fixed;
@@ -433,6 +530,12 @@
 <body>
 
     <a href="/" class="back-link">&larr; Kevin Lee</a>
+    <div class="top-controls">
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </div>
 
     <!-- ==================== HERO ==================== -->
     <section class="hero">
@@ -498,54 +601,6 @@
         </div>
     </section>
 
-    <!-- ==================== ROLL 02 ==================== -->
-    <section class="roll">
-        <div class="roll-header reveal">
-            <p class="roll-number">Roll 02</p>
-            <h2 class="roll-title">First Month in LA</h2>
-            <p class="roll-meta">Various &middot; March 2026</p>
-            <p class="roll-note">Hollywood, Mammoth, and the apartment slowly becoming home.</p>
-        </div>
-
-        <div class="grid">
-            <div class="grid-item reveal" data-location="Mammoth" data-detail="iPhone &middot; March 2026">
-                <img src="/film/images/mammoth-01.jpeg" alt="Sunset at Mammoth Mountain" loading="lazy">
-                <div class="grid-caption">
-                    <span class="grid-caption-location">Mammoth</span>
-                    <span class="grid-caption-text">Last sunset of ski season</span>
-                </div>
-            </div>
-            <div class="grid-item reveal" data-location="Hollywood" data-detail="iPhone &middot; March 2026">
-                <img src="/film/images/la-02.jpeg" alt="Reading nook by the window" loading="lazy">
-                <div class="grid-caption">
-                    <span class="grid-caption-location">Hollywood</span>
-                    <span class="grid-caption-text">Morning light</span>
-                </div>
-            </div>
-            <div class="grid-item reveal" data-location="Mammoth" data-detail="iPhone &middot; March 2026">
-                <img src="/film/images/mammoth-02.jpeg" alt="The crew at Mammoth" loading="lazy">
-                <div class="grid-caption">
-                    <span class="grid-caption-location">Mammoth</span>
-                    <span class="grid-caption-text">The crew</span>
-                </div>
-            </div>
-            <div class="grid-item reveal" data-location="Hollywood" data-detail="iPhone &middot; March 2026">
-                <img src="/film/images/la-03.jpeg" alt="Bedroom with warm lighting" loading="lazy">
-                <div class="grid-caption">
-                    <span class="grid-caption-location">Hollywood</span>
-                    <span class="grid-caption-text">Free furniture from London</span>
-                </div>
-            </div>
-            <div class="grid-item reveal" data-location="Hollywood" data-detail="iPhone &middot; March 2026">
-                <img src="/film/images/la-01.jpeg" alt="Team dinner" loading="lazy">
-                <div class="grid-caption">
-                    <span class="grid-caption-location">Hollywood</span>
-                    <span class="grid-caption-text">Team dinner</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- ==================== FOOTER ==================== -->
     <footer class="gallery-footer">
         <p>Kevin Lee &middot; <a href="/">klee.page</a></p>
@@ -553,11 +608,14 @@
 
     <!-- ==================== LIGHTBOX ==================== -->
     <div class="lightbox" id="lightbox">
-        <button class="lightbox-close" id="lightboxClose">&times; Close</button>
+        <button class="lightbox-close" id="lightboxClose">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous photo">&larr;</button>
+        <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next photo">&rarr;</button>
         <img id="lightboxImg" src="" alt="">
         <div class="lightbox-meta">
             <p class="lightbox-meta-location" id="lightboxLocation"></p>
             <p class="lightbox-meta-detail" id="lightboxDetail"></p>
+            <p class="lightbox-meta-count" id="lightboxCount"></p>
         </div>
     </div>
 
@@ -570,37 +628,71 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
 
+    <script src="/js/theme.js"></script>
     <script>
-        // ==================== LIGHTBOX ====================
+        // ==================== LIGHTBOX WITH NAV ====================
         (function() {
             var lightbox = document.getElementById('lightbox');
-            var lightboxImg = document.getElementById('lightboxImg');
-            var lightboxLocation = document.getElementById('lightboxLocation');
-            var lightboxDetail = document.getElementById('lightboxDetail');
-            var closeBtn = document.getElementById('lightboxClose');
+            var lbImg = document.getElementById('lightboxImg');
+            var lbLocation = document.getElementById('lightboxLocation');
+            var lbDetail = document.getElementById('lightboxDetail');
+            var lbCount = document.getElementById('lightboxCount');
+            var items = Array.from(document.querySelectorAll('.grid-item'));
+            var currentIndex = 0;
 
-            document.querySelectorAll('.grid-item').forEach(function(item) {
-                item.addEventListener('click', function() {
-                    var img = item.querySelector('img');
-                    lightboxImg.src = img.src;
-                    lightboxImg.alt = img.alt;
-                    lightboxLocation.textContent = item.getAttribute('data-location') || '';
-                    lightboxDetail.textContent = item.getAttribute('data-detail') || '';
-                    lightbox.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            });
+            function openLightbox(index) {
+                currentIndex = index;
+                var item = items[index];
+                var img = item.querySelector('img');
+                lbImg.src = img.src;
+                lbImg.alt = img.alt;
+                lbLocation.textContent = item.getAttribute('data-location') || '';
+                lbDetail.textContent = item.getAttribute('data-detail') || '';
+                lbCount.textContent = (index + 1) + ' / ' + items.length;
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
 
             function closeLightbox() {
                 lightbox.classList.remove('active');
                 document.body.style.overflow = '';
             }
 
-            closeBtn.addEventListener('click', function(e) { e.stopPropagation(); closeLightbox(); });
+            function navigate(dir) {
+                currentIndex = (currentIndex + dir + items.length) % items.length;
+                openLightbox(currentIndex);
+            }
+
+            // Click handlers
+            items.forEach(function(item, i) {
+                item.addEventListener('click', function() { openLightbox(i); });
+            });
+
+            document.getElementById('lightboxClose').addEventListener('click', function(e) { e.stopPropagation(); closeLightbox(); });
+            document.getElementById('lightboxPrev').addEventListener('click', function(e) { e.stopPropagation(); navigate(-1); });
+            document.getElementById('lightboxNext').addEventListener('click', function(e) { e.stopPropagation(); navigate(1); });
             lightbox.addEventListener('click', closeLightbox);
-            lightboxImg.addEventListener('click', function(e) { e.stopPropagation(); });
+            lbImg.addEventListener('click', function(e) { e.stopPropagation(); });
+
+            // Keyboard navigation
             document.addEventListener('keydown', function(e) {
+                if (!lightbox.classList.contains('active')) return;
                 if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowRight') navigate(1);
+                if (e.key === 'ArrowLeft') navigate(-1);
+            });
+
+            // Touch/swipe on mobile
+            var touchStartX = 0;
+            lightbox.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+            lightbox.addEventListener('touchend', function(e) {
+                var dx = e.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(dx) > 50) {
+                    e.preventDefault();
+                    navigate(dx > 0 ? -1 : 1);
+                }
             });
         })();
 
@@ -612,30 +704,24 @@
             if (window._galleryInit) return;
             window._galleryInit = true;
 
-            // Smooth scroll
             var lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
             lenis.on('scroll', ScrollTrigger.update);
             gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
             gsap.ticker.lagSmoothing(0);
 
-            // Hero Ken Burns
             gsap.to('#heroImg', {
-                scale: 1.15,
-                ease: 'none',
+                scale: 1.15, ease: 'none',
                 scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
             });
 
-            // Fade scroll hint
             gsap.to('.scroll-hint', {
                 opacity: 0,
                 scrollTrigger: { trigger: '.hero', start: '20% top', end: '40% top', scrub: true }
             });
 
-            // Reveals — staggered for grid items
-            gsap.utils.toArray('.reveal').forEach(function(el, i) {
+            gsap.utils.toArray('.reveal').forEach(function(el) {
                 gsap.to(el, {
-                    opacity: 1, y: 0, duration: 0.8,
-                    ease: 'power2.out',
+                    opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
                     scrollTrigger: { trigger: el, start: 'top 90%', once: true }
                 });
             });
