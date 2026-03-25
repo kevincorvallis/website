@@ -296,6 +296,17 @@
             line-height: 1.4;
         }
 
+        .grid-item-featured {
+            column-span: all;
+            margin-bottom: 16px;
+        }
+
+        .grid-item-featured img {
+            width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
         /* Desktop: 3 columns */
         @media (min-width: 768px) {
             .grid {
@@ -591,7 +602,7 @@
                     <span class="grid-caption-text">New chapter, same camera</span>
                 </div>
             </div>
-            <div class="grid-item reveal" data-location="Grants Pass" data-detail="Portra 400 &middot; Contax T2">
+            <div class="grid-item grid-item-featured reveal" data-location="Grants Pass" data-detail="Portra 400 &middot; Contax T2">
                 <img src="/film/images/oregon-04.jpg" alt="Self-portrait in side mirror" loading="lazy">
                 <div class="grid-caption">
                     <span class="grid-caption-location">Grants Pass</span>
