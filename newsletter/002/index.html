@@ -1897,6 +1897,12 @@
             }
 
             function checkPassword(val, callback) {
+                // Client-side check first — password is shared openly with friends
+                if (val.trim().toLowerCase() === 'komorebi') {
+                    callback(true);
+                    return;
+                }
+                // Also try server in case password changes
                 fetch('/api/gate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1904,10 +1910,7 @@
                 })
                 .then(function(r) { return r.json(); })
                 .then(function(data) { callback(data.ok === true); })
-                .catch(function() {
-                    // Fallback for local dev (no API)
-                    callback(val.toLowerCase() === 'komorebi');
-                });
+                .catch(function() { callback(false); });
             }
 
             // Already authenticated this session
@@ -1920,15 +1923,15 @@
             var params = new URLSearchParams(window.location.search);
             var urlKey = params.get('key');
             if (urlKey) {
-                gate.style.opacity = '0';
+                // Clean the URL immediately so password isn't visible in address bar
+                params.delete('key');
+                var clean = window.location.pathname + (params.toString() ? '?' + params : '');
+                window.history.replaceState({}, '', clean);
+
                 checkPassword(urlKey, function(ok) {
                     if (ok) {
                         unlock();
-                        params.delete('key');
-                        var clean = window.location.pathname + (params.toString() ? '?' + params : '');
-                        window.history.replaceState({}, '', clean);
                     } else {
-                        gate.style.opacity = '';
                         showGate();
                     }
                 });
