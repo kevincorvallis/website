@@ -268,13 +268,13 @@
             position: relative;
             display: flex;
             align-items: center;
-            width: 52px;
-            height: 22px;
+            width: 56px;
+            height: 24px;
             background: var(--text);
-            border-radius: 11px;
+            border-radius: 12px;
             cursor: pointer;
             user-select: none;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.5s ease;
         }
 
         .lang-pill:hover { opacity: 0.75; }
@@ -294,16 +294,16 @@
 
         .lang-pill-dot {
             position: absolute;
-            top: 2px;
-            left: 2px;
+            top: 3px;
+            left: 3px;
             width: 18px;
             height: 18px;
             background: var(--bg);
             border-radius: 50%;
-            transition: transform 0.2s ease, background-color 0.3s ease;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
         }
 
-        [data-lang="ko"] .lang-pill-dot { transform: translateX(30px); }
+        [data-lang="ko"] .lang-pill-dot { transform: translateX(32px); }
         [data-lang="en"] .lang-pill-ko { opacity: 0.4; }
         [data-lang="ko"] .lang-pill-en { opacity: 0.4; }
 
@@ -317,28 +317,28 @@
         .toggle-wrap label {
             position: relative;
             display: block;
-            width: 40px;
-            height: 20px;
+            width: 44px;
+            height: 24px;
             background: var(--text);
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.5s ease;
         }
 
         .toggle-wrap label::after {
             content: '';
             position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 16px;
-            height: 16px;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
             background: var(--bg);
             border-radius: 50%;
-            transition: transform 0s, background-color 0.3s ease;
+            transition: transform 0s, background-color 0.5s ease;
         }
 
         .toggle-wrap label.has-transition::after {
-            transition: transform 0.2s, background-color 0.3s ease;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
         }
 
         .toggle-wrap input:checked + label::after {
