@@ -175,7 +175,11 @@
         }
 
         .gate-input::placeholder {
-            color: transparent;
+            color: var(--caption);
+            opacity: 0.5;
+            letter-spacing: 0;
+            font-size: 15px;
+            font-style: italic;
         }
 
         .gate-input:focus {
@@ -1271,9 +1275,10 @@
             </p>
             <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
                 <input
-                    type="password"
+                    type="text"
                     class="gate-input"
                     id="gateInput"
+                    placeholder="enter password"
                     autocomplete="off"
                     autofocus
                 >
