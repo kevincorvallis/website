@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Film — Kevin Lee</title>
+    <meta name="description" content="Film photography by Kevin Lee. Portra 400, Contax T2, 35mm.">
+    <meta name="author" content="Kenny Lee">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://klee.page/film">
+    <meta property="og:title" content="Film — Kevin Lee">
+    <meta property="og:description" content="Film photography by Kevin Lee. Shot on Portra 400.">
+    <meta property="og:image" content="https://klee.page/film/images/oregon-02.jpg">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎞</text></svg>">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #1a1918;
+            --surface: #222120;
+            --text: #e8e4dd;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --font-display: 'EB Garamond', Georgia, serif;
+            --font-body: 'Newsreader', Georgia, serif;
+            --font-mono: 'Space Grotesk', system-ui, sans-serif;
+        }
+
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 16px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::selection { background: rgba(160, 130, 109, 0.3); color: var(--text); }
+
+        a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+        a:hover { opacity: 0.7; }
+
+        /* ========== HERO ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.35;
+            will-change: transform;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 15vw, 8rem);
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            line-height: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-name {
+            font-family: var(--font-body);
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--caption);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-meta {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.4;
+        }
+
+        .scroll-hint span {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--caption);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 28px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ========== INTRO QUOTE ========== */
+        .intro {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .intro blockquote {
+            font-family: var(--font-body);
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-style: italic;
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--caption);
+        }
+
+        /* ========== ROLL HEADER ========== */
+        .roll {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .roll + .roll {
+            margin-top: 6rem;
+        }
+
+        .roll-header {
+            text-align: center;
+            padding: 4rem 1rem 2.5rem;
+        }
+
+        .roll-number {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .roll-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 7vw, 3.5rem);
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            line-height: 1.1;
+            margin-bottom: 0.75rem;
+        }
+
+        .roll-meta {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            color: var(--caption);
+        }
+
+        .roll-note {
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-style: italic;
+            color: var(--caption);
+            max-width: 440px;
+            margin: 1rem auto 0;
+            line-height: 1.6;
+        }
+
+        /* ========== MASONRY GRID ========== */
+        .grid {
+            columns: 2;
+            column-gap: 10px;
+            padding: 0 4px;
+        }
+
+        .grid-item {
+            break-inside: avoid;
+            margin-bottom: 10px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .grid-item img {
+            width: 100%;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease;
+        }
+
+        .grid-item:hover img {
+            transform: scale(1.03);
+        }
+
+        .grid-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(26,25,24,0.5) 0%, transparent 40%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .grid-item:hover::after {
+            opacity: 1;
+        }
+
+        .grid-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .grid-item:hover .grid-caption {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .grid-caption-location {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .grid-caption-text {
+            font-family: var(--font-body);
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        /* Desktop: 3 columns */
+        @media (min-width: 768px) {
+            .grid {
+                columns: 3;
+                column-gap: 14px;
+                padding: 0;
+            }
+            .grid-item { margin-bottom: 14px; }
+        }
+
+        /* ========== LIGHTBOX ========== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(10,10,9,0.97);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            cursor: zoom-out;
+            padding: 1rem;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--caption);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 2;
+            transition: color 0.2s ease;
+        }
+
+        .lightbox-close:hover { color: var(--text); }
+
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 2px;
+            transform: scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .lightbox.active img {
+            transform: scale(1);
+        }
+
+        .lightbox-meta {
+            margin-top: 1rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
+        }
+
+        .lightbox.active .lightbox-meta {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .lightbox-meta-location {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .lightbox-meta-detail {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--caption);
+        }
+
+        /* ========== BACK NAV ========== */
+        .back-link {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 50;
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--caption);
+            text-decoration: none;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+
+        .back-link:hover { opacity: 1; }
+
+        /* ========== FOOTER ========== */
+        .gallery-footer {
+            text-align: center;
+            padding: 6rem 2rem 3rem;
+        }
+
+        .gallery-footer p {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--caption);
+            letter-spacing: 0.05em;
+        }
+
+        .gallery-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .gallery-footer a:hover { text-decoration: underline; }
+
+        /* ========== REVEAL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1 !important; transform: none !important; }
+            .scroll-line { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="/" class="back-link">&larr; Kevin Lee</a>
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero">
+        <div class="hero-bg">
+            <img src="/film/images/oregon-02.jpg" alt="" id="heroImg">
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Film</h1>
+            <p class="hero-name">Kevin Lee</p>
+            <p class="hero-meta">Portra 400 &middot; Contax T2 &middot; 35mm</p>
+        </div>
+        <div class="scroll-hint">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ==================== INTRO ==================== -->
+    <div class="intro reveal">
+        <blockquote>
+            There's a patience to film that digital will never understand. You get 36 chances, and every frame costs you something.
+        </blockquote>
+    </div>
+
+    <!-- ==================== ROLL 01 ==================== -->
+    <section class="roll">
+        <div class="roll-header reveal">
+            <p class="roll-number">Roll 01</p>
+            <h2 class="roll-title">Oregon to California</h2>
+            <p class="roll-meta">Portra 400 &middot; Contax T2 &middot; December 2025</p>
+            <p class="roll-note">The drive down from Portland to LA. Fog, redwoods, and the feeling of starting over.</p>
+        </div>
+
+        <div class="grid">
+            <div class="grid-item reveal" data-location="Oregon" data-detail="Portra 400 &middot; Contax T2">
+                <img src="/film/images/oregon-02.jpg" alt="Foggy highway through Oregon" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">Oregon</span>
+                    <span class="grid-caption-text">Fog and fir trees</span>
+                </div>
+            </div>
+            <div class="grid-item reveal" data-location="Oregon" data-detail="Portra 400 &middot; Contax T2">
+                <img src="/film/images/oregon-03.jpg" alt="Old-growth trees with moss" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">Redwoods</span>
+                    <span class="grid-caption-text">Old-growth moss</span>
+                </div>
+            </div>
+            <div class="grid-item reveal" data-location="I-5 South" data-detail="Portra 400 &middot; Contax T2">
+                <img src="/film/images/oregon-01.jpg" alt="Road through the redwoods" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">I-5 South</span>
+                    <span class="grid-caption-text">New chapter, same camera</span>
+                </div>
+            </div>
+            <div class="grid-item reveal" data-location="Grants Pass" data-detail="Portra 400 &middot; Contax T2">
+                <img src="/film/images/oregon-04.jpg" alt="Self-portrait in side mirror" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">Grants Pass</span>
+                    <span class="grid-caption-text">Side mirror self-portrait</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ROLL 02 ==================== -->
+    <section class="roll">
+        <div class="roll-header reveal">
+            <p class="roll-number">Roll 02</p>
+            <h2 class="roll-title">First Month in LA</h2>
+            <p class="roll-meta">Various &middot; March 2026</p>
+            <p class="roll-note">Hollywood, Mammoth, and the apartment slowly becoming home.</p>
+        </div>
+
+        <div class="grid">
+            <div class="grid-item reveal" data-location="Mammoth" data-detail="iPhone &middot; March 2026">
+                <img src="/film/images/mammoth-01.jpeg" alt="Sunset at Mammoth Mountain" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">Mammoth</span>
+                    <span class="grid-caption-text">Last sunset of ski season</span>
+                </div>
+            </div>
+            <div class="grid-item reveal" data-location="Hollywood" data-detail="iPhone &middot; March 2026">
+                <img src="/film/images/la-02.jpeg" alt="Reading nook by the window" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">Hollywood</span>
+                    <span class="grid-caption-text">Morning light</span>
+                </div>
+            </div>
+            <div class="grid-item reveal" data-location="Mammoth" data-detail="iPhone &middot; March 2026">
+                <img src="/film/images/mammoth-02.jpeg" alt="The crew at Mammoth" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">Mammoth</span>
+                    <span class="grid-caption-text">The crew</span>
+                </div>
+            </div>
+            <div class="grid-item reveal" data-location="Hollywood" data-detail="iPhone &middot; March 2026">
+                <img src="/film/images/la-03.jpeg" alt="Bedroom with warm lighting" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">Hollywood</span>
+                    <span class="grid-caption-text">Free furniture from London</span>
+                </div>
+            </div>
+            <div class="grid-item reveal" data-location="Hollywood" data-detail="iPhone &middot; March 2026">
+                <img src="/film/images/la-01.jpeg" alt="Team dinner" loading="lazy">
+                <div class="grid-caption">
+                    <span class="grid-caption-location">Hollywood</span>
+                    <span class="grid-caption-text">Team dinner</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="gallery-footer">
+        <p>Kevin Lee &middot; <a href="/">klee.page</a></p>
+    </footer>
+
+    <!-- ==================== LIGHTBOX ==================== -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose">&times; Close</button>
+        <img id="lightboxImg" src="" alt="">
+        <div class="lightbox-meta">
+            <p class="lightbox-meta-location" id="lightboxLocation"></p>
+            <p class="lightbox-meta-detail" id="lightboxDetail"></p>
+        </div>
+    </div>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- GSAP for reveals -->
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js" integrity="sha384-O55L/6rhHr9CFvrxqv5luxOCcmVaBmETbZbJDP+Do8T0pztTACsFBD/IXCNkj7DV" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
+
+    <script>
+        // ==================== LIGHTBOX ====================
+        (function() {
+            var lightbox = document.getElementById('lightbox');
+            var lightboxImg = document.getElementById('lightboxImg');
+            var lightboxLocation = document.getElementById('lightboxLocation');
+            var lightboxDetail = document.getElementById('lightboxDetail');
+            var closeBtn = document.getElementById('lightboxClose');
+
+            document.querySelectorAll('.grid-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    var img = item.querySelector('img');
+                    lightboxImg.src = img.src;
+                    lightboxImg.alt = img.alt;
+                    lightboxLocation.textContent = item.getAttribute('data-location') || '';
+                    lightboxDetail.textContent = item.getAttribute('data-detail') || '';
+                    lightbox.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            closeBtn.addEventListener('click', function(e) { e.stopPropagation(); closeLightbox(); });
+            lightbox.addEventListener('click', closeLightbox);
+            lightboxImg.addEventListener('click', function(e) { e.stopPropagation(); });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeLightbox();
+            });
+        })();
+
+        // ==================== GSAP ANIMATIONS ====================
+        window.addEventListener('load', function() { initGallery(); });
+        setTimeout(function() { if (typeof gsap !== 'undefined' && !window._galleryInit) initGallery(); }, 4000);
+
+        function initGallery() {
+            if (window._galleryInit) return;
+            window._galleryInit = true;
+
+            // Smooth scroll
+            var lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            // Hero Ken Burns
+            gsap.to('#heroImg', {
+                scale: 1.15,
+                ease: 'none',
+                scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+            });
+
+            // Fade scroll hint
+            gsap.to('.scroll-hint', {
+                opacity: 0,
+                scrollTrigger: { trigger: '.hero', start: '20% top', end: '40% top', scrub: true }
+            });
+
+            // Reveals — staggered for grid items
+            gsap.utils.toArray('.reveal').forEach(function(el, i) {
+                gsap.to(el, {
+                    opacity: 1, y: 0, duration: 0.8,
+                    ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 90%', once: true }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
