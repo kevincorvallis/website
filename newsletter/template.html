@@ -1,352 +1,2095 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="en" data-lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="color-scheme" content="light dark">
-  <meta name="supported-color-schemes" content="light dark">
-  <title>Dispatch 002 — Kevin Lee</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatch XXX: TITLE — Kevin Lee</title>
+    <meta name="description" content="DESCRIPTION">
+    <meta name="author" content="Kevin Lee">
 
-  <!--[if mso]>
-  <noscript>
-    <xml>
-      <o:OfficeDocumentSettings>
-        <o:PixelsPerInch>96</o:PixelsPerInch>
-      </o:OfficeDocumentSettings>
-    </xml>
-  </noscript>
-  <![endif]-->
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://klee.page/newsletter/XXX/">
+    <meta property="og:title" content="Dispatch XXX: TITLE — Kevin Lee">
+    <meta property="og:description" content="DESCRIPTION">
+    <meta property="og:image" content="https://klee.page/newsletter/XXX/images/HERO_IMAGE">
 
-  <style>
-    /* Reset */
-    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-    body { margin: 0; padding: 0; width: 100% !important; height: 100% !important; }
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dispatch XXX: TITLE — Kevin Lee">
+    <meta name="twitter:description" content="DESCRIPTION">
+    <meta name="twitter:image" content="https://klee.page/newsletter/XXX/images/HERO_IMAGE">
 
-    /* Mobile */
-    @media only screen and (max-width: 620px) {
-      .email-container { width: 100% !important; max-width: 100% !important; }
-      .fluid { max-width: 100% !important; height: auto !important; }
-      .content-padding { padding-left: 20px !important; padding-right: 20px !important; }
-      .mobile-hero-title { font-size: 32px !important; }
-      .mobile-section-title { font-size: 28px !important; }
-      .mobile-pull-quote { font-size: 22px !important; }
-    }
+    <!-- Smart App Banner -->
+    <meta name="apple-itunes-app" content="app-id=APP_ID">
 
-    /* Dark mode support for email clients that respect it */
-    @media (prefers-color-scheme: dark) {
-      .email-bg { background-color: #1f1e1d !important; }
-      .card-bg { background-color: #2a2928 !important; }
-      .text-primary { color: #f0eee6 !important; }
-      .text-body { color: #d4d2ca !important; }
-      .text-caption { color: #7a7a75 !important; }
-      .text-accent { color: #c4a882 !important; }
-      .divider-accent { background-color: #c4a882 !important; }
-      .link-color { color: #f0eee6 !important; }
-      .link-accent { color: #c4a882 !important; }
-      .bg-inset { background-color: #252423 !important; }
-      .rule-color { border-color: rgba(240,238,230,0.08) !important; }
-    }
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
 
-    :root { color-scheme: light dark; }
+    <!-- Detect theme + language before first paint -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
 
-    a { text-decoration: underline; text-underline-offset: 2px; }
-  </style>
+            var params = new URLSearchParams(window.location.search);
+            var urlLang = params.get('lang');
+            var storedLang = localStorage.getItem('dispatch-lang');
+            var navLang = (navigator.language || '').slice(0, 2);
+            var lang = (urlLang === 'ko' || urlLang === 'en') ? urlLang
+                     : (storedLang === 'ko' || storedLang === 'en') ? storedLang
+                     : navLang === 'ko' ? 'ko'
+                     : 'en';
+            document.documentElement.setAttribute('data-lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+        }
+
+        [data-lang="ko"] {
+            --font: 'Noto Serif KR', 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
+        }
+
+        /* Language toggle */
+        [data-lang="en"] [data-l="ko"],
+        [data-lang="ko"] [data-l="en"] {
+            display: none !important;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection {
+            background: rgba(0, 100, 255, 0.26);
+            color: inherit;
+        }
+
+        a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+        /* ========== PASSWORD GATE ========== */
+        .gate {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            transition: opacity 0.6s ease, visibility 0.6s ease, background-color 0.3s ease;
+        }
+
+        .gate.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .gate-content {
+            max-width: 320px;
+        }
+
+        .gate-title {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.75rem;
+        }
+
+        .gate-subtitle {
+            font-size: 16px;
+            color: var(--caption);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .gate-input {
+            width: 100%;
+            max-width: 240px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--accent);
+            border-radius: 0;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 18px;
+            padding: 12px 0;
+            text-align: center;
+            outline: none;
+            letter-spacing: 0.12em;
+            transition: border-color 0.4s ease, color 0.3s ease;
+        }
+
+        .gate-input::placeholder {
+            color: var(--caption);
+            opacity: 0.5;
+            letter-spacing: 0;
+            font-size: 15px;
+            font-style: italic;
+        }
+
+        .gate-input:focus {
+            border-color: var(--text);
+        }
+
+        .gate-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-family: var(--font);
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            padding: 8px 24px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-btn:hover {
+            opacity: 1;
+        }
+
+        .gate-input.shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .gate-hint {
+            font-size: 13px;
+            color: var(--caption);
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-hint.visible {
+            opacity: 1;
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--accent);
+            z-index: 60;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== NAVIGATION ========== */
+        .back-link {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 50;
+            font-size: 15px;
+            font-weight: 400;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, color 0.3s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.75;
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 1.15rem;
+            right: 1.25rem;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .lang-pill {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 56px;
+            height: 24px;
+            background: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.5s ease;
+        }
+
+        .lang-pill:hover { opacity: 0.75; }
+
+        .lang-pill-label {
+            flex: 1;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            line-height: 22px;
+            color: var(--bg);
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        .lang-pill-dot {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        [data-lang="ko"] .lang-pill-dot { transform: translateX(32px); }
+        [data-lang="en"] .lang-pill-ko { opacity: 0.4; }
+        [data-lang="ko"] .lang-pill-en { opacity: 0.4; }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-wrap input { display: none; }
+
+        .toggle-wrap label {
+            position: relative;
+            display: block;
+            width: 44px;
+            height: 24px;
+            background: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.5s ease;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0s, background-color 0.5s ease;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(
+                to top,
+                rgba(240, 238, 230, 0.95) 0%,
+                rgba(240, 238, 230, 0.5) 35%,
+                rgba(240, 238, 230, 0.05) 100%
+            );
+            transition: background 0.3s ease;
+        }
+
+        [data-theme="dark"] .hero-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(31, 30, 29, 0.95) 0%,
+                rgba(31, 30, 29, 0.4) 35%,
+                rgba(31, 30, 29, 0.05) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding-bottom: 3rem;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 10vw, 5.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            margin-bottom: 1rem;
+            opacity: 0;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+        }
+
+        .scroll-hint span {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to bottom, var(--caption), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ========== TABLE OF CONTENTS ========== */
+        .toc {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .toc-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem 1.25rem;
+        }
+
+        .toc-list a {
+            font-size: 14px;
+            color: var(--caption);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .toc-list a:hover {
+            color: var(--accent);
+            opacity: 1;
+        }
+
+        /* ========== ISSUE HEADER ========== */
+        .issue-intro {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 1.5rem;
+        }
+
+        .issue-number {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .issue-date {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .issue-opener {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 440px;
+            transition: color 0.3s ease;
+        }
+
+        .reading-time {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--caption);
+            margin-top: 1rem;
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SECTION HEADERS ========== */
+        .section-header {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        /* ========== TEXT BLOCKS ========== */
+        .text-block {
+            padding: 2rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .text-block p {
+            font-size: 20px;
+            line-height: 1.7;
+            margin-bottom: 1.25rem;
+        }
+
+        .text-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .text-block em { font-style: italic; }
+        .text-block strong { font-weight: 600; }
+
+        /* ========== PULL QUOTE ========== */
+        .pull-quote {
+            padding: 4rem 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pull-quote blockquote {
+            font-size: clamp(1.5rem, 5vw, 2.25rem);
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .pull-quote cite {
+            display: block;
+            margin-top: 1rem;
+            font-size: 14px;
+            font-style: normal;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* Pull quote variant with accent sidebar */
+        .pull-quote-side {
+            padding: 3rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .pull-quote-side blockquote {
+            border-left: 2px solid var(--accent);
+            padding-left: 1.5rem;
+            font-size: clamp(1.25rem, 4vw, 1.75rem);
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            transition: border-color 0.3s ease;
+        }
+
+        .pull-quote-side cite {
+            display: block;
+            margin-top: 0.75rem;
+            padding-left: 1.5rem;
+            font-size: 14px;
+            font-style: normal;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== PHOTO LAYOUTS ========== */
+        .photo-full {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .photo-full img {
+            width: 100%;
+            height: auto;
+            display: block;
+            will-change: transform;
+        }
+
+        .photo-full .photo-caption {
+            position: absolute;
+            bottom: 1rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            z-index: 2;
+            color: #f0f0ec;
+        }
+
+        .photo-full::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to top, rgba(10,10,10,0.5), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .photo-inset {
+            padding: 1rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .photo-inset img,
+        .photo-inset .gif-wrap img {
+            width: 100%;
+            border-radius: 3px;
+            display: block;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            padding: 0 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .photo-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        .photo-caption {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .photo-caption .caption-location {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .photo-full .photo-caption .caption-location {
+            color: #c4a882;
+        }
+
+        .photo-inset .photo-caption {
+            margin-top: 0.75rem;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SIGN OFF ========== */
+        .sign-off {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .sign-off-text {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .sign-off-name {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* ========== DIVIDER ========== */
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 0 auto;
+            opacity: 0.5;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== SPACERS ========== */
+        .spacer { height: 4rem; }
+        .spacer-sm { height: 2rem; }
+        .spacer-lg { height: 8rem; }
+
+        /* ========== FOOTER ========== */
+        .story-footer {
+            padding: 4rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .story-footer p {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .story-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SUBSCRIBE ========== */
+        .subscribe {
+            padding: 5rem 1.5rem 3rem;
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .subscribe-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-desc {
+            font-size: 16px;
+            color: var(--caption);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .subscribe-input::placeholder { color: var(--caption); }
+        .subscribe-input:focus { border-color: var(--accent); }
+
+        .subscribe-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .subscribe-btn:hover { opacity: 0.7; }
+
+        .subscribe-success {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent);
+            display: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe.submitted .subscribe-form { display: none; }
+        .subscribe.submitted .subscribe-success { display: block; }
+
+        .subscribe-note {
+            font-size: 13px;
+            color: var(--caption);
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .subscribe-form { flex-direction: column; }
+            .subscribe-btn { padding: 14px 24px; }
+        }
+
+        /* ========== COMMENTS ========== */
+        .comments {
+            padding: 3rem 1.5rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .comments-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .comments-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .comments-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .comments-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 2.5rem;
+        }
+
+        .comments-input {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .comments-input::placeholder { color: var(--caption); }
+        .comments-input:focus { border-color: var(--accent); }
+
+        .comments-textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .comments-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            align-self: flex-end;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .comments-btn:hover { opacity: 0.7; }
+
+        .comments-list { list-style: none; }
+
+        .comment-item {
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-item:first-child {
+            border-top: 1px solid var(--rule);
+        }
+
+        .comment-meta {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .comment-name { font-size: 15px; font-weight: 600; }
+
+        .comment-time {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .comment-body {
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .comments-empty {
+            font-size: 16px;
+            color: var(--caption);
+            text-align: center;
+            padding: 2rem 0;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .comments-btn { align-self: stretch; padding: 14px 24px; }
+        }
+
+        /* ========== REVEAL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal-fade { opacity: 0; }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.97);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .back-link { font-size: 14px; }
+            .text-block p { font-size: 18px; }
+            .section-header { padding: 5rem 1.5rem 2.5rem; }
+            .photo-full .photo-caption { bottom: 0.75rem; left: 1rem; right: 1rem; }
+            .toc-list { gap: 0.25rem 1rem; }
+        }
+
+        @media (min-width: 768px) {
+            .photo-inset { padding: 2rem 3rem; max-width: 700px; }
+            .photo-grid { gap: 1rem; padding: 0 3rem; max-width: 900px; }
+            .text-block { padding: 2.5rem 3rem; }
+            .pull-quote { padding: 5rem 3rem; }
+            .pull-quote-side { padding: 3rem 3rem; }
+        }
+
+        /* ========== KOMOREBI INTERSTITIAL ========== */
+        .komorebi {
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 1s ease, visibility 0s;
+        }
+
+        .komorebi.exiting {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+
+        .komorebi-content {
+            max-width: 480px;
+            position: relative;
+        }
+
+        .komorebi-kanji {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(3.5rem, 14vw, 7rem);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            opacity: 0;
+            transform: translateY(20px) scale(0.96);
+            line-height: 1.2;
+        }
+
+        .komorebi-romaji {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--accent);
+            margin-top: 0.75rem;
+            letter-spacing: 0.04em;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-noun {
+            font-family: var(--font);
+            font-size: 12px;
+            font-style: italic;
+            color: var(--caption);
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-meaning {
+            font-family: var(--font);
+            font-size: 17px;
+            color: var(--caption);
+            line-height: 1.8;
+            margin-top: 2.5rem;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 2rem auto;
+            opacity: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi-tagline {
+            font-size: 14px;
+            color: var(--caption);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-dismiss {
+            background: none;
+            border: none;
+            font-family: var(--font);
+            font-size: 15px;
+            color: var(--accent);
+            cursor: pointer;
+            margin-top: 2.5rem;
+            padding: 10px 28px;
+            letter-spacing: 0.03em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, color 0.3s ease, transform 0.8s cubic-bezier(0.22,0.61,0.36,1);
+        }
+
+        .komorebi-dismiss:hover {
+            opacity: 0.7 !important;
+        }
+
+        /* Dappled light system */
+        .komorebi-light {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            mix-blend-mode: plus-lighter;
+            transition: opacity 2.5s ease;
+        }
+
+        .gate-light {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 199;
+            opacity: 0.02;
+            mix-blend-mode: plus-lighter;
+            background: radial-gradient(ellipse at 50% 30%, rgba(160,130,109,0.3) 0%, transparent 60%);
+            transition: opacity 2s ease;
+        }
+
+        .gate-light.awakening {
+            opacity: 0.15;
+        }
+
+        .komorebi-leaves {
+            position: absolute;
+            inset: -20%;
+            pointer-events: none;
+            opacity: 0;
+            filter: blur(8px);
+            animation: leafSway 12s ease-in-out infinite;
+        }
+
+        @keyframes leafSway {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(1%, -0.5%) rotate(0.3deg); }
+            66% { transform: translate(-0.5%, 0.5%) rotate(-0.2deg); }
+        }
+
+        .komorebi-sun {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            background: radial-gradient(
+                ellipse at 50% -10%,
+                rgba(160,130,109,0.25) 0%,
+                rgba(160,130,109,0.08) 30%,
+                transparent 65%
+            );
+            transition: opacity 3s ease;
+        }
+
+        .komorebi-spots {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .komorebi-spot {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(200,175,140,0.15);
+            filter: blur(20px);
+            animation: spotPulse 8s ease-in-out infinite;
+        }
+
+        .komorebi-spot:nth-child(1) { width: 120px; height: 80px; top: 8%; left: 15%; animation-delay: 0s; transform: rotate(-15deg); }
+        .komorebi-spot:nth-child(2) { width: 90px; height: 60px; top: 25%; right: 20%; animation-delay: 2.5s; transform: rotate(10deg); }
+        .komorebi-spot:nth-child(3) { width: 140px; height: 90px; bottom: 30%; left: 25%; animation-delay: 1.2s; transform: rotate(-8deg); }
+        .komorebi-spot:nth-child(4) { width: 70px; height: 50px; bottom: 15%; right: 30%; animation-delay: 4s; transform: rotate(20deg); }
+        .komorebi-spot:nth-child(5) { width: 100px; height: 70px; top: 50%; left: 55%; animation-delay: 3s; transform: rotate(-5deg); }
+
+        @keyframes spotPulse {
+            0%, 100% { opacity: 0.3; transform: rotate(-15deg) scale(0.9); }
+            50% { opacity: 0.7; transform: rotate(-12deg) scale(1.1); }
+        }
+
+        /* ========== REDUCED MOTION ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-fade, .reveal-scale {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .scroll-line { animation: none; }
+            .gate-input.shake { animation: none; }
+            .komorebi-spot, .komorebi-leaves { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
 </head>
+<body>
 
-<body style="margin: 0; padding: 0; background-color: #f0eee6; font-family: Georgia, 'Times New Roman', serif;">
+    <!-- ==================== PASSWORD GATE ==================== -->
+    <div class="gate" id="gate">
+        <div class="gate-content">
+            <h1 class="gate-title">Dispatch</h1>
+            <p class="gate-subtitle">
+                <span data-l="en">This letter is for friends and family.</span>
+                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
+            </p>
+            <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
+                <input
+                    type="text"
+                    class="gate-input"
+                    id="gateInput"
+                    placeholder="enter password"
+                    autocomplete="off"
+                    autofocus
+                >
+                <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
+            </form>
+            <p class="gate-hint" id="gateHint">
+                <span data-l="en">Hmm, that's not it.</span>
+                <span data-l="ko">음, 아닌데?</span>
+            </p>
+        </div>
+    </div>
 
-  <!-- Preheader (hidden preview text) -->
-  <div style="display: none; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #f0eee6;">
-    First week at Paramount, apartment hunting in Hollywood, and film photos from the drive down.&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
-  </div>
+    <!-- Ambient gate light -->
+    <div class="gate-light" id="gateLight"></div>
 
-  <!-- Outer wrapper: parchment background -->
-  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f0eee6;" class="email-bg">
-    <tr>
-      <td style="padding: 40px 16px 20px;">
+    <!-- ==================== KOMOREBI INTERSTITIAL ==================== -->
+    <div class="komorebi" id="komorebi">
+        <svg class="komorebi-leaves" id="komorebiLeaves" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <filter id="leafBlur"><feGaussianBlur stdDeviation="3"/></filter>
+            </defs>
+            <g fill="rgba(160,130,109,0.12)" filter="url(#leafBlur)">
+                <ellipse cx="120" cy="100" rx="45" ry="22" transform="rotate(-30 120 100)"/>
+                <ellipse cx="350" cy="80" rx="35" ry="18" transform="rotate(15 350 80)"/>
+                <ellipse cx="600" cy="150" rx="50" ry="25" transform="rotate(-20 600 150)"/>
+                <ellipse cx="200" cy="300" rx="40" ry="20" transform="rotate(25 200 300)"/>
+                <ellipse cx="500" cy="350" rx="55" ry="28" transform="rotate(-10 500 350)"/>
+                <ellipse cx="700" cy="400" rx="38" ry="19" transform="rotate(30 700 400)"/>
+                <ellipse cx="150" cy="550" rx="48" ry="24" transform="rotate(-15 150 550)"/>
+                <ellipse cx="400" cy="600" rx="42" ry="21" transform="rotate(20 400 600)"/>
+                <ellipse cx="650" cy="650" rx="35" ry="17" transform="rotate(-25 650 650)"/>
+                <ellipse cx="300" cy="750" rx="52" ry="26" transform="rotate(10 300 750)"/>
+            </g>
+        </svg>
+        <div class="komorebi-sun" id="komorebiSun"></div>
+        <div class="komorebi-spots" id="komorebiSpots">
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+        </div>
+        <div class="komorebi-content">
+            <p class="komorebi-kanji" id="komorebiKanji">木漏れ日</p>
+            <p class="komorebi-romaji" id="komorebiRomaji">komorebi</p>
+            <p class="komorebi-noun" id="komorebiNoun">noun &middot; Japanese</p>
+            <p class="komorebi-meaning" id="komorebiMeaning">
+                <span data-l="en">Sunlight filtering through the leaves of trees &mdash; the interplay of light and shadow when sunshine passes through foliage.</span>
+                <span data-l="ko">나뭇잎 사이로 스며드는 햇빛 &mdash; 햇살이 나뭇잎을 통과하며 만드는 빛과 그림자의 춤.</span>
+            </p>
+            <div class="komorebi-divider" id="komorebiDivider"></div>
+            <p class="komorebi-tagline" id="komorebiTagline">
+                <span data-l="en">A letter for friends and family.</span>
+                <span data-l="ko">가까운 사람들한테 보내는 편지.</span>
+            </p>
+            <button class="komorebi-dismiss" id="komorebiDismiss">
+                <span data-l="en">Continue &rarr;</span>
+                <span data-l="ko">계속 &rarr;</span>
+            </button>
+        </div>
+    </div>
 
-        <!-- ============================================ -->
-        <!-- MASTHEAD                                     -->
-        <!-- ============================================ -->
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" align="center" style="max-width: 600px;" class="email-container">
-          <tr>
-            <td align="center" style="padding-bottom: 8px;">
-              <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 40px; font-weight: bold; line-height: 1; letter-spacing: -0.02em; color: #1f1e1d;" class="text-primary mobile-hero-title">Dispatch</span>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding-bottom: 20px;">
-              <span style="font-family: Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #a0826d;" class="text-accent">002 &middot; March 24, 2026</span>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding-bottom: 32px;">
-              <!--[if mso]><v:rect xmlns:v="urn:schemas-microsoft-com:vml" style="width:40px;height:1px;" strokecolor="#a0826d" fillcolor="#a0826d" stroked="f"><v:fill type="solid"/></v:rect><![endif]-->
-              <!--[if !mso]><!--><div style="width: 40px; height: 1px; background-color: #a0826d; margin: 0 auto;" class="divider-accent"></div><!--<![endif]-->
-            </td>
-          </tr>
-        </table>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
 
-        <!-- Main content card -->
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" align="center" style="max-width: 600px;" class="email-container">
+    <!-- Navigation -->
+    <a href="/newsletter" class="back-link">&larr; Dispatch</a>
+    <div class="top-controls">
+        <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
+            <span class="lang-pill-label lang-pill-en">EN</span>
+            <span class="lang-pill-label lang-pill-ko">한</span>
+            <span class="lang-pill-dot"></span>
+        </div>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </div>
 
-          <!-- ============================================ -->
-          <!-- INTRO / LETTER                               -->
-          <!-- ============================================ -->
-          <tr>
-            <td style="padding: 0 32px 36px;" class="content-padding">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <tr>
-                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: normal; line-height: 1.7; color: #1f1e1d;" class="text-primary">
-                    Hi friends,
-                    <br><br>
-                    It's been a full week. I shipped a new ranking model for short-form clips at Paramount, squeezed in a flight over the Cascades on a rare clear Saturday, and spent Sunday morning processing a roll of Portra 400 from Pike Place. Some weeks everything lines up.
-                    <br><br>
-                    Here's what I've been thinking about.
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+    <!-- ==================== HERO ==================== -->
+    <section class="hero">
+        <div class="hero-image">
+            <!-- REPLACE: Hero image -->
+            <img src="/newsletter/XXX/images/HERO_IMAGE" alt="HERO_ALT" id="heroImg">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-label">
+                <span data-l="en">A weekly letter</span>
+                <span data-l="ko">매주 쓰는 편지</span>
+            </div>
+            <h1 class="hero-title">Dispatch</h1>
+            <p class="hero-description">
+                <span data-l="en">Updates from my world — for the people I care about most.</span>
+                <span data-l="ko">요즘 뭐 하고 사는지 — 가까운 사람들한테 보내는 근황.</span>
+            </p>
+        </div>
+        <div class="scroll-hint">
+            <span data-l="en">Scroll</span>
+            <span data-l="ko">스크롤</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
 
-          <!-- ============================================ -->
-          <!-- SECTION: THIS WEEK                           -->
-          <!-- ============================================ -->
-          <tr>
-            <td style="padding: 0 32px;" class="content-padding">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <!-- Section label + title -->
-                <tr>
-                  <td align="center" style="padding-bottom: 32px;">
-                    <div style="font-family: Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #a0826d; padding-bottom: 8px;" class="text-accent">This Week</div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 32px; font-weight: bold; letter-spacing: -0.02em; line-height: 1.1; color: #1f1e1d;" class="text-primary mobile-section-title">What I've Been Up To</div>
-                  </td>
-                </tr>
+    <!-- ==================== ISSUE XXX ==================== -->
 
-                <!-- Item 1 -->
-                <tr>
-                  <td style="padding-bottom: 28px;">
-                    <div style="font-family: Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #a0826d; padding-bottom: 6px;" class="text-accent">Engineering</div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: bold; line-height: 1.3; color: #1f1e1d; padding-bottom: 8px;" class="text-primary">
-                      Reinforcement Learning for Short-Form Content Selection
-                    </div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: normal; line-height: 1.65; color: #1f1e1d; padding-bottom: 10px;" class="text-body">
-                      We replaced our heuristic clip ranker with an RL-based model that optimizes for engagement signals. Early A/B results show a meaningful lift in completion rate. The tricky part was defining the reward function.
-                    </div>
-                    <a href="https://klee.page/newsletter/002/#engineering" style="font-family: Georgia, serif; font-size: 15px; color: #a0826d; text-decoration: underline; text-underline-offset: 3px;" class="link-accent">Read more &rarr;</a>
-                  </td>
-                </tr>
+    <div class="issue-intro reveal">
+        <!-- REPLACE: Issue number -->
+        <p class="issue-number">No. XXX</p>
+        <h2 class="issue-date">
+            <!-- REPLACE: Issue title -->
+            <span data-l="en">TITLE</span>
+            <span data-l="ko">제목</span>
+        </h2>
+        <p class="issue-opener">
+            <!-- REPLACE: Date -->
+            <span data-l="en">Month DD, YYYY</span>
+            <span data-l="ko">YYYY년 M월 D일</span>
+        </p>
+    </div>
 
-                <!-- Spacer (no hard line, just breathing room) -->
-                <tr><td style="height: 4px;"></td></tr>
+    <div class="divider reveal-fade"></div>
 
-                <!-- Item 2 -->
-                <tr>
-                  <td style="padding-bottom: 28px;">
-                    <div style="font-family: Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #a0826d; padding-bottom: 6px;" class="text-accent">Flying</div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: bold; line-height: 1.3; color: #1f1e1d; padding-bottom: 8px;" class="text-primary">
-                      VFR Over the North Cascades
-                    </div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: normal; line-height: 1.65; color: #1f1e1d; padding-bottom: 10px;" class="text-body">
-                      Saturday gave us unlimited ceilings and calm winds &mdash; the kind of day you drop everything for. Flew north from Paine Field, crossed over the Skagit Valley, and turned back along the Sauk River.
-                    </div>
-                    <a href="https://klee.page/newsletter/002/#flying" style="font-family: Georgia, serif; font-size: 15px; color: #a0826d; text-decoration: underline; text-underline-offset: 3px;" class="link-accent">Read more &rarr;</a>
-                  </td>
-                </tr>
+    <!-- ——— The Letter ——— -->
 
-                <tr><td style="height: 4px;"></td></tr>
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                Hey everyone,
+            </p>
+            <p>
+                <!-- REPLACE: Opening paragraph -->
+                Your opening paragraph here.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                안녕 여러분,
+            </p>
+            <p>
+                <!-- REPLACE: Opening paragraph (Korean) -->
+                한국어 첫 문단.
+            </p>
+        </div>
+    </div>
 
-                <!-- Item 3 -->
-                <tr>
-                  <td style="padding-bottom: 12px;">
-                    <div style="font-family: Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #a0826d; padding-bottom: 6px;" class="text-accent">Photography</div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: bold; line-height: 1.3; color: #1f1e1d; padding-bottom: 8px;" class="text-primary">
-                      Morning Light at Pike Place
-                    </div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: normal; line-height: 1.65; color: #1f1e1d; padding-bottom: 10px;" class="text-body">
-                      Shot a roll of Portra 400 before the tourists arrived. There's a quality of light at 7am in the market that disappears by 8. The flower vendors setting up is one of my favorite quiet rituals.
-                    </div>
-                    <a href="https://klee.page/newsletter/002/#photography" style="font-family: Georgia, serif; font-size: 15px; color: #a0826d; text-decoration: underline; text-underline-offset: 3px;" class="link-accent">Read more &rarr;</a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+    <!-- EXAMPLE: Full-bleed photo -->
+    <div class="photo-full reveal-scale">
+        <img src="/newsletter/XXX/images/PHOTO.jpeg" alt="ALT_TEXT">
+        <div class="photo-caption">
+            <span class="caption-location">LOCATION</span>
+            <span data-l="en">Caption text.</span>
+            <span data-l="ko">캡션 텍스트.</span>
+        </div>
+    </div>
 
-          <!-- ============================================ -->
-          <!-- PHOTO                                        -->
-          <!-- ============================================ -->
-          <tr>
-            <td style="padding: 36px 32px;" class="content-padding">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <tr>
-                  <td>
-                    <!-- Replace src with your actual image URL -->
-                    <img src="https://placehold.co/536x358/d8d4c8/8a8880?text=+" width="536" alt="Photo of the week" style="width: 100%; max-width: 536px; height: auto; display: block; border: 0; border-radius: 3px;">
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding-top: 10px;">
-                    <div style="font-family: Georgia, serif; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #a0826d; padding-bottom: 3px;" class="text-accent">Pike Place Market, Seattle</div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 14px; font-weight: normal; line-height: 1.5; color: #8a8880;" class="text-caption">7:14am, before the crowds. Portra 400, Contax G2.</div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+    <!-- EXAMPLE: Text block -->
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>
+                Another paragraph of content.
+            </p>
+        </div>
+        <div data-l="ko">
+            <p>
+                또 다른 문단.
+            </p>
+        </div>
+    </div>
 
-          <!-- ============================================ -->
-          <!-- PULL QUOTE                                   -->
-          <!-- ============================================ -->
-          <tr>
-            <td style="padding: 20px 40px 20px;" class="content-padding">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <tr>
-                  <td align="center" style="padding-bottom: 16px;">
-                    <div style="width: 40px; height: 1px; background-color: #a0826d; margin: 0 auto;" class="divider-accent"></div>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; color: #1f1e1d; padding: 16px 0;" class="text-primary mobile-pull-quote">
-                    &ldquo;The best camera is the one that's with you. The best flight is the one you didn't plan.&rdquo;
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="font-family: Georgia, serif; font-size: 13px; font-weight: normal; color: #8a8880; padding-bottom: 16px;" class="text-caption">
-                    &mdash; something I keep telling myself
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center">
-                    <div style="width: 40px; height: 1px; background-color: #a0826d; margin: 0 auto;" class="divider-accent"></div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+    <!-- EXAMPLE: Inset photo -->
+    <div class="photo-inset reveal">
+        <img src="/newsletter/XXX/images/PHOTO.jpeg" alt="ALT_TEXT">
+        <div class="photo-caption">
+            <span data-l="en">Caption text.</span>
+            <span data-l="ko">캡션 텍스트.</span>
+        </div>
+    </div>
 
-          <!-- ============================================ -->
-          <!-- WORTH READING                                -->
-          <!-- ============================================ -->
-          <tr>
-            <td style="padding: 36px 32px 0;" class="content-padding">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <!-- Section label + title -->
-                <tr>
-                  <td align="center" style="padding-bottom: 24px;">
-                    <div style="font-family: Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #a0826d; padding-bottom: 8px;" class="text-accent">Worth Reading</div>
-                    <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: bold; letter-spacing: -0.02em; line-height: 1.1; color: #1f1e1d;" class="text-primary">Links &amp; Bookmarks</div>
-                  </td>
-                </tr>
+    <div class="spacer-sm"></div>
 
-                <!-- Link 1 -->
-                <tr>
-                  <td style="padding-bottom: 16px;">
-                    <a href="#" style="font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: bold; color: #1f1e1d; text-decoration: underline; text-underline-offset: 3px; line-height: 1.35;" class="link-color">The Bitter Lesson</a>
-                    <br>
-                    <span style="font-family: Georgia, serif; font-size: 14px; color: #8a8880; line-height: 1.5;" class="text-caption">Rich Sutton's most important essay in ML. Scale and search beat hand-crafted features.</span>
-                  </td>
-                </tr>
+    <!-- EXAMPLE: Photo grid (2 columns) -->
+    <div class="photo-grid reveal">
+        <img src="/newsletter/XXX/images/PHOTO_LEFT.jpeg" alt="ALT_TEXT">
+        <img src="/newsletter/XXX/images/PHOTO_RIGHT.jpeg" alt="ALT_TEXT">
+    </div>
 
-                <!-- Link 2 -->
-                <tr>
-                  <td style="padding-bottom: 16px;">
-                    <a href="#" style="font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: bold; color: #1f1e1d; text-decoration: underline; text-underline-offset: 3px; line-height: 1.35;" class="link-color">How to Land a Taildragger in a Crosswind</a>
-                    <br>
-                    <span style="font-family: Georgia, serif; font-size: 14px; color: #8a8880; line-height: 1.5;" class="text-caption">Why conventional gear demands your full attention, every time.</span>
-                  </td>
-                </tr>
+    <div class="spacer"></div>
 
-                <!-- Link 3 -->
-                <tr>
-                  <td style="padding-bottom: 16px;">
-                    <a href="#" style="font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: bold; color: #1f1e1d; text-decoration: underline; text-underline-offset: 3px; line-height: 1.35;" class="link-color">The Color of Light</a>
-                    <br>
-                    <span style="font-family: Georgia, serif; font-size: 14px; color: #8a8880; line-height: 1.5;" class="text-caption">New Saul Leiter retrospective. The compositions are impossibly good.</span>
-                  </td>
-                </tr>
+    <!-- EXAMPLE: Video -->
+    <div style="max-width: 620px; margin: 0 auto; padding: 0 1.5rem;" class="reveal">
+        <video autoplay muted loop playsinline style="width: 100%; border-radius: 3px; display: block;">
+            <source src="/newsletter/XXX/images/VIDEO.mp4" type="video/mp4">
+        </video>
+        <div class="photo-caption" style="margin-top: 0.75rem; color: var(--caption);">
+            <span data-l="en">Video caption.</span>
+            <span data-l="ko">비디오 캡션.</span>
+        </div>
+    </div>
 
-                <!-- Link 4 -->
-                <tr>
-                  <td style="padding-bottom: 8px;">
-                    <a href="#" style="font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: bold; color: #1f1e1d; text-decoration: underline; text-underline-offset: 3px; line-height: 1.35;" class="link-color">Staff Engineer: Leadership Beyond the Management Track</a>
-                    <br>
-                    <span style="font-family: Georgia, serif; font-size: 14px; color: #8a8880; line-height: 1.5;" class="text-caption">Re-reading Will Larson's chapter on being glue.</span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+    <div class="spacer"></div>
 
-          <!-- ============================================ -->
-          <!-- CTA: READ FULL ISSUE ONLINE                  -->
-          <!-- ============================================ -->
-          <tr>
-            <td align="center" style="padding: 40px 32px 0;" class="content-padding">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td align="center" style="font-family: Georgia, serif; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;">
-                    <a href="https://klee.page/newsletter/002/" style="color: #a0826d; text-decoration: underline; text-underline-offset: 3px;" class="link-accent">Read the full issue with photos &rarr;</a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+    <!-- EXAMPLE: Side pull quote -->
+    <div class="pull-quote-side reveal">
+        <blockquote>
+            <span data-l="en">A memorable quote from the letter.</span>
+            <span data-l="ko">편지에서 기억에 남는 인용구.</span>
+        </blockquote>
+    </div>
 
-          <!-- ============================================ -->
-          <!-- SIGN-OFF                                     -->
-          <!-- ============================================ -->
-          <tr>
-            <td align="center" style="padding: 48px 32px 0;" class="content-padding">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <tr>
-                  <td align="center" style="font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: normal; line-height: 1.6; color: #8a8880; padding-bottom: 12px;" class="text-caption">
-                    Until next week,
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: #1f1e1d;" class="text-primary">
-                    Kevin
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+    <div class="divider reveal-fade"></div>
 
-          <!-- ============================================ -->
-          <!-- FOOTER                                       -->
-          <!-- ============================================ -->
-          <tr>
-            <td style="padding: 48px 32px 40px;" class="content-padding">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <tr>
-                  <td align="center" style="padding-bottom: 20px;">
-                    <div style="width: 40px; height: 1px; background-color: #a0826d; opacity: 0.5; margin: 0 auto;" class="divider-accent"></div>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="font-family: Georgia, serif; font-size: 13px; font-weight: normal; line-height: 1.7; color: #8a8880;" class="text-caption">
-                    <a href="https://klee.page/newsletter" style="color: #a0826d; text-decoration: underline; text-underline-offset: 2px;" class="link-accent">klee.page/newsletter</a>
-                    <br>
-                    You're receiving this because you subscribed.
-                    <br>
-                    <a href="{{unsubscribe_url}}" style="color: #8a8880; text-decoration: underline; text-underline-offset: 2px;" class="text-caption">Unsubscribe</a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+    <!-- ——— Word of the Week ——— -->
+    <div class="section-header reveal" id="word">
+        <p class="section-label">
+            <span data-l="en">Word of the Week</span>
+            <span data-l="ko">이번 주 단어</span>
+        </p>
+        <!-- REPLACE: Word -->
+        <h2 class="section-title" style="font-style: italic;">
+            WORD
+        </h2>
+    </div>
 
-        </table>
-        <!-- /Main content -->
+    <div class="text-block reveal" style="text-align: center;">
+        <!-- REPLACE: Pronunciation and definition -->
+        <p style="color: var(--caption); font-size: 14px; font-style: italic; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+            /pronunciation/ &middot; noun &middot; Language
+        </p>
+        <p style="color: var(--caption); font-size: 17px; max-width: 400px; margin: 0 auto;">
+            <span data-l="en">Definition of the word.</span>
+            <span data-l="ko">단어의 뜻.</span>
+        </p>
+    </div>
 
-      </td>
-    </tr>
-  </table>
-  <!-- /Outer wrapper -->
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
 
+    <!-- ——— Song of the Week ——— -->
+    <div class="section-header reveal" id="song">
+        <p class="section-label">
+            <span data-l="en">On Repeat</span>
+            <span data-l="ko">반복 재생 중</span>
+        </p>
+        <h2 class="section-title">
+            <span data-l="en">Song of the Week</span>
+            <span data-l="ko">이번 주 노래</span>
+        </h2>
+    </div>
+
+    <!-- REPLACE: YouTube embed URL -->
+    <div style="max-width: 560px; margin: 0 auto; padding: 0 1.5rem;" class="reveal">
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 3px;">
+            <iframe
+                src="https://www.youtube.com/embed/VIDEO_ID?rel=0&modestbranding=1"
+                title="SONG_TITLE"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                loading="lazy"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+            ></iframe>
+        </div>
+    </div>
+
+    <div class="text-block reveal" style="text-align: center;">
+        <!-- REPLACE: Song info -->
+        <p style="font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 0.25rem;">
+            Song Title <span style="font-weight: 400; font-style: italic;">(Version)</span>
+        </p>
+        <p style="color: var(--accent); font-size: 15px; margin-bottom: 1rem;">Artist Name</p>
+        <p style="color: var(--caption); font-size: 16px;">
+            <span data-l="en">Why this song matters this week.</span>
+            <span data-l="ko">이번 주에 이 노래가 중요한 이유.</span>
+        </p>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Sign Off ——— -->
+    <div class="sign-off reveal">
+        <p class="sign-off-text">
+            <!-- REPLACE: Closing message -->
+            <span data-l="en">Closing message to friends and family.</span>
+            <span data-l="ko">마무리 메시지.</span>
+        </p>
+        <p class="sign-off-name">&mdash; Kevin</p>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Subscribe ——— -->
+    <div class="subscribe reveal" id="subscribe">
+        <p class="subscribe-label">
+            <span data-l="en">Stay in the Loop</span>
+            <span data-l="ko">소식 받기</span>
+        </p>
+        <h2 class="subscribe-title">
+            <span data-l="en">Want this weekly?</span>
+            <span data-l="ko">매주 받고 싶다면?</span>
+        </h2>
+        <p class="subscribe-desc">
+            <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
+            <span data-l="ko">이메일 남겨주면 매주 보내줄게. 스팸 같은 거 없고 그냥 내 근황.</span>
+        </p>
+        <form class="subscribe-form" id="subscribeForm">
+            <input type="email" class="subscribe-input" id="subscribeEmail" placeholder="your@email.com" required autocomplete="email">
+            <button type="submit" class="subscribe-btn" id="subscribeBtn">
+                <span data-l="en">Subscribe</span>
+                <span data-l="ko">구독</span>
+            </button>
+        </form>
+        <p class="subscribe-success" id="subscribeSuccess">
+            <span data-l="en">You're in. See you next week.</span>
+            <span data-l="ko">등록됨. 다음 주에 보자.</span>
+        </p>
+        <p class="subscribe-note">
+            <span data-l="en">Just between us — no third parties, ever.</span>
+            <span data-l="ko">우리끼리만. 어디 넘기거나 그런 거 절대 없음.</span>
+        </p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ==================== COMMENTS ==================== -->
+    <div class="comments reveal" id="comments">
+        <div class="comments-header">
+            <p class="comments-label">
+                <span data-l="en">Discussion</span>
+                <span data-l="ko">댓글</span>
+            </p>
+            <h2 class="comments-title">
+                <span data-l="en">Leave a note</span>
+                <span data-l="ko">한마디 남기기</span>
+            </h2>
+        </div>
+        <form class="comments-form" id="commentsForm">
+            <input type="text" class="comments-input" id="commentName" placeholder="Your name" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <button type="submit" class="comments-btn" id="commentBtn">
+                <span data-l="en">Post</span>
+                <span data-l="ko">게시</span>
+            </button>
+        </form>
+        <div class="comments-list" id="commentsList"></div>
+        <p class="comments-empty" id="commentsEmpty" style="display:none;">
+            <span data-l="en">No comments yet. Be the first.</span>
+            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨 주세요.</span>
+        </p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="story-footer">
+        <p>
+            <!-- REPLACE: Issue number and title -->
+            <span data-l="en">Dispatch No. XXX &middot; TITLE &middot;</span>
+            <span data-l="ko">Dispatch XXX호 &middot; 제목 &middot;</span>
+            <a href="/">klee.page</a>
+        </p>
+    </footer>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- Scripts -->
+    <script src="/js/theme.js"></script>
+    <script>
+        // ==================== KOMOREBI GATE ====================
+        (function() {
+            var gate = document.getElementById('gate');
+            var input = document.getElementById('gateInput');
+            var hint = document.getElementById('gateHint');
+            var komorebi = document.getElementById('komorebi');
+            if (!gate || !input) return;
+
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            var issueKey = 'dispatch-auth-' + path;
+
+            function animateKomorebi(callback) {
+                var gateLight = document.getElementById('gateLight');
+                gateLight.classList.add('awakening');
+
+                komorebi.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
+                setTimeout(function() {
+                    gate.classList.add('unlocked');
+                    gateLight.style.display = 'none';
+
+                    var leaves = document.getElementById('komorebiLeaves');
+                    var sun = document.getElementById('komorebiSun');
+                    var spots = document.getElementById('komorebiSpots');
+                    var kanji = document.getElementById('komorebiKanji');
+                    var romaji = document.getElementById('komorebiRomaji');
+                    var noun = document.getElementById('komorebiNoun');
+                    var meaning = document.getElementById('komorebiMeaning');
+                    var divider = document.getElementById('komorebiDivider');
+                    var tagline = document.getElementById('komorebiTagline');
+
+                    var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+
+                    function animate(el, d, dur) {
+                        dur = dur || 1;
+                        setTimeout(function() {
+                            el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0) scale(1)';
+                        }, d);
+                    }
+
+                    setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
+                    setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
+                    setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
+
+                    animate(kanji, 800, 1.4);
+                    animate(romaji, 1800, 1);
+                    animate(noun, 2200, 0.8);
+                    animate(meaning, 2800, 1.1);
+                    setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
+                    animate(tagline, 3800, 0.9);
+
+                    var dismiss = document.getElementById('komorebiDismiss');
+                    setTimeout(function() {
+                        dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
+                        dismiss.style.opacity = '0.5';
+                        dismiss.style.transform = 'translateY(0)';
+                    }, 4200);
+
+                    dismiss.addEventListener('click', function() {
+                        komorebi.classList.add('exiting');
+                        document.body.style.overflow = '';
+                        setTimeout(callback, 1200);
+                    });
+                }, 800);
+            }
+
+            function unlock() {
+                sessionStorage.setItem(issueKey, '1');
+                animateKomorebi(function() {
+                    komorebi.style.display = 'none';
+                });
+            }
+
+            function unlockQuiet() {
+                sessionStorage.setItem(issueKey, '1');
+                gate.classList.add('unlocked');
+            }
+
+            function showGate() {
+                document.body.style.overflow = 'hidden';
+                var form = document.getElementById('gateForm');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var val = input.value.trim();
+                    if (!val) return;
+                    input.disabled = true;
+                    document.getElementById('gateBtn').disabled = true;
+                    checkPassword(val, function(ok) {
+                        input.disabled = false;
+                        document.getElementById('gateBtn').disabled = false;
+                        if (ok) {
+                            unlock();
+                        } else {
+                            input.value = '';
+                            input.classList.remove('shake');
+                            void input.offsetWidth;
+                            input.classList.add('shake');
+                            if (hint) hint.classList.add('visible');
+                        }
+                    });
+                });
+            }
+
+            function checkPassword(val, callback) {
+                if (val.trim().toLowerCase() === 'komorebi') {
+                    callback(true);
+                    return;
+                }
+                fetch('/api/gate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: val }),
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { callback(data.ok === true); })
+                .catch(function() { callback(false); });
+            }
+
+            if (sessionStorage.getItem(issueKey) === '1') {
+                gate.classList.add('unlocked');
+                return;
+            }
+
+            var params = new URLSearchParams(window.location.search);
+            var urlKey = params.get('key');
+            if (urlKey) {
+                params.delete('key');
+                var clean = window.location.pathname + (params.toString() ? '?' + params : '');
+                window.history.replaceState({}, '', clean);
+
+                checkPassword(urlKey, function(ok) {
+                    if (ok) {
+                        unlock();
+                    } else {
+                        showGate();
+                    }
+                });
+                return;
+            }
+
+            showGate();
+        })();
+    </script>
+    <script>
+        // ==================== LANGUAGE TOGGLE ====================
+        (function() {
+            var pill = document.getElementById('langPill');
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+
+            function toggle() {
+                current = current === 'en' ? 'ko' : 'en';
+                document.documentElement.setAttribute('data-lang', current);
+                document.documentElement.setAttribute('lang', current);
+                localStorage.setItem('dispatch-lang', current);
+            }
+
+            pill.addEventListener('click', toggle);
+            pill.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+            });
+        })();
+
+        // ==================== SUBSCRIBE ====================
+        (function() {
+            var form = document.getElementById('subscribeForm');
+            var emailInput = document.getElementById('subscribeEmail');
+            var btn = document.getElementById('subscribeBtn');
+            var section = document.getElementById('subscribe');
+
+            if (localStorage.getItem('dispatch-subscribed')) {
+                section.classList.add('submitted');
+                return;
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = emailInput.value.trim();
+                if (!email) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function() {
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.add('submitted');
+                })
+                .catch(function() {
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.add('submitted');
+                });
+            });
+        })();
+
+        // ==================== COMMENTS ====================
+        (function() {
+            var form = document.getElementById('commentsForm');
+            var nameInput = document.getElementById('commentName');
+            var textInput = document.getElementById('commentText');
+            var btn = document.getElementById('commentBtn');
+            var list = document.getElementById('commentsList');
+            var empty = document.getElementById('commentsEmpty');
+            // REPLACE: Issue number for comments API
+            var issue = 'XXX';
+
+            function escapeHtml(str) {
+                var div = document.createElement('div');
+                div.appendChild(document.createTextNode(str));
+                return div.innerHTML;
+            }
+
+            function timeAgo(dateStr) {
+                var seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+                if (seconds < 60) return 'just now';
+                var intervals = [
+                    [31536000, 'y'], [2592000, 'mo'], [86400, 'd'],
+                    [3600, 'h'], [60, 'm']
+                ];
+                for (var i = 0; i < intervals.length; i++) {
+                    var count = Math.floor(seconds / intervals[i][0]);
+                    if (count >= 1) return count + intervals[i][1] + ' ago';
+                }
+                return 'just now';
+            }
+
+            function renderComment(c) {
+                var div = document.createElement('div');
+                div.className = 'comment-item';
+                div.innerHTML = '<div class="comment-meta">'
+                    + '<span class="comment-name">' + escapeHtml(c.name) + '</span>'
+                    + '<span class="comment-time">' + timeAgo(c.created_at) + '</span>'
+                    + '</div>'
+                    + '<p class="comment-body">' + escapeHtml(c.comment) + '</p>';
+                return div;
+            }
+
+            function loadComments() {
+                fetch('/api/comments?issue=' + issue)
+                    .then(function(r) { return r.json(); })
+                    .then(function(comments) {
+                        list.innerHTML = '';
+                        if (!comments.length) {
+                            empty.style.display = '';
+                            return;
+                        }
+                        empty.style.display = 'none';
+                        comments.forEach(function(c) {
+                            list.appendChild(renderComment(c));
+                        });
+                    })
+                    .catch(function() {});
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = nameInput.value.trim();
+                var comment = textInput.value.trim();
+                if (!name || !comment) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issue: issue, name: name, comment: comment })
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error();
+                    localStorage.setItem('dispatch-comment-name', name);
+                    textInput.value = '';
+                    loadComments();
+                })
+                .catch(function() {})
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                });
+            });
+
+            var savedName = localStorage.getItem('dispatch-comment-name');
+            if (savedName) nameInput.value = savedName;
+
+            loadComments();
+        })();
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js" integrity="sha384-O55L/6rhHr9CFvrxqv5luxOCcmVaBmETbZbJDP+Do8T0pztTACsFBD/IXCNkj7DV" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener('load', function() { initDispatch(); });
+        setTimeout(function() {
+            if (typeof gsap !== 'undefined' && !window._dispatchInit) initDispatch();
+        }, 4000);
+
+        function initDispatch() {
+            if (window._dispatchInit) return;
+            window._dispatchInit = true;
+
+            // Smooth scroll
+            var lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            // Progress bar
+            gsap.to('#progressBar', {
+                width: '100%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: 0.3,
+                }
+            });
+
+            // Hero animations
+            var heroTl = gsap.timeline({ delay: 0.3 });
+            heroTl
+                .to('.hero-label', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+                .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
+                .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+                .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+
+            // Hero Ken Burns
+            gsap.to('#heroImg', {
+                scale: 1.15,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Hero title parallax
+            gsap.to('.hero-title', {
+                yPercent: -20,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Fade scroll hint
+            gsap.to('.scroll-hint', {
+                opacity: 0,
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: '15% top',
+                    end: '30% top',
+                    scrub: true,
+                }
+            });
+
+            // Reveals
+            gsap.utils.toArray('.reveal').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, y: 0, duration: 0.9, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-fade').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, duration: 1, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-scale').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            // Ken Burns on full-bleed photos
+            gsap.utils.toArray('.photo-full img').forEach(function(img) {
+                gsap.fromTo(img,
+                    { scale: 1.03 },
+                    {
+                        scale: 1.1, ease: 'none',
+                        scrollTrigger: {
+                            trigger: img.closest('.photo-full'),
+                            start: 'top bottom',
+                            end: 'bottom top',
+                            scrub: true,
+                        }
+                    }
+                );
+            });
+
+            // Section title parallax
+            gsap.utils.toArray('.section-title').forEach(function(el) {
+                gsap.to(el, {
+                    yPercent: -10, ease: 'none',
+                    scrollTrigger: {
+                        trigger: el.closest('.section-header'),
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: true,
+                    }
+                });
+            });
+
+            // Pull quote scale
+            gsap.utils.toArray('.pull-quote blockquote, .pull-quote-side blockquote').forEach(function(el) {
+                gsap.fromTo(el,
+                    { scale: 0.92, opacity: 0 },
+                    {
+                        scale: 1, opacity: 1, duration: 1, ease: 'power2.out',
+                        scrollTrigger: { trigger: el, start: 'top 80%', once: true }
+                    }
+                );
+            });
+
+            // Smooth anchor scrolling for TOC links
+            document.querySelectorAll('.toc-list a').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    var target = document.querySelector(link.getAttribute('href'));
+                    if (target) {
+                        e.preventDefault();
+                        lenis.scrollTo(target, { offset: -40, duration: 1.2 });
+                    }
+                });
+            });
+        }
+    </script>
 </body>
 </html>
