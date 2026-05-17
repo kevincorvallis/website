@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-page="privacy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — Kevin Lee</title>
+    <meta name="description" content="Privacy policy for klee.page and Dispatch.">
+    <meta name="robots" content="noindex">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://klee.page/privacy">
+    <meta property="og:title" content="Privacy Policy — Kevin Lee">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <script>
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || systemPreference);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/vpx6nbc.css">
+    <link rel="stylesheet" href="../css/main.css">
+
+    <style>
+        .legal-page {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 80px 24px 120px;
+        }
+        .legal-page .back-link {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            opacity: 0.5;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        .legal-page .back-link:hover { opacity: 1; }
+        .legal-page h1 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin: 48px 0 32px;
+            letter-spacing: -0.02em;
+        }
+        .legal-page .updated {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            opacity: 0.4;
+            margin-bottom: 48px;
+        }
+        .legal-page h2 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin: 40px 0 16px;
+        }
+        .legal-page p, .legal-page li {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.8;
+            opacity: 0.75;
+            margin-bottom: 12px;
+        }
+        .legal-page ul {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+        .legal-page li { margin-bottom: 8px; }
+        .legal-page strong { opacity: 1; }
+        .legal-page a { color: var(--color-accent, #a0826d); }
+    </style>
+</head>
+<body>
+    <div class="legal-page">
+        <a href="/" class="back-link">← klee.page</a>
+
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: March 25, 2026</p>
+
+        <h2>Overview</h2>
+        <p>This privacy policy covers klee.page (personal website) and Dispatch (letter-sending app). Your privacy matters — here's exactly what we do and don't do with your data.</p>
+
+        <h2>klee.page (Personal Website)</h2>
+        <p>klee.page is a static personal website. It does not collect personal data, use cookies, or track individual visitors. Anonymous analytics are collected via Vercel Web Analytics to understand aggregate traffic patterns (page views, referrers). No personally identifiable information is stored.</p>
+
+        <h2>Dispatch (Letter App)</h2>
+        <p>Dispatch is a platform for creating and sending personal letters. When you use Dispatch, we collect:</p>
+        <ul>
+            <li><strong>Account information:</strong> Name, email, profile photo. Used to identify you and deliver letters.</li>
+            <li><strong>Letter content:</strong> Text, photos, media in your letters. Stored encrypted. Only accessible to you and your recipients.</li>
+            <li><strong>Device tokens:</strong> Push notification tokens. Used solely to notify you when you receive a letter.</li>
+            <li><strong>Photo metadata:</strong> When you use the photo compose feature, EXIF data (GPS coordinates, date) is read locally on your device to auto-tag locations. This data is not sent to our servers unless you choose to include it in your letter.</li>
+        </ul>
+
+        <h2>What We Don't Do</h2>
+        <ul>
+            <li>We don't read your letters.</li>
+            <li>We don't sell your data to anyone, ever.</li>
+            <li>We don't show you ads.</li>
+            <li>We don't share your information with third parties for marketing.</li>
+            <li>We don't use your content to train AI models.</li>
+            <li>We don't track you across websites.</li>
+        </ul>
+
+        <h2>AI Features</h2>
+        <p>When you use AI writing assistance (polish, translate, voice-to-letter), your text is processed by our AI provider to generate suggestions. This content is processed in real-time and is not stored by the AI provider. AI features are always optional — you can write without them.</p>
+
+        <h2>Data Storage & Security</h2>
+        <p>Data is stored on Supabase (hosted on AWS in the US). All data is encrypted at rest and in transit. Database backups are encrypted and retained for 30 days. We use row-level security (RLS) policies to ensure users can only access their own data.</p>
+
+        <h2>Third-Party Services</h2>
+        <ul>
+            <li><strong>Supabase:</strong> Database, authentication, and file storage</li>
+            <li><strong>Vercel:</strong> Website hosting, serverless functions, analytics</li>
+            <li><strong>Apple:</strong> Sign in with Apple, push notifications (APNs)</li>
+            <li><strong>AI providers:</strong> Text processing for writing assistance (no data retention)</li>
+        </ul>
+
+        <h2>Your Rights</h2>
+        <ul>
+            <li><strong>Access:</strong> View all your data within the app at any time.</li>
+            <li><strong>Export:</strong> Download all your letters and profile data.</li>
+            <li><strong>Correction:</strong> Update your profile information in Settings.</li>
+            <li><strong>Deletion:</strong> Delete your account and all associated data permanently from Settings > Delete Account. This cannot be undone.</li>
+            <li><strong>Portability:</strong> Request a machine-readable export of your data.</li>
+        </ul>
+        <p>For EU/EEA users: You have additional rights under GDPR including the right to object to processing and the right to lodge a complaint with a supervisory authority.</p>
+        <p>For California users: Under CCPA, you have the right to know what personal information we collect, request deletion, and opt out of the sale of personal information (we don't sell your data).</p>
+
+        <h2>Children</h2>
+        <p>Our services are not intended for users under 13 years of age (16 in the EU). We do not knowingly collect personal information from children. If we learn we have collected data from a child, we will delete it promptly.</p>
+
+        <h2>Data Retention</h2>
+        <p>We retain your data as long as your account is active. When you delete your account, all personal data is permanently deleted within 30 days. Anonymized, aggregate analytics data may be retained indefinitely.</p>
+
+        <h2>Changes</h2>
+        <p>We may update this policy from time to time. Significant changes will be communicated via email or in-app notification. The "Last updated" date at the top reflects the most recent revision.</p>
+
+        <h2>Contact</h2>
+        <p>Questions about privacy? Contact <a href="mailto:kevin@klee.page">kevin@klee.page</a></p>
+    </div>
+</body>
+</html>
