@@ -1,0 +1,2734 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dispatch 004: Open House — Kevin Lee</title>
+    <meta name="description" content="A receipt of a few weeks. Friends flew in, a cousin graduated from USC, Kobe stole a snack. Itemized accordingly.">
+    <meta name="author" content="Kevin Lee">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://klee.page/newsletter/004/">
+    <meta property="og:title" content="Dispatch 004: Open House — Kevin Lee">
+    <meta property="og:description" content="A receipt of a few weeks. Friends flew in, a cousin graduated from USC, Kobe stole a snack. Itemized accordingly.">
+    <meta property="og:image" content="https://klee.page/newsletter/004/images/matthew-graduation.jpeg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dispatch 004: Open House — Kevin Lee">
+    <meta name="twitter:description" content="A receipt of a few weeks. Friends flew in, a cousin graduated from USC, Kobe stole a snack. Itemized accordingly.">
+    <meta name="twitter:image" content="https://klee.page/newsletter/004/images/matthew-graduation.jpeg">
+
+    <!-- Smart App Banner -->
+    <meta name="apple-itunes-app" content="app-id=6761163892">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <!-- Detect theme + language + URL-key bypass before first paint -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+
+            var params = new URLSearchParams(window.location.search);
+            var urlLang = params.get('lang');
+            var storedLang = localStorage.getItem('dispatch-lang');
+            var navLang = (navigator.language || '').slice(0, 2);
+            var lang = (urlLang === 'ko' || urlLang === 'en') ? urlLang
+                     : (storedLang === 'ko' || storedLang === 'en') ? storedLang
+                     : navLang === 'ko' ? 'ko'
+                     : 'en';
+            document.documentElement.setAttribute('data-lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+
+            // Pre-paint URL-key bypass: if the link includes the correct ?key=, hide
+            // the password input gate immediately so it never flashes. The jeong welcome
+            // interstitial still plays — the gate JS reads ?key= and calls unlock()
+            // which animates the interstitial. We only suppress the password input UI.
+            var urlKey = params.get('key');
+            if (urlKey && urlKey.trim().toLowerCase() === 'jeong') {
+                document.documentElement.setAttribute('data-prebypass', '1');
+            }
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+        }
+
+        [data-lang="ko"] {
+            --font: 'Noto Serif KR', 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
+        }
+
+        /* Language toggle */
+        [data-lang="en"] [data-l="ko"],
+        [data-lang="ko"] [data-l="en"] {
+            display: none !important;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection {
+            background: rgba(0, 100, 255, 0.26);
+            color: inherit;
+        }
+
+        a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+        /* When ?key= bypass is present, hide ONLY the password input + ambient gate
+           light. The unc welcome interstitial (.komorebi) still plays. */
+        [data-prebypass="1"] .gate,
+        [data-prebypass="1"] .gate-light {
+            display: none !important;
+        }
+
+        /* ========== PASSWORD GATE ========== */
+        .gate {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            transition: opacity 0.6s ease, visibility 0.6s ease, background-color 0.3s ease;
+        }
+
+        .gate.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .gate-content {
+            max-width: 320px;
+        }
+
+        .gate-title {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.75rem;
+        }
+
+        .gate-subtitle {
+            font-size: 16px;
+            color: var(--caption);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .gate-input {
+            width: 100%;
+            max-width: 240px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--accent);
+            border-radius: 0;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 18px;
+            padding: 12px 0;
+            text-align: center;
+            outline: none;
+            letter-spacing: 0.12em;
+            transition: border-color 0.4s ease, color 0.3s ease;
+        }
+
+        .gate-input::placeholder {
+            color: var(--caption);
+            opacity: 0.5;
+            letter-spacing: 0;
+            font-size: 15px;
+            font-style: italic;
+        }
+
+        .gate-input:focus {
+            border-color: var(--text);
+        }
+
+        .gate-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-family: var(--font);
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            padding: 8px 24px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-btn:hover {
+            opacity: 1;
+        }
+
+        .gate-input.shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .gate-hint {
+            font-size: 13px;
+            color: var(--caption);
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-hint.visible {
+            opacity: 1;
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--accent);
+            z-index: 60;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== NAVIGATION ========== */
+        .back-link {
+            position: fixed;
+            top: max(1.25rem, calc(env(safe-area-inset-top) + 0.6rem));
+            left: max(1.25rem, calc(env(safe-area-inset-left) + 1rem));
+            z-index: 50;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+            color: #f0eee6;
+            opacity: 0.85;
+            text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+            transition: opacity 0.2s ease, color 0.4s ease, text-shadow 0.4s ease;
+        }
+
+        /* Once user scrolls past hero, drop the white-on-image treatment */
+        .back-link.scrolled {
+            color: var(--text);
+            opacity: 0.55;
+            text-shadow: none;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .top-controls {
+            position: fixed;
+            top: max(1.15rem, calc(env(safe-area-inset-top) + 0.5rem));
+            right: max(1.25rem, calc(env(safe-area-inset-right) + 1rem));
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .lang-pill {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 56px;
+            height: 24px;
+            background: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.5s ease;
+        }
+
+        .lang-pill:hover { opacity: 0.75; }
+
+        .lang-pill-label {
+            flex: 1;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            line-height: 22px;
+            color: var(--bg);
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        .lang-pill-dot {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        [data-lang="ko"] .lang-pill-dot { transform: translateX(32px); }
+        [data-lang="en"] .lang-pill-ko { opacity: 0.4; }
+        [data-lang="ko"] .lang-pill-en { opacity: 0.4; }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-wrap input { display: none; }
+
+        .toggle-wrap label {
+            position: relative;
+            display: block;
+            width: 44px;
+            height: 24px;
+            background: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.5s ease;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0s, background-color 0.5s ease;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        /* ========== RECEIPT — mobile-first, the format IS the layout ========== */
+        :root {
+            --paper-w: 360px;
+            --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Menlo', monospace;
+            --perf: rgba(31, 30, 29, 0.18);
+        }
+        [data-theme="dark"] {
+            --perf: rgba(240, 238, 230, 0.18);
+        }
+        [data-lang="ko"] {
+            --mono: 'Noto Serif KR', 'JetBrains Mono', ui-monospace, monospace;
+        }
+
+        /* The "paper" — a single centered column that becomes the whole experience.
+           On mobile, viewport edges become the receipt edges (with 12px breathing
+           room). On desktop, it sits centered on the background. */
+        .receipt {
+            width: 100%;
+            max-width: var(--paper-w);
+            margin: 0 auto;
+            padding: 2.25rem 1.25rem 1rem;
+            font-size: 16px;
+            line-height: 1.55;
+            position: relative;
+        }
+
+        /* Desktop: a soft drop shadow and a faint paper texture suggest a physical
+           receipt sitting on a table. On mobile this is unnecessary visual noise. */
+        @media (min-width: 720px) {
+            .receipt {
+                margin-top: 3rem;
+                margin-bottom: 3rem;
+                padding: 3rem 1.75rem 1.5rem;
+                box-shadow:
+                    0 1px 2px rgba(0,0,0,0.04),
+                    0 8px 24px rgba(0,0,0,0.06),
+                    0 24px 48px rgba(0,0,0,0.04);
+                background:
+                    repeating-linear-gradient(
+                        180deg,
+                        transparent 0 28px,
+                        rgba(31,30,29,0.012) 28px 29px
+                    ),
+                    var(--bg);
+            }
+            [data-theme="dark"] .receipt {
+                box-shadow:
+                    0 1px 2px rgba(0,0,0,0.4),
+                    0 8px 24px rgba(0,0,0,0.5),
+                    0 24px 48px rgba(0,0,0,0.3);
+                background:
+                    repeating-linear-gradient(
+                        180deg,
+                        transparent 0 28px,
+                        rgba(240,238,230,0.018) 28px 29px
+                    ),
+                    var(--bg);
+            }
+        }
+
+        /* ========== RECEIPT HEADER ========== */
+        .receipt-head {
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            color: var(--text);
+            text-transform: uppercase;
+            line-height: 1.8;
+        }
+
+        .receipt-head .brand {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.18em;
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+        }
+
+        .receipt-head .issue-no {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .receipt-head .meta {
+            font-size: 11px;
+            opacity: 0.75;
+        }
+
+        .receipt-head .meta div { margin: 0; }
+
+        /* Dashed/dotted perforated rules between line groups */
+        .perf {
+            border: 0;
+            margin: 1.25rem 0;
+            border-top: 1px dashed var(--perf);
+        }
+        .perf.thick {
+            border-top: 2px solid var(--text);
+            opacity: 0.7;
+        }
+        .perf.dotted {
+            border-top: 1px dotted var(--perf);
+        }
+
+        /* ========== TRANSACTION (a section of the receipt) ========== */
+        .txn {
+            margin: 1.5rem 0;
+        }
+
+        .txn-head {
+            font-family: var(--mono);
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .txn-head .label { font-weight: 600; }
+
+        /* The Korean mood-word stays Korean regardless of data-lang. It IS the
+           bilingual hook — a one-word seasoning that both audiences read. */
+        .txn-head .mood {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .txn-title {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 600;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            margin: 0.25rem 0 1rem;
+        }
+        [data-lang="ko"] .txn-title {
+            font-family: 'Noto Serif KR', serif;
+            font-weight: 600;
+        }
+
+        /* The list of itemized lines under a transaction header.
+           Mono-style "leader dots" between description and value via flex. */
+        .items {
+            list-style: none;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.85;
+            margin: 0 0 1rem;
+            padding: 0;
+        }
+
+        .items li {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .items li .desc {
+            flex: 0 1 auto;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .items li .leaders {
+            flex: 1 1 auto;
+            border-bottom: 1px dotted var(--perf);
+            transform: translateY(-4px);
+            min-width: 1rem;
+        }
+
+        .items li .val {
+            flex: 0 0 auto;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Subtotal — italic serif, looks like a hand-stamped summary on the receipt */
+        .subtotal {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 15px;
+            text-align: right;
+            color: var(--accent);
+            margin: 0.5rem 0 0;
+            letter-spacing: 0.01em;
+        }
+        .subtotal::before {
+            content: "subtotal · ";
+            font-family: var(--mono);
+            font-style: normal;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--caption);
+            margin-right: 0.4rem;
+        }
+        [data-lang="ko"] .subtotal::before {
+            content: "합계 · ";
+        }
+
+        /* ========== TOTAL (the grand summary at the bottom of the receipt) ========== */
+        .total {
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--caption);
+            margin: 1.5rem 0 0.75rem;
+        }
+        .total .amount {
+            display: block;
+            font-family: 'Noto Serif KR', 'Noto Serif JP', var(--font-display), serif;
+            font-size: 30px;
+            line-height: 1.15;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: var(--text);
+            text-transform: none;
+            margin-top: 0.4rem;
+        }
+        .total .glyph-bridge {
+            display: block;
+            font-family: 'Noto Serif KR', 'Noto Serif JP', serif;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+            margin-top: 0.3rem;
+        }
+        .total .glyph-note {
+            display: block;
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: var(--caption);
+            text-transform: uppercase;
+            margin-top: 0.4rem;
+            line-height: 1.6;
+        }
+
+        /* The closing "thank you" bilingual block */
+        .ty {
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--caption);
+            line-height: 2;
+            margin: 1.25rem 0 0.5rem;
+        }
+        .ty .kr {
+            font-family: 'Noto Serif KR', serif;
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            color: var(--text);
+            margin: 0.25rem 0;
+        }
+
+        /* ========== TEXT BLOCKS — narrower for receipt context ========== */
+        .text-block {
+            padding: 0.5rem 0 1rem;
+        }
+
+        .text-block p {
+            font-size: 16px;
+            line-height: 1.65;
+            margin-bottom: 0.85rem;
+        }
+
+        .text-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .text-block em { font-style: italic; }
+        .text-block strong { font-weight: 600; }
+        .text-block a {
+            color: var(--text);
+            text-decoration-color: var(--accent);
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
+        }
+
+        /* ========== ENCLOSURE — a "stapled" photo or video inside the receipt ==========
+           The trick: a slight rotation + dual box-shadow simulates paper-on-paper
+           and a single staple at the top. Borderless. Theme-aware. */
+        .enc {
+            margin: 1.25rem 0 1.5rem;
+            padding: 0;
+            position: relative;
+            transform: rotate(-0.8deg);
+            transition: transform 0.4s ease;
+        }
+        .enc:nth-of-type(even) { transform: rotate(0.6deg); }
+        .enc:nth-of-type(3n)   { transform: rotate(-0.4deg); }
+        .enc:hover { transform: rotate(0) scale(1.01); }
+
+        .enc img,
+        .enc video {
+            width: 100%;
+            height: auto;
+            display: block;
+            box-shadow:
+                0 1px 1px rgba(0,0,0,0.06),
+                0 6px 18px rgba(0,0,0,0.08);
+            background: #ddd;
+        }
+        [data-theme="dark"] .enc img,
+        [data-theme="dark"] .enc video {
+            box-shadow:
+                0 1px 1px rgba(0,0,0,0.3),
+                0 6px 18px rgba(0,0,0,0.4);
+            background: #333;
+        }
+
+        /* The "staple" — a tiny diagonal mark above the enclosure */
+        .enc::before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-12deg);
+            width: 22px;
+            height: 3px;
+            background: var(--text);
+            opacity: 0.45;
+            box-shadow:
+                inset 0 -1px 0 rgba(0,0,0,0.15);
+            border-radius: 1px;
+        }
+
+        .enc-caption {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: var(--caption);
+            text-align: center;
+            margin-top: 0.6rem;
+            line-height: 1.55;
+        }
+        .enc-caption .stamp {
+            display: inline-block;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: 10px;
+            margin-right: 0.4em;
+            border: 1px solid currentColor;
+            padding: 1px 6px;
+            border-radius: 2px;
+        }
+
+        /* Placeholder enclosure — when no image file exists yet, render a labeled
+           paper-textured box so Kevin can see where the photo will go. */
+        .enc-placeholder {
+            aspect-ratio: 4 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: var(--caption);
+            text-transform: uppercase;
+            text-align: center;
+            padding: 1rem;
+            border: 1px dashed var(--perf);
+            background:
+                repeating-linear-gradient(
+                    45deg,
+                    transparent 0 12px,
+                    rgba(160,130,109,0.04) 12px 13px
+                );
+            box-shadow: none !important;
+        }
+        [data-theme="dark"] .enc-placeholder {
+            background:
+                repeating-linear-gradient(
+                    45deg,
+                    transparent 0 12px,
+                    rgba(196,168,130,0.04) 12px 13px
+                );
+        }
+
+        /* Short bilingual mood-quote, set inside the receipt prose */
+        .quote {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 17px;
+            line-height: 1.55;
+            color: var(--text);
+            padding: 0.5rem 0 0.5rem 1rem;
+            border-left: 2px solid var(--accent);
+            margin: 1rem 0;
+        }
+        [data-lang="ko"] .quote {
+            font-family: 'Noto Serif KR', serif;
+            font-style: normal;
+            font-weight: 400;
+        }
+
+        /* ========== SIGN OFF — receipt context, smaller scale ========== */
+        .sign-off {
+            padding: 1rem 0 1.25rem;
+            text-align: left;
+        }
+
+        .sign-off-text {
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.65;
+            margin: 0 0 1rem;
+            font-style: italic;
+        }
+        [data-lang="ko"] .sign-off-text { font-style: normal; }
+
+        .sign-off-name {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--accent);
+        }
+
+        /* ========== DIVIDER — repurposed as receipt perforation ========== */
+        .divider {
+            display: none; /* receipt uses .perf rules instead */
+        }
+
+        /* ========== SPACERS ========== */
+        .spacer { height: 1.5rem; }
+        .spacer-sm { height: 0.75rem; }
+        .spacer-lg { height: 3rem; }
+
+        /* ========== TEAR LINE — the perforated bottom of the receipt ========== */
+        .tear {
+            position: relative;
+            margin: 2rem 0 0;
+            padding: 1rem 0;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--caption);
+            user-select: none;
+        }
+        .tear::before {
+            content: "";
+            display: block;
+            border-top: 2px dashed var(--perf);
+            margin-bottom: 0.75rem;
+        }
+        .tear .scissors {
+            display: inline-block;
+            transform: translateY(2px);
+            margin-right: 0.5rem;
+            font-style: normal;
+        }
+
+        /* ========== FOOTER ========== */
+        .story-footer {
+            padding: 4rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .story-footer p {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .story-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SUBSCRIBE ========== */
+        .subscribe {
+            padding: 5rem 1.5rem 3rem;
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .subscribe-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-desc {
+            font-size: 16px;
+            color: var(--caption);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .subscribe-input::placeholder { color: var(--caption); }
+        .subscribe-input:focus { border-color: var(--accent); }
+
+        .subscribe-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .subscribe-btn:hover { opacity: 0.7; }
+
+        .subscribe-success {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent);
+            display: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe.submitted .subscribe-form { display: none; }
+        .subscribe.submitted .subscribe-success { display: block; }
+
+        .subscribe-note {
+            font-size: 13px;
+            color: var(--caption);
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .subscribe-form { flex-direction: column; }
+            .subscribe-btn { padding: 14px 24px; }
+        }
+
+        /* ========== COMMENTS ========== */
+        .comments {
+            padding: 3rem 1.5rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .comments-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .comments-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .comments-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .comments-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 2.5rem;
+        }
+
+        .comments-input {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .comments-input::placeholder { color: var(--caption); }
+        .comments-input:focus { border-color: var(--accent); }
+
+        .comments-textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .comments-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            align-self: flex-end;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .comments-btn:hover { opacity: 0.7; }
+
+        .comments-list { list-style: none; }
+
+        .comment-item {
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-item:first-child {
+            border-top: 1px solid var(--rule);
+        }
+
+        .comment-meta {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .comment-name { font-size: 15px; font-weight: 600; }
+
+        .comment-time {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .comment-body {
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .comments-empty {
+            font-size: 16px;
+            color: var(--caption);
+            text-align: center;
+            padding: 2rem 0;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .comments-btn { align-self: stretch; padding: 14px 24px; }
+        }
+
+        /* ========== REVEAL ANIMATIONS (IntersectionObserver-driven) ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        .reveal-fade {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.97);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal.visible,
+        .reveal-fade.visible,
+        .reveal-scale.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Receipt line-item "print stagger" — each .items > li reveals in sequence
+           when its parent .items list enters the viewport. */
+        .items li {
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .items.printed li {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: calc(var(--i, 0) * 45ms);
+        }
+
+        /* ========== RESPONSIVE — mobile-first; desktop just centers and shadows ========== */
+        @media (max-width: 380px) {
+            .receipt { padding: 1.75rem 1rem 0.75rem; }
+            .receipt-head .brand { font-size: 20px; letter-spacing: 0.14em; }
+            .txn-title { font-size: 22px; }
+        }
+
+        /* ========== KOMOREBI INTERSTITIAL ========== */
+        .komorebi {
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 1s ease, visibility 0s;
+        }
+
+        .komorebi.exiting {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+
+        .komorebi-content {
+            max-width: 480px;
+            position: relative;
+        }
+
+        .komorebi-kanji {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: clamp(3rem, 11vw, 5.5rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            opacity: 0;
+            transform: translateY(20px) scale(0.96);
+            line-height: 1.1;
+        }
+
+        .komorebi-romaji {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--accent);
+            margin-top: 0.75rem;
+            letter-spacing: 0.04em;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-noun {
+            font-family: var(--font);
+            font-size: 12px;
+            font-style: italic;
+            color: var(--caption);
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-meaning {
+            font-family: var(--font);
+            font-size: 17px;
+            color: var(--caption);
+            line-height: 1.8;
+            margin-top: 2.5rem;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 2rem auto;
+            opacity: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi-tagline {
+            font-size: 14px;
+            color: var(--caption);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-dismiss {
+            background: none;
+            border: none;
+            font-family: var(--font);
+            font-size: 15px;
+            color: var(--accent);
+            cursor: pointer;
+            margin-top: 2.5rem;
+            padding: 10px 28px;
+            letter-spacing: 0.03em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, color 0.3s ease, transform 0.8s cubic-bezier(0.22,0.61,0.36,1);
+        }
+
+        .komorebi-dismiss:hover {
+            opacity: 0.7 !important;
+        }
+
+        /* Dappled light system — mix-blend-mode: plus-lighter for true sunlight */
+        .komorebi-light {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            mix-blend-mode: plus-lighter;
+            transition: opacity 2.5s ease;
+        }
+
+        /* Gate ambient — barely perceptible hint of light */
+        .gate-light {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 199;
+            opacity: 0.02;
+            mix-blend-mode: plus-lighter;
+            background: radial-gradient(ellipse at 50% 30%, rgba(160,130,109,0.3) 0%, transparent 60%);
+            transition: opacity 2s ease;
+        }
+
+        .gate-light.awakening {
+            opacity: 0.15;
+        }
+
+        /* Leaf shadow SVG overlay */
+        .komorebi-leaves {
+            position: absolute;
+            inset: -20%;
+            pointer-events: none;
+            opacity: 0;
+            filter: blur(8px);
+            animation: leafSway 12s ease-in-out infinite;
+        }
+
+        @keyframes leafSway {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(1%, -0.5%) rotate(0.3deg); }
+            66% { transform: translate(-0.5%, 0.5%) rotate(-0.2deg); }
+        }
+
+        /* Warm sun gradient from top */
+        .komorebi-sun {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            background: radial-gradient(
+                ellipse at 50% -10%,
+                rgba(160,130,109,0.25) 0%,
+                rgba(160,130,109,0.08) 30%,
+                transparent 65%
+            );
+            transition: opacity 3s ease;
+        }
+
+        /* Dappled light spots */
+        .komorebi-spots {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .komorebi-spot {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(200,175,140,0.15);
+            filter: blur(20px);
+            animation: spotPulse 8s ease-in-out infinite;
+        }
+
+        .komorebi-spot:nth-child(1) { width: 120px; height: 80px; top: 8%; left: 15%; animation-delay: 0s; transform: rotate(-15deg); }
+        .komorebi-spot:nth-child(2) { width: 90px; height: 60px; top: 25%; right: 20%; animation-delay: 2.5s; transform: rotate(10deg); }
+        .komorebi-spot:nth-child(3) { width: 140px; height: 90px; bottom: 30%; left: 25%; animation-delay: 1.2s; transform: rotate(-8deg); }
+        .komorebi-spot:nth-child(4) { width: 70px; height: 50px; bottom: 15%; right: 30%; animation-delay: 4s; transform: rotate(20deg); }
+        .komorebi-spot:nth-child(5) { width: 100px; height: 70px; top: 50%; left: 55%; animation-delay: 3s; transform: rotate(-5deg); }
+
+        @keyframes spotPulse {
+            0%, 100% { opacity: 0.3; transform: rotate(-15deg) scale(0.9); }
+            50% { opacity: 0.7; transform: rotate(-12deg) scale(1.1); }
+        }
+
+        /* In-app browser banner (Instagram, TikTok, KakaoTalk in-app webviews) */
+        .browser-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 400;
+            background: var(--accent);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 0.02em;
+            transform: translateY(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .browser-banner.visible { transform: translateY(0); }
+
+        /* ========== REDUCED MOTION ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-fade, .reveal-scale, .receipt-line {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .enc { transform: none !important; }
+            .gate-input.shake { animation: none; }
+            .komorebi-spot, .komorebi-leaves { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ========== MINI PLAYER — pinned bottom-left, song of the week ==========
+           Fixed pill that fades in when komorebi dismisses (= user gesture) and
+           tries to autoplay. If autoplay is blocked, user can tap the button. */
+        .mini-player {
+            position: fixed;
+            bottom: max(1rem, env(safe-area-inset-bottom, 0));
+            left: 1rem;
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0.6rem 0.4rem 0.4rem;
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: 100px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06);
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: var(--text);
+            max-width: calc(100vw - 2rem);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        background-color 0.3s ease,
+                        border-color 0.3s ease;
+        }
+        [data-theme="dark"] .mini-player {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 12px 32px rgba(0,0,0,0.4);
+        }
+        .mini-player.visible { opacity: 1; transform: translateY(0); }
+        .mini-player[hidden] { display: none; }
+
+        .mini-player-btn {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: 100%;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            flex: 0 0 auto;
+            transition: transform 0.18s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        background-color 0.3s ease,
+                        color 0.3s ease;
+            padding: 0;
+            overflow: visible;
+        }
+        .mini-player-btn:hover    { transform: scale(1.05); }
+        .mini-player-btn:active   { transform: scale(0.92); }
+
+        /* Circular progress ring — rendered behind the icon. The ring-track is the
+           faint background circle; ring-progress is the foreground arc whose
+           stroke-dashoffset is animated in JS on the audio 'timeupdate' event. */
+        .mini-player-ring {
+            position: absolute;
+            inset: -3px;
+            width: calc(100% + 6px);
+            height: calc(100% + 6px);
+            transform: rotate(-90deg); /* start the arc from 12 o'clock */
+            pointer-events: none;
+            fill: none;
+        }
+        .ring-track {
+            stroke: var(--rule);
+            stroke-width: 1.5;
+            transition: stroke 0.3s ease;
+        }
+        .ring-progress {
+            stroke: var(--accent);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-dasharray: 100.531; /* 2π · r where r = 16 */
+            stroke-dashoffset: 100.531;
+            transition: stroke-dashoffset 0.18s linear, stroke 0.3s ease;
+        }
+
+        /* The icon SVG holds BOTH play and pause paths; the .icon-play / .icon-pause
+           paths cross-fade with scale + rotation. data-state on the parent button
+           controls which path is visible. */
+        .mini-player-icon {
+            position: relative;
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+            display: block;
+            overflow: visible;
+        }
+        .mini-player-icon path {
+            transition: opacity 0.22s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: 12px 12px;
+            transform-box: fill-box;
+        }
+        /* Default: show play, hide pause */
+        .mini-player-icon .icon-play  { opacity: 1; transform: scale(1) rotate(0deg); }
+        .mini-player-icon .icon-pause { opacity: 0; transform: scale(0.6) rotate(-90deg); }
+        /* When playing: hide play, show pause */
+        .mini-player-btn[data-state="playing"] .icon-play  { opacity: 0; transform: scale(0.6) rotate(90deg); }
+        .mini-player-btn[data-state="playing"] .icon-pause { opacity: 1; transform: scale(1) rotate(0deg); }
+
+        /* Slight pulse on the ring's track when audio is buffering — visible feedback
+           for the "I tapped but nothing's happening yet" microsecond. */
+        @keyframes ring-buffer {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.4; }
+        }
+        .mini-player-btn[data-state="buffering"] .ring-track {
+            animation: ring-buffer 1s ease-in-out infinite;
+        }
+
+        .mini-player-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
+            line-height: 1.2;
+        }
+        .mini-player-title {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
+        }
+        .mini-player-artist {
+            font-size: 10px;
+            color: var(--caption);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.3s ease;
+        }
+
+        .mini-player-close {
+            background: none;
+            border: none;
+            color: var(--caption);
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 4px;
+            opacity: 0.6;
+            transition: opacity 0.2s ease, color 0.3s ease;
+            flex: 0 0 auto;
+        }
+        .mini-player-close:hover { opacity: 1; }
+
+        /* Pulse the play button when autoplay was blocked — tells user "tap me" */
+        @keyframes nudge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(160,130,109,0); }
+            50%      { box-shadow: 0 0 0 8px rgba(160,130,109,0.15); }
+        }
+        .mini-player.needs-tap .mini-player-btn {
+            animation: nudge 1.8s ease-in-out infinite;
+        }
+        [data-theme="dark"] .mini-player.needs-tap .mini-player-btn {
+            animation-name: nudge-dark;
+        }
+        @keyframes nudge-dark {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(196,168,130,0); }
+            50%      { box-shadow: 0 0 0 8px rgba(196,168,130,0.2); }
+        }
+
+        /* ========== VIEW TRANSITIONS — smooth theme + language swap ========== */
+        @supports (view-transition-name: x) {
+            ::view-transition-old(root),
+            ::view-transition-new(root) {
+                animation-duration: 0.3s;
+                animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+            }
+        }
+
+        /* ========== PRINT — readers can cmd+P and keep a real letter ========== */
+        @media print {
+            @page {
+                size: 80mm auto;
+                margin: 6mm;
+            }
+            html, body { background: #fff !important; color: #000 !important; }
+            .gate, .gate-light, .komorebi,
+            .back-link, .top-controls, .progress-bar,
+            .subscribe, .comments, .browser-banner, .tear, .mini-player { display: none !important; }
+            .receipt {
+                box-shadow: none !important;
+                background: #fff !important;
+                margin: 0 auto !important;
+                max-width: 68mm;
+                padding: 0 !important;
+                font-size: 11px !important;
+            }
+            .receipt-head .brand { font-size: 16px !important; }
+            .txn-title { font-size: 14px !important; }
+            .enc { transform: none !important; page-break-inside: avoid; }
+            .enc::before { display: none; }
+            a { color: #000 !important; text-decoration: none !important; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== PASSWORD GATE ==================== -->
+    <div class="gate" id="gate">
+        <div class="gate-content">
+            <h1 class="gate-title">Dispatch</h1>
+            <p class="gate-subtitle">
+                <span data-l="en">This letter is for friends and family.</span>
+                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
+            </p>
+            <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
+                <input
+                    type="text"
+                    class="gate-input"
+                    id="gateInput"
+                    placeholder="enter password"
+                    autocomplete="off"
+                    autofocus
+                >
+                <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
+            </form>
+            <p class="gate-hint" id="gateHint">
+                <span data-l="en">Hmm, that's not it.</span>
+                <span data-l="ko">음, 아닌데?</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Ambient gate light — barely visible on password screen, intensifies on correct entry -->
+    <div class="gate-light" id="gateLight"></div>
+
+    <!-- ==================== KOMOREBI INTERSTITIAL ==================== -->
+    <div class="komorebi" id="komorebi">
+        <!-- SVG leaf shadow layer -->
+        <svg class="komorebi-leaves" id="komorebiLeaves" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <filter id="leafBlur"><feGaussianBlur stdDeviation="3"/></filter>
+            </defs>
+            <g fill="rgba(160,130,109,0.12)" filter="url(#leafBlur)">
+                <ellipse cx="120" cy="100" rx="45" ry="22" transform="rotate(-30 120 100)"/>
+                <ellipse cx="350" cy="80" rx="35" ry="18" transform="rotate(15 350 80)"/>
+                <ellipse cx="600" cy="150" rx="50" ry="25" transform="rotate(-20 600 150)"/>
+                <ellipse cx="200" cy="300" rx="40" ry="20" transform="rotate(25 200 300)"/>
+                <ellipse cx="500" cy="350" rx="55" ry="28" transform="rotate(-10 500 350)"/>
+                <ellipse cx="700" cy="400" rx="38" ry="19" transform="rotate(30 700 400)"/>
+                <ellipse cx="150" cy="550" rx="48" ry="24" transform="rotate(-15 150 550)"/>
+                <ellipse cx="400" cy="600" rx="42" ry="21" transform="rotate(20 400 600)"/>
+                <ellipse cx="650" cy="650" rx="35" ry="17" transform="rotate(-25 650 650)"/>
+                <ellipse cx="300" cy="750" rx="52" ry="26" transform="rotate(10 300 750)"/>
+            </g>
+        </svg>
+        <!-- Warm sun gradient -->
+        <div class="komorebi-sun" id="komorebiSun"></div>
+        <!-- Dappled light spots -->
+        <div class="komorebi-spots" id="komorebiSpots">
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+        </div>
+        <div class="komorebi-content">
+            <p class="komorebi-kanji" id="komorebiKanji">정</p>
+            <p class="komorebi-romaji" id="komorebiRomaji">jeong</p>
+            <p class="komorebi-noun" id="komorebiNoun">noun &middot; korean</p>
+            <p class="komorebi-meaning" id="komorebiMeaning">
+                <span data-l="en">The slow-grown, unspoken affection between people who have shared time. Not love exactly &mdash; the older, deeper thing under it. <em>(Untranslatable. People keep trying.)</em></span>
+                <span data-l="ko">함께 시간을 보낸 사람들 사이에 천천히 자라는, 말 없는 애착. 사랑이라기보다 &mdash; 그 밑에 깔린 더 오래되고 깊은 것. <em>(번역 안 됨. 그래도 다들 시도는 함.)</em></span>
+            </p>
+            <div class="komorebi-divider" id="komorebiDivider"></div>
+            <p class="komorebi-tagline" id="komorebiTagline">
+                <span data-l="en">A letter for friends and family.</span>
+                <span data-l="ko">가까운 사람들한테 보내는 편지.</span>
+            </p>
+            <button class="komorebi-dismiss" id="komorebiDismiss">
+                <span data-l="en">Continue &rarr;</span>
+                <span data-l="ko">계속 &rarr;</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <a href="/newsletter" class="back-link">&larr; Dispatch</a>
+    <div class="top-controls">
+        <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
+            <span class="lang-pill-label lang-pill-en">EN</span>
+            <span class="lang-pill-label lang-pill-ko">한</span>
+            <span class="lang-pill-dot"></span>
+        </div>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </div>
+
+    <!-- ==================== RECEIPT — single narrow column, mobile-native ==================== -->
+    <article class="receipt">
+
+        <header class="receipt-head reveal">
+            <div class="brand">DISPATCH</div>
+            <div class="issue-no">no. 004</div>
+            <div class="meta">
+                <div>KLEE.PAGE</div>
+                <div>17 MAY 2026 &middot; 22:47 PDT</div>
+                <div>CASHIER: K. LEE</div>
+                <div>
+                    RE: <span data-l="en">OPEN HOUSE</span><span data-l="ko">손님맞이</span>
+                </div>
+            </div>
+        </header>
+
+        <hr class="perf thick">
+
+        <!-- ============ OPENER ============ -->
+        <div class="text-block reveal">
+            <div data-l="en">
+                <p>The past few weeks have been an open house. Two cousins flew in from the east coast. A high school friend drove down from Salt Lake. Another cousin graduated from <a href="https://en.wikipedia.org/wiki/University_of_Southern_California" target="_blank">USC</a>. Justin shipped out for <a href="https://en.wikipedia.org/wiki/United_States_National_Guard" target="_blank">National Guard</a> training, which means Kobe &mdash; his dog, not the human &mdash; moved in for the duration and immediately tried to organize a coup.</p>
+                <p>Itemized accordingly.</p>
+            </div>
+            <div data-l="ko">
+                <p>지난 몇 주는 오픈 하우스였다. 동부에서 사촌 둘이 날아왔다. 고등학교 친구는 솔트레이크에서 차를 몰고 내려왔다. 또 다른 사촌이 <a href="https://en.wikipedia.org/wiki/University_of_Southern_California" target="_blank">USC</a>를 졸업했다. Justin은 <a href="https://en.wikipedia.org/wiki/United_States_National_Guard" target="_blank">주방위군</a> 훈련 갔는데, 그 말은 즉 Kobe &mdash; 사람 말고 개 &mdash; 가 여기로 임시 입주했고 즉시 쿠데타를 시도했다는 뜻이다.</p>
+                <p>항목별로 정리한다.</p>
+            </div>
+        </div>
+
+        <hr class="perf">
+
+        <!-- ============ TRANSACTION 001 — Eunice & Lance (cousins, mom's side) ============ -->
+        <section class="txn reveal">
+            <div class="txn-head">
+                <span class="label">txn 001 &middot; east coast &middot; in transit</span>
+                <span class="mood">들썩</span>
+            </div>
+            <h2 class="txn-title">
+                <span data-l="en">Eunice &amp; Lance, Westbound</span>
+                <span data-l="ko">유니스 &amp; 랜스, 서쪽으로</span>
+            </h2>
+
+            <div class="text-block">
+                <div data-l="en">
+                    <p>The east coast contingent arrived first. <strong>Eunice</strong> and <strong>Lance</strong> are both cousins on <strong>엄마</strong>'s side, which means a visit from them is technically a family event and emotionally a surprise audit of one's life choices. We are all old enough now that the audit goes both ways &mdash; a gentle, unspoken mutual agreement to notice but not comment on each other's new and interesting anxieties.</p>
+                    <p><strong>Eunice</strong> &mdash; freshly promoted from analyst to associate at the bank &mdash; cashed in two weeks of <a href="https://en.wikipedia.org/wiki/Annual_leave" target="_blank">PTO</a> the moment the ink was dry on her new title. She celebrated this foregone conclusion by flying three thousand miles away from the source of it, which is the only correct way to handle good news.</p>
+                    <p><strong>Lance</strong> is still marinating in the consequences of <a href="https://en.wikipedia.org/wiki/Harvard_University" target="_blank">dropping out of Harvard</a> two years ago to join a startup that promised to revolutionize &mdash; I think &mdash; the way people schedule meetings about scheduling meetings. He is, this week, deciding to go back in the Fall. The kind of decision that sounds final until you say it out loud to your cousin in a car, and the cost of gas in California being what it is, I believe that makes me his highest-paid therapist.</p>
+                    <p>I had forgotten the specific way these two laugh when they're in the same room. It sounds like two very happy, slightly confused geese being told the same very good joke. It came back fast.</p>
+                </div>
+                <div data-l="ko">
+                    <p>동부 팀이 먼저 도착했다. <strong>유니스</strong>와 <strong>랜스</strong>는 둘 다 <strong>엄마</strong> 쪽 사촌. 이 둘의 방문은 기술적으로는 가족 행사고, 감정적으로는 내 인생 선택에 대한 무통보 감사(audit). 우리 넷 다 이제 그 감사가 양방향으로 흐를 만큼 컸다 &mdash; 서로의 새롭고 흥미로운 불안들을 알아차리되 굳이 입 밖에 꺼내지는 않는, 부드러운 무언의 합의.</p>
+                    <p><strong>유니스</strong>는 &mdash; 은행에서 어소시에이트로 막 승진하자마자 &mdash; 잉크 마르기도 전에 <a href="https://en.wikipedia.org/wiki/Annual_leave" target="_blank">2주 PTO</a>를 질러버렸다. 예정된 결과를 축하하는 방법으로, 그 결과의 발원지에서 5천 킬로미터 떨어진 도시로 날아왔다. 좋은 소식을 다루는 유일하게 올바른 방법.</p>
+                    <p><strong>랜스</strong>는 2년 전에 <a href="https://en.wikipedia.org/wiki/Harvard_University" target="_blank">하버드</a>를 자퇴하고, "미팅 잡는 미팅을 잡는 방식을 혁신하겠다"는 &mdash; 아마도 &mdash; 어떤 스타트업에 합류한 결과 속에서 아직 마리네이드되는 중. 이번 주에 가을 복학을 결정하는 중이다. 사촌 앞에서 입 밖으로 꺼내야 진짜가 되는 종류의 결정. 캘리포니아 휘발유 값이 이러니, 내가 그의 가장 비싼 심리상담사 같다.</p>
+                    <p>이 둘이 한 공간에 있을 때 웃는 방식, 그 디테일을 잊고 있었다. 같은 농담을 동시에 들은 약간 어리둥절한 두 마리 거위 같은 소리. 금방 돌아왔다.</p>
+                </div>
+            </div>
+
+            <ul class="items">
+                <li><span class="desc"><span data-l="en">cousins, east coast</span><span data-l="ko">사촌, 동부</span></span><span class="leaders"></span><span class="val">2</span></li>
+                <li><span class="desc"><span data-l="en">eunice's PTO, weeks</span><span data-l="ko">유니스 PTO (주)</span></span><span class="leaders"></span><span class="val">2</span></li>
+                <li><span class="desc"><span data-l="en">lance's harvard status</span><span data-l="ko">랜스 하버드 상태</span></span><span class="leaders"></span><span class="val">pending</span></li>
+                <li><span class="desc"><span data-l="en">title promotions, celebrated</span><span data-l="ko">승진 축하</span></span><span class="leaders"></span><span class="val">1</span></li>
+                <li><span class="desc"><span data-l="en">long ways to dinner</span><span data-l="ko">저녁 가는 먼 길</span></span><span class="leaders"></span><span class="val">×3</span></li>
+            </ul>
+
+            <figure class="enc reveal">
+                <video autoplay muted loop playsinline preload="metadata">
+                    <source src="/newsletter/004/images/eunice-and-lance-under-flower-tree.mp4" type="video/mp4">
+                </video>
+                <figcaption class="enc-caption"><span class="stamp">enc 01 &middot; clip</span><span data-l="en">eunice &amp; lance, under the flower tree</span><span data-l="ko">유니스 &amp; 랜스, 꽃나무 아래</span></figcaption>
+            </figure>
+
+            <p class="subtotal"><span data-l="en">two cousins, one fall semester pending</span><span data-l="ko">사촌 둘, 가을 학기 한 개 보류</span></p>
+        </section>
+
+        <hr class="perf">
+
+        <!-- ============ TRANSACTION 002 — Brawley + surf crew ============ -->
+        <section class="txn reveal">
+            <div class="txn-head">
+                <span class="label">txn 002 &middot; salt lake city &middot; in person</span>
+                <span class="mood">시원</span>
+            </div>
+            <h2 class="txn-title">
+                <span data-l="en">Brawley, Bows-Forward</span>
+                <span data-l="ko">브롤리, 보우즈 출동</span>
+            </h2>
+
+            <div class="text-block">
+                <div data-l="en">
+                    <p><strong>Brawley</strong> drove down from <a href="https://en.wikipedia.org/wiki/Salt_Lake_City" target="_blank">Salt Lake</a> for the surf. We've been friends since high school, a stretch of time so vast I no longer find it strange that he has his own personal <a href="https://en.wikipedia.org/wiki/Idiolect" target="_blank">idiolect</a>, of which the primary feature is referring to <a href="https://en.wikipedia.org/wiki/Rainbow_Sandals" target="_blank">Rainbow sandals</a>, exclusively, as "Bows." He says it without irony. He says it without pause. It has not been funny for fifteen years, which has, through some strange temporal loop, made it hysterical.</p>
+                    <p>"You bringing your Bows?"<br>
+                    "I'm wearing my Bows."<br>
+                    "Pack a spare pair of Bows in case."</p>
+                    <p>We surfed with <strong>Lauren</strong> and <strong>Dakota</strong> &mdash; an activity that, depending on the day, is 90% floating, 8% paddling, and 2% a brief frantic conversation with God. The water was cold. The sets were forgiving. Nobody got hurt, nobody got greedy, and everyone got at least one shaka in before the wind came up and reminded us we are all, at our core, just fragile land-mammals with questionable hobbies.</p>
+                </div>
+                <div data-l="ko">
+                    <p><strong>브롤리</strong>가 서핑 하러 <a href="https://en.wikipedia.org/wiki/Salt_Lake_City" target="_blank">솔트레이크</a>에서 차 몰고 내려왔다. 고등학교 때부터 친구라서, 이 사람만의 <a href="https://en.wikipedia.org/wiki/Idiolect" target="_blank">개인어</a>가 있는 게 더 이상 이상하지 않은 시간이 흘렀다. 그 개인어의 핵심 특징은 <a href="https://en.wikipedia.org/wiki/Rainbow_Sandals" target="_blank">레인보우 샌들</a>을 오직 "보우즈"라고만 부른다는 점. 진지하게. 망설임 없이. 15년 동안 한 번도 안 웃겼던 게 시간의 이상한 루프를 거쳐 결국 미친듯이 웃기게 됐다.</p>
+                    <p>"보우즈 챙겼어?"<br>
+                    "보우즈 신고 있어."<br>
+                    "혹시 모르니까 여분 보우즈 챙겨."</p>
+                    <p><strong>로런</strong>이랑 <strong>다코타</strong>랑 같이 서핑했다 &mdash; 그날의 컨디션에 따라 90%는 둥둥 떠 있기, 8%는 패들링, 2%는 신과의 짧고 다급한 대화로 구성되는 활동. 물은 차가웠고. 파도는 너그러웠고. 아무도 안 다쳤고, 아무도 욕심 안 부렸고, 바람 올라와서 우리가 결국 의심스러운 취미를 가진 약한 육상 포유류일 뿐이라고 일깨우기 전까지 다들 샤카 한 번은 찍었다.</p>
+                </div>
+            </div>
+
+            <ul class="items">
+                <li><span class="desc"><span data-l="en">miles, slc → SD</span><span data-l="ko">마일, 솔트레이크 → 샌디에고</span></span><span class="leaders"></span><span class="val">~745</span></li>
+                <li><span class="desc"><span data-l="en">utterances of "Bows"</span><span data-l="ko">"보우즈" 언급</span></span><span class="leaders"></span><span class="val">~30</span></li>
+                <li><span class="desc"><span data-l="en">shakas thrown, group</span><span data-l="ko">샤카, 단체</span></span><span class="leaders"></span><span class="val">5</span></li>
+                <li><span class="desc"><span data-l="en">waves, makeable</span><span data-l="ko">탈만한 파도</span></span><span class="leaders"></span><span class="val">11</span></li>
+                <li><span class="desc"><span data-l="en">waves, taken</span><span data-l="ko">탄 파도</span></span><span class="leaders"></span><span class="val">8</span></li>
+                <li><span class="desc"><span data-l="en">years of this friendship</span><span data-l="ko">우정 연차</span></span><span class="leaders"></span><span class="val">15</span></li>
+            </ul>
+
+            <figure class="enc reveal">
+                <img src="/newsletter/004/images/lauren-brawley-dakota-shaka.jpeg" alt="Lauren, Brawley, Dakota — shaka, surf">
+                <figcaption class="enc-caption"><span class="stamp">enc 02</span><span data-l="en">lauren · brawley · dakota &mdash; shaka, post-paddle</span><span data-l="ko">로런 · 브롤리 · 다코타 &mdash; 샤카, 패들 후</span></figcaption>
+            </figure>
+
+            <p class="subtotal"><span data-l="en">one bows, fifteen years</span><span data-l="ko">보우즈 하나, 15년</span></p>
+        </section>
+
+        <hr class="perf">
+
+        <!-- ============ TRANSACTION 002b — Kevin (the other one) + Ayeshna ============ -->
+        <section class="txn reveal">
+            <div class="txn-head">
+                <span class="label">txn 002b &middot; also this week</span>
+                <span class="mood">왕복</span>
+            </div>
+            <h2 class="txn-title">
+                <span data-l="en">The Other Kevin</span>
+                <span data-l="ko">다른 케빈</span>
+            </h2>
+
+            <div class="text-block">
+                <div data-l="en">
+                    <p>Also rotating through this week: <strong>Kevin</strong> &mdash; the other Kevin &mdash; with <strong>Ayeshna</strong>. He commutes weekly from <a href="https://en.wikipedia.org/wiki/San_Francisco" target="_blank">San Francisco</a>, half for work and half for <strong>Sarah</strong>, who is grinding through an <a href="https://en.wikipedia.org/wiki/MD%E2%80%93PhD" target="_blank">MD-PhD</a> at <a href="https://en.wikipedia.org/wiki/University_of_California,_Los_Angeles" target="_blank">UCLA</a>. That is a doctorate AND a medical degree, simultaneously, which is the kind of fact one's friends learn to mention only when explicitly asked, and even then with the same careful tone you use to describe a relative's hedge fund.</p>
+                    <p>Kevin has memorized every <a href="https://en.wikipedia.org/wiki/Southwest_Airlines" target="_blank">Southwest</a> gate at <a href="https://en.wikipedia.org/wiki/Los_Angeles_International_Airport" target="_blank">LAX</a>, which I respect and also slightly fear. The fact that this newsletter now contains two Kevins is, statistically, my fault.</p>
+                </div>
+                <div data-l="ko">
+                    <p>이번 주에 잠깐 들른 사람들 중에: <strong>케빈</strong> &mdash; 다른 케빈 &mdash; <strong>아예시나</strong>와 함께. 매주 <a href="https://en.wikipedia.org/wiki/San_Francisco" target="_blank">샌프란시스코</a>에서 통근하는데, 반은 일 때문, 반은 <strong>사라</strong> 때문이다. 사라는 <a href="https://en.wikipedia.org/wiki/University_of_California,_Los_Angeles" target="_blank">UCLA</a>에서 <a href="https://en.wikipedia.org/wiki/MD%E2%80%93PhD" target="_blank">MD-PhD</a>를 갈고 있다 &mdash; 그건 박사 학위와 의학 학위를 동시에 받는다는 뜻이고, 이런 사람을 사귀는 친구가 누가 물어봐야만 조심스럽게 꺼내는 종류의 정보다. 친척의 헤지펀드 얘기를 꺼낼 때 쓰는 그 톤으로.</p>
+                    <p>케빈은 <a href="https://en.wikipedia.org/wiki/Los_Angeles_International_Airport" target="_blank">LAX</a>의 <a href="https://en.wikipedia.org/wiki/Southwest_Airlines" target="_blank">사우스웨스트</a> 게이트를 전부 외웠는데, 존경스럽기도 하고 살짝 무섭기도 하다. 이번 호에 케빈이 두 명 등장한다는 사실은, 통계적으로 내 탓이다.</p>
+                </div>
+            </div>
+
+            <ul class="items">
+                <li><span class="desc"><span data-l="en">SFO &harr; LAX, weekly</span><span data-l="ko">SFO &harr; LAX (주간)</span></span><span class="leaders"></span><span class="val">2</span></li>
+                <li><span class="desc"><span data-l="en">degrees, in progress (sarah)</span><span data-l="ko">진행 중 학위 (사라)</span></span><span class="leaders"></span><span class="val">2</span></li>
+                <li><span class="desc"><span data-l="en">southwest gates, memorized</span><span data-l="ko">사우스웨스트 게이트, 암기</span></span><span class="leaders"></span><span class="val">~14</span></li>
+                <li><span class="desc"><span data-l="en">kevins, this issue</span><span data-l="ko">이번 호 케빈 수</span></span><span class="leaders"></span><span class="val">2</span></li>
+            </ul>
+
+            <figure class="enc reveal">
+                <img src="/newsletter/004/images/kevin-ayeshna.jpeg" alt="Kevin (the other one) and Ayeshna">
+                <figcaption class="enc-caption"><span class="stamp">enc 02b</span><span data-l="en">kevin (other) &amp; ayeshna &middot; somewhere mid-commute</span><span data-l="ko">케빈 (다른 사람) &amp; 아예시나 &middot; 통근 중간 어딘가</span></figcaption>
+            </figure>
+
+            <p class="subtotal"><span data-l="en">one boyfriend, two coasts</span><span data-l="ko">남자친구 하나, 해안 두 개</span></p>
+        </section>
+
+        <hr class="perf">
+
+        <!-- ============ TRANSACTION 003 — Matthew's USC graduation ============ -->
+        <section class="txn reveal">
+            <div class="txn-head">
+                <span class="label">txn 003 &middot; 5/15 &middot; fri</span>
+                <span class="mood">뿌듯</span>
+            </div>
+            <h2 class="txn-title">
+                <span data-l="en">Matthew, Conferred</span>
+                <span data-l="ko">매튜, 학위 수여</span>
+            </h2>
+
+            <div class="text-block">
+                <div data-l="en">
+                    <p>Friday afternoon at <a href="https://en.wikipedia.org/wiki/University_of_Southern_California" target="_blank">USC</a>. Awarding <strong>Matthew</strong> a degree in <a href="https://en.wikipedia.org/wiki/Psychology" target="_blank">psychology</a> is, structurally, like giving a cat a driver's license &mdash; hilarious, slightly concerning, and you're not entirely sure he understands the responsibility he now holds. The diploma is physical proof of a thesis the entire family has been arguing about for four years: that he is, in fact, capable of listening.</p>
+                    <p>The row, left to right: <strong>고모부</strong>, <strong>고모</strong>, <strong>Christine</strong>, me. A phalanx of iPhones operating at slightly different angles &mdash; a study in familial parallax. <strong>고모</strong> didn't take hers out once. She was just watching. A terrifying, beautiful focus.</p>
+                    <p>When they called his name &mdash; given name, family name, the small precise pause between them &mdash; a sound somewhere between a stadium roar and a startled goat erupted from our section. Then the cap went up. Then the cap came down. Then somebody else's cap landed in our row and we cheered for that one too, because we were in a rhythm. Matthew is now professionally qualified to analyze why we all made that sound. He has, so far, declined to comment.</p>
+                    <blockquote class="quote"><span data-l="en">A diploma is a piece of paper. The walk across the stage is the whole sentence.</span></blockquote>
+                </div>
+                <div data-l="ko">
+                    <p>금요일 오후 <a href="https://en.wikipedia.org/wiki/University_of_Southern_California" target="_blank">USC</a>. <strong>매튜</strong>한테 <a href="https://en.wikipedia.org/wiki/Psychology" target="_blank">심리학</a> 학위를 주는 건, 구조적으로, 고양이한테 운전면허를 발급하는 것과 같다 &mdash; 웃기고, 약간 걱정되고, 본인이 자기가 들고 있는 책임의 무게를 정확히 이해하고 있는지 확신이 안 가는. 졸업장은 가족이 4년 동안 우겨온 가설의 물리적 증거다: 매튜가, 사실은, 남의 얘기를 들을 줄 안다는 것.</p>
+                    <p>줄 순서, 왼쪽에서 오른쪽으로: <strong>고모부</strong>, <strong>고모</strong>, <strong>크리스틴</strong>, 나. 약간씩 다른 각도로 작동 중인 아이폰들의 방진(方陣) &mdash; 가족적 시차(parallax) 연구. <strong>고모</strong>는 한 번도 폰을 안 꺼냈다. 그냥 보고 있었다. 무서울 정도로 아름다운 집중.</p>
+                    <p>매튜 이름이 호명됐을 때 &mdash; 이름, 성, 그 사이의 작고 정확한 멈춤 &mdash; 경기장 함성과 놀란 염소 울음 사이 어딘가의 소리가 우리 구역에서 터져 나왔다. 학사모가 올라갔다. 학사모가 내려왔다. 다른 사람 학사모가 우리 줄에 떨어졌고, 우리는 이미 리듬을 타고 있었기에 그것도 같이 응원했다. 매튜는 이제 우리가 왜 그런 소리를 냈는지 직업적으로 분석할 자격이 있다. 아직까지 코멘트는 거절했다.</p>
+                    <blockquote class="quote"><span data-l="ko">졸업장은 종이 한 장. 무대를 가로지르는 그 걸음이 진짜 문장.</span></blockquote>
+                </div>
+            </div>
+
+            <ul class="items">
+                <li><span class="desc"><span data-l="en">ceremony, hours</span><span data-l="ko">식 길이 (시간)</span></span><span class="leaders"></span><span class="val">~2</span></li>
+                <li><span class="desc"><span data-l="en">diplomas conferred</span><span data-l="ko">졸업장 수여</span></span><span class="leaders"></span><span class="val">1</span></li>
+                <li><span class="desc"><span data-l="en">psych majors, validated</span><span data-l="ko">심리학 전공, 인증</span></span><span class="leaders"></span><span class="val">1</span></li>
+                <li><span class="desc"><span data-l="en">caps caught (other)</span><span data-l="ko">남의 학사모, 받음</span></span><span class="leaders"></span><span class="val">1</span></li>
+                <li><span class="desc"><span data-l="en">고모's phone, deployments</span><span data-l="ko">고모 폰, 사용</span></span><span class="leaders"></span><span class="val">0</span></li>
+                <li><span class="desc"><span data-l="en">my tears, secret</span><span data-l="ko">내 눈물, 비밀</span></span><span class="leaders"></span><span class="val">1</span></li>
+            </ul>
+
+            <figure class="enc reveal">
+                <img src="/newsletter/004/images/matthew-graduation.jpeg" alt="Matthew at USC graduation">
+                <figcaption class="enc-caption"><span class="stamp">enc 03</span><span data-l="en">matthew &middot; usc psych &middot; class of '26</span><span data-l="ko">매튜 &middot; USC 심리학 &middot; 2026년 졸업</span></figcaption>
+            </figure>
+
+            <p class="subtotal"><span data-l="en">a degree, conferred</span><span data-l="ko">학위, 수여됨</span></p>
+        </section>
+
+        <hr class="perf">
+
+        <!-- ============ TRANSACTION 004 — Kobe (Justin's dog) dogsitting ============ -->
+        <section class="txn reveal">
+            <div class="txn-head">
+                <span class="label">txn 004 &middot; the dogsitter chronicles</span>
+                <span class="mood">난리</span>
+            </div>
+            <h2 class="txn-title">
+                <span data-l="en">Kobe, Unsupervised</span>
+                <span data-l="ko">코비, 무방비</span>
+            </h2>
+
+            <div class="text-block">
+                <div data-l="en">
+                    <p><strong>Justin</strong> shipped out for <a href="https://en.wikipedia.org/wiki/United_States_National_Guard" target="_blank">National Guard</a> training, which left <strong>Kobe</strong> &mdash; the dog, not the late Laker &mdash; in my custody for the duration. He took it personally. For three days he refused dinner, refused walks, and stationed himself by the front door with the thousand-yard stare of a man who has been deeply and personally wronged by the federal government.</p>
+                    <p>By day four he had assimilated. By day five he was, by any reasonable definition, radicalized. By day six I caught him on the <a href="https://en.wikipedia.org/wiki/Ring_(company)" target="_blank">Ring</a> camera &mdash; mid-heist, from across town &mdash; counter-surfing an entire family-size bag of <a href="https://en.wikipedia.org/wiki/Pirate%27s_Booty" target="_blank">Pirate's Booty</a> I had foolishly left within mouth-range. The footage is a masterclass in unrepentant criminal enterprise. I have watched it seventeen times.</p>
+                    <p>We also got him on a board at the beach, which was unauthorized by the actual owner but extremely authorized by Kobe, who seemed to view it as a clear violation of his parole and enjoyed it accordingly.</p>
+                </div>
+                <div data-l="ko">
+                    <p><strong>Justin</strong>이 <a href="https://en.wikipedia.org/wiki/United_States_National_Guard" target="_blank">주방위군</a> 훈련 가는 바람에 <strong>코비</strong> &mdash; 사람 말고 개 &mdash; 가 그 기간 동안 내 보호하에 있게 됐다. 본인은 이걸 개인적으로 받아들였다. 처음 사흘은 밥도 안 먹고, 산책도 안 가고, 현관문 옆에 앉아 연방 정부에 깊이, 그리고 개인적으로 배신당한 사람의 천 야드 응시(thousand-yard stare)를 짓고 있었다.</p>
+                    <p>4일째에 적응했다. 5일째에는, 어떤 합리적 기준으로 봐도, 급진화됐다. 6일째에 내가 <a href="https://en.wikipedia.org/wiki/Ring_(company)" target="_blank">링</a> 카메라로 잡았다 &mdash; 강도질 한복판에서, 다른 동네에서 &mdash; 입 닿는 거리에 멍청하게 놓고 나간 패밀리 사이즈 <a href="https://en.wikipedia.org/wiki/Pirate%27s_Booty" target="_blank">파이렛츠 부티</a> 한 봉지를 통째로 카운터에서 털고 있었다. 그 영상은 회개 없는 범죄 행위의 명작이다. 열일곱 번 돌려봤다.</p>
+                    <p>해변에서 보드 위에 태우기도 했다. 실제 주인의 허가는 없었지만 코비 본인은 적극 승인했다. 본인은 이걸 가석방 조건 위반으로 인식한 듯했고, 그에 걸맞게 한껏 즐겼다.</p>
+                </div>
+            </div>
+
+            <ul class="items">
+                <li><span class="desc"><span data-l="en">days of grief, kobe</span><span data-l="ko">코비 상실의 날들</span></span><span class="leaders"></span><span class="val">3</span></li>
+                <li><span class="desc"><span data-l="en">days to radicalization</span><span data-l="ko">급진화 소요 일수</span></span><span class="leaders"></span><span class="val">5</span></li>
+                <li><span class="desc"><span data-l="en">pirate's booty, looted</span><span data-l="ko">파이렛츠 부티, 약탈</span></span><span class="leaders"></span><span class="val">1 bag</span></li>
+                <li><span class="desc"><span data-l="en">ring footage, rewatches</span><span data-l="ko">링 영상, 다시보기</span></span><span class="leaders"></span><span class="val">17</span></li>
+                <li><span class="desc"><span data-l="en">surfboards boarded, kobe</span><span data-l="ko">코비 탑승 보드</span></span><span class="leaders"></span><span class="val">1</span></li>
+                <li><span class="desc"><span data-l="en">justin, informed</span><span data-l="ko">저스틴, 통보 여부</span></span><span class="leaders"></span><span class="val">pending</span></li>
+            </ul>
+
+            <figure class="enc reveal">
+                <video controls playsinline muted preload="metadata">
+                    <source src="/newsletter/004/images/kobe-stealing-snacks-while-im-away.mp4" type="video/mp4">
+                </video>
+                <figcaption class="enc-caption"><span class="stamp">enc 04a &middot; ring</span><span data-l="en">exhibit A &middot; kitchen counter &middot; 2:14pm</span><span data-l="ko">증거 A &middot; 부엌 카운터 &middot; 오후 2:14</span></figcaption>
+            </figure>
+
+            <figure class="enc reveal">
+                <img src="/newsletter/004/images/kobe-surfboard.jpeg" alt="Kobe on a surfboard with Kevin">
+                <figcaption class="enc-caption"><span class="stamp">enc 04b</span><span data-l="en">kobe &middot; first wave &middot; unauthorized</span><span data-l="ko">코비 &middot; 첫 파도 &middot; 무허가</span></figcaption>
+            </figure>
+
+            <figure class="enc reveal">
+                <video autoplay muted loop playsinline preload="metadata">
+                    <source src="/newsletter/004/images/kobe-digging-at-the-beach.mp4" type="video/mp4">
+                </video>
+                <figcaption class="enc-caption"><span class="stamp">enc 04c &middot; clip</span><span data-l="en">kobe digging &middot; whatever is buried, he wants it</span><span data-l="ko">코비 파는 중 &middot; 묻혀 있는 게 뭐든 갖고 싶음</span></figcaption>
+            </figure>
+
+            <p class="subtotal"><span data-l="en">one dog, fully briefed</span><span data-l="ko">개 한 마리, 풀브리핑 완료</span></p>
+        </section>
+
+        <hr class="perf">
+
+        <!-- ============ TRANSACTION 005 — Work / Now Hiring ============ -->
+        <section class="txn reveal">
+            <div class="txn-head">
+                <span class="label">txn 005 &middot; paramount short form &middot; now hiring</span>
+                <span class="mood">분주</span>
+            </div>
+            <h2 class="txn-title">
+                <span data-l="en">Two More Seats</span>
+                <span data-l="ko">자리 두 개 더</span>
+            </h2>
+
+            <div class="text-block">
+                <div data-l="en">
+                    <p>The team is now six and growing. <a href="https://www.paramount.com/" target="_blank">Paramount</a> Short Form is hiring two more engineers this quarter, which means the collective suffering-to-shipping ratio is about to improve dramatically. It has been the most rewarding work of my career &mdash; which is a polite way of saying it has sandblasted the last vestiges of my youth from my very bones, but in a fun, stock-vesting kind of way.</p>
+                    <p>Roles are <strong>~$200K USD</strong> depending on experience. If you know someone good &mdash; the kind of engineer who reads the docs, ships the thing, then comes back and asks, with unnerving sincerity, <em>why</em> &mdash; please forward this. Application: <a href="https://lnkd.in/gkq2uqsV" target="_blank">lnkd.in/gkq2uqsV</a>.</p>
+                    <p>I will personally read every referral that comes in through this letter. That is both a promise and a thinly-veiled cry for help.</p>
+                </div>
+                <div data-l="ko">
+                    <p>팀이 이제 6명, 계속 늘어나는 중. <a href="https://www.paramount.com/" target="_blank">Paramount</a> Short Form에서 이번 분기에 엔지니어 2명 더 채용. 즉, 팀 전체의 "고통 대 배포(shipping)" 비율이 곧 극적으로 개선될 예정이라는 뜻이다. 커리어 통틀어 가장 보람 있는 일이다 &mdash; 이건 "내 청춘의 마지막 잔재가 내 뼛속에서 모래분사기로 깎여나가는 중인데, 스톡 베스팅이 같이 굴러가서 재미있는 방식으로 그렇다"의 정중한 표현이다.</p>
+                    <p>연봉은 경력에 따라 <strong>약 $200K USD</strong>. 좋은 사람 알고 있으면 &mdash; 문서 읽고, 만들어서 띄우고, 그 다음 불안할 정도의 진심으로 다시 와서 <em>왜</em>라고 묻는 종류의 엔지니어 &mdash; 이 편지 좀 전달해줘. 지원: <a href="https://lnkd.in/gkq2uqsV" target="_blank">lnkd.in/gkq2uqsV</a>.</p>
+                    <p>이 편지 통해서 들어오는 추천은 내가 직접 다 읽을게. 약속이자, 동시에 적당히 가려진 구조 요청이다.</p>
+                </div>
+            </div>
+
+            <ul class="items">
+                <li><span class="desc"><span data-l="en">direct reports</span><span data-l="ko">직속 인원</span></span><span class="leaders"></span><span class="val">6</span></li>
+                <li><span class="desc"><span data-l="en">open headcount</span><span data-l="ko">오픈 헤드카운트</span></span><span class="leaders"></span><span class="val">2</span></li>
+                <li><span class="desc"><span data-l="en">salary band, USD</span><span data-l="ko">연봉 밴드 (USD)</span></span><span class="leaders"></span><span class="val">~200K</span></li>
+                <li><span class="desc"><span data-l="en">1:1s, this week</span><span data-l="ko">1:1, 이번 주</span></span><span class="leaders"></span><span class="val">8</span></li>
+                <li><span class="desc"><span data-l="en">books on management, read</span><span data-l="ko">매니지먼트 책, 읽음</span></span><span class="leaders"></span><span class="val">2</span></li>
+            </ul>
+
+            <figure class="enc reveal">
+                <img src="/newsletter/004/images/linkedin-job-post.png" alt="LinkedIn job posting — Paramount Short Form engineering hires">
+                <figcaption class="enc-caption"><span class="stamp">enc 05 &middot; lnkdn</span><span data-l="en">job post &middot; <a href="https://lnkd.in/gkq2uqsV" target="_blank">lnkd.in/gkq2uqsV</a></span><span data-l="ko">채용 공고 &middot; <a href="https://lnkd.in/gkq2uqsV" target="_blank">lnkd.in/gkq2uqsV</a></span></figcaption>
+            </figure>
+
+            <figure class="enc reveal">
+                <img src="/newsletter/004/images/rolls-royce.jpeg" alt="Rolls-Royce Corniche convertible, spotted">
+                <figcaption class="enc-caption"><span class="stamp">enc 05b &middot; spotted</span><span data-l="en">rolls-royce corniche &middot; '70s or '80s &middot; for the record</span><span data-l="ko">롤스로이스 코르니쉬 &middot; 70~80년대 추정 &middot; 기록용</span></figcaption>
+            </figure>
+
+            <p class="subtotal"><span data-l="en">two seats, one to fill</span><span data-l="ko">자리 두 개, 채울 자리 두 개</span></p>
+        </section>
+
+        <hr class="perf thick">
+
+        <!-- ============ SONG OF THE WEEK ============ -->
+        <section class="txn reveal">
+            <div class="txn-head">
+                <span class="label"><span data-l="en">on repeat &middot; the week</span><span data-l="ko">반복재생 &middot; 이번 주</span></span>
+                <span class="mood">잔잔</span>
+            </div>
+            <h2 class="txn-title">
+                <span data-l="en">Song of the Week</span>
+                <span data-l="ko">이번 주 노래</span>
+            </h2>
+
+            <div class="text-block" style="text-align: center; padding-top: 0.5rem;">
+                <p style="font-family: 'Noto Serif KR', var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 0.2rem;">기억의 습작</p>
+                <p style="font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--caption); margin-bottom: 0.4rem;">Gieok-ui Seupjak &middot; A Sketch of Memory</p>
+                <p style="color: var(--accent); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.85rem;">김동률 &middot; Kim Dong-ryul</p>
+                <p style="font-size: 14px; color: var(--caption); max-width: 300px; margin: 0 auto;">
+                    <span data-l="en">Already playing in the bottom-left, if your browser allowed it. <a href="https://en.wikipedia.org/wiki/Kim_Dong-ryul" target="_blank">Kim Dong-ryul</a>'s 1994 ballad &mdash; the kind of song every Korean cousin knows by heart by the third bar. Fits a week of cousins, sketches a feeling for which <em>jeong</em> is the only honest word.</span>
+                    <span data-l="ko">브라우저가 허락했다면 왼쪽 아래에서 이미 재생 중. <a href="https://en.wikipedia.org/wiki/Kim_Dong-ryul" target="_blank">김동률</a>의 1994년 발라드 &mdash; 사촌 다 모이면 셋째 마디부터 같이 따라부르는 그 노래. 사촌들이 다녀간 주에 어울리는, <em>정</em>이라는 단어 말고는 정확히 부를 수 없는 감정의 스케치.</span>
+                </p>
+            </div>
+        </section>
+
+        <hr class="perf">
+
+        <!-- ============ SIGN OFF ============ -->
+        <div class="sign-off reveal">
+            <p class="sign-off-text">
+                <span data-l="en">Eunice and Lance are back to auditing their respective coasts. Brawley drove back to Salt Lake, presumably still in his Bows. Kevin (the other one) is mid-flight as I type this. Matthew has a degree and is now professionally qualified to judge us. Kobe is a repeat offender with a documented taste for puffed corn snacks. Justin is somewhere learning to do push-ups in a chemical-warfare mask. The team is hiring. The fridge is full. Miss you all &mdash; come visit, the door's open.</span>
+                <span data-l="ko">유니스랑 랜스는 각자의 해안으로 돌아가 다시 감사 모드 돌입. 브롤리는 솔트레이크로 돌아갔다, 아마도 여전히 보우즈 신고. 케빈 (다른 케빈)은 내가 이 글 쓰는 동안에도 비행 중. 매튜는 학위가 생겼고 이제 우리를 직업적으로 분석할 자격이 있다. 코비는 퍼프 콘 스낵에 대한 기록된 취향을 가진 재범자. Justin은 어디선가 화학전 마스크 쓰고 푸시업 하는 중. 팀은 채용 중. 냉장고는 꽉 차 있음. 보고 싶다, 다들 &mdash; 놀러 와. 문 열려 있어.</span>
+            </p>
+            <p class="sign-off-name">&mdash; Kevin</p>
+        </div>
+
+        <hr class="perf">
+
+        <!-- ============ TOTAL — Korean 정 paired with Japanese じょう ============
+             Same kanji (情) inherited from classical Chinese by both languages.
+             Korean reads it as "jeong"; Japanese reads it as "jou". One feeling,
+             two readings, one character. -->
+        <div class="total reveal">
+            <span data-l="en">total</span><span data-l="ko">합계</span>
+            <span class="amount">정 &middot; じょう</span>
+            <span class="glyph-bridge">情</span>
+            <span class="glyph-note">
+                <span data-l="en">same kanji &middot; two languages</span>
+                <span data-l="ko">같은 한자 &middot; 두 언어</span>
+            </span>
+        </div>
+
+        <!-- ============ THANK YOU ============ -->
+        <div class="ty">
+            <div><span data-l="en">thank you</span><span data-l="ko">고맙습니다</span></div>
+            <span class="kr">감사합니다</span>
+            <div><span data-l="en">come again</span><span data-l="ko">또 오세요</span></div>
+        </div>
+
+        <!-- ============ TEAR LINE ============ -->
+        <div class="tear">
+            <span class="scissors">&#9986;</span>&nbsp;&nbsp;- - - - - - - - - - - - - - -
+        </div>
+
+    </article>
+
+
+    <!-- ——— Subscribe ——— -->
+    <div class="subscribe reveal" id="subscribe">
+        <p class="subscribe-label">
+            <span data-l="en">Stay in the Loop</span>
+            <span data-l="ko">소식 받기</span>
+        </p>
+        <h2 class="subscribe-title">
+            <span data-l="en">Want this weekly?</span>
+            <span data-l="ko">매주 받고 싶다면?</span>
+        </h2>
+        <p class="subscribe-desc">
+            <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
+            <span data-l="ko">이메일 남겨주면 매주 보내줄게. 스팸 같은 거 없고 그냥 내 근황.</span>
+        </p>
+        <form class="subscribe-form" id="subscribeForm">
+            <input type="email" class="subscribe-input" id="subscribeEmail" placeholder="your@email.com" required autocomplete="email">
+            <button type="submit" class="subscribe-btn" id="subscribeBtn">
+                <span data-l="en">Subscribe</span>
+                <span data-l="ko">구독</span>
+            </button>
+        </form>
+        <p class="subscribe-success" id="subscribeSuccess">
+            <span data-l="en">You're in. See you next week.</span>
+            <span data-l="ko">등록됨. 다음 주에 보자.</span>
+        </p>
+        <p class="subscribe-note">
+            <span data-l="en">Just between us — no third parties, ever.</span>
+            <span data-l="ko">우리끼리만. 어디 넘기거나 그런 거 절대 없음.</span>
+        </p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ==================== COMMENTS ==================== -->
+    <div class="comments reveal" id="comments">
+        <div class="comments-header">
+            <p class="comments-label">
+                <span data-l="en">Discussion</span>
+                <span data-l="ko">댓글</span>
+            </p>
+            <h2 class="comments-title">
+                <span data-l="en">Leave a note</span>
+                <span data-l="ko">한마디 남기기</span>
+            </h2>
+        </div>
+        <form class="comments-form" id="commentsForm">
+            <input type="text" class="comments-input" id="commentName" placeholder="Your name" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <button type="submit" class="comments-btn" id="commentBtn">
+                <span data-l="en">Post</span>
+                <span data-l="ko">게시</span>
+            </button>
+        </form>
+        <div class="comments-list" id="commentsList"></div>
+        <p class="comments-empty" id="commentsEmpty" style="display:none;">
+            <span data-l="en">No comments yet. Be the first.</span>
+            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨 주세요.</span>
+        </p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="story-footer">
+        <p>
+            <span data-l="en">Dispatch No. 004 &middot; Open House &middot;</span>
+            <span data-l="ko">Dispatch 004호 &middot; 손님맞이 &middot;</span>
+            <a href="/">klee.page</a>
+        </p>
+    </footer>
+
+    <!-- ==================== SONG OF THE WEEK — audio + mini player ==================== -->
+    <audio id="songOfTheWeek" src="/newsletter/004/images/kim-dong-ryul-memory.mp3" preload="metadata" loop></audio>
+    <div class="mini-player" id="miniPlayer" hidden aria-label="Song of the week mini player">
+        <button class="mini-player-btn" id="miniPlayerBtn" type="button" aria-label="Play or pause song of the week" data-state="paused">
+            <!-- Circular progress ring — stroke-dashoffset animated via JS on timeupdate -->
+            <svg class="mini-player-ring" viewBox="0 0 36 36" aria-hidden="true">
+                <circle class="ring-track"    cx="18" cy="18" r="16"></circle>
+                <circle class="ring-progress" cx="18" cy="18" r="16" id="miniPlayerRing"></circle>
+            </svg>
+            <!-- Single SVG with two paths that cross-fade + scale between play and pause -->
+            <svg class="mini-player-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="icon-play"  d="M7 5 L7 19 L19 12 Z"></path>
+                <path class="icon-pause" d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z"></path>
+            </svg>
+        </button>
+        <div class="mini-player-meta">
+            <div class="mini-player-title"><span data-l="en">Gieok-ui Seupjak</span><span data-l="ko">기억의 습작</span></div>
+            <div class="mini-player-artist"><span data-l="en">Kim Dong-ryul &middot; 김동률</span><span data-l="ko">김동률</span></div>
+        </div>
+        <button class="mini-player-close" id="miniPlayerClose" type="button" aria-label="Close mini player">&times;</button>
+    </div>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- Scripts -->
+    <script src="/js/theme.js"></script>
+    <script>
+        // ==================== KOMOREBI GATE ====================
+        (function() {
+            var gate = document.getElementById('gate');
+            var input = document.getElementById('gateInput');
+            var hint = document.getElementById('gateHint');
+            var komorebi = document.getElementById('komorebi');
+            if (!gate || !input) return;
+
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            var issueKey = 'dispatch-auth-' + path;
+
+            function animateKomorebi(callback) {
+                // First: gate light intensifies (the password summons the light)
+                var gateLight = document.getElementById('gateLight');
+                gateLight.classList.add('awakening');
+
+                // Activate komorebi immediately (behind gate at z-index 150)
+                komorebi.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
+                // After light builds, fade gate out — komorebi is already underneath
+                setTimeout(function() {
+                    gate.classList.add('unlocked');
+                    gateLight.style.display = 'none';
+
+                    var leaves = document.getElementById('komorebiLeaves');
+                    var sun = document.getElementById('komorebiSun');
+                    var spots = document.getElementById('komorebiSpots');
+                    var kanji = document.getElementById('komorebiKanji');
+                    var romaji = document.getElementById('komorebiRomaji');
+                    var noun = document.getElementById('komorebiNoun');
+                    var meaning = document.getElementById('komorebiMeaning');
+                    var divider = document.getElementById('komorebiDivider');
+                    var tagline = document.getElementById('komorebiTagline');
+
+                    var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+
+                    function animate(el, d, dur) {
+                        dur = dur || 1;
+                        setTimeout(function() {
+                            el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0) scale(1)';
+                        }, d);
+                    }
+
+                    // Light arrives first — sun, leaves, spots fade in
+                    setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
+                    setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
+                    setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
+
+                    // Text reveals — kanji first, alone for a beat (Ma)
+                    animate(kanji, 800, 1.4);
+                    // Then the rest, staggered
+                    animate(romaji, 1800, 1);
+                    animate(noun, 2200, 0.8);
+                    animate(meaning, 2800, 1.1);
+                    setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
+                    animate(tagline, 3800, 0.9);
+
+                    // Show dismiss button last
+                    var dismiss = document.getElementById('komorebiDismiss');
+                    setTimeout(function() {
+                        dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
+                        dismiss.style.opacity = '0.5';
+                        dismiss.style.transform = 'translateY(0)';
+                    }, 4200);
+
+                    // Dismiss on click
+                    dismiss.addEventListener('click', function() {
+                        komorebi.classList.add('exiting');
+                        document.body.style.overflow = '';
+                        setTimeout(callback, 1200);
+                    });
+                }, 800); // Wait for gate light to build
+            }
+
+            function unlock() {
+                sessionStorage.setItem(issueKey, '1');
+                // Activate komorebi BEHIND the gate first, then fade gate out
+                // This prevents the article from flashing through
+                animateKomorebi(function() {
+                    komorebi.style.display = 'none';
+                });
+            }
+
+            function unlockQuiet() {
+                sessionStorage.setItem(issueKey, '1');
+                gate.classList.add('unlocked');
+                // Skip komorebi for returning visitors
+            }
+
+            function showGate() {
+                document.body.style.overflow = 'hidden';
+                var form = document.getElementById('gateForm');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var val = input.value.trim();
+                    if (!val) return;
+                    input.disabled = true;
+                    document.getElementById('gateBtn').disabled = true;
+                    checkPassword(val, function(ok) {
+                        input.disabled = false;
+                        document.getElementById('gateBtn').disabled = false;
+                        if (ok) {
+                            unlock();
+                        } else {
+                            input.value = '';
+                            input.classList.remove('shake');
+                            void input.offsetWidth;
+                            input.classList.add('shake');
+                            if (hint) hint.classList.add('visible');
+                        }
+                    });
+                });
+            }
+
+            function checkPassword(val, callback) {
+                // Client-side check first — password is shared openly with friends
+                if (val.trim().toLowerCase() === 'jeong') {
+                    callback(true);
+                    return;
+                }
+                // Also try server in case password changes
+                fetch('/api/gate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: val }),
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { callback(data.ok === true); })
+                .catch(function() { callback(false); });
+            }
+
+            // Already authenticated this session
+            if (sessionStorage.getItem(issueKey) === '1') {
+                gate.classList.add('unlocked');
+                return;
+            }
+
+            // Check URL bypass (?key=)
+            var params = new URLSearchParams(window.location.search);
+            var urlKey = params.get('key');
+            if (urlKey) {
+                // Clean the URL immediately so password isn't visible in address bar
+                params.delete('key');
+                var clean = window.location.pathname + (params.toString() ? '?' + params : '');
+                window.history.replaceState({}, '', clean);
+
+                checkPassword(urlKey, function(ok) {
+                    if (ok) {
+                        unlock();
+                    } else {
+                        showGate();
+                    }
+                });
+                return;
+            }
+
+            showGate();
+        })();
+    </script>
+    <script>
+        // ==================== LANGUAGE TOGGLE (with View Transitions) ====================
+        (function() {
+            var pill = document.getElementById('langPill');
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+
+            function applySwap() {
+                current = current === 'en' ? 'ko' : 'en';
+                document.documentElement.setAttribute('data-lang', current);
+                document.documentElement.setAttribute('lang', current);
+                localStorage.setItem('dispatch-lang', current);
+            }
+
+            function toggle() {
+                // Progressive enhancement: View Transitions API (Chrome/Edge 111+, Safari 18+).
+                // Falls back to instant swap if not supported — no loss of function.
+                if (document.startViewTransition) {
+                    document.startViewTransition(applySwap);
+                } else {
+                    applySwap();
+                }
+            }
+
+            pill.addEventListener('click', toggle);
+            pill.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+            });
+        })();
+
+        // ==================== SUBSCRIBE ====================
+        (function() {
+            var form = document.getElementById('subscribeForm');
+            var emailInput = document.getElementById('subscribeEmail');
+            var btn = document.getElementById('subscribeBtn');
+            var section = document.getElementById('subscribe');
+
+            if (localStorage.getItem('dispatch-subscribed')) {
+                section.classList.add('submitted');
+                return;
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = emailInput.value.trim();
+                if (!email) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function() {
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.add('submitted');
+                })
+                .catch(function() {
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.add('submitted');
+                });
+            });
+        })();
+
+        // ==================== COMMENTS ====================
+        (function() {
+            var form = document.getElementById('commentsForm');
+            var nameInput = document.getElementById('commentName');
+            var textInput = document.getElementById('commentText');
+            var btn = document.getElementById('commentBtn');
+            var list = document.getElementById('commentsList');
+            var empty = document.getElementById('commentsEmpty');
+            var issue = '004';
+
+            function escapeHtml(str) {
+                var div = document.createElement('div');
+                div.appendChild(document.createTextNode(str));
+                return div.innerHTML;
+            }
+
+            function timeAgo(dateStr) {
+                var seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+                if (seconds < 60) return 'just now';
+                var intervals = [
+                    [31536000, 'y'], [2592000, 'mo'], [86400, 'd'],
+                    [3600, 'h'], [60, 'm']
+                ];
+                for (var i = 0; i < intervals.length; i++) {
+                    var count = Math.floor(seconds / intervals[i][0]);
+                    if (count >= 1) return count + intervals[i][1] + ' ago';
+                }
+                return 'just now';
+            }
+
+            function renderComment(c) {
+                var div = document.createElement('div');
+                div.className = 'comment-item';
+                div.innerHTML = '<div class="comment-meta">'
+                    + '<span class="comment-name">' + escapeHtml(c.name) + '</span>'
+                    + '<span class="comment-time">' + timeAgo(c.created_at) + '</span>'
+                    + '</div>'
+                    + '<p class="comment-body">' + escapeHtml(c.comment) + '</p>';
+                return div;
+            }
+
+            function loadComments() {
+                fetch('/api/comments?issue=' + issue)
+                    .then(function(r) { return r.json(); })
+                    .then(function(comments) {
+                        list.innerHTML = '';
+                        if (!comments.length) {
+                            empty.style.display = '';
+                            return;
+                        }
+                        empty.style.display = 'none';
+                        comments.forEach(function(c) {
+                            list.appendChild(renderComment(c));
+                        });
+                    })
+                    .catch(function() {});
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = nameInput.value.trim();
+                var comment = textInput.value.trim();
+                if (!name || !comment) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issue: issue, name: name, comment: comment })
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error();
+                    localStorage.setItem('dispatch-comment-name', name);
+                    textInput.value = '';
+                    loadComments();
+                })
+                .catch(function() {})
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                });
+            });
+
+            var savedName = localStorage.getItem('dispatch-comment-name');
+            if (savedName) nameInput.value = savedName;
+
+            loadComments();
+        })();
+    </script>
+    <!-- 004 is intentionally lean: no Lenis, no GSAP. Native momentum scroll is
+         silky on iOS, and the receipt format has no parallax to choreograph. -->
+    <script>
+        // ==================== PROGRESS BAR (rAF-throttled, passive scroll) ====================
+        (function() {
+            var bar = document.getElementById('progressBar');
+            if (!bar) return;
+            var ticking = false;
+            function update() {
+                var h = document.documentElement;
+                var max = (h.scrollHeight - h.clientHeight) || 1;
+                var pct = Math.min(100, Math.max(0, (h.scrollTop || window.scrollY) / max * 100));
+                bar.style.width = pct + '%';
+                ticking = false;
+            }
+            window.addEventListener('scroll', function() {
+                if (!ticking) { requestAnimationFrame(update); ticking = true; }
+            }, { passive: true });
+            update();
+        })();
+
+        // ==================== RECEIPT-LINE STAGGER ====================
+        // Each .items list "prints" its <li>s in mechanical stagger when it enters view.
+        // Pure CSS handles the animation; this just adds .printed and sets --i per line.
+        (function() {
+            var lists = document.querySelectorAll('.items');
+            if (!lists.length) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                lists.forEach(function(l) { l.classList.add('printed'); });
+                return;
+            }
+            lists.forEach(function(list) {
+                Array.prototype.forEach.call(list.children, function(li, i) {
+                    li.style.setProperty('--i', i);
+                });
+            });
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('printed');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+            lists.forEach(function(l) { io.observe(l); });
+        })();
+
+        // ==================== SONG OF THE WEEK — autoplay + dynamic player ====================
+        // iOS Safari blocks pure page-load audio autoplay. But ANY user gesture
+        // (komorebi-dismiss click, password submit, even tearline tap) satisfies
+        // the policy. We try to play() inside the first reachable gesture handler;
+        // if it still fails, the mini-player surfaces a nudging pulse so the user
+        // can tap-start in one move.
+        //
+        // Player state lives in [data-state] on the button: "paused" | "playing" |
+        // "buffering". CSS reads this to drive the icon morph + ring color. The
+        // ring progress is driven by stroke-dashoffset updated on 'timeupdate'.
+        (function() {
+            var audio   = document.getElementById('songOfTheWeek');
+            var player  = document.getElementById('miniPlayer');
+            var btn     = document.getElementById('miniPlayerBtn');
+            var ring    = document.getElementById('miniPlayerRing');
+            var closeBtn = document.getElementById('miniPlayerClose');
+            if (!audio || !player || !btn || !ring) return;
+
+            // Ring geometry. r=16 → circumference ≈ 100.531.
+            var RING_C = 2 * Math.PI * 16;
+            ring.style.strokeDasharray = RING_C;
+            ring.style.strokeDashoffset = RING_C;
+
+            var triedAutoplay = false;
+            var dismissed = false;
+            var rafId = null;
+
+            function showPlayer() {
+                if (dismissed) return;
+                player.hidden = false;
+                requestAnimationFrame(function() { player.classList.add('visible'); });
+            }
+
+            function setState(s) {
+                btn.setAttribute('data-state', s);
+                if (s === 'playing') player.classList.remove('needs-tap');
+            }
+
+            function updateRing() {
+                if (!audio.duration || !isFinite(audio.duration)) {
+                    rafId = requestAnimationFrame(updateRing);
+                    return;
+                }
+                var pct = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
+                ring.style.strokeDashoffset = RING_C * (1 - pct);
+                if (!audio.paused) rafId = requestAnimationFrame(updateRing);
+            }
+
+            function startRingLoop() {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(updateRing);
+            }
+            function stopRingLoop() {
+                if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+                updateRing(); // one final paint at current position
+            }
+
+            audio.addEventListener('play',     function() { setState('playing'); startRingLoop(); });
+            audio.addEventListener('playing',  function() { setState('playing'); startRingLoop(); });
+            audio.addEventListener('pause',    function() { setState('paused');  stopRingLoop();  });
+            audio.addEventListener('ended',    function() { setState('paused');  stopRingLoop();  });
+            audio.addEventListener('waiting',  function() { setState('buffering'); });
+            audio.addEventListener('seeking',  function() { setState('buffering'); });
+            audio.addEventListener('loadedmetadata', updateRing);
+
+            // Toggle button — pure user gesture path
+            btn.addEventListener('click', function() {
+                if (audio.paused) {
+                    var p = audio.play();
+                    if (p && p.catch) p.catch(function() {});
+                } else {
+                    audio.pause();
+                }
+            });
+
+            // Keyboard accessibility — space and 'k' (YouTube convention) toggle
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (player.hidden) return;
+                if (e.key === 'k' || (e.key === ' ' && document.activeElement === btn)) {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+
+            closeBtn.addEventListener('click', function() {
+                audio.pause();
+                dismissed = true;
+                player.classList.remove('visible');
+                setTimeout(function() { player.hidden = true; }, 450);
+            });
+
+            function tryAutoplay() {
+                if (triedAutoplay) return;
+                triedAutoplay = true;
+                showPlayer();
+                audio.volume = 0.55; // ballad — a touch quieter than pop
+                var p = audio.play();
+                if (p && p.catch) {
+                    p.catch(function() { player.classList.add('needs-tap'); });
+                }
+            }
+
+            // Triggers — any user gesture that satisfies the autoplay policy
+            var dismiss = document.getElementById('komorebiDismiss');
+            if (dismiss) dismiss.addEventListener('click', tryAutoplay);
+            var gateForm = document.getElementById('gateForm');
+            if (gateForm) gateForm.addEventListener('submit', tryAutoplay);
+            var tear = document.querySelector('.tear');
+            if (tear) tear.addEventListener('click', tryAutoplay);
+
+            // Returning visitor — gate + komorebi skipped, surface the player and
+            // mark needs-tap so they know to start it.
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            var alreadyAuthed = sessionStorage.getItem('dispatch-auth-' + path) === '1';
+            if (alreadyAuthed) {
+                setTimeout(function() {
+                    showPlayer();
+                    player.classList.add('needs-tap');
+                }, 1200);
+            }
+        })();
+
+        // ==================== TEAR TAP ====================
+        // Tap the perforated tear line to "tear off" the receipt — scrolls down
+        // to subscribe/comments. Pure delight, no functional cost.
+        (function() {
+            var tear = document.querySelector('.tear');
+            var sub = document.getElementById('subscribe');
+            if (!tear || !sub) return;
+            tear.style.cursor = 'pointer';
+            tear.setAttribute('role', 'button');
+            tear.setAttribute('tabindex', '0');
+            function fire() { sub.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            tear.addEventListener('click', fire);
+            tear.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(); }
+            });
+        })();
+    </script>
+
+    <!-- ==================== REVEAL ANIMATIONS (IO, runs immediately) ==================== -->
+    <script>
+        (function() {
+            var els = document.querySelectorAll('.reveal, .reveal-fade, .reveal-scale');
+            if (!els.length) return;
+            // Reduced motion: just show everything immediately
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                els.forEach(function(el) { el.classList.add('visible'); });
+                return;
+            }
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+            els.forEach(function(el) { io.observe(el); });
+        })();
+    </script>
+
+    <!-- 004 has no rotation cinema. The receipt format reads top-down on any
+         orientation, and no clip needs landscape choreography. -->
+    <script>
+        // ==================== BACK-LINK SCROLL STATE ====================
+        // No hero in 004 — the back-link stays in its default theme color from the
+        // first paint. This stub preserves the API in case shared header CSS later
+        // depends on the `.scrolled` class; harmless if .back-link doesn't exist.
+        (function() {
+            var link = document.querySelector('.back-link');
+            if (!link) return;
+            // Always considered "scrolled" in 004 — no hero to be light-on-image over.
+            link.classList.add('scrolled');
+            var hero = null; // unused — kept so the rest of the IIFE compiles.
+            if (!hero) return;
+            var threshold = function() { return hero.offsetHeight * 0.7; };
+            var update = function() {
+                if (window.scrollY > threshold()) link.classList.add('scrolled');
+                else link.classList.remove('scrolled');
+            };
+            update();
+            window.addEventListener('scroll', update, { passive: true });
+        })();
+
+        // ==================== IN-APP BROWSER BANNER ====================
+        (function() {
+            var ua = navigator.userAgent || '';
+            var isInApp = /Instagram|FBAN|FBAV|FB_IAB|Twitter|Line\/|KAKAOTALK|TikTok|MicroMessenger/i.test(ua);
+            if (!isInApp) return;
+
+            var banner = document.createElement('div');
+            banner.className = 'browser-banner';
+            var lang = document.documentElement.getAttribute('data-lang') || 'en';
+            banner.textContent = lang === 'ko'
+                ? '전체 경험을 위해 Safari에서 열어주세요 →'
+                : 'For the full experience, open in Safari →';
+            document.body.appendChild(banner);
+            setTimeout(function() { banner.classList.add('visible'); }, 1400);
+        })();
+    </script>
+</body>
+</html>

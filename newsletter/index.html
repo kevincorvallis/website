@@ -20,6 +20,9 @@
     <meta name="twitter:description" content="A weekly letter from Kevin Lee — for friends and family.">
     <meta name="twitter:image" content="https://klee.page/images/kevi394-053.jpg">
 
+    <!-- Smart App Banner -->
+    <meta name="apple-itunes-app" content="app-id=6761163892">
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
 
@@ -262,7 +265,9 @@
         }
 
         .issue-link {
-            display: block;
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
             text-decoration: none;
             padding: 1.75rem 0;
             transition: opacity 0.2s ease;
@@ -270,6 +275,28 @@
 
         .issue-link:hover {
             opacity: 0.6;
+        }
+
+        .issue-cover {
+            flex-shrink: 0;
+            width: 120px;
+            height: 90px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--rule);
+        }
+
+        @media (max-width: 768px) {
+            .issue-cover {
+                width: 90px;
+                height: 68px;
+                border-radius: 6px;
+            }
+        }
+
+        .issue-content {
+            flex: 1;
+            min-width: 0;
         }
 
         .issue-meta {
@@ -404,45 +431,95 @@
 
         <ul class="issue-list">
             <li>
+                <a href="/newsletter/004/" class="issue-link">
+                    <img src="/newsletter/004/images/matthew-graduation.jpeg" alt="" class="issue-cover" loading="lazy">
+                    <div class="issue-content">
+                        <div class="issue-meta">
+                            <span class="issue-num">004</span>
+                            <span class="issue-date">
+                                <span data-l="en">May 17, 2026</span>
+                                <span data-l="ko">2026년 5월 17일</span>
+                            </span>
+                            <span class="issue-badge">
+                                <span data-l="en">Latest</span>
+                                <span data-l="ko">최신</span>
+                            </span>
+                        </div>
+                        <div class="issue-title">
+                            <span data-l="en">Open House</span>
+                            <span data-l="ko">손님맞이</span>
+                        </div>
+                        <p class="issue-desc">
+                            <span data-l="en">Cousins Eunice &amp; Lance flew in from the east coast, Brawley and his Bows drove down from Salt Lake, cousin Matthew got his USC psych degree, and Kobe robbed the counter on the Ring cam. Itemized as a receipt.</span>
+                            <span data-l="ko">동부에서 온 사촌 유니스 &amp; 랜스, 솔트레이크에서 보우즈 신고 내려온 브롤리, USC 심리학 학위 받은 사촌 매튜, 그리고 링 카메라에 잡힌 카운터 털이범 코비. 영수증 형식.</span>
+                        </p>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="/newsletter/003/" class="issue-link">
+                    <img src="/newsletter/003/images/bieber-poster.jpg" alt="" class="issue-cover" loading="lazy">
+                    <div class="issue-content">
+                        <div class="issue-meta">
+                            <span class="issue-num">003</span>
+                            <span class="issue-date">
+                                <span data-l="en">April 27, 2026</span>
+                                <span data-l="ko">2026년 4월 27일</span>
+                            </span>
+                        </div>
+                        <div class="issue-title">
+                            <span data-l="en">Field of Daisies</span>
+                            <span data-l="ko">데이지 들판</span>
+                        </div>
+                        <p class="issue-desc">
+                            <span data-l="en">Youbin's H1B, Kobe back from Germany, first 1:1s as a manager, and Justin Bieber crashing Coachella. Flip your phone.</span>
+                            <span data-l="ko">유빈이의 H1B, 독일에서 돌아온 Kobe, 매니저로서 첫 1:1, 그리고 코첼라에 등장한 저스틴 비버. 폰을 옆으로 돌려.</span>
+                        </p>
+                    </div>
+                </a>
+            </li>
+            <li>
                 <a href="/newsletter/002/" class="issue-link">
-                    <div class="issue-meta">
-                        <span class="issue-num">002</span>
-                        <span class="issue-date">
-                            <span data-l="en">March 21, 2026</span>
-                            <span data-l="ko">2026년 3월 21일</span>
-                        </span>
-                        <span class="issue-badge">
-                            <span data-l="en">Latest</span>
-                            <span data-l="ko">최신</span>
-                        </span>
+                    <img src="/newsletter/002/images/mammoth-sunset.jpeg" alt="" class="issue-cover" loading="lazy">
+                    <div class="issue-content">
+                        <div class="issue-meta">
+                            <span class="issue-num">002</span>
+                            <span class="issue-date">
+                                <span data-l="en">March 21, 2026</span>
+                                <span data-l="ko">2026년 3월 21일</span>
+                            </span>
+                        </div>
+                        <div class="issue-title">
+                            <span data-l="en">Spring on the Mountain</span>
+                            <span data-l="ko">산 위의 봄</span>
+                        </div>
+                        <p class="issue-desc">
+                            <span data-l="en">Closing out ski season at Mammoth, producing at Paramount, free furniture from London, and Dylan's first visit.</span>
+                            <span data-l="ko">매머드에서 시즌 마무리, 파라마운트에서 프로듀싱, 런던 사람한테 공짜 가구, Dylan 첫 방문.</span>
+                        </p>
                     </div>
-                    <div class="issue-title">
-                        <span data-l="en">Spring on the Mountain</span>
-                        <span data-l="ko">산 위의 봄</span>
-                    </div>
-                    <p class="issue-desc">
-                        <span data-l="en">Closing out ski season at Mammoth, producing at Paramount, free furniture from London, and Dylan's first visit.</span>
-                        <span data-l="ko">매머드에서 시즌 마무리, 파라마운트에서 프로듀싱, 런던 사람한테 공짜 가구, Dylan 첫 방문.</span>
-                    </p>
                 </a>
             </li>
             <li>
                 <a href="/newsletter/001/" class="issue-link">
-                    <div class="issue-meta">
-                        <span class="issue-num">001</span>
-                        <span class="issue-date">
-                            <span data-l="en">March 8, 2026</span>
-                            <span data-l="ko">2026년 3월 8일</span>
-                        </span>
+                    <img src="/newsletter/001/images/paramountlot.jpg" alt="" class="issue-cover" loading="lazy">
+                    <div class="issue-content">
+                        <div class="issue-meta">
+                            <span class="issue-num">001</span>
+                            <span class="issue-date">
+                                <span data-l="en">March 8, 2026</span>
+                                <span data-l="ko">2026년 3월 8일</span>
+                            </span>
+                        </div>
+                        <div class="issue-title">
+                            <span data-l="en">Week One in LA</span>
+                            <span data-l="ko">LA 첫째 주</span>
+                        </div>
+                        <p class="issue-desc">
+                            <span data-l="en">First week at Paramount, apartment hunting in Hollywood, and film photos from the drive down.</span>
+                            <span data-l="ko">파라마운트 첫 주, 할리우드 집 구하기, 오레곤에서 내려오면서 찍은 필름 사진들.</span>
+                        </p>
                     </div>
-                    <div class="issue-title">
-                        <span data-l="en">Week One in LA</span>
-                        <span data-l="ko">LA 첫째 주</span>
-                    </div>
-                    <p class="issue-desc">
-                        <span data-l="en">First week at Paramount, apartment hunting in Hollywood, and film photos from the drive down.</span>
-                        <span data-l="ko">파라마운트 첫 주, 할리우드 집 구하기, 오레곤에서 내려오면서 찍은 필름 사진들.</span>
-                    </p>
                 </a>
             </li>
         </ul>

@@ -12,8 +12,15 @@ setTimeout(() => {
 
 toggle.addEventListener('change', () => {
     const next = toggle.checked ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
+    const apply = () => {
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+    };
+    if (document.startViewTransition) {
+        document.startViewTransition(apply);
+    } else {
+        apply();
+    }
 });
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
