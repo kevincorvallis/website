@@ -2,7 +2,8 @@
 <html lang="en" data-lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="canonical" href="https://klee.page/newsletter/005/">
     <title>Dispatch 005: Coquelicots — Kevin Lee</title>
     <meta name="description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
     <meta name="author" content="Kevin Lee">
@@ -13,6 +14,8 @@
     <meta property="og:title" content="Dispatch 005: Coquelicots — Kevin Lee">
     <meta property="og:description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
     <meta property="og:image" content="https://klee.page/newsletter/005/images/coquelicots.jpg">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ko_KR">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
@@ -26,7 +29,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
 
-    <!-- Detect theme + language before first paint -->
+    <!-- Detect theme + language + URL-key bypass before first paint -->
     <script>
         (function() {
             var stored = localStorage.getItem('theme');
@@ -43,6 +46,17 @@
                      : 'en';
             document.documentElement.setAttribute('data-lang', lang);
             document.documentElement.setAttribute('lang', lang);
+
+            // Pre-paint URL-key bypass: hide password UI so it never flashes.
+            // The tsundoku welcome interstitial still plays after unlock().
+            var urlKey = params.get('key');
+            if (urlKey) {
+                var raw = urlKey.trim();
+                var lower = raw.toLowerCase();
+                if (lower === 'tsundoku' || lower === 'komorebi' || raw === '積ん読' || raw === '積読') {
+                    document.documentElement.setAttribute('data-prebypass', '1');
+                }
+            }
         })();
     </script>
 
@@ -117,6 +131,13 @@
 
         a:hover {
             opacity: 0.6;
+        }
+
+        /* When ?key= bypass is present, hide ONLY the password input + ambient gate
+           light. The tsundoku welcome interstitial still plays. */
+        [data-prebypass="1"] .gate,
+        [data-prebypass="1"] .gate-light {
+            display: none !important;
         }
 
         /* ========== PASSWORD GATE ========== */
@@ -317,15 +338,6 @@
             font-size: 13px;
             opacity: 0.75;
             letter-spacing: 0.03em;
-        }
-        .gate-aside .kanji {
-            font-family: 'Noto Serif JP', var(--font-display), serif;
-            font-style: normal;
-            color: var(--accent);
-            opacity: 0.5;
-            font-size: 17px;
-            margin-left: 0.4em;
-            letter-spacing: 0;
         }
 
         /* ========== MINI PLAYER — pinned bottom-left, song of the week ========== */
@@ -570,19 +582,6 @@
             overflow: hidden;
         }
 
-        .hero-image {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-        }
-
-        .hero-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            will-change: transform;
-        }
-
         /* Monet flow-field — fixed background across the entire article (005) */
         .hero-smoke, .hero-chars {
             position: fixed;
@@ -597,6 +596,8 @@
             position: fixed; inset: 0; z-index: -4;
             background-size: cover; background-position: center;
             opacity: 0; transition: opacity 0.6s ease;
+            transform: scale(1);
+            will-change: transform;
         }
         .hero-fallback.show { opacity: 1; }
 
@@ -659,13 +660,11 @@
         [data-theme="dark"] .chapter-mark { mix-blend-mode: screen; opacity: 0.85; }
 
         /* The text-block sits on the painting; a soft radial halo provides reading legibility */
-        .chapter .text-block,
-        .chapter .pull-quote-side {
+        .chapter .text-block {
             position: relative;
             z-index: 1;
         }
-        .chapter .text-block::before,
-        .chapter .pull-quote-side::before {
+        .chapter .text-block::before {
             content: '';
             position: absolute;
             inset: -2rem -1.5rem;
@@ -675,29 +674,8 @@
             pointer-events: none;
             transition: background 0.4s ease;
         }
-        [data-theme="dark"] .chapter .text-block::before,
-        [data-theme="dark"] .chapter .pull-quote-side::before {
+        [data-theme="dark"] .chapter .text-block::before {
             background: radial-gradient(ellipse at center, rgba(31,30,29,0.78) 0%, rgba(31,30,29,0.62) 50%, rgba(31,30,29,0.0) 100%);
-        }
-
-        /* Chapter V pull-quote → climactic, larger, centered (no longer floated to side) */
-        .chapter[data-monet="4"] .pull-quote-side {
-            float: none;
-            margin: 4rem auto 0;
-            max-width: 720px;
-            text-align: center;
-            padding: 2rem 1.5rem;
-        }
-        .chapter[data-monet="4"] .pull-quote-side blockquote {
-            border: none;
-            padding: 0;
-            font-family: var(--font-display);
-            font-style: italic;
-            font-size: clamp(1.6rem, 4vw, 2.4rem);
-            font-weight: 400;
-            line-height: 1.25;
-            color: var(--text);
-            opacity: 0.95;
         }
 
         /* Photos within a chapter: soft white frame ("polaroid-ish"), gentle shadow,
@@ -820,44 +798,6 @@
             50% { opacity: 1; transform: scaleY(1); }
         }
 
-        /* ========== TABLE OF CONTENTS ========== */
-        .toc {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 2.5rem 1.5rem 1rem;
-            text-align: center;
-        }
-
-        .toc-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            transition: color 0.3s ease;
-        }
-
-        .toc-list {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.25rem 1.25rem;
-        }
-
-        .toc-list a {
-            font-size: 14px;
-            color: var(--caption);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .toc-list a:hover {
-            color: var(--accent);
-            opacity: 1;
-        }
-
         /* ========== ISSUE HEADER ========== */
         .issue-intro {
             min-height: 40vh;
@@ -896,41 +836,6 @@
             transition: color 0.3s ease;
         }
 
-        .reading-time {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--caption);
-            margin-top: 1rem;
-            opacity: 0.6;
-            transition: color 0.3s ease;
-        }
-
-        /* ========== SECTION HEADERS ========== */
-        .section-header {
-            padding: 6rem 1.5rem 3rem;
-            text-align: center;
-        }
-
-        .section-label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 0.75rem;
-            transition: color 0.3s ease;
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: clamp(2rem, 8vw, 3.5rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            line-height: 1;
-        }
-
         /* ========== TEXT BLOCKS ========== */
         .text-block {
             padding: 2rem 1.5rem;
@@ -951,92 +856,6 @@
         .text-block em { font-style: italic; }
         .text-block strong { font-weight: 600; }
 
-        /* ========== PULL QUOTE ========== */
-        .pull-quote {
-            padding: 4rem 1.5rem;
-            max-width: 700px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .pull-quote blockquote {
-            font-size: clamp(1.5rem, 5vw, 2.25rem);
-            font-weight: 600;
-            line-height: 1.3;
-            letter-spacing: -0.01em;
-        }
-
-        .pull-quote cite {
-            display: block;
-            margin-top: 1rem;
-            font-size: 14px;
-            font-style: normal;
-            color: var(--caption);
-            transition: color 0.3s ease;
-        }
-
-        /* Pull quote variant with accent sidebar */
-        .pull-quote-side {
-            padding: 3rem 1.5rem;
-            max-width: 620px;
-            margin: 0 auto;
-        }
-
-        .pull-quote-side blockquote {
-            border-left: 2px solid var(--accent);
-            padding-left: 1.5rem;
-            font-size: clamp(1.25rem, 4vw, 1.75rem);
-            font-weight: 600;
-            line-height: 1.4;
-            letter-spacing: -0.01em;
-            transition: border-color 0.3s ease;
-        }
-
-        .pull-quote-side cite {
-            display: block;
-            margin-top: 0.75rem;
-            padding-left: 1.5rem;
-            font-size: 14px;
-            font-style: normal;
-            color: var(--caption);
-            transition: color 0.3s ease;
-        }
-
-        /* ========== PHOTO LAYOUTS ========== */
-        .photo-full {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .photo-full img {
-            width: 100%;
-            height: auto;
-            display: block;
-            will-change: transform;
-        }
-
-        .photo-full .photo-caption {
-            position: absolute;
-            bottom: 1rem;
-            left: 1.5rem;
-            right: 1.5rem;
-            z-index: 2;
-            color: #f0f0ec;
-        }
-
-        .photo-full::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(to top, rgba(10,10,10,0.5), transparent);
-            z-index: 1;
-            pointer-events: none;
-        }
-
         .photo-inset {
             padding: 1rem 1.5rem;
             max-width: 620px;
@@ -1048,22 +867,6 @@
             width: 100%;
             border-radius: 3px;
             display: block;
-        }
-
-        .photo-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            padding: 0 1rem;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .photo-grid img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 3px;
         }
 
         .photo-caption {
@@ -1082,10 +885,6 @@
             margin-bottom: 0.25rem;
         }
 
-        .photo-full .photo-caption .caption-location {
-            color: #c4a882;
-        }
-
         .photo-inset .photo-caption {
             margin-top: 0.75rem;
             color: var(--caption);
@@ -1096,15 +895,6 @@
         .sign-off {
             padding: 6rem 1.5rem 3rem;
             text-align: center;
-        }
-
-        .sign-off-text {
-            font-size: 18px;
-            color: var(--caption);
-            line-height: 1.6;
-            max-width: 400px;
-            margin: 0 auto 2rem;
-            transition: color 0.3s ease;
         }
 
         .sign-off-name {
@@ -1382,17 +1172,11 @@
             body { font-size: 18px; }
             .back-link { font-size: 14px; }
             .text-block p { font-size: 18px; }
-            .section-header { padding: 5rem 1.5rem 2.5rem; }
-            .photo-full .photo-caption { bottom: 0.75rem; left: 1rem; right: 1rem; }
-            .toc-list { gap: 0.25rem 1rem; }
         }
 
         @media (min-width: 768px) {
             .photo-inset { padding: 2rem 3rem; max-width: 700px; }
-            .photo-grid { gap: 1rem; padding: 0 3rem; max-width: 900px; }
             .text-block { padding: 2.5rem 3rem; }
-            .pull-quote { padding: 5rem 3rem; }
-            .pull-quote-side { padding: 3rem 3rem; }
         }
 
         /* ========== KOMOREBI INTERSTITIAL ========== */
@@ -1629,7 +1413,9 @@
                     type="text"
                     class="gate-input"
                     id="gateInput"
-                    placeholder="this week's word"
+                    data-ph-en="this week's word"
+                    data-ph-ko="이번 주 단어"
+                    aria-describedby="gateAside"
                     autocomplete="off"
                     autofocus
                 >
@@ -1639,10 +1425,9 @@
                 <span data-l="en">Hmm, that's not it.</span>
                 <span data-l="ko">음, 아닌데?</span>
             </p>
-            <p class="gate-aside">
-                <span data-l="en">a Japanese noun, four letters, two kanji</span>
-                <span data-l="ko">일본어 명사, 알파벳 네 글자 &middot; 한자 둘</span>
-                <span class="kanji">積ん読</span>
+            <p class="gate-aside" id="gateAside">
+                <span data-l="en">Japanese noun &mdash; romaji or kanji</span>
+                <span data-l="ko">일본어 명사 &mdash; 로마자 또는 한자</span>
             </p>
         </div>
     </div>
@@ -1814,7 +1599,10 @@
     <div class="chapter" data-monet="2">
         <p class="chapter-mark"><span class="numeral">IV</span><span class="painting-title">Parc Monceau</span></p>
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/newprofilepic.jpg" alt="Kevin's new profile photo">
+            <img src="/newsletter/005/images/newprofilepic.jpg"
+                data-alt-en="Kevin's new profile photo"
+                data-alt-ko="케빈의 새 프로필 사진"
+                alt="Kevin's new profile photo">
             <div class="photo-caption">
                 <span data-l="en">the new headshot &mdash; 엄마 said I look serious</span>
                 <span data-l="ko">새 프로필 사진 &mdash; 엄마는 내가 너무 심각해 보인다고 했다</span>
@@ -1831,7 +1619,10 @@
             </div>
         </div>
         <div style="max-width: 620px; margin: 2rem auto 0; padding: 0 1.5rem;" class="reveal">
-            <video autoplay muted loop playsinline style="width: 100%; border-radius: 3px; display: block;">
+            <video id="catKungfuVideo" muted loop playsinline preload="none"
+                data-aria-en="AI-generated video of a cat performing kung fu"
+                data-aria-ko="쿵후를 하는 고양이 AI 생성 영상"
+                style="width: 100%; border-radius: 3px; display: block;">
                 <source src="/newsletter/005/images/catkungfu.mp4" type="video/mp4">
             </video>
             <div class="photo-caption" style="margin-top: 0.75rem; color: var(--caption);">
@@ -1863,6 +1654,8 @@
             <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 3px;">
                 <iframe
                     src="https://www.youtube.com/embed/OfXD6ceEPT4?rel=0&modestbranding=1"
+                    data-title-en="La fille aux cheveux de lin — Debussy"
+                    data-title-ko="아마빛 머리의 소녀 — 드뷔시"
                     title="La fille aux cheveux de lin — Debussy"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1887,16 +1680,19 @@
             <div data-l="en">
                 <p>May is almost over. I'll be twenty-eight in three months. There's a stack of books on my nightstand I haven't read &mdash; things I bought thinking I'd get to. There's a Japanese word for it: <span style="font-family: 'Noto Serif JP', serif;">積ん読</span>, <em>tsundoku.</em> The pile of books you meant to read.</p>
                 <p>Most of my life is shaped like that right now. Intention outrunning execution. The 170 I want to be. The Japanese I want to know. The chapters of this letter I keep meaning to send sooner. I'm trying to be gentler with the gap than I used to be.</p>
-                <p>If you've read something lately that actually changed how you saw a Tuesday afternoon, send it my way. My goodreads is <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank">here</a>. I'm not asking for productivity-bro lists. I want the ones that did something for you, even if you can't name what.</p>
+                <p>If you've read something lately that actually changed how you saw a Tuesday afternoon, send it my way. My goodreads is <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank" rel="noopener noreferrer">here</a>. I'm not asking for productivity-bro lists. I want the ones that did something for you, even if you can't name what.</p>
             </div>
             <div data-l="ko">
                 <p>5월이 거의 끝나간다. 석 달 뒤면 스물여덟이다. 침대 옆에 안 읽은 책이 쌓여 있다 &mdash; 언젠가 읽겠지 하고 사놓은 것들. 일본어에 그걸 가리키는 단어가 있다. <span style="font-family: 'Noto Serif JP', serif;">積ん読</span>, <em>tsundoku.</em> 읽으려고 사놓고 쌓아둔 책들.</p>
                 <p>요즘 내 삶이 대체로 그 모양이다. 의도가 실행을 앞서 달리는. 되고 싶은 170. 알고 싶은 일본어. 더 일찍 보내야지 하면서 미루는 이 편지의 챕터들. 그 간극에 좀 더 너그러워지려 노력 중이다.</p>
-                <p>최근 화요일 오후를 바라보는 시선을 진짜로 바꿔놓은 책이 있다면 보내달라. 내 goodreads는 <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank">여기</a>. 자기계발 책 목록 말고. 너에게 뭔가 일어나게 한 책. 그게 뭔지 말로 못 해도.</p>
+                <p>최근 화요일 오후를 바라보는 시선을 진짜로 바꿔놓은 책이 있다면 보내달라. 내 goodreads는 <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank" rel="noopener noreferrer">여기</a>. 자기계발 책 목록 말고. 너에게 뭔가 일어나게 한 책. 그게 뭔지 말로 못 해도.</p>
             </div>
         </div>
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/dogonmyshoulders.jpg" alt="A dog using Kevin's shoulders as a landing pad">
+            <img src="/newsletter/005/images/dogonmyshoulders.jpg"
+                data-alt-en="A dog using Kevin's shoulders as a landing pad"
+                data-alt-ko="케빈의 어깨를 착륙장으로 쓴 개"
+                alt="A dog using Kevin's shoulders as a landing pad">
             <div class="photo-caption">
                 <span data-l="en">my cousin's friend's dog, unannounced &mdash; he looked at me like he had something to say, and then he didn't say it</span>
                 <span data-l="ko">사촌 친구의 개, 통보 없이 어깨로 &mdash; 뭔가 할 말이 있는 표정으로 나를 보더니, 결국 아무 말도 하지 않았다</span>
@@ -1932,7 +1728,9 @@
             <span data-l="ko">이메일 남겨주면 매주 보내줄게. 스팸 같은 거 없고 그냥 내 근황.</span>
         </p>
         <form class="subscribe-form" id="subscribeForm">
-            <input type="email" class="subscribe-input" id="subscribeEmail" placeholder="your@email.com" required autocomplete="email">
+            <input type="email" class="subscribe-input" id="subscribeEmail"
+                data-ph-en="your@email.com" data-ph-ko="your@email.com"
+                required autocomplete="email">
             <button type="submit" class="subscribe-btn" id="subscribeBtn">
                 <span data-l="en">Subscribe</span>
                 <span data-l="ko">구독</span>
@@ -1963,8 +1761,8 @@
             </h2>
         </div>
         <form class="comments-form" id="commentsForm">
-            <input type="text" class="comments-input" id="commentName" placeholder="Your name" maxlength="100" required>
-            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <input type="text" class="comments-input" id="commentName" data-ph-en="Your name" data-ph-ko="이름" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" data-ph-en="Write a comment..." data-ph-ko="댓글 작성..." maxlength="2000" required></textarea>
             <button type="submit" class="comments-btn" id="commentBtn">
                 <span data-l="en">Post</span>
                 <span data-l="ko">게시</span>
@@ -2128,7 +1926,7 @@
                 // Falls through to /api/gate which still honors DISPATCH_PASS (komorebi) as a master.
                 var raw = val.trim();
                 var lower = raw.toLowerCase();
-                if (lower === 'tsundoku' || raw === '積ん読' || raw === '積読') {
+                if (lower === 'tsundoku' || lower === 'komorebi' || raw === '積ん読' || raw === '積読') {
                     callback(true);
                     return;
                 }
@@ -2144,6 +1942,8 @@
 
             if (sessionStorage.getItem(issueKey) === '1') {
                 gate.classList.add('unlocked');
+                document.body.classList.add('gate-open');
+                if (komorebi) komorebi.style.display = 'none';
                 return;
             }
 
@@ -2168,6 +1968,36 @@
         })();
     </script>
     <script>
+        // ==================== DISPATCH I18N ====================
+        (function() {
+            function getLang() {
+                return document.documentElement.getAttribute('data-lang') || 'en';
+            }
+
+            function applyI18n() {
+                var lang = getLang();
+                document.querySelectorAll('[data-ph-en]').forEach(function(el) {
+                    el.placeholder = el.getAttribute('data-ph-' + lang) || el.getAttribute('data-ph-en');
+                });
+                document.querySelectorAll('[data-alt-en]').forEach(function(el) {
+                    el.alt = el.getAttribute('data-alt-' + lang) || el.getAttribute('data-alt-en');
+                });
+                document.querySelectorAll('[data-aria-en]').forEach(function(el) {
+                    el.setAttribute('aria-label',
+                        el.getAttribute('data-aria-' + lang) || el.getAttribute('data-aria-en'));
+                });
+                document.querySelectorAll('[data-title-en]').forEach(function(el) {
+                    el.title = el.getAttribute('data-title-' + lang) || el.getAttribute('data-title-en');
+                });
+                if (typeof window.dispatchCommentsRefresh === 'function') {
+                    window.dispatchCommentsRefresh();
+                }
+            }
+
+            window.dispatchApplyI18n = applyI18n;
+            applyI18n();
+        })();
+
         // ==================== LANGUAGE TOGGLE ====================
         (function() {
             var pill = document.getElementById('langPill');
@@ -2178,12 +2008,33 @@
                 document.documentElement.setAttribute('data-lang', current);
                 document.documentElement.setAttribute('lang', current);
                 localStorage.setItem('dispatch-lang', current);
+                window.dispatchApplyI18n();
             }
 
             pill.addEventListener('click', toggle);
             pill.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
             });
+        })();
+
+        // ==================== LAZY VIDEO (cat kung fu) ====================
+        (function() {
+            var video = document.getElementById('catKungfuVideo');
+            if (!video) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (!('IntersectionObserver' in window)) return;
+
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        var p = video.play();
+                        if (p && p.catch) p.catch(function() {});
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, { threshold: 0.2 });
+            io.observe(video);
         })();
 
         // ==================== SUBSCRIBE ====================
@@ -2232,6 +2083,7 @@
             var list = document.getElementById('commentsList');
             var empty = document.getElementById('commentsEmpty');
             var issue = '005';
+            var cachedComments = [];
 
             function escapeHtml(str) {
                 var div = document.createElement('div');
@@ -2240,17 +2092,21 @@
             }
 
             function timeAgo(dateStr) {
+                var lang = document.documentElement.getAttribute('data-lang') || 'en';
                 var seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-                if (seconds < 60) return 'just now';
-                var intervals = [
-                    [31536000, 'y'], [2592000, 'mo'], [86400, 'd'],
-                    [3600, 'h'], [60, 'm']
-                ];
+                if (seconds < 60) return lang === 'ko' ? '방금' : 'just now';
+                var intervals = lang === 'ko'
+                    ? [[31536000, '년'], [2592000, '개월'], [86400, '일'], [3600, '시간'], [60, '분']]
+                    : [[31536000, 'y'], [2592000, 'mo'], [86400, 'd'], [3600, 'h'], [60, 'm']];
                 for (var i = 0; i < intervals.length; i++) {
                     var count = Math.floor(seconds / intervals[i][0]);
-                    if (count >= 1) return count + intervals[i][1] + ' ago';
+                    if (count >= 1) {
+                        return lang === 'ko'
+                            ? count + intervals[i][1] + ' 전'
+                            : count + intervals[i][1] + ' ago';
+                    }
                 }
-                return 'just now';
+                return lang === 'ko' ? '방금' : 'just now';
             }
 
             function renderComment(c) {
@@ -2264,19 +2120,28 @@
                 return div;
             }
 
+            function renderComments(comments) {
+                cachedComments = comments || [];
+                list.innerHTML = '';
+                if (!cachedComments.length) {
+                    empty.style.display = '';
+                    return;
+                }
+                empty.style.display = 'none';
+                cachedComments.forEach(function(c) {
+                    list.appendChild(renderComment(c));
+                });
+            }
+
+            window.dispatchCommentsRefresh = function() {
+                if (cachedComments.length) renderComments(cachedComments);
+            };
+
             function loadComments() {
                 fetch('/api/comments?issue=' + issue)
                     .then(function(r) { return r.json(); })
                     .then(function(comments) {
-                        list.innerHTML = '';
-                        if (!comments.length) {
-                            empty.style.display = '';
-                            return;
-                        }
-                        empty.style.display = 'none';
-                        comments.forEach(function(c) {
-                            list.appendChild(renderComment(c));
-                        });
+                        renderComments(comments);
                     })
                     .catch(function() {});
             }
@@ -2455,9 +2320,10 @@
                 .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
                 .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
 
-            // Hero Ken Burns
-            gsap.to('#heroImg', {
-                scale: 1.15,
+            // Hero Ken Burns (fallback painting behind canvas)
+            gsap.to('#heroFallback', {
+                scale: 1.06,
+                transformOrigin: 'center center',
                 ease: 'none',
                 scrollTrigger: {
                     trigger: '.hero',
@@ -2509,57 +2375,6 @@
                 gsap.to(el, {
                     opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out',
                     scrollTrigger: { trigger: el, start: 'top 85%', once: true }
-                });
-            });
-
-            // Ken Burns on full-bleed photos
-            gsap.utils.toArray('.photo-full img').forEach(function(img) {
-                gsap.fromTo(img,
-                    { scale: 1.03 },
-                    {
-                        scale: 1.1, ease: 'none',
-                        scrollTrigger: {
-                            trigger: img.closest('.photo-full'),
-                            start: 'top bottom',
-                            end: 'bottom top',
-                            scrub: true,
-                        }
-                    }
-                );
-            });
-
-            // Section title parallax
-            gsap.utils.toArray('.section-title').forEach(function(el) {
-                gsap.to(el, {
-                    yPercent: -10, ease: 'none',
-                    scrollTrigger: {
-                        trigger: el.closest('.section-header'),
-                        start: 'top bottom',
-                        end: 'bottom top',
-                        scrub: true,
-                    }
-                });
-            });
-
-            // Pull quote scale
-            gsap.utils.toArray('.pull-quote blockquote, .pull-quote-side blockquote').forEach(function(el) {
-                gsap.fromTo(el,
-                    { scale: 0.92, opacity: 0 },
-                    {
-                        scale: 1, opacity: 1, duration: 1, ease: 'power2.out',
-                        scrollTrigger: { trigger: el, start: 'top 80%', once: true }
-                    }
-                );
-            });
-
-            // Smooth anchor scrolling for TOC links
-            document.querySelectorAll('.toc-list a').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    var target = document.querySelector(link.getAttribute('href'));
-                    if (target) {
-                        e.preventDefault();
-                        lenis.scrollTo(target, { offset: -40, duration: 1.2 });
-                    }
                 });
             });
         }
