@@ -43,15 +43,6 @@
                      : 'en';
             document.documentElement.setAttribute('data-lang', lang);
             document.documentElement.setAttribute('lang', lang);
-
-            // Pre-paint URL-key bypass: if the link includes the correct ?key=, hide
-            // the password input gate immediately so it never flashes. The unc welcome
-            // interstitial still plays — the gate JS reads ?key= and calls unlock()
-            // which animates the interstitial. We only suppress the password input UI.
-            var urlKey = params.get('key');
-            if (urlKey && urlKey.trim().toLowerCase() === 'bieberchella') {
-                document.documentElement.setAttribute('data-prebypass', '1');
-            }
         })();
     </script>
 
@@ -126,122 +117,6 @@
 
         a:hover {
             opacity: 0.6;
-        }
-
-        /* When ?key= bypass is present, hide ONLY the password input + ambient gate
-           light. The unc welcome interstitial (.komorebi) still plays. */
-        [data-prebypass="1"] .gate,
-        [data-prebypass="1"] .gate-light {
-            display: none !important;
-        }
-
-        /* ========== PASSWORD GATE ========== */
-        .gate {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            transition: opacity 0.6s ease, visibility 0.6s ease, background-color 0.3s ease;
-        }
-
-        .gate.unlocked {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-
-        .gate-content {
-            max-width: 320px;
-        }
-
-        .gate-title {
-            font-family: var(--font-display);
-            font-size: 32px;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            margin-bottom: 0.75rem;
-        }
-
-        .gate-subtitle {
-            font-size: 16px;
-            color: var(--caption);
-            margin-bottom: 2rem;
-            line-height: 1.5;
-            transition: color 0.3s ease;
-        }
-
-        .gate-input {
-            width: 100%;
-            max-width: 240px;
-            background: none;
-            border: none;
-            border-bottom: 1px solid var(--accent);
-            border-radius: 0;
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 18px;
-            padding: 12px 0;
-            text-align: center;
-            outline: none;
-            letter-spacing: 0.12em;
-            transition: border-color 0.4s ease, color 0.3s ease;
-        }
-
-        .gate-input::placeholder {
-            color: var(--caption);
-            opacity: 0.5;
-            letter-spacing: 0;
-            font-size: 15px;
-            font-style: italic;
-        }
-
-        .gate-input:focus {
-            border-color: var(--text);
-        }
-
-        .gate-btn {
-            background: none;
-            border: none;
-            color: var(--accent);
-            font-family: var(--font);
-            font-size: 20px;
-            cursor: pointer;
-            margin-top: 1.25rem;
-            padding: 8px 24px;
-            opacity: 0.5;
-            transition: opacity 0.3s ease, color 0.3s ease;
-        }
-
-        .gate-btn:hover {
-            opacity: 1;
-        }
-
-        .gate-input.shake {
-            animation: shake 0.4s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
-        }
-
-        .gate-hint {
-            font-size: 13px;
-            color: var(--caption);
-            margin-top: 1rem;
-            opacity: 0;
-            transition: opacity 0.3s ease, color 0.3s ease;
-        }
-
-        .gate-hint.visible {
-            opacity: 1;
         }
 
         /* ========== PROGRESS BAR ========== */
@@ -1216,22 +1091,6 @@
             transition: opacity 2.5s ease;
         }
 
-        /* Gate ambient — barely perceptible hint of light */
-        .gate-light {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 199;
-            opacity: 0.02;
-            mix-blend-mode: plus-lighter;
-            background: radial-gradient(ellipse at 50% 30%, rgba(160,130,109,0.3) 0%, transparent 60%);
-            transition: opacity 2s ease;
-        }
-
-        .gate-light.awakening {
-            opacity: 0.15;
-        }
-
         /* Leaf shadow SVG overlay */
         .komorebi-leaves {
             position: absolute;
@@ -1518,7 +1377,6 @@
                 transform: none !important;
             }
             .scroll-line { animation: none; }
-            .gate-input.shake { animation: none; }
             .komorebi-spot, .komorebi-leaves { animation: none; }
             .rotate-icon svg { animation: none; }
             *, *::before, *::after {
@@ -1529,35 +1387,6 @@
     </style>
 </head>
 <body>
-
-    <!-- ==================== PASSWORD GATE ==================== -->
-    <div class="gate" id="gate">
-        <div class="gate-content">
-            <h1 class="gate-title">Dispatch</h1>
-            <p class="gate-subtitle">
-                <span data-l="en">This letter is for friends and family.</span>
-                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
-            </p>
-            <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
-                <input
-                    type="text"
-                    class="gate-input"
-                    id="gateInput"
-                    placeholder="enter password"
-                    autocomplete="off"
-                    autofocus
-                >
-                <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
-            </form>
-            <p class="gate-hint" id="gateHint">
-                <span data-l="en">Hmm, that's not it.</span>
-                <span data-l="ko">음, 아닌데?</span>
-            </p>
-        </div>
-    </div>
-
-    <!-- Ambient gate light — barely visible on password screen, intensifies on correct entry -->
-    <div class="gate-light" id="gateLight"></div>
 
     <!-- ==================== KOMOREBI INTERSTITIAL ==================== -->
     <div class="komorebi" id="komorebi">
@@ -2021,166 +1850,67 @@
     <!-- Scripts -->
     <script src="/js/theme.js"></script>
     <script>
-        // ==================== KOMOREBI GATE ====================
+        // ==================== KOMOREBI INTERSTITIAL ====================
         (function() {
-            var gate = document.getElementById('gate');
-            var input = document.getElementById('gateInput');
-            var hint = document.getElementById('gateHint');
             var komorebi = document.getElementById('komorebi');
-            if (!gate || !input) return;
+            if (!komorebi) return;
 
             var path = window.location.pathname.replace(/\/$/, '') || '/';
-            var issueKey = 'dispatch-auth-' + path;
+            var seenKey = 'dispatch-seen-' + path;
 
-            function animateKomorebi(callback) {
-                // First: gate light intensifies (the password summons the light)
-                var gateLight = document.getElementById('gateLight');
-                gateLight.classList.add('awakening');
+            // Skip interstitial for returning visitors this session
+            if (sessionStorage.getItem(seenKey) === '1') return;
+            sessionStorage.setItem(seenKey, '1');
 
-                // Activate komorebi immediately (behind gate at z-index 150)
-                komorebi.classList.add('active');
-                document.body.style.overflow = 'hidden';
+            komorebi.classList.add('active');
+            document.body.style.overflow = 'hidden';
 
-                // After light builds, fade gate out — komorebi is already underneath
+            var leaves = document.getElementById('komorebiLeaves');
+            var sun = document.getElementById('komorebiSun');
+            var spots = document.getElementById('komorebiSpots');
+            var kanji = document.getElementById('komorebiKanji');
+            var romaji = document.getElementById('komorebiRomaji');
+            var noun = document.getElementById('komorebiNoun');
+            var meaning = document.getElementById('komorebiMeaning');
+            var divider = document.getElementById('komorebiDivider');
+            var tagline = document.getElementById('komorebiTagline');
+
+            var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+
+            function animate(el, d, dur) {
+                dur = dur || 1;
                 setTimeout(function() {
-                    gate.classList.add('unlocked');
-                    gateLight.style.display = 'none';
-
-                    var leaves = document.getElementById('komorebiLeaves');
-                    var sun = document.getElementById('komorebiSun');
-                    var spots = document.getElementById('komorebiSpots');
-                    var kanji = document.getElementById('komorebiKanji');
-                    var romaji = document.getElementById('komorebiRomaji');
-                    var noun = document.getElementById('komorebiNoun');
-                    var meaning = document.getElementById('komorebiMeaning');
-                    var divider = document.getElementById('komorebiDivider');
-                    var tagline = document.getElementById('komorebiTagline');
-
-                    var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
-
-                    function animate(el, d, dur) {
-                        dur = dur || 1;
-                        setTimeout(function() {
-                            el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
-                            el.style.opacity = '1';
-                            el.style.transform = 'translateY(0) scale(1)';
-                        }, d);
-                    }
-
-                    // Light arrives first — sun, leaves, spots fade in
-                    setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
-                    setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
-                    setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
-
-                    // Text reveals — kanji first, alone for a beat (Ma)
-                    animate(kanji, 800, 1.4);
-                    // Then the rest, staggered
-                    animate(romaji, 1800, 1);
-                    animate(noun, 2200, 0.8);
-                    animate(meaning, 2800, 1.1);
-                    setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
-                    animate(tagline, 3800, 0.9);
-
-                    // Show dismiss button last
-                    var dismiss = document.getElementById('komorebiDismiss');
-                    setTimeout(function() {
-                        dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
-                        dismiss.style.opacity = '0.5';
-                        dismiss.style.transform = 'translateY(0)';
-                    }, 4200);
-
-                    // Dismiss on click
-                    dismiss.addEventListener('click', function() {
-                        komorebi.classList.add('exiting');
-                        document.body.style.overflow = '';
-                        setTimeout(callback, 1200);
-                    });
-                }, 800); // Wait for gate light to build
+                    el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0) scale(1)';
+                }, d);
             }
 
-            function unlock() {
-                sessionStorage.setItem(issueKey, '1');
-                // Activate komorebi BEHIND the gate first, then fade gate out
-                // This prevents the article from flashing through
-                animateKomorebi(function() {
+            setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
+            setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
+            setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
+
+            animate(kanji, 800, 1.4);
+            animate(romaji, 1800, 1);
+            animate(noun, 2200, 0.8);
+            animate(meaning, 2800, 1.1);
+            setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
+            animate(tagline, 3800, 0.9);
+
+            var dismiss = document.getElementById('komorebiDismiss');
+            setTimeout(function() {
+                dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
+                dismiss.style.opacity = '0.5';
+                dismiss.style.transform = 'translateY(0)';
+            }, 4200);
+
+            dismiss.addEventListener('click', function() {
+                komorebi.classList.add('exiting');
+                document.body.style.overflow = '';
+                setTimeout(function() {
                     komorebi.style.display = 'none';
-                });
-            }
-
-            function unlockQuiet() {
-                sessionStorage.setItem(issueKey, '1');
-                gate.classList.add('unlocked');
-                // Skip komorebi for returning visitors
-            }
-
-            function showGate() {
-                document.body.style.overflow = 'hidden';
-                var form = document.getElementById('gateForm');
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var val = input.value.trim();
-                    if (!val) return;
-                    input.disabled = true;
-                    document.getElementById('gateBtn').disabled = true;
-                    checkPassword(val, function(ok) {
-                        input.disabled = false;
-                        document.getElementById('gateBtn').disabled = false;
-                        if (ok) {
-                            unlock();
-                        } else {
-                            input.value = '';
-                            input.classList.remove('shake');
-                            void input.offsetWidth;
-                            input.classList.add('shake');
-                            if (hint) hint.classList.add('visible');
-                        }
-                    });
-                });
-            }
-
-            function checkPassword(val, callback) {
-                // Client-side check first — password is shared openly with friends
-                if (val.trim().toLowerCase() === 'bieberchella') {
-                    callback(true);
-                    return;
-                }
-                // Also try server in case password changes
-                fetch('/api/gate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: val }),
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) { callback(data.ok === true); })
-                .catch(function() { callback(false); });
-            }
-
-            // Already authenticated this session
-            if (sessionStorage.getItem(issueKey) === '1') {
-                gate.classList.add('unlocked');
-                return;
-            }
-
-            // Check URL bypass (?key=)
-            var params = new URLSearchParams(window.location.search);
-            var urlKey = params.get('key');
-            if (urlKey) {
-                // Clean the URL immediately so password isn't visible in address bar
-                params.delete('key');
-                var clean = window.location.pathname + (params.toString() ? '?' + params : '');
-                window.history.replaceState({}, '', clean);
-
-                checkPassword(urlKey, function(ok) {
-                    if (ok) {
-                        unlock();
-                    } else {
-                        showGate();
-                    }
-                });
-                return;
-            }
-
-            showGate();
+                }, 1200);
+            });
         })();
     </script>
     <script>
@@ -2583,12 +2313,6 @@
 
             // Orientation change — the main hook
             function onOrientation() {
-                // Don't show cinema while gate is still locked (e.g. user opens link in landscape).
-                var gate = document.getElementById('gate');
-                if (gate && !gate.classList.contains('unlocked')) {
-                    hideCinema();
-                    return;
-                }
                 if (orientationMql.matches) {
                     var clip = getClipForActiveCard();
                     if (clip) {

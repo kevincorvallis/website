@@ -46,17 +46,6 @@
                      : 'en';
             document.documentElement.setAttribute('data-lang', lang);
             document.documentElement.setAttribute('lang', lang);
-
-            // Pre-paint URL-key bypass: hide password UI so it never flashes.
-            // The tsundoku welcome interstitial still plays after unlock().
-            var urlKey = params.get('key');
-            if (urlKey) {
-                var raw = urlKey.trim();
-                var lower = raw.toLowerCase();
-                if (lower === 'tsundoku' || lower === 'komorebi' || raw === '積ん読' || raw === '積読') {
-                    document.documentElement.setAttribute('data-prebypass', '1');
-                }
-            }
         })();
     </script>
 
@@ -133,211 +122,13 @@
             opacity: 0.6;
         }
 
-        /* When ?key= bypass is present, hide ONLY the password input + ambient gate
-           light. The tsundoku welcome interstitial still plays. */
-        [data-prebypass="1"] .gate,
-        [data-prebypass="1"] .gate-light {
-            display: none !important;
-        }
-
-        /* ========== PASSWORD GATE ========== */
-        .gate {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            transition: opacity 0.6s ease, visibility 0.6s ease, background-color 0.3s ease;
-        }
-
-        .gate.unlocked {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-
-        .gate-content {
-            max-width: 320px;
-        }
-
-        .gate-title {
-            font-family: var(--font-display);
-            font-size: 32px;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            margin-bottom: 0.75rem;
-        }
-
-        .gate-subtitle {
-            font-size: 16px;
-            color: var(--caption);
-            margin-bottom: 2rem;
-            line-height: 1.5;
-            transition: color 0.3s ease;
-        }
-
-        .gate-input {
-            width: 100%;
-            max-width: 240px;
-            background: none;
-            border: none;
-            border-bottom: 1px solid var(--accent);
-            border-radius: 0;
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 18px;
-            padding: 12px 0;
-            text-align: center;
-            outline: none;
-            letter-spacing: 0.12em;
-            transition: border-color 0.4s ease, color 0.3s ease;
-        }
-
-        .gate-input::placeholder {
-            color: var(--caption);
-            opacity: 0.5;
-            letter-spacing: 0;
-            font-size: 15px;
-            font-style: italic;
-        }
-
-        .gate-input:focus {
-            border-color: var(--text);
-        }
-
-        .gate-btn {
-            background: none;
-            border: none;
-            color: var(--accent);
-            font-family: var(--font);
-            font-size: 20px;
-            cursor: pointer;
-            margin-top: 1.25rem;
-            padding: 8px 24px;
-            opacity: 0.5;
-            transition: opacity 0.3s ease, color 0.3s ease;
-        }
-
-        .gate-btn:hover {
-            opacity: 1;
-        }
-
-        .gate-input.shake {
-            animation: shake 0.4s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
-        }
-
-        .gate-hint {
-            font-size: 13px;
-            color: var(--caption);
-            margin-top: 1rem;
-            opacity: 0;
-            transition: opacity 0.3s ease, color 0.3s ease;
-        }
-
-        .gate-hint.visible {
-            opacity: 1;
-        }
-
-        /* ========== GATE — Monet revamp (005) ========== */
-        /* The gate is transparent so the live hero flow-field shows through.
-           A frosted-glass card holds the form; a soft cream veil sits between. */
-        .gate {
-            background: transparent;
-            overflow: hidden;
-        }
-        .gate::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-            background:
-                radial-gradient(ellipse 55% 80% at center, rgba(240,238,230,0.05) 0%, rgba(240,238,230,0.30) 55%, rgba(240,238,230,0.55) 100%);
-            pointer-events: none;
-        }
-        [data-theme="dark"] .gate::after {
-            background:
-                radial-gradient(ellipse 55% 80% at center, rgba(31,30,29,0.10) 0%, rgba(31,30,29,0.45) 55%, rgba(31,30,29,0.70) 100%);
-        }
-
-        /* Hold the hero text dark until the gate opens — let the reveal land */
+        /* Hero content fades in on first paint */
         .hero-content {
             opacity: 0;
-            transition: opacity 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.4s;
+            animation: heroFadeIn 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.4s forwards;
         }
-        .gate.unlocked ~ section.hero .hero-content,
-        body.gate-open .hero-content {
-            opacity: 1;
-        }
-        /* When the gate is up, soften the hero overlay so the painting reads */
-        .hero-overlay {
-            transition: background 0.6s ease, opacity 0.6s ease;
-        }
-        body:not(.gate-open) .hero-overlay { opacity: 0.35; }
-
-        /* Frosted-glass card holding the form */
-        .gate-content {
-            position: relative;
-            background: rgba(240, 238, 230, 0.42);
-            backdrop-filter: blur(14px) saturate(1.08);
-            -webkit-backdrop-filter: blur(14px) saturate(1.08);
-            padding: 2.4rem 2.4rem 2rem;
-            border-radius: 2px;
-            box-shadow: 0 18px 70px -30px rgba(31, 30, 29, 0.45);
-            max-width: 360px;
-            width: calc(100% - 2.5rem);
-            border-top: 1px solid rgba(255,255,255,0.45);
-            border-bottom: 1px solid rgba(31, 30, 29, 0.06);
-        }
-        [data-theme="dark"] .gate-content {
-            background: rgba(31, 30, 29, 0.55);
-            border-top: 1px solid rgba(240, 238, 230, 0.10);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.20);
-            box-shadow: 0 18px 70px -28px rgba(0, 0, 0, 0.7);
-        }
-
-        .gate-meta {
-            font-family: var(--font-display);
-            font-style: italic;
-            font-size: 11px;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            opacity: 0.85;
-        }
-        .gate-title {
-            font-style: italic;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-        }
-        .gate-subtitle { font-style: italic; }
-        .gate-input {
-            background: rgba(240, 238, 230, 0.55);
-            border-radius: 2px;
-            padding: 12px 14px;
-        }
-        [data-theme="dark"] .gate-input {
-            background: rgba(31, 30, 29, 0.45);
-        }
-        .gate-aside {
-            margin-top: 1.5rem;
-            font-family: var(--font-display);
-            font-style: italic;
-            color: var(--caption);
-            font-size: 13px;
-            opacity: 0.75;
-            letter-spacing: 0.03em;
+        @keyframes heroFadeIn {
+            to { opacity: 1; }
         }
 
         /* ========== MINI PLAYER — pinned bottom-left, song of the week ========== */
@@ -1311,21 +1102,6 @@
             transition: opacity 2.5s ease;
         }
 
-        .gate-light {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 199;
-            opacity: 0.02;
-            mix-blend-mode: plus-lighter;
-            background: radial-gradient(ellipse at 50% 30%, rgba(160,130,109,0.3) 0%, transparent 60%);
-            transition: opacity 2s ease;
-        }
-
-        .gate-light.awakening {
-            opacity: 0.15;
-        }
-
         .komorebi-leaves {
             position: absolute;
             inset: -20%;
@@ -1388,7 +1164,6 @@
                 transform: none !important;
             }
             .scroll-line { animation: none; }
-            .gate-input.shake { animation: none; }
             .komorebi-spot, .komorebi-leaves { animation: none; }
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -1398,42 +1173,6 @@
     </style>
 </head>
 <body>
-
-    <!-- ==================== PASSWORD GATE ==================== -->
-    <div class="gate" id="gate">
-        <div class="gate-content">
-            <p class="gate-meta">No. 005 &middot; Coquelicots</p>
-            <h1 class="gate-title">Dispatch</h1>
-            <p class="gate-subtitle">
-                <span data-l="en">This letter is for friends and family.</span>
-                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
-            </p>
-            <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
-                <input
-                    type="text"
-                    class="gate-input"
-                    id="gateInput"
-                    data-ph-en="this week's word"
-                    data-ph-ko="이번 주 단어"
-                    aria-describedby="gateAside"
-                    autocomplete="off"
-                    autofocus
-                >
-                <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
-            </form>
-            <p class="gate-hint" id="gateHint">
-                <span data-l="en">Hmm, that's not it.</span>
-                <span data-l="ko">음, 아닌데?</span>
-            </p>
-            <p class="gate-aside" id="gateAside">
-                <span data-l="en">Japanese noun &mdash; romaji or kanji</span>
-                <span data-l="ko">일본어 명사 &mdash; 로마자 또는 한자</span>
-            </p>
-        </div>
-    </div>
-
-    <!-- Ambient gate light -->
-    <div class="gate-light" id="gateLight"></div>
 
     <!-- ==================== KOMOREBI INTERSTITIAL ==================== -->
     <div class="komorebi" id="komorebi">
@@ -1813,158 +1552,70 @@
     <!-- Scripts -->
     <script src="/js/theme.js"></script>
     <script>
-        // ==================== KOMOREBI GATE ====================
+        // ==================== KOMOREBI INTERSTITIAL ====================
         (function() {
-            var gate = document.getElementById('gate');
-            var input = document.getElementById('gateInput');
-            var hint = document.getElementById('gateHint');
             var komorebi = document.getElementById('komorebi');
-            if (!gate || !input) return;
+            if (!komorebi) return;
 
             var path = window.location.pathname.replace(/\/$/, '') || '/';
-            var issueKey = 'dispatch-auth-' + path;
+            var seenKey = 'dispatch-seen-' + path;
 
-            function animateKomorebi(callback) {
-                var gateLight = document.getElementById('gateLight');
-                gateLight.classList.add('awakening');
+            // Skip interstitial for returning visitors this session
+            if (sessionStorage.getItem(seenKey) === '1') {
+                komorebi.style.display = 'none';
+                return;
+            }
+            sessionStorage.setItem(seenKey, '1');
 
-                komorebi.classList.add('active');
-                document.body.style.overflow = 'hidden';
+            komorebi.classList.add('active');
+            document.body.style.overflow = 'hidden';
 
+            var leaves = document.getElementById('komorebiLeaves');
+            var sun = document.getElementById('komorebiSun');
+            var spots = document.getElementById('komorebiSpots');
+            var kanji = document.getElementById('komorebiKanji');
+            var romaji = document.getElementById('komorebiRomaji');
+            var noun = document.getElementById('komorebiNoun');
+            var meaning = document.getElementById('komorebiMeaning');
+            var divider = document.getElementById('komorebiDivider');
+            var tagline = document.getElementById('komorebiTagline');
+
+            var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+
+            function animate(el, d, dur) {
+                dur = dur || 1;
                 setTimeout(function() {
-                    gate.classList.add('unlocked');
-                    gateLight.style.display = 'none';
-
-                    var leaves = document.getElementById('komorebiLeaves');
-                    var sun = document.getElementById('komorebiSun');
-                    var spots = document.getElementById('komorebiSpots');
-                    var kanji = document.getElementById('komorebiKanji');
-                    var romaji = document.getElementById('komorebiRomaji');
-                    var noun = document.getElementById('komorebiNoun');
-                    var meaning = document.getElementById('komorebiMeaning');
-                    var divider = document.getElementById('komorebiDivider');
-                    var tagline = document.getElementById('komorebiTagline');
-
-                    var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
-
-                    function animate(el, d, dur) {
-                        dur = dur || 1;
-                        setTimeout(function() {
-                            el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
-                            el.style.opacity = '1';
-                            el.style.transform = 'translateY(0) scale(1)';
-                        }, d);
-                    }
-
-                    setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
-                    setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
-                    setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
-
-                    animate(kanji, 800, 1.4);
-                    animate(romaji, 1800, 1);
-                    animate(noun, 2200, 0.8);
-                    animate(meaning, 2800, 1.1);
-                    setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
-                    animate(tagline, 3800, 0.9);
-
-                    var dismiss = document.getElementById('komorebiDismiss');
-                    setTimeout(function() {
-                        dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
-                        dismiss.style.opacity = '0.5';
-                        dismiss.style.transform = 'translateY(0)';
-                    }, 4200);
-
-                    dismiss.addEventListener('click', function() {
-                        komorebi.classList.add('exiting');
-                        document.body.style.overflow = '';
-                        document.body.classList.add('gate-open');
-                        setTimeout(callback, 1200);
-                    });
-                }, 800);
+                    el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0) scale(1)';
+                }, d);
             }
 
-            function unlock() {
-                sessionStorage.setItem(issueKey, '1');
-                animateKomorebi(function() {
+            setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
+            setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
+            setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
+
+            animate(kanji, 800, 1.4);
+            animate(romaji, 1800, 1);
+            animate(noun, 2200, 0.8);
+            animate(meaning, 2800, 1.1);
+            setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
+            animate(tagline, 3800, 0.9);
+
+            var dismiss = document.getElementById('komorebiDismiss');
+            setTimeout(function() {
+                dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
+                dismiss.style.opacity = '0.5';
+                dismiss.style.transform = 'translateY(0)';
+            }, 4200);
+
+            dismiss.addEventListener('click', function() {
+                komorebi.classList.add('exiting');
+                document.body.style.overflow = '';
+                setTimeout(function() {
                     komorebi.style.display = 'none';
-                });
-            }
-
-            function unlockQuiet() {
-                sessionStorage.setItem(issueKey, '1');
-                gate.classList.add('unlocked');
-                document.body.classList.add('gate-open');
-            }
-
-            function showGate() {
-                document.body.style.overflow = 'hidden';
-                var form = document.getElementById('gateForm');
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var val = input.value.trim();
-                    if (!val) return;
-                    input.disabled = true;
-                    document.getElementById('gateBtn').disabled = true;
-                    checkPassword(val, function(ok) {
-                        input.disabled = false;
-                        document.getElementById('gateBtn').disabled = false;
-                        if (ok) {
-                            unlock();
-                        } else {
-                            input.value = '';
-                            input.classList.remove('shake');
-                            void input.offsetWidth;
-                            input.classList.add('shake');
-                            if (hint) hint.classList.add('visible');
-                        }
-                    });
-                });
-            }
-
-            function checkPassword(val, callback) {
-                // 005's word of the week is the password.
-                // Falls through to /api/gate which still honors DISPATCH_PASS (komorebi) as a master.
-                var raw = val.trim();
-                var lower = raw.toLowerCase();
-                if (lower === 'tsundoku' || lower === 'komorebi' || raw === '積ん読' || raw === '積読') {
-                    callback(true);
-                    return;
-                }
-                fetch('/api/gate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: val }),
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) { callback(data.ok === true); })
-                .catch(function() { callback(false); });
-            }
-
-            if (sessionStorage.getItem(issueKey) === '1') {
-                gate.classList.add('unlocked');
-                document.body.classList.add('gate-open');
-                if (komorebi) komorebi.style.display = 'none';
-                return;
-            }
-
-            var params = new URLSearchParams(window.location.search);
-            var urlKey = params.get('key');
-            if (urlKey) {
-                params.delete('key');
-                var clean = window.location.pathname + (params.toString() ? '?' + params : '');
-                window.history.replaceState({}, '', clean);
-
-                checkPassword(urlKey, function(ok) {
-                    if (ok) {
-                        unlock();
-                    } else {
-                        showGate();
-                    }
-                });
-                return;
-            }
-
-            showGate();
+                }, 1200);
+            });
         })();
     </script>
     <script>
@@ -2267,13 +1918,11 @@
 
             var dismiss = document.getElementById('komorebiDismiss');
             if (dismiss) dismiss.addEventListener('click', tryAutoplay);
-            var gateForm = document.getElementById('gateForm');
-            if (gateForm) gateForm.addEventListener('submit', tryAutoplay);
 
-            // Returning visitor — gate already passed, surface the player with needs-tap
+            // Returning visitor — interstitial already seen, surface the player with needs-tap
             var path = window.location.pathname.replace(/\/$/, '') || '/';
-            var alreadyAuthed = sessionStorage.getItem('dispatch-auth-' + path) === '1';
-            if (alreadyAuthed) {
+            var alreadySeen = sessionStorage.getItem('dispatch-seen-' + path) === '1';
+            if (alreadySeen) {
                 setTimeout(function() {
                     showPlayer();
                     player.classList.add('needs-tap');

@@ -120,92 +120,6 @@
             opacity: 0.6;
         }
 
-        /* ========== PASSWORD GATE ========== */
-        .gate {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            transition: opacity 0.6s ease, visibility 0.6s ease, background-color 0.3s ease;
-        }
-
-        .gate.unlocked {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .gate-content {
-            max-width: 320px;
-        }
-
-        .gate-title {
-            font-family: var(--font-display);
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .gate-subtitle {
-            font-size: 16px;
-            color: var(--caption);
-            margin-bottom: 2rem;
-            line-height: 1.5;
-            transition: color 0.3s ease;
-        }
-
-        .gate-input {
-            width: 100%;
-            background: none;
-            border: 1px solid var(--rule);
-            border-radius: 8px;
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 18px;
-            padding: 12px 16px;
-            text-align: center;
-            outline: none;
-            letter-spacing: 0.1em;
-            transition: border-color 0.2s ease, color 0.3s ease;
-        }
-
-        .gate-input::placeholder {
-            color: var(--caption);
-            letter-spacing: 0;
-            font-size: 16px;
-        }
-
-        .gate-input:focus {
-            border-color: var(--accent);
-        }
-
-        .gate-input.shake {
-            animation: shake 0.4s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
-        }
-
-        .gate-hint {
-            font-size: 13px;
-            color: var(--caption);
-            margin-top: 1rem;
-            opacity: 0;
-            transition: opacity 0.3s ease, color 0.3s ease;
-        }
-
-        .gate-hint.visible {
-            opacity: 1;
-        }
-
         /* ========== PROGRESS BAR ========== */
         .progress-bar {
             position: fixed;
@@ -1003,7 +917,6 @@
                 transform: none !important;
             }
             .scroll-line { animation: none; }
-            .gate-input.shake { animation: none; }
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
                 transition-duration: 0.01ms !important;
@@ -1012,28 +925,6 @@
     </style>
 </head>
 <body>
-
-    <!-- ==================== PASSWORD GATE ==================== -->
-    <div class="gate" id="gate">
-        <div class="gate-content">
-            <h1 class="gate-title">Dispatch</h1>
-            <p class="gate-subtitle">
-                <span data-l="en">This letter is for friends and family.</span>
-                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
-            </p>
-            <input
-                type="password"
-                class="gate-input"
-                id="gateInput"
-                autocomplete="off"
-                autofocus
-            >
-            <p class="gate-hint" id="gateHint">
-                <span data-l="en">Hmm, that's not it.</span>
-                <span data-l="ko">음, 아닌데?</span>
-            </p>
-        </div>
-    </div>
 
     <!-- Progress Bar -->
     <div class="progress-bar" id="progressBar"></div>
@@ -1512,7 +1403,6 @@
 
     <!-- Scripts -->
     <script src="/js/theme.js"></script>
-    <script src="/newsletter/gate.js"></script>
     <script>
         // ==================== LANGUAGE TOGGLE ====================
         (function() {
