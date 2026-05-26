@@ -1617,6 +1617,134 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* ============================================================
+           FIELD-LOG ADDITIONS — small cinematic moments for Dispatch 005
+           Three pieces, same universe: a REC pulse on the field log,
+           a scroll-drawn route line from church to ridge, and a faint
+           sun arc behind the sunset moment.
+           ============================================================ */
+
+        /* --- 1) REC pulse on the sunset-moment field log --- */
+        .sunset-moment .field-log {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4em;
+        }
+        .sunset-moment .field-log .rec-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #c0563e;
+            box-shadow: 0 0 6px rgba(192, 86, 62, 0.55);
+            margin-right: 0.15em;
+            transform-origin: center;
+            animation: recPulse 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            flex: 0 0 auto;
+        }
+        [data-theme="dark"] .sunset-moment .field-log .rec-dot {
+            background: #d96a4f;
+            box-shadow: 0 0 8px rgba(217, 106, 79, 0.6);
+        }
+        @keyframes recPulse {
+            0%, 100% { opacity: 0.55; transform: scale(1); }
+            50%      { opacity: 1;    transform: scale(1.35); }
+        }
+
+        /* --- 2) Scroll-drawn route line (church to ridge) --- */
+        .route-line {
+            max-width: 620px;
+            margin: 1.5rem auto 0.5rem;
+            padding: 0 1.5rem;
+            text-align: center;
+        }
+        .route-line svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 480px;
+            margin: 0 auto;
+            overflow: visible;
+        }
+        .route-line .rl-path {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1.4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0.85;
+            /* Natural state: fully drawn. JS overrides via inline style
+               to animate stroke-dashoffset; reduced-motion users see the
+               completed line because we never set the inline override. */
+        }
+        .route-line .rl-dot {
+            fill: var(--accent);
+        }
+        .route-line .rl-dot-ring {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1;
+            opacity: 0.4;
+        }
+        .route-line .rl-label {
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 9px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            fill: var(--caption);
+            opacity: 0.85;
+        }
+        .route-line .rl-caption {
+            display: block;
+            margin-top: 0.5rem;
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--caption);
+            opacity: 0.7;
+            transition: color 0.3s ease;
+        }
+
+        /* --- 3) Sun arc behind the sunset moment ---
+           Sits behind the radial glow + frame. The `.sunset-moment > *`
+           rule at line 706 forces children to z-index 1; we override
+           with a class-on-descendant selector and push to z-index 0. */
+        .sunset-moment .sun-arc {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            display: block;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        .sunset-moment .sun-arc .arc-path {
+            fill: none;
+            stroke: rgba(255, 168, 87, 0.45);
+            stroke-width: 1;
+            stroke-linecap: round;
+            stroke-dasharray: 3 5;
+            stroke-dashoffset: 0;
+            opacity: 0.7;
+        }
+        [data-theme="dark"] .sunset-moment .sun-arc .arc-path {
+            stroke: rgba(255, 168, 87, 0.55);
+        }
+        .sunset-moment .sun-arc .arc-sun {
+            fill: rgba(255, 168, 87, 0.7);
+            opacity: 0.85;
+        }
+        [data-theme="dark"] .sunset-moment .sun-arc .arc-sun {
+            fill: rgba(255, 190, 110, 0.85);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sunset-moment .field-log .rec-dot { animation: none; opacity: 0.85; transform: none; }
+        }
     </style>
 </head>
 <body>
@@ -1770,6 +1898,33 @@
             <div class="photo-caption">post-service in the courtyard &mdash; Minyoung, Justin, me, overcast doing the lighting</div>
         </div>
 
+        <!-- Scroll-drawn route line: church (lower-left) -> Big Bear ridge (upper-right),
+             with a small fire-road switchback at the tail. Hand-drawn-looking curve. -->
+        <div class="route-line reveal-fade" aria-hidden="true">
+            <svg id="routeLine" viewBox="0 0 480 140" preserveAspectRatio="xMidYMid meet">
+                <!-- start dot: church / LA -->
+                <circle class="rl-dot-ring" cx="40" cy="108" r="6"></circle>
+                <circle class="rl-dot"      cx="40" cy="108" r="2.4"></circle>
+                <text class="rl-label" x="40" y="128" text-anchor="middle">LA &middot; church</text>
+
+                <!-- end dot: Big Bear ridge -->
+                <circle class="rl-dot-ring" cx="440" cy="38" r="6"></circle>
+                <circle class="rl-dot"      cx="440" cy="38" r="2.4"></circle>
+                <text class="rl-label" x="440" y="22" text-anchor="middle">Big Bear</text>
+
+                <!-- the route: gentle climb east, then a switchback near the ridge -->
+                <path id="routeLinePath" class="rl-path"
+                      d="M 46 106
+                         C 110 100, 170 92, 230 76
+                         S 330 50, 380 44
+                         L 400 56
+                         L 414 40
+                         L 426 50
+                         L 434 38"></path>
+            </svg>
+            <span class="rl-caption">Hollywood to the ridge &middot; ~1h 30m</span>
+        </div>
+
         <div class="text-block reveal">
             <p>By mid-afternoon I had decided I needed dirt. I went home, threw a bag and a single camp chair in the RAV4, and pointed it east. I'm a recent convert to <strong>dispersed camping</strong> &mdash; for anyone unfamiliar, it's camping without a campsite. You drive into a national forest until the asphalt becomes gravel and the gravel becomes a suggestion, then you find a flat patch far enough from anyone else to pretend you've left civilization. The trade is no bathroom, no neighbors, no Wi-Fi, no rules. Mostly worth it.</p>
         </div>
@@ -1811,7 +1966,16 @@
         </div>
 
         <div class="sunset-moment reveal">
+            <!-- Faint dashed sun arc tracing the day's path. Sits behind the
+                 radial glow + frame. Sun pinned to the right edge where it
+                 actually sets in the video. Draws once on enter; static after. -->
+            <svg class="sun-arc" id="sunArc" viewBox="0 0 720 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <path id="sunArcPath" class="arc-path"
+                      d="M 40 470 C 200 60, 520 60, 660 220"></path>
+                <circle id="sunArcSun" class="arc-sun" cx="660" cy="220" r="6"></circle>
+            </svg>
             <p class="field-log">
+                <span class="rec-dot" aria-hidden="true"></span>
                 <span>Field log</span>
                 <span class="sep">&middot;</span>
                 <span>2026.05.24</span>
@@ -2522,6 +2686,65 @@
                     scrollTrigger: { trigger: el, start: 'top 85%', once: true }
                 });
             });
+
+            // ===== Field-log additions =====
+            // All scroll-coupled drawing is gated behind reduced-motion. When
+            // reduced-motion is on, the SVG paths fall back to their natural,
+            // fully-drawn state (no inline style override), so the user sees
+            // a complete line/arc without animation.
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (!reduceMotion) {
+                // Scroll-drawn route line — draws from church dot to Big Bear
+                // dot as the user scrolls through the "needed dirt" paragraph.
+                var routePath = document.getElementById('routeLinePath');
+                if (routePath) {
+                    var routeLen = routePath.getTotalLength();
+                    gsap.set(routePath, {
+                        strokeDasharray: routeLen,
+                        strokeDashoffset: routeLen
+                    });
+                    gsap.to(routePath, {
+                        strokeDashoffset: 0,
+                        ease: 'none',
+                        scrollTrigger: {
+                            trigger: '.route-line',
+                            start: 'top 80%',
+                            end: 'bottom 55%',
+                            scrub: 0.6
+                        }
+                    });
+                }
+
+                // Sun arc — draws itself once as the sunset moment enters
+                // the viewport, then stays. Faint, low-priority, behind glow.
+                var arcPath = document.getElementById('sunArcPath');
+                var arcSun  = document.getElementById('sunArcSun');
+                if (arcPath) {
+                    var arcLen = arcPath.getTotalLength();
+                    gsap.set(arcPath, {
+                        strokeDasharray: arcLen,
+                        strokeDashoffset: arcLen
+                    });
+                    if (arcSun) gsap.set(arcSun, { opacity: 0 });
+                    gsap.timeline({
+                        scrollTrigger: {
+                            trigger: '.sunset-moment',
+                            start: 'top 75%',
+                            once: true
+                        }
+                    })
+                    .to(arcPath, {
+                        strokeDashoffset: 0,
+                        duration: 2.4,
+                        ease: 'power1.inOut'
+                    })
+                    .to(arcSun, {
+                        opacity: 0.85,
+                        duration: 0.6,
+                        ease: 'power2.out'
+                    }, '-=0.4');
+                }
+            }
         }
     </script>
 
