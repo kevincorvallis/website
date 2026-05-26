@@ -4,24 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="canonical" href="https://klee.page/newsletter/005/">
-    <title>Dispatch 005: Coquelicots — Kevin Lee</title>
-    <meta name="description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
+    <title>Dispatch 005: Margin — Kevin Lee</title>
+    <meta name="description" content="A long weekend in four parts — a screening on the Paramount lot, two nights off-grid in Big Bear, a Sunday pew, and a cat who knows exactly where he wants to be touched.">
     <meta name="author" content="Kevin Lee">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://klee.page/newsletter/005/">
-    <meta property="og:title" content="Dispatch 005: Coquelicots — Kevin Lee">
-    <meta property="og:description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
-    <meta property="og:image" content="https://klee.page/newsletter/005/images/coquelicots.jpg">
+    <meta property="og:title" content="Dispatch 005: Margin — Kevin Lee">
+    <meta property="og:description" content="A long weekend in four parts — a screening on the Paramount lot, two nights off-grid in Big Bear, a Sunday pew, and a cat who knows exactly where he wants to be touched.">
+    <meta property="og:image" content="https://klee.page/newsletter/005/images/camp-setup.jpg">
     <meta property="og:locale" content="en_US">
-    <meta property="og:locale:alternate" content="ko_KR">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Dispatch 005: Coquelicots — Kevin Lee">
-    <meta name="twitter:description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
-    <meta name="twitter:image" content="https://klee.page/newsletter/005/images/coquelicots.jpg">
+    <meta name="twitter:title" content="Dispatch 005: Margin — Kevin Lee">
+    <meta name="twitter:description" content="A long weekend in four parts — a screening on the Paramount lot, two nights off-grid in Big Bear, a Sunday pew, and a cat who knows exactly where he wants to be touched.">
+    <meta name="twitter:image" content="https://klee.page/newsletter/005/images/camp-setup.jpg">
 
     <!-- Smart App Banner -->
     <meta name="apple-itunes-app" content="app-id=6761163892">
@@ -48,12 +47,12 @@
             document.documentElement.setAttribute('lang', lang);
 
             // Pre-paint URL-key bypass: hide password UI so it never flashes.
-            // The tsundoku welcome interstitial still plays after unlock().
+            // The yohaku welcome interstitial still plays after unlock().
             var urlKey = params.get('key');
             if (urlKey) {
                 var raw = urlKey.trim();
                 var lower = raw.toLowerCase();
-                if (lower === 'tsundoku' || lower === 'komorebi' || raw === '積ん読' || raw === '積読') {
+                if (lower === 'yohaku' || lower === 'komorebi' || raw === '余白') {
                     document.documentElement.setAttribute('data-prebypass', '1');
                 }
             }
@@ -96,12 +95,6 @@
             --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
         }
 
-        /* Language toggle */
-        [data-lang="en"] [data-l="ko"],
-        [data-lang="ko"] [data-l="en"] {
-            display: none !important;
-        }
-
         html {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -134,7 +127,7 @@
         }
 
         /* When ?key= bypass is present, hide ONLY the password input + ambient gate
-           light. The tsundoku welcome interstitial still plays. */
+           light. The yohaku welcome interstitial still plays. */
         [data-prebypass="1"] .gate,
         [data-prebypass="1"] .gate-light {
             display: none !important;
@@ -249,8 +242,8 @@
             opacity: 1;
         }
 
-        /* ========== GATE — Monet revamp (005) ========== */
-        /* The gate is transparent so the live hero flow-field shows through.
+        /* ========== GATE (005) ========== */
+        /* The gate is transparent so the sunset hero video shows through.
            A frosted-glass card holds the form; a soft cream veil sits between. */
         .gate {
             background: transparent;
@@ -582,104 +575,49 @@
             overflow: hidden;
         }
 
-        /* Monet flow-field — fixed background across the entire article (005) */
-        .hero-smoke, .hero-chars {
-            position: fixed;
+        /* Hero video — fills the hero, behind overlay */
+        .hero-video {
+            position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
-            display: block;
-        }
-        .hero-smoke { z-index: -3; }
-        .hero-chars { z-index: -2; pointer-events: none; }
-        .hero-fallback {
-            position: fixed; inset: 0; z-index: -4;
-            background-size: cover; background-position: center;
-            opacity: 0; transition: opacity 0.6s ease;
-            transform: scale(1);
+            object-fit: cover;
+            z-index: 0;
             will-change: transform;
         }
-        .hero-fallback.show { opacity: 1; }
 
-        /* The journey: the painting IS the medium. The veil is a very soft tint,
-           not a wash; legibility lives in per-text-block scrims (.chapter .text-block). */
-        .article-veil {
-            position: fixed; inset: 0; z-index: -1;
-            background: rgba(240, 238, 230, 0.0);  /* effectively transparent; kept for theme transition only */
-            pointer-events: none;
-            opacity: 1;
-            transition: background-color 0.5s ease;
-        }
-        [data-theme="dark"] .article-veil {
-            background: rgba(31, 30, 29, 0.0);
-        }
-
-        /* ==================== JOURNEY CHAPTERS ==================== */
-        /* Each .chapter is a room: full-viewport tall, content centered, painting in full bloom behind. */
+        /* ==================== CHAPTERS ==================== */
         .chapter {
             position: relative;
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 12vh 0;
-            gap: 2.5rem;
+            padding: 4rem 0 3rem;
         }
         .chapter > * { width: 100%; }
 
-        /* Museum placard — sticks to the top of the viewport while you're in this chapter,
-           hands off when the next chapter's mark sticks past it. */
+        /* Day placard — small uppercase mark above each chapter */
         .chapter-mark {
-            position: sticky;
-            top: 1.5rem;
-            z-index: 5;
             text-align: center;
-            margin: 0;
+            margin: 0 0 1.5rem;
             font-family: var(--font-display);
             color: var(--accent);
             letter-spacing: 0.22em;
             text-transform: uppercase;
             font-size: 12px;
             opacity: 0.9;
-            pointer-events: none;
-            mix-blend-mode: multiply;
         }
-        .chapter-mark .numeral {
+        .chapter-mark .day {
             font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.3em;
             margin-right: 0.9rem;
         }
-        .chapter-mark .painting-title {
+        .chapter-mark .day-title {
             font-style: italic;
             letter-spacing: 0.12em;
             text-transform: none;
         }
-        [data-theme="dark"] .chapter-mark { mix-blend-mode: screen; opacity: 0.85; }
-
-        /* The text-block sits on the painting; a soft radial halo provides reading legibility */
-        .chapter .text-block {
-            position: relative;
-            z-index: 1;
-        }
-        .chapter .text-block::before {
-            content: '';
-            position: absolute;
-            inset: -2rem -1.5rem;
-            z-index: -1;
-            background: radial-gradient(ellipse at center, rgba(240,238,230,0.78) 0%, rgba(240,238,230,0.62) 50%, rgba(240,238,230,0.0) 100%);
-            border-radius: 6px;
-            pointer-events: none;
-            transition: background 0.4s ease;
-        }
-        [data-theme="dark"] .chapter .text-block::before {
-            background: radial-gradient(ellipse at center, rgba(31,30,29,0.78) 0%, rgba(31,30,29,0.62) 50%, rgba(31,30,29,0.0) 100%);
-        }
 
         /* Photos within a chapter: soft white frame ("polaroid-ish"), gentle shadow,
-           barely-there tilt so they feel pinned to the painting */
+           barely-there tilt for a hand-pinned feel */
         .chapter .photo-inset img {
             box-shadow: 0 18px 60px -22px rgba(31, 30, 29, 0.45),
                         0 4px 12px -4px rgba(31, 30, 29, 0.15);
@@ -694,14 +632,79 @@
         }
         .chapter .photo-inset:nth-of-type(even) img { transform: rotate(0.6deg); }
 
-        /* Body must be transparent so the canvases show through */
-        body { background: transparent; }
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: -5;
-            background: var(--bg);
-            transition: background-color 0.3s ease;
+        /* Inline video — same polaroid treatment */
+        .chapter .video-inset {
+            padding: 1rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
         }
+        .chapter .video-inset video {
+            width: 100%;
+            display: block;
+            border-radius: 3px;
+            background: #000;
+            box-shadow: 0 18px 60px -22px rgba(31, 30, 29, 0.45),
+                        0 4px 12px -4px rgba(31, 30, 29, 0.15);
+        }
+        [data-theme="dark"] .chapter .video-inset video {
+            box-shadow: 0 18px 60px -22px rgba(0, 0, 0, 0.6);
+        }
+        .chapter .video-inset .photo-caption {
+            margin-top: 0.75rem;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+        @media (min-width: 768px) {
+            .chapter .video-inset { padding: 2rem 3rem; max-width: 700px; }
+        }
+
+        /* Vertical-format videos (phone footage) get a smaller column so they don't
+           dominate the page; horizontal videos use the full 620px / 700px */
+        .chapter .video-inset.portrait video {
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+            .chapter .video-inset.portrait video { max-width: 440px; }
+        }
+
+        /* Field card — a small placard for the camping location */
+        .field-card {
+            max-width: 360px;
+            margin: 2rem auto;
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--accent);
+            border-bottom: 1px solid var(--accent);
+            text-align: center;
+            font-family: var(--font-display);
+            color: var(--text);
+            opacity: 0.92;
+        }
+        .field-card .fc-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .field-card .fc-name {
+            font-size: 18px;
+            font-style: italic;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+            margin-bottom: 0.6rem;
+        }
+        .field-card .fc-stats {
+            font-family: var(--font);
+            font-size: 13px;
+            color: var(--caption);
+            letter-spacing: 0.04em;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+        .field-card .fc-stats .fc-sep { opacity: 0.4; margin: 0 0.5rem; }
 
         .hero-overlay {
             position: absolute;
@@ -1402,33 +1405,23 @@
     <!-- ==================== PASSWORD GATE ==================== -->
     <div class="gate" id="gate">
         <div class="gate-content">
-            <p class="gate-meta">No. 005 &middot; Coquelicots</p>
+            <p class="gate-meta">No. 005 &middot; Long weekend</p>
             <h1 class="gate-title">Dispatch</h1>
-            <p class="gate-subtitle">
-                <span data-l="en">This letter is for friends and family.</span>
-                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
-            </p>
+            <p class="gate-subtitle">This letter is for friends and family.</p>
             <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
                 <input
                     type="text"
                     class="gate-input"
                     id="gateInput"
-                    data-ph-en="this week's word"
-                    data-ph-ko="이번 주 단어"
+                    placeholder="this week's word"
                     aria-describedby="gateAside"
                     autocomplete="off"
                     autofocus
                 >
                 <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
             </form>
-            <p class="gate-hint" id="gateHint">
-                <span data-l="en">Hmm, that's not it.</span>
-                <span data-l="ko">음, 아닌데?</span>
-            </p>
-            <p class="gate-aside" id="gateAside">
-                <span data-l="en">Japanese noun &mdash; romaji or kanji</span>
-                <span data-l="ko">일본어 명사 &mdash; 로마자 또는 한자</span>
-            </p>
+            <p class="gate-hint" id="gateHint">Hmm, that's not it.</p>
+            <p class="gate-aside" id="gateAside">Japanese noun &mdash; romaji or kanji</p>
         </div>
     </div>
 
@@ -1463,22 +1456,15 @@
             <div class="komorebi-spot"></div>
         </div>
         <div class="komorebi-content">
-            <p class="komorebi-kanji" id="komorebiKanji">積ん読</p>
-            <p class="komorebi-romaji" id="komorebiRomaji">tsundoku</p>
+            <p class="komorebi-kanji" id="komorebiKanji">余白</p>
+            <p class="komorebi-romaji" id="komorebiRomaji">yohaku</p>
             <p class="komorebi-noun" id="komorebiNoun">noun &middot; Japanese</p>
             <p class="komorebi-meaning" id="komorebiMeaning">
-                <span data-l="en">The practice of buying books and letting them pile up unread on a shelf &mdash; a named architectural failure of intention.</span>
-                <span data-l="ko">책을 사놓고 읽지 않은 채 책장에 쌓아두는 일 &mdash; 의도가 무너지는 방식에 따로 이름을 붙여둔 단어.</span>
+                The blank space deliberately left around a thing &mdash; the margin, the breathing room, the part you choose not to fill.
             </p>
             <div class="komorebi-divider" id="komorebiDivider"></div>
-            <p class="komorebi-tagline" id="komorebiTagline">
-                <span data-l="en">A letter for friends and family.</span>
-                <span data-l="ko">가까운 사람들한테 보내는 편지.</span>
-            </p>
-            <button class="komorebi-dismiss" id="komorebiDismiss">
-                <span data-l="en">Continue &rarr;</span>
-                <span data-l="ko">계속 &rarr;</span>
-            </button>
+            <p class="komorebi-tagline" id="komorebiTagline">A letter for friends and family.</p>
+            <button class="komorebi-dismiss" id="komorebiDismiss">Continue &rarr;</button>
         </div>
     </div>
 
@@ -1488,56 +1474,35 @@
     <!-- Navigation -->
     <a href="/newsletter" class="back-link">&larr; Dispatch</a>
     <div class="top-controls">
-        <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
-            <span class="lang-pill-label lang-pill-en">EN</span>
-            <span class="lang-pill-label lang-pill-ko">한</span>
-            <span class="lang-pill-dot"></span>
-        </div>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle">
             <label for="theme-toggle"></label>
         </div>
     </div>
 
-    <!-- ==================== MONET BACKGROUND (fixed, page-wide) ==================== -->
-    <div class="hero-fallback" id="heroFallback" style="background-image: url('/newsletter/005/images/coquelicots.jpg');"></div>
-    <canvas class="hero-smoke" id="heroSmoke"></canvas>
-    <canvas class="hero-chars" id="heroChars"></canvas>
-    <div class="article-veil" id="articleVeil"></div>
-
     <!-- ==================== HERO ==================== -->
     <section class="hero" id="heroSection">
+        <video class="hero-video" id="heroVideo" autoplay muted loop playsinline preload="auto" poster="/newsletter/005/images/camp-setup.jpg" aria-hidden="true">
+            <source src="/newsletter/005/images/sunset.mp4" type="video/mp4">
+        </video>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="hero-label">
-                <span data-l="en">Dispatch 005 &middot; A Journey Through Monet</span>
-                <span data-l="ko">디스패치 005호 &middot; 모네의 그림을 따라</span>
-            </div>
-            <h1 class="hero-title" style="font-style: italic;">Coquelicots</h1>
-            <p class="hero-description">
-                <span data-l="en">after Monet, 1873 &mdash; letters drift through pigment</span>
-                <span data-l="ko">모네의 들판, 1873 &mdash; 글자가 안료 사이를 떠다닌다</span>
-            </p>
+            <div class="hero-label">Dispatch 005 &middot; Long weekend</div>
+            <h1 class="hero-title" style="font-style: italic;">Margin</h1>
+            <p class="hero-description">three days, mostly outdoors &mdash; a screening, a forest road, a pew, a cat</p>
         </div>
         <div class="scroll-hint">
-            <span data-l="en">Scroll</span>
-            <span data-l="ko">스크롤</span>
+            <span>Scroll</span>
             <div class="scroll-line"></div>
         </div>
     </section>
 
-    <!-- ==================== ISSUE 005 — Coquelicots ==================== -->
+    <!-- ==================== ISSUE 005 — Margin ==================== -->
 
     <div class="issue-intro reveal">
         <p class="issue-number">No. 005</p>
-        <h2 class="issue-date">
-            <span data-l="en">Coquelicots</span>
-            <span data-l="ko">개양귀비</span>
-        </h2>
-        <p class="issue-opener">
-            <span data-l="en">May 21, 2026</span>
-            <span data-l="ko">2026년 5월 21일</span>
-        </p>
+        <h2 class="issue-date">Margin</h2>
+        <p class="issue-opener">Memorial Day weekend &middot; May 22&ndash;25, 2026</p>
     </div>
 
     <div class="divider reveal-fade"></div>
@@ -1545,118 +1510,85 @@
     <!-- ——— The Letter ——— -->
 
     <!-- ============================================================
-         CHAPTER I — Coquelicots (the body, the field, sunset paddling)
+         FRIDAY — The Lot
          ============================================================ -->
-    <div class="chapter" data-monet="0">
-        <p class="chapter-mark"><span class="numeral">I</span><span class="painting-title">Coquelicots</span></p>
+    <div class="chapter">
+        <p class="chapter-mark"><span class="day">FRI</span><span class="day-title">The Lot</span></p>
         <div class="text-block reveal">
-            <div data-l="en">
-                <p>I weighed myself last week. 192. I've been around 170 my whole adult life. I knew I'd put on a few since the move, but not that &mdash; and the number sat with me for a minute before I put on a shirt. The plan is to get back. Not all the way. Just enough that the next time I paddle out, my belly doesn't catch me off guard.</p>
-            </div>
-            <div data-l="ko">
-                <p>지난주에 몸무게를 쟀다. 192. 어른이 된 이후로 줄곧 170 언저리였다. 이사 와서 몇 파운드 붙었을 거라곤 짐작했지만, 192일 줄은 몰랐다 &mdash; 셔츠를 입기 전, 잠시 그 숫자를 들여다봤다. 다시 돌아갈 계획이다. 끝까지는 아니고. 다음에 패들보드를 타고 나갈 때, 배가 나를 놀라게 하지 않을 정도까지만.</p>
-            </div>
+            <p>Memorial Day weekend started Friday afternoon, when an internal email I almost archived turned out to be a screening invite &mdash; <em>The Passenger</em>, on the Paramount lot, that night, plus-one included. I texted Justin: "are you free in two hours." He was free in two hours.</p>
+            <p>Walking onto the Paramount lot at golden hour does not get old. The arched gate, the soundstages with their numbered doors, the water tower that nobody owns but somehow belongs to all of us. I've been at Paramount long enough that I should be over it. I'm not over it.</p>
         </div>
-    </div>
-
-    <!-- ============================================================
-         CHAPTER II — Tulip Fields at Sassenheim (work, the structure)
-         ============================================================ -->
-    <div class="chapter" data-monet="1">
-        <p class="chapter-mark"><span class="numeral">II</span><span class="painting-title">Tulip Fields at Sassenheim</span></p>
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>Work is a lot right now. I manage six people. We might add three more this quarter, which would put the team at nine. I used to think this was what I wanted &mdash; the responsibility, the room to make calls. Now that I have it I'm learning that wanting it and doing it are two different conversations.</p>
-                <p>I went to the Burbank office today &mdash; the Nickelodeon one. Stood in the lobby for a minute before going up. Some weeks I do better than others at keeping the burnout at arm's length. This was one of the harder ones.</p>
-            </div>
-            <div data-l="ko">
-                <p>요즘 회사 일이 많다. 6명을 매니징하고 있고, 이번 분기 안에 3명 정도 더 합류할 것 같다. 그러면 팀이 9명이 된다. 예전엔 이게 내가 원하는 거라고 생각했다 &mdash; 책임이라든가, 결정할 수 있는 여지 같은 거. 막상 가져보니, 원하는 것과 해내는 건 별개의 대화라는 걸 배우고 있다.</p>
-                <p>오늘은 버뱅크 사무실에 있었다 &mdash; 니켈로디언 쪽. 로비에서 잠깐 서 있다가 올라갔다. 번아웃을 어떻게든 손이 닿지 않는 거리에 두려고 하는데, 어떤 주는 잘되고 어떤 주는 잘 안 된다. 이번 주는 후자였다.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================
-         CHAPTER III — Spring in Giverny (beginning again)
-         ============================================================ -->
-    <div class="chapter" data-monet="3">
-        <p class="chapter-mark"><span class="numeral">III</span><span class="painting-title">Spring in Giverny</span></p>
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>In between, I'm taking Japanese lessons. Hiragana, slowly. I don't really know what I'll do with it yet. It's just nice to be a beginner at something again &mdash; to sit with a teacher and not be the one anyone expects to have the answers.</p>
-                <p>Hunter is driving up from San Diego this weekend. We've known each other since high school; he's been in the Marine Corps for a few years now. There's a kind of friendship where you don't have to be impressive &mdash; you just have to show up. I'm grateful for the ones that have lasted long enough to become that.</p>
-            </div>
-            <div data-l="ko">
-                <p>그 사이사이에 일본어 수업을 받고 있다. 히라가나, 천천히. 이걸로 뭘 하게 될지는 아직 모르겠다. 그냥 다시 초보가 되는 게 좋다 &mdash; 선생님 앞에 앉아서, 답을 알고 있어야 하는 사람이 아닌 상태로.</p>
-                <p>이번 주말엔 헌터가 샌디에이고에서 차를 몰고 올라온다. 고등학교 때부터 친구고, 몇 년째 해병대에 있다. 어떤 우정은 잘 보이려고 애쓰지 않아도 되는 종류다 &mdash; 그냥 나타나기만 하면 된다. 그런 우정이 오래 살아남아 줘서 고맙다.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================
-         CHAPTER IV — Parc Monceau (overgrown garden / feed)
-         ============================================================ -->
-    <div class="chapter" data-monet="2">
-        <p class="chapter-mark"><span class="numeral">IV</span><span class="painting-title">Parc Monceau</span></p>
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/newprofilepic.jpg"
-                data-alt-en="Kevin's new profile photo"
-                data-alt-ko="케빈의 새 프로필 사진"
-                alt="Kevin's new profile photo">
-            <div class="photo-caption">
-                <span data-l="en">the new headshot &mdash; 엄마 said I look serious</span>
-                <span data-l="ko">새 프로필 사진 &mdash; 엄마는 내가 너무 심각해 보인다고 했다</span>
-            </div>
+            <img src="/newsletter/005/images/paramount-lot.jpg" alt="Paramount Theatre marquee on the studio lot at dusk">
+            <div class="photo-caption">the Paramount Theatre &mdash; built before the word "projection mapping" existed</div>
         </div>
         <div class="text-block reveal">
-            <div data-l="en">
-                <p>I posted a new headshot this week. I don't usually take photos of myself. <strong>엄마</strong> texted to ask why I looked so serious; everyone else was quiet, which is roughly how the internet works.</p>
-                <p>The next morning I opened my phone to an AI-generated video of a cat doing kung fu. It made me laugh, and then it made me a little sad &mdash; that we built a world where five seconds of compute can turn a housecat into a martial artist, and the same five seconds can't fix any of the things that actually hurt.</p>
-            </div>
-            <div data-l="ko">
-                <p>이번 주에 새 프로필 사진을 올렸다. 평소 내 사진은 잘 안 찍는다. <strong>엄마</strong>가 왜 그렇게 심각해 보이냐고 문자를 보냈고, 다른 사람들은 조용했다. 인터넷이 대체로 그렇다.</p>
-                <p>다음 날 아침 폰을 켰는데, 고양이가 쿵후를 하는 AI 영상이 떠 있었다. 웃겼고, 곧 좀 슬펐다 &mdash; 5초의 연산으로 집고양이를 무술가로 만들 수 있는 세상은 만들어 놓고, 그 5초로 실제로 아픈 것들은 하나도 못 고친다는 게.</p>
-            </div>
+            <p>The screening was at the Paramount Theatre. Old school. Velvet, sloped floor, the kind of acoustics they don't really build into rooms anymore. Justin kept whispering "this is insane," which is the correct response to being a software engineer who shows up to a movie premiere on a movie lot. We sat through the credits like we were going to learn something. We did not learn anything. It was still nice.</p>
         </div>
-        <div style="max-width: 620px; margin: 2rem auto 0; padding: 0 1.5rem;" class="reveal">
-            <video id="catKungfuVideo" muted loop playsinline preload="none"
-                data-aria-en="AI-generated video of a cat performing kung fu"
-                data-aria-ko="쿵후를 하는 고양이 AI 생성 영상"
-                style="width: 100%; border-radius: 3px; display: block;">
-                <source src="/newsletter/005/images/catkungfu.mp4" type="video/mp4">
-            </video>
-            <div class="photo-caption" style="margin-top: 0.75rem; color: var(--caption);">
-                <span data-l="en">five seconds of processing, one new master of the martial arts</span>
-                <span data-l="ko">5초의 연산, 한 명의 새로운 무술의 대가</span>
-            </div>
+        <div class="photo-inset reveal">
+            <img src="/newsletter/005/images/passenger-screening.jpg" alt="Inside the Paramount Theatre before the screening">
+            <div class="photo-caption">red velvet, sloped floor, the lights still up &mdash; the moment before</div>
         </div>
     </div>
 
     <!-- ============================================================
-         CHAPTER V — Poppy Field at Argenteuil (Dakota + Berly + Debussy)
+         SATURDAY — Off-grid
          ============================================================ -->
-    <div class="chapter" data-monet="4">
-        <p class="chapter-mark"><span class="numeral">V</span><span class="painting-title">Poppy Field at Argenteuil</span></p>
+    <div class="chapter">
+        <p class="chapter-mark"><span class="day">SAT</span><span class="day-title">Off-grid</span></p>
         <div class="text-block reveal">
-            <div data-l="en">
-                <p>I had dinner with Dakota tonight. We were talking about the way things are right now &mdash; people losing their jobs, the strange suddenness of it &mdash; and somewhere between the entrées he asked, "Who's your role model?" I didn't have a name. I tried for a minute and came up with nothing.</p>
-                <p>What I told him instead was something Berly said to me once: <em>comparison is the thief of joy.</em> I think about it more than I let on. I see what other people my age have built &mdash; the wealth, the headlines, the velocity &mdash; and there's a version of me that gets very small. But the truth is I'm okay. I have breath in my lungs and food on my plate and people I love sitting across the table. That's the part that matters, even if it doesn't sound like much.</p>
-                <p>I've been playing <em>La fille aux cheveux de lin</em> on loop while I work. It's a Debussy prelude, two and a half minutes long, written in 1910 when half of Europe was trying to be Wagner. Debussy just wrote a small piece about a girl. He didn't try to be impressive. He just was. That's closer to a role model than anything I could name.</p>
-            </div>
-            <div data-l="ko">
-                <p>오늘 저녁엔 다코타와 밥을 먹었다. 요즘 세상 돌아가는 얘기를 했다 &mdash; 일자리를 잃는 사람들, 그 묘하게 빠른 속도. 식사 중간쯤 그가 물었다. "네 롤모델은 누구야?" 떠오르는 이름이 없었다. 한참 생각해봤지만 빈칸이었다.</p>
-                <p>대신 얼마 전 버리가 해준 말을 꺼냈다. <em>비교는 기쁨을 앗아간다.</em> 입 밖에 잘 안 내지만, 자주 생각한다. 또래들이 쌓아 올린 걸 보면 나의 어떤 버전이 작아진다. 하지만 사실 나는 괜찮다. 폐로 들이마시는 숨이 있고, 접시 위에 음식이 있고, 식탁 건너편에 사랑하는 사람들이 있다. 그게 중요한 부분이다. 별 거 아닌 것처럼 들려도.</p>
-                <p>요즘은 일하는 동안 <em>La fille aux cheveux de lin</em>을 반복 재생한다. 드뷔시가 1910년에 쓴 2분 30초짜리 전주곡이다. 유럽의 절반이 바그너처럼 쓰려 애쓸 때, 드뷔시는 그냥 소녀에 관한 짧은 곡을 썼다. 굳이 인상 깊으려 하지 않았다. 그냥 그 자체로 있었다. 내가 떠올릴 수 있는 그 어떤 롤모델보다도 그쪽이 가깝다.</p>
-            </div>
+            <p>I'm a recent convert to <strong>dispersed camping</strong>. For anyone unfamiliar: it's camping without a campsite. You drive into a national forest until the asphalt becomes gravel and the gravel becomes a suggestion, then you find a flat patch far enough from anyone else to pretend you've left civilization. The trade is no bathroom, no neighbors, no Wi-Fi, no rules. Mostly worth it.</p>
         </div>
-        <!-- Debussy embed, in-chapter — the song is part of this room, not a separate feature -->
-        <div style="max-width: 560px; margin: 1rem auto 0; padding: 0 1.5rem;" class="reveal">
+
+        <div class="field-card reveal-fade">
+            <p class="fc-label">Location</p>
+            <p class="fc-name">San Bernardino<br>National Forest</p>
+            <p class="fc-stats">
+                367,357 acres
+                <span class="fc-sep">&middot;</span>
+                USFS
+                <span class="fc-sep">&middot;</span>
+                CA-18, north of Big Bear
+            </p>
+        </div>
+
+        <div class="text-block reveal">
+            <p>Big Bear is about an hour and a half from me. Pacific Crest country, lake at the bottom, fire roads going every direction up the ridge. I aired the RAV4 down &mdash; yes, the RAV4 &mdash; and pointed it uphill.</p>
+        </div>
+
+        <div class="video-inset portrait reveal">
+            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="RAV4 climbing a fire road in Big Bear">
+                <source src="/newsletter/005/images/rav4-offroad.mp4" type="video/mp4">
+            </video>
+            <div class="photo-caption">a 4-cylinder crossover doing things it was politely not designed to do</div>
+        </div>
+
+        <div class="text-block reveal">
+            <p>Found a flat-ish patch near a stand of Jeffrey pines. Backed in. Got the cot up, the bag down, the little stove going. There's a very specific moment in dispersed camping when the engine finally clicks off and your ears reset &mdash; and you realize how loud the things you live with normally are.</p>
+        </div>
+
+        <div class="photo-inset reveal">
+            <img src="/newsletter/005/images/camp-setup.jpg" alt="Dispersed campsite — cot, stove, RAV4 in the trees">
+            <div class="photo-caption">camp, eventually &mdash; no permit, no neighbors, no plumbing</div>
+        </div>
+
+        <div class="text-block reveal">
+            <p>The sunset was the kind that makes a non-photographer instinctively reach for their phone. Mine was on airplane mode. I reached for it anyway.</p>
+        </div>
+
+        <div class="video-inset portrait reveal">
+            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Sunset over Big Bear from camp">
+                <source src="/newsletter/005/images/sunset.mp4" type="video/mp4">
+            </video>
+            <div class="photo-caption">somewhere off CA-18 &middot; 7:42 PM</div>
+        </div>
+
+        <!-- Song of the week, woven into the chapter -->
+        <div style="max-width: 560px; margin: 2rem auto 0; padding: 0 1.5rem;" class="reveal">
             <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 3px;">
                 <iframe
-                    src="https://www.youtube.com/embed/OfXD6ceEPT4?rel=0&modestbranding=1"
-                    data-title-en="La fille aux cheveux de lin — Debussy"
-                    data-title-ko="아마빛 머리의 소녀 — 드뷔시"
-                    title="La fille aux cheveux de lin — Debussy"
+                    src="https://www.youtube.com/embed/TWcyIpul8OE?rel=0&modestbranding=1"
+                    title="Holocene — Bon Iver"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen
@@ -1664,46 +1596,71 @@
                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
                 ></iframe>
             </div>
-            <p class="photo-caption" style="margin-top: 0.6rem; color: var(--caption); text-align: center; font-style: italic;">
-                <span data-l="en">Claude Debussy &middot; <em>Préludes, Book I</em> &middot; 1910</span>
-                <span data-l="ko">클로드 드뷔시 &middot; <em>전주곡집 1권</em> &middot; 1910</span>
-            </p>
+            <p class="photo-caption" style="margin-top: 0.6rem; color: var(--caption); text-align: center; font-style: italic;">Bon Iver &middot; <em>Holocene</em> &middot; 2011 &mdash; played on the drive down at exactly the speed it asks for</p>
         </div>
     </div>
 
     <!-- ============================================================
-         CHAPTER VI — Coquelicots, revisited (May ends; tsundoku; books)
+         SUNDAY — Restored
          ============================================================ -->
-    <div class="chapter" data-monet="0">
-        <p class="chapter-mark"><span class="numeral">VI</span><span class="painting-title">Coquelicots, revisited</span></p>
+    <div class="chapter">
+        <p class="chapter-mark"><span class="day">SUN</span><span class="day-title">Restored</span></p>
         <div class="text-block reveal">
-            <div data-l="en">
-                <p>May is almost over. I'll be twenty-eight in three months. There's a stack of books on my nightstand I haven't read &mdash; things I bought thinking I'd get to. There's a Japanese word for it: <span style="font-family: 'Noto Serif JP', serif;">積ん読</span>, <em>tsundoku.</em> The pile of books you meant to read.</p>
-                <p>Most of my life is shaped like that right now. Intention outrunning execution. The 170 I want to be. The Japanese I want to know. The chapters of this letter I keep meaning to send sooner. I'm trying to be gentler with the gap than I used to be.</p>
-                <p>If you've read something lately that actually changed how you saw a Tuesday afternoon, send it my way. My goodreads is <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank" rel="noopener noreferrer">here</a>. I'm not asking for productivity-bro lists. I want the ones that did something for you, even if you can't name what.</p>
-            </div>
-            <div data-l="ko">
-                <p>5월이 거의 끝나간다. 석 달 뒤면 스물여덟이다. 침대 옆에 안 읽은 책이 쌓여 있다 &mdash; 언젠가 읽겠지 하고 사놓은 것들. 일본어에 그걸 가리키는 단어가 있다. <span style="font-family: 'Noto Serif JP', serif;">積ん読</span>, <em>tsundoku.</em> 읽으려고 사놓고 쌓아둔 책들.</p>
-                <p>요즘 내 삶이 대체로 그 모양이다. 의도가 실행을 앞서 달리는. 되고 싶은 170. 알고 싶은 일본어. 더 일찍 보내야지 하면서 미루는 이 편지의 챕터들. 그 간극에 좀 더 너그러워지려 노력 중이다.</p>
-                <p>최근 화요일 오후를 바라보는 시선을 진짜로 바꿔놓은 책이 있다면 보내달라. 내 goodreads는 <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank" rel="noopener noreferrer">여기</a>. 자기계발 책 목록 말고. 너에게 뭔가 일어나게 한 책. 그게 뭔지 말로 못 해도.</p>
-            </div>
+            <p>Sunday morning I drove back down, showered (finally), and met Minyoung and Justin for service at Citizens Church. There's a particular kind of clean that comes from two nights in the dirt, then a real shower, then sitting in a pew next to people you actually like. <em>Restored</em> is not too strong a word.</p>
         </div>
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/dogonmyshoulders.jpg"
-                data-alt-en="A dog using Kevin's shoulders as a landing pad"
-                data-alt-ko="케빈의 어깨를 착륙장으로 쓴 개"
-                alt="A dog using Kevin's shoulders as a landing pad">
-            <div class="photo-caption">
-                <span data-l="en">my cousin's friend's dog, unannounced &mdash; he looked at me like he had something to say, and then he didn't say it</span>
-                <span data-l="ko">사촌 친구의 개, 통보 없이 어깨로 &mdash; 뭔가 할 말이 있는 표정으로 나를 보더니, 결국 아무 말도 하지 않았다</span>
-            </div>
+            <img src="/newsletter/005/images/citizens-church.jpg" alt="With Minyoung and Justin after church">
+            <div class="photo-caption">Citizens Church &mdash; with Minyoung and Justin, post-service, pre-coffee</div>
         </div>
     </div>
 
-    <!-- The Word of the Week and Song of the Week have been folded into the prose
-         of Chapters V (Debussy) and VI (tsundoku) so they read as part of the letter,
-         not as separate features. The standalone section blocks are intentionally
-         removed in this issue. -->
+    <!-- ============================================================
+         MONDAY — Domestic
+         ============================================================ -->
+    <div class="chapter">
+        <p class="chapter-mark"><span class="day">MON</span><span class="day-title">Domestic</span></p>
+        <div class="text-block reveal">
+            <p>Monday I refused to put on real pants. The to-do list was: nothing. The actual list, naturally, was a few things.</p>
+            <p>I tried to cut a bike lock with bolt cutters someone had left in my garage. I had reasonable assumptions about how hard this would be &mdash; it being a tool literally <em>named</em> for the thing it's supposed to cut. The bike lock, at the time of this writing, remains uncut. My ego, less so.</p>
+        </div>
+
+        <div class="video-inset portrait reveal">
+            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Attempting to cut a bike lock with bolt cutters">
+                <source src="/newsletter/005/images/bolt-cutters.mp4" type="video/mp4">
+            </video>
+            <div class="photo-caption">posted so my ancestors know what I am made of</div>
+        </div>
+
+        <div class="text-block reveal">
+            <p>Kobe rotated through his usual loop &mdash; bed, sun spot, my lap, back to bed. He has a strong preference for being touched in one very specific area: directly between the front paws. Bury your hand in there and he goes catatonic. It is one of the few perfectly efficient happiness loops I have access to, and I lean on it.</p>
+        </div>
+
+        <div class="video-inset portrait reveal">
+            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Touching Kobe between the paws">
+                <source src="/newsletter/005/images/kobe-paws.mp4" type="video/mp4">
+            </video>
+            <div class="photo-caption">the spot &mdash; he will not contest your method</div>
+        </div>
+
+        <div class="text-block reveal">
+            <p>The rest of Monday was margin. The actual word. Sitting at the work station for no reason. Reading a chapter, abandoning it, reading another. Watching the late light pass across the living room floor for longer than I had any business watching it.</p>
+        </div>
+
+        <div class="photo-inset reveal">
+            <img src="/newsletter/005/images/living-room.jpg" alt="The living room in late afternoon light">
+            <div class="photo-caption">the living room &mdash; cleaned for the photo, I will not pretend otherwise</div>
+        </div>
+
+        <div class="photo-inset reveal">
+            <img src="/newsletter/005/images/workstation.jpg" alt="My work station">
+            <div class="photo-caption">the work station &mdash; same disclaimer</div>
+        </div>
+
+        <div class="text-block reveal">
+            <p>Three days. Two nights in the dirt. One movie on a lot I still can't believe I work at. A bike lock that won the bolt cutter standoff. A cat between whose paws I will continue to find solace.</p>
+            <p>Happy Memorial Day to those it's for. To the rest: take the long weekend wherever you can find it.</p>
+        </div>
+    </div>
 
     <!-- ——— Sign Off — quiet, just the name ——— -->
     <div class="sign-off reveal">
@@ -1715,35 +1672,17 @@
 
     <!-- ——— Subscribe ——— -->
     <div class="subscribe reveal" id="subscribe">
-        <p class="subscribe-label">
-            <span data-l="en">Stay in the Loop</span>
-            <span data-l="ko">소식 받기</span>
-        </p>
-        <h2 class="subscribe-title">
-            <span data-l="en">Want this weekly?</span>
-            <span data-l="ko">매주 받고 싶다면?</span>
-        </h2>
-        <p class="subscribe-desc">
-            <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
-            <span data-l="ko">이메일 남겨주면 매주 보내줄게. 스팸 같은 거 없고 그냥 내 근황.</span>
-        </p>
+        <p class="subscribe-label">Stay in the Loop</p>
+        <h2 class="subscribe-title">Want this weekly?</h2>
+        <p class="subscribe-desc">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</p>
         <form class="subscribe-form" id="subscribeForm">
             <input type="email" class="subscribe-input" id="subscribeEmail"
-                data-ph-en="your@email.com" data-ph-ko="your@email.com"
+                placeholder="your@email.com"
                 required autocomplete="email">
-            <button type="submit" class="subscribe-btn" id="subscribeBtn">
-                <span data-l="en">Subscribe</span>
-                <span data-l="ko">구독</span>
-            </button>
+            <button type="submit" class="subscribe-btn" id="subscribeBtn">Subscribe</button>
         </form>
-        <p class="subscribe-success" id="subscribeSuccess">
-            <span data-l="en">You're in. See you next week.</span>
-            <span data-l="ko">등록됨. 다음 주에 보자.</span>
-        </p>
-        <p class="subscribe-note">
-            <span data-l="en">Just between us — no third parties, ever.</span>
-            <span data-l="ko">우리끼리만. 어디 넘기거나 그런 거 절대 없음.</span>
-        </p>
+        <p class="subscribe-success" id="subscribeSuccess">You're in. See you next week.</p>
+        <p class="subscribe-note">Just between us &mdash; no third parties, ever.</p>
     </div>
 
     <div class="divider reveal-fade"></div>
@@ -1751,60 +1690,24 @@
     <!-- ==================== COMMENTS ==================== -->
     <div class="comments reveal" id="comments">
         <div class="comments-header">
-            <p class="comments-label">
-                <span data-l="en">Discussion</span>
-                <span data-l="ko">댓글</span>
-            </p>
-            <h2 class="comments-title">
-                <span data-l="en">Leave a note</span>
-                <span data-l="ko">한마디 남기기</span>
-            </h2>
+            <p class="comments-label">Discussion</p>
+            <h2 class="comments-title">Leave a note</h2>
         </div>
         <form class="comments-form" id="commentsForm">
-            <input type="text" class="comments-input" id="commentName" data-ph-en="Your name" data-ph-ko="이름" maxlength="100" required>
-            <textarea class="comments-input comments-textarea" id="commentText" data-ph-en="Write a comment..." data-ph-ko="댓글 작성..." maxlength="2000" required></textarea>
-            <button type="submit" class="comments-btn" id="commentBtn">
-                <span data-l="en">Post</span>
-                <span data-l="ko">게시</span>
-            </button>
+            <input type="text" class="comments-input" id="commentName" placeholder="Your name" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <button type="submit" class="comments-btn" id="commentBtn">Post</button>
         </form>
         <div class="comments-list" id="commentsList"></div>
-        <p class="comments-empty" id="commentsEmpty" style="display:none;">
-            <span data-l="en">No comments yet. Be the first.</span>
-            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨 주세요.</span>
-        </p>
+        <p class="comments-empty" id="commentsEmpty" style="display:none;">No comments yet. Be the first.</p>
     </div>
 
     <div class="spacer-lg"></div>
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="story-footer">
-        <p>
-            <span data-l="en">Dispatch No. 005 &middot; Coquelicots &middot;</span>
-            <span data-l="ko">Dispatch 005호 &middot; 개양귀비 &middot;</span>
-            <a href="/">klee.page</a>
-        </p>
+        <p>Dispatch No. 005 &middot; Margin &middot; <a href="/">klee.page</a></p>
     </footer>
-
-    <!-- ==================== SONG OF THE WEEK — audio + mini player ==================== -->
-    <audio id="songOfTheWeek" src="/newsletter/005/images/la-fille-aux-cheveux-de-lin.mp3" preload="metadata" loop></audio>
-    <div class="mini-player" id="miniPlayer" hidden aria-label="Song of the week mini player">
-        <button class="mini-player-btn" id="miniPlayerBtn" type="button" aria-label="Play or pause song of the week" data-state="paused">
-            <svg class="mini-player-ring" viewBox="0 0 36 36" aria-hidden="true">
-                <circle class="ring-track"    cx="18" cy="18" r="16"></circle>
-                <circle class="ring-progress" cx="18" cy="18" r="16" id="miniPlayerRing"></circle>
-            </svg>
-            <svg class="mini-player-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path class="icon-play"  d="M7 5 L7 19 L19 12 Z"></path>
-                <path class="icon-pause" d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z"></path>
-            </svg>
-        </button>
-        <div class="mini-player-meta">
-            <div class="mini-player-title"><span data-l="en">La fille aux cheveux de lin</span><span data-l="ko">아마빛 머리의 소녀</span></div>
-            <div class="mini-player-artist"><span data-l="en">Debussy &middot; 1910</span><span data-l="ko">드뷔시 &middot; 1910</span></div>
-        </div>
-        <button class="mini-player-close" id="miniPlayerClose" type="button" aria-label="Close mini player">&times;</button>
-    </div>
 
     <!-- Analytics -->
     <script defer src="/_vercel/insights/script.js"></script>
@@ -1926,7 +1829,7 @@
                 // Falls through to /api/gate which still honors DISPATCH_PASS (komorebi) as a master.
                 var raw = val.trim();
                 var lower = raw.toLowerCase();
-                if (lower === 'tsundoku' || lower === 'komorebi' || raw === '積ん読' || raw === '積読') {
+                if (lower === 'yohaku' || lower === 'komorebi' || raw === '余白') {
                     callback(true);
                     return;
                 }
@@ -1968,73 +1871,27 @@
         })();
     </script>
     <script>
-        // ==================== DISPATCH I18N ====================
+        // ==================== LAZY-PLAY INLINE VIDEOS ====================
+        // Any <video class="lazy-video"> in the body plays when scrolled into view,
+        // pauses when scrolled out. Respects prefers-reduced-motion.
         (function() {
-            function getLang() {
-                return document.documentElement.getAttribute('data-lang') || 'en';
-            }
-
-            function applyI18n() {
-                var lang = getLang();
-                document.querySelectorAll('[data-ph-en]').forEach(function(el) {
-                    el.placeholder = el.getAttribute('data-ph-' + lang) || el.getAttribute('data-ph-en');
-                });
-                document.querySelectorAll('[data-alt-en]').forEach(function(el) {
-                    el.alt = el.getAttribute('data-alt-' + lang) || el.getAttribute('data-alt-en');
-                });
-                document.querySelectorAll('[data-aria-en]').forEach(function(el) {
-                    el.setAttribute('aria-label',
-                        el.getAttribute('data-aria-' + lang) || el.getAttribute('data-aria-en'));
-                });
-                document.querySelectorAll('[data-title-en]').forEach(function(el) {
-                    el.title = el.getAttribute('data-title-' + lang) || el.getAttribute('data-title-en');
-                });
-                if (typeof window.dispatchCommentsRefresh === 'function') {
-                    window.dispatchCommentsRefresh();
-                }
-            }
-
-            window.dispatchApplyI18n = applyI18n;
-            applyI18n();
-        })();
-
-        // ==================== LANGUAGE TOGGLE ====================
-        (function() {
-            var pill = document.getElementById('langPill');
-            var current = document.documentElement.getAttribute('data-lang') || 'en';
-
-            function toggle() {
-                current = current === 'en' ? 'ko' : 'en';
-                document.documentElement.setAttribute('data-lang', current);
-                document.documentElement.setAttribute('lang', current);
-                localStorage.setItem('dispatch-lang', current);
-                window.dispatchApplyI18n();
-            }
-
-            pill.addEventListener('click', toggle);
-            pill.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-            });
-        })();
-
-        // ==================== LAZY VIDEO (cat kung fu) ====================
-        (function() {
-            var video = document.getElementById('catKungfuVideo');
-            if (!video) return;
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
             if (!('IntersectionObserver' in window)) return;
+            var videos = document.querySelectorAll('video.lazy-video');
+            if (!videos.length) return;
 
             var io = new IntersectionObserver(function(entries) {
                 entries.forEach(function(entry) {
+                    var v = entry.target;
                     if (entry.isIntersecting) {
-                        var p = video.play();
+                        var p = v.play();
                         if (p && p.catch) p.catch(function() {});
                     } else {
-                        video.pause();
+                        v.pause();
                     }
                 });
-            }, { threshold: 0.2 });
-            io.observe(video);
+            }, { threshold: 0.25 });
+            videos.forEach(function(v) { io.observe(v); });
         })();
 
         // ==================== SUBSCRIBE ====================
@@ -2178,108 +2035,6 @@
 
             loadComments();
         })();
-
-        // ==================== MINI PLAYER (song of the week, autoplay) ====================
-        (function() {
-            var audio    = document.getElementById('songOfTheWeek');
-            var player   = document.getElementById('miniPlayer');
-            var btn      = document.getElementById('miniPlayerBtn');
-            var ring     = document.getElementById('miniPlayerRing');
-            var closeBtn = document.getElementById('miniPlayerClose');
-            if (!audio || !player || !btn || !ring) return;
-
-            var RING_C = 2 * Math.PI * 16;
-            ring.style.strokeDasharray  = RING_C;
-            ring.style.strokeDashoffset = RING_C;
-
-            var triedAutoplay = false;
-            var dismissed = false;
-            var rafId = null;
-
-            function showPlayer() {
-                if (dismissed) return;
-                player.hidden = false;
-                requestAnimationFrame(function() { player.classList.add('visible'); });
-            }
-            function setState(s) {
-                btn.setAttribute('data-state', s);
-                if (s === 'playing') player.classList.remove('needs-tap');
-            }
-            function updateRing() {
-                if (!audio.duration || !isFinite(audio.duration)) {
-                    rafId = requestAnimationFrame(updateRing);
-                    return;
-                }
-                var pct = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
-                ring.style.strokeDashoffset = RING_C * (1 - pct);
-                if (!audio.paused) rafId = requestAnimationFrame(updateRing);
-            }
-            function startRingLoop() {
-                if (rafId) cancelAnimationFrame(rafId);
-                rafId = requestAnimationFrame(updateRing);
-            }
-            function stopRingLoop() {
-                if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-                updateRing();
-            }
-
-            audio.addEventListener('play',     function() { setState('playing'); startRingLoop(); });
-            audio.addEventListener('playing',  function() { setState('playing'); startRingLoop(); });
-            audio.addEventListener('pause',    function() { setState('paused');  stopRingLoop();  });
-            audio.addEventListener('ended',    function() { setState('paused');  stopRingLoop();  });
-            audio.addEventListener('waiting',  function() { setState('buffering'); });
-            audio.addEventListener('seeking',  function() { setState('buffering'); });
-            audio.addEventListener('loadedmetadata', updateRing);
-
-            btn.addEventListener('click', function() {
-                if (audio.paused) {
-                    var p = audio.play();
-                    if (p && p.catch) p.catch(function() {});
-                } else {
-                    audio.pause();
-                }
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-                if (player.hidden) return;
-                if (e.key === 'k' || (e.key === ' ' && document.activeElement === btn)) {
-                    e.preventDefault();
-                    btn.click();
-                }
-            });
-            closeBtn.addEventListener('click', function() {
-                audio.pause();
-                dismissed = true;
-                player.classList.remove('visible');
-                setTimeout(function() { player.hidden = true; }, 450);
-            });
-
-            function tryAutoplay() {
-                if (triedAutoplay) return;
-                triedAutoplay = true;
-                showPlayer();
-                audio.volume = 0.5; // gentle piano — keep it quiet
-                var p = audio.play();
-                if (p && p.catch) {
-                    p.catch(function() { player.classList.add('needs-tap'); });
-                }
-            }
-
-            var dismiss = document.getElementById('komorebiDismiss');
-            if (dismiss) dismiss.addEventListener('click', tryAutoplay);
-            var gateForm = document.getElementById('gateForm');
-            if (gateForm) gateForm.addEventListener('submit', tryAutoplay);
-
-            // Returning visitor — gate already passed, surface the player with needs-tap
-            var path = window.location.pathname.replace(/\/$/, '') || '/';
-            var alreadyAuthed = sessionStorage.getItem('dispatch-auth-' + path) === '1';
-            if (alreadyAuthed) {
-                setTimeout(function() {
-                    showPlayer();
-                    player.classList.add('needs-tap');
-                }, 1200);
-            }
-        })();
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js" integrity="sha384-O55L/6rhHr9CFvrxqv5luxOCcmVaBmETbZbJDP+Do8T0pztTACsFBD/IXCNkj7DV" crossorigin="anonymous"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
@@ -2320,10 +2075,9 @@
                 .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
                 .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
 
-            // Hero Ken Burns (fallback painting behind canvas)
-            gsap.to('#heroFallback', {
-                scale: 1.06,
-                transformOrigin: 'center center',
+            // Hero video parallax — gentle downward drift as you scroll past the hero
+            gsap.to('#heroVideo', {
+                yPercent: 12,
                 ease: 'none',
                 scrollTrigger: {
                     trigger: '.hero',
@@ -2380,552 +2134,5 @@
         }
     </script>
 
-    <!-- ==================== HERO — Monet flow-field ==================== -->
-    <script>
-    (function(){
-      "use strict";
-      const smoke = document.getElementById('heroSmoke');
-      const chars = document.getElementById('heroChars');
-      const fallback = document.getElementById('heroFallback');
-      if (!smoke || !chars) return;
-
-      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const gl = smoke.getContext('webgl2', { antialias:false, premultipliedAlpha:false, alpha:false });
-      if (reduced || !gl) {
-        // graceful fallback: show the painting still
-        if (fallback) fallback.classList.add('show');
-        smoke.style.display = 'none'; chars.style.display = 'none';
-        return;
-      }
-
-      const DPR = Math.min(devicePixelRatio || 1, 2);
-      const IS_NARROW = innerWidth < 700;
-      const SIM_SCALE = IS_NARROW ? 0.45 : 0.55;
-
-      // ---- interactive state: cursor (UV coords, GL convention y-up) + scatter target px coords
-      let cursorUV = [0.5, 0.5];
-      let cursorPower = 0;
-      let cursorPX = -9999, cursorPY = -9999;
-      function setCursor(clientX, clientY){
-        cursorPX = clientX;
-        cursorPY = clientY;
-        cursorUV[0] = clientX / innerWidth;
-        cursorUV[1] = 1 - clientY / innerHeight;   // GL y-up
-        cursorPower = 1.0;
-      }
-      addEventListener('mousemove', (e) => setCursor(e.clientX, e.clientY), { passive: true });
-      addEventListener('touchmove', (e) => {
-        if (e.touches.length) setCursor(e.touches[0].clientX, e.touches[0].clientY);
-      }, { passive: true });
-      addEventListener('mouseleave', () => { cursorPX = -9999; cursorPY = -9999; });
-      const halfFloatExt = gl.getExtension('EXT_color_buffer_float');
-      const FBO_INTERNAL = halfFloatExt ? gl.RGBA16F : gl.RGBA;
-      const FBO_TYPE    = halfFloatExt ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE;
-      const t0 = performance.now();
-
-      function fitSmoke(){
-        smoke.width  = Math.max(1, Math.floor(smoke.clientWidth  * DPR));
-        smoke.height = Math.max(1, Math.floor(smoke.clientHeight * DPR));
-      }
-      fitSmoke();
-
-      function compile(t, src){
-        const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s);
-        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
-        return s;
-      }
-      function program(vs, fs){
-        const p = gl.createProgram();
-        gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
-        gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
-        gl.linkProgram(p);
-        return p;
-      }
-
-      const VS = `#version 300 es
-in vec2 a_pos; out vec2 v_uv;
-void main(){ v_uv = a_pos*0.5+0.5; gl_Position = vec4(a_pos,0.,1.); }`;
-
-      const FS_ADVECT = `#version 300 es
-precision highp float;
-in vec2 v_uv;
-uniform sampler2D u_prev;
-uniform sampler2D u_seedA;
-uniform sampler2D u_seedB;
-uniform float u_seedMix;
-uniform float u_time;
-uniform vec2 u_resolution;
-uniform vec2 u_cursor;       // UV coords, [0..1], origin top-left flipped to bottom-left
-uniform float u_cursorPower; // 0..1 decaying after movement
-out vec4 outColor;
-vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
-vec2 mod289(vec2 x){return x-floor(x*(1./289.))*289.;}
-vec3 permute(vec3 x){return mod289(((x*34.)+1.)*x);}
-float snoise(vec2 v){
-  const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);
-  vec2 i=floor(v+dot(v,C.yy));
-  vec2 x0=v-i+dot(i,C.xx);
-  vec2 i1=(x0.x>x0.y)?vec2(1.,0.):vec2(0.,1.);
-  vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1;
-  i=mod289(i);
-  vec3 p=permute(permute(i.y+vec3(0.,i1.y,1.))+i.x+vec3(0.,i1.x,1.));
-  vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.);
-  m=m*m; m=m*m;
-  vec3 x=2.*fract(p*C.www)-1.;
-  vec3 h=abs(x)-0.5;
-  vec3 ox=floor(x+0.5);
-  vec3 a0=x-ox;
-  m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);
-  vec3 g; g.x=a0.x*x0.x+h.x*x0.y;
-  g.yz=a0.yz*x12.xz+h.yz*x12.yw;
-  return 130.*dot(m,g);
-}
-vec2 curl(vec2 p){
-  float e=0.018;
-  return vec2(snoise(p+vec2(0,e))-snoise(p-vec2(0,e)),
-              -(snoise(p+vec2(e,0))-snoise(p-vec2(e,0))))/(2.*e);
-}
-void main(){
-  vec2 uv = v_uv;
-  vec2 p  = uv*2.-1.;
-  p.x *= u_resolution.x/u_resolution.y;
-  vec2 vel = curl(p*0.75 + vec2(0., u_time*0.045));
-  vel    += 0.40*curl(p*2.0 + vec2(-u_time*0.030, u_time*0.024));
-  // cursor swirl — local vortex around mouse/touch
-  vec2 cd = uv - u_cursor;
-  cd.x *= u_resolution.x / u_resolution.y;
-  vec2 swirl = vec2(-cd.y, cd.x) * exp(-dot(cd,cd) * 35.0) * 3.0;
-  vel += swirl * u_cursorPower;
-  float dt = 0.0024;
-  vec2 prevUV = uv - vel*dt;
-  vec3 prev     = texture(u_prev, prevUV).rgb;
-  vec3 paintA   = texture(u_seedA, uv).rgb;
-  vec3 paintB   = texture(u_seedB, uv).rgb;
-  vec3 painting = mix(paintA, paintB, smoothstep(0.0, 1.0, u_seedMix));
-  // push painting harder so transitions read; the drift in prev still provides motion
-  vec3 col = prev*0.52 + painting*0.48;
-  outColor = vec4(col, 1.0);
-}`;
-      const FS_PRESENT = `#version 300 es
-precision highp float;
-in vec2 v_uv;
-uniform sampler2D u_src;
-out vec4 outColor;
-void main(){
-  vec3 c = texture(u_src, v_uv).rgb;
-  c = pow(max(c, 0.0), vec3(0.95));
-  float L = dot(c, vec3(0.299, 0.587, 0.114));
-  c = mix(vec3(L), c, 1.25);
-  vec2 q = v_uv - 0.5;
-  c *= smoothstep(1.25, 0.25, dot(q,q)*1.25);
-  outColor = vec4(c, 1.0);
-}`;
-      const FS_BLIT = `#version 300 es
-precision highp float;
-in vec2 v_uv; uniform sampler2D u_seedA; out vec4 outColor;
-void main(){ outColor = vec4(texture(u_seedA, v_uv).rgb, 1.0); }`;
-
-      const progAdvect  = program(VS, FS_ADVECT);
-      const progPresent = program(VS, FS_PRESENT);
-      const progBlit    = program(VS, FS_BLIT);
-
-      const quad = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
-      function bindQuad(prog){
-        const loc = gl.getAttribLocation(prog, 'a_pos');
-        gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-        gl.enableVertexAttribArray(loc);
-        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      }
-      function makeFBO(w, h){
-        const tex = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texImage2D(gl.TEXTURE_2D, 0, FBO_INTERNAL, w, h, 0, gl.RGBA, FBO_TYPE, null);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        const fbo = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
-        return { fbo, tex, w, h };
-      }
-
-      // Multiple Monet seed textures, cycling slowly with crossfade.
-      // Order is chosen so adjacent paintings differ in palette (no two greens in a row).
-      const PAINTING_SRCS = [
-        '/newsletter/005/images/coquelicots.jpg',       // red poppies, sage
-        '/newsletter/005/images/monet-tulips.jpg',      // cool blues, pink/red tulip stripes
-        '/newsletter/005/images/monet-parc.jpg',        // green park, pink florals, warm light
-        '/newsletter/005/images/monet-spring.jpg',      // pastel pinks, soft greens
-        '/newsletter/005/images/monet-poppies.jpg'      // lavender + cool blue, peachy clouds
-      ];
-      const HOLD_S = 12.0;   // (unused now — kept for back-compat with older builds)
-      const FADE_S = 2.2;    // seconds of crossfade between paintings
-      const palW = 320, palH = 240;
-
-      let seedTextures = [];          // GPU textures, one per painting
-      let palettes = [];              // CPU palette caches, one per painting
-      let painImgs = [];              // <img> elements (kept for GC)
-      let A, B;
-      let indexA = 0, indexB = 0;     // both start at painting 0 → seedMix=0 shows painting 0
-      let seedMix = 0;                // 0 → 1 during the crossfade
-      let loadedCount = 0;
-
-      function uploadTexture(img){
-        const tex = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        return tex;
-      }
-      function cachePalette(img){
-        const pal = document.createElement('canvas');
-        pal.width = palW; pal.height = palH;
-        const pctx = pal.getContext('2d');
-        pctx.drawImage(img, 0, 0, palW, palH);
-        return pctx.getImageData(0, 0, palW, palH).data;
-      }
-
-      // Load each painting; once the FIRST one is in, start the loop. Others
-      // join the rotation as they arrive (they're at index >= 1 by definition).
-      PAINTING_SRCS.forEach((src, i) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.src = src;
-        img.onload = () => {
-          seedTextures[i] = uploadTexture(img);
-          palettes[i] = cachePalette(img);
-          painImgs[i] = img;
-          loadedCount++;
-          if (i === 0) {           // first painting ready → start
-            rebuildFBOs();
-            startLoops();
-          }
-        };
-        img.onerror = () => {
-          if (i === 0 && fallback) fallback.classList.add('show');
-        };
-      });
-
-      function rebuildFBOs(){
-        if (!seedTextures[0]) return;
-        fitSmoke();
-        const w = Math.max(2, Math.floor(smoke.width * SIM_SCALE));
-        const h = Math.max(2, Math.floor(smoke.height * SIM_SCALE));
-        A = makeFBO(w, h); B = makeFBO(w, h);
-        gl.useProgram(progBlit);
-        bindQuad(progBlit);
-        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, seedTextures[0]);
-        gl.uniform1i(gl.getUniformLocation(progBlit, 'u_seedA'), 0);
-        for (const f of [A, B]){
-          gl.bindFramebuffer(gl.FRAMEBUFFER, f.fbo);
-          gl.viewport(0, 0, f.w, f.h);
-          gl.drawArrays(gl.TRIANGLES, 0, 6);
-        }
-      }
-
-      // Scroll-driven painting transition: each section declares data-monet="N";
-      // an observer picks the section currently most-visible and we lerp seedMix
-      // toward that section's painting over FADE_S seconds.
-      let targetIndex = 0;       // painting we're heading toward
-      let fadeStartAt = null;    // performance.now()/1000 when current fade started
-
-      function visiblePainting(){
-        // When seedMix==0 we show indexA; when ==1 we show indexB; in between, the blend.
-        return seedMix >= 1 ? indexB : (seedMix <= 0 ? indexA : null);
-      }
-
-      function requestPainting(idx){
-        if (idx === targetIndex && fadeStartAt !== null) return;   // already heading there
-        const vp = visiblePainting();
-        if (idx === vp && fadeStartAt === null) return;            // already shown, no fade running
-        // snapshot whatever is currently visible into indexA so the next fade starts cleanly
-        if (fadeStartAt !== null) {
-          if (seedMix >= 0.5) indexA = indexB;
-          // else keep indexA as-is — closer to A than B
-        }
-        indexB = idx;
-        seedMix = 0;
-        fadeStartAt = performance.now() / 1000;
-        targetIndex = idx;
-      }
-
-      function tickCycle(){
-        if (fadeStartAt == null) return;                  // settled
-        const elapsed = performance.now()/1000 - fadeStartAt;
-        if (elapsed >= FADE_S) {
-          indexA = indexB;
-          seedMix = 0;
-          fadeStartAt = null;
-        } else {
-          seedMix = elapsed / FADE_S;
-        }
-      }
-
-      function sampleColor(u, v){
-        // Use index A's palette (the dominant one — accurate during HOLD, slightly off mid-FADE)
-        const palData = palettes[indexA] || palettes[0];
-        if (!palData) return [200, 200, 200];
-        const x = Math.min(palW-1, Math.max(0, (u*palW)|0));
-        const y = Math.min(palH-1, Math.max(0, (v*palH)|0));
-        const i = (y*palW + x)*4;
-        return [palData[i], palData[i+1], palData[i+2]];
-      }
-
-      // ---- chars layer ----
-      const cctx = chars.getContext('2d', { alpha: true });
-      const POOL = ('a a b c d e f g h i j k l m n o o p q r s t t u v w x y z '
-                  + '. . . , , ; \' / — '
-                  + '木 漏 れ 日 風 空 光 雲 雨 想 夢 静 '
-                  + 'ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅇ ㅎ '
-                  + 'A I L K M S').split(/\s+/).filter(Boolean);
-      function fitChars(){
-        const w = chars.clientWidth, h = chars.clientHeight;
-        chars.width  = Math.max(1, Math.floor(w * DPR));
-        chars.height = Math.max(1, Math.floor(h * DPR));
-        cctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-        cctx.textBaseline = 'middle';
-        cctx.textAlign = 'center';
-      }
-      fitChars();
-
-      const SIZE_PX = [16, 22, 30];
-      const FONTS = ['"Newsreader", Georgia, serif', '"Noto Serif JP", serif', '"Noto Serif KR", serif'];
-      function fontKey(ch){
-        const cp = ch.codePointAt(0);
-        if (cp >= 0x3000 && cp <= 0x9FFF) return 1;
-        if ((cp >= 0x1100 && cp <= 0x11FF) || (cp >= 0x3130 && cp <= 0x318F)) return 2;
-        return 0;
-      }
-      const PARTICLE_TARGET = IS_NARROW ? 380 : 700;
-      const particles = [];
-      function spawn(p, fresh){
-        const w = chars.clientWidth, h = chars.clientHeight;
-        p.x = Math.random() * w;
-        p.y = Math.random() * h;
-        p.vx = 0; p.vy = 0;
-        p.ch = POOL[(Math.random()*POOL.length)|0];
-        p.sizeClass = (Math.random() < 0.6) ? 0 : (Math.random() < 0.75 ? 1 : 2);
-        p.weight = Math.random() < 0.15 ? 600 : 400;
-        p.life = fresh ? 0 : Math.random() * 220;
-        p.maxLife = 240 + Math.random() * 380;
-        p.fontKey = fontKey(p.ch);
-      }
-      for (let i=0; i<PARTICLE_TARGET; i++){ const p = {}; spawn(p, false); particles.push(p); }
-
-      function flow(x, y, t){
-        const ax = 0.0036, ay = 0.0030, bx = 0.0078, by = 0.0066;
-        const u = Math.sin(y*ay + t*0.26)
-                + 0.55*Math.sin(y*by + x*ax*1.8 + t*0.46)
-                + 0.28*Math.cos(x*ax*0.6 - t*0.36);
-        const v = Math.cos(x*ax + t*0.24)
-                + 0.55*Math.cos(x*bx + y*ay*1.8 + t*0.42)
-                + 0.28*Math.sin(y*ay*0.6 - t*0.46);
-        return [u*0.8, v*0.8];
-      }
-      const SPEED = 48, VEL_SMOOTH = 0.90;
-      const BUCKETS = [];
-      for (let f=0; f<FONTS.length; f++)
-        for (let w of [400, 600])
-          for (let s=0; s<SIZE_PX.length; s++)
-            BUCKETS.push({ font: `italic ${w} ${SIZE_PX[s]}px ${FONTS[f]}`, list: [] });
-      function bucketIndex(p){
-        const w = p.weight === 600 ? 1 : 0;
-        return ((p.fontKey*2 + w)*SIZE_PX.length + p.sizeClass);
-      }
-
-      let running = false;
-      let lastT = performance.now();
-      function smokeFrame(){
-        if (!running) return;
-        tickCycle();
-        const t = (performance.now() - t0)/1000;
-        const seedA = seedTextures[indexA] || seedTextures[0];
-        const seedB = seedTextures[indexB] || seedTextures[indexA] || seedTextures[0];
-        gl.useProgram(progAdvect);
-        bindQuad(progAdvect);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, B.fbo);
-        gl.viewport(0,0,B.w,B.h);
-        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, A.tex);
-        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_prev'),  0);
-        gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, seedA);
-        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_seedA'), 1);
-        gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, seedB);
-        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_seedB'), 2);
-        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_seedMix'), seedMix);
-        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_time'), t);
-        gl.uniform2f(gl.getUniformLocation(progAdvect,'u_resolution'), B.w, B.h);
-        gl.uniform2f(gl.getUniformLocation(progAdvect,'u_cursor'), cursorUV[0], cursorUV[1]);
-        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_cursorPower'), cursorPower);
-        cursorPower *= 0.94;   // exponential decay each frame
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-        gl.useProgram(progPresent);
-        bindQuad(progPresent);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, smoke.width, smoke.height);
-        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, B.tex);
-        gl.uniform1i(gl.getUniformLocation(progPresent,'u_src'), 0);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-        const tmp = A; A = B; B = tmp;
-        requestAnimationFrame(smokeFrame);
-      }
-
-      function charsFrame(now){
-        if (!running) return;
-        const t = (now - t0) / 1000;
-        let dt = (now - lastT) / 1000;
-        if (dt > 0.05) dt = 0.05;
-        lastT = now;
-        const w = chars.clientWidth, h = chars.clientHeight;
-        cctx.clearRect(0, 0, w, h);
-        for (const b of BUCKETS) b.list.length = 0;
-        const CURSOR_R = 160;
-        const CURSOR_R2 = CURSOR_R * CURSOR_R;
-        for (const p of particles){
-          const f = flow(p.x, p.y, t);
-          p.vx = p.vx * VEL_SMOOTH + f[0] * (1 - VEL_SMOOTH);
-          p.vy = p.vy * VEL_SMOOTH + f[1] * (1 - VEL_SMOOTH);
-          // cursor scatter — push letters out of a ~160px radius around the cursor
-          if (cursorPX > -1000) {
-            const dx = p.x - cursorPX, dy = p.y - cursorPY;
-            const d2 = dx*dx + dy*dy;
-            if (d2 < CURSOR_R2 && d2 > 4) {
-              const d = Math.sqrt(d2);
-              const force = (CURSOR_R - d) / CURSOR_R;  // 0..1
-              const kick = force * force * 6.5;          // sharper falloff
-              p.x += (dx/d) * kick;
-              p.y += (dy/d) * kick;
-              // also impart a small persistent velocity nudge
-              p.vx += (dx/d) * force * 0.18;
-              p.vy += (dy/d) * force * 0.18;
-            }
-          }
-          p.x += p.vx * SPEED * dt;
-          p.y += p.vy * SPEED * dt;
-          if (p.x < -30) p.x = w + 30;
-          if (p.x > w + 30) p.x = -30;
-          if (p.y < -30) p.y = h + 30;
-          if (p.y > h + 30) p.y = -30;
-          p.life += dt * 60;
-          if (p.life > p.maxLife){ spawn(p, true); continue; }
-          const fadeIn  = Math.min(1, p.life / 40);
-          const fadeOut = Math.min(1, (p.maxLife - p.life) / 40);
-          const vFade = p.y < h * 0.55 ? 1.0
-                      : 1.0 - Math.min(1, (p.y - h*0.55) / (h*0.35));
-          p.alpha = fadeIn * fadeOut * vFade;
-          if (p.alpha < 0.04) continue;
-          const c = sampleColor(p.x / w, p.y / h);
-          p.r = Math.max(0, c[0]-30)|0;
-          p.g = Math.max(0, c[1]-30)|0;
-          p.b = Math.max(0, c[2]-30)|0;
-          BUCKETS[bucketIndex(p)].list.push(p);
-        }
-        for (const b of BUCKETS){
-          if (b.list.length === 0) continue;
-          cctx.font = b.font;
-          for (const p of b.list){
-            cctx.globalAlpha = p.alpha * 0.85;
-            cctx.fillStyle = `rgb(${p.r},${p.g},${p.b})`;
-            cctx.fillText(p.ch, p.x, p.y);
-          }
-        }
-        cctx.globalAlpha = 1;
-        requestAnimationFrame(charsFrame);
-      }
-
-      function startLoops(){
-        if (running) return;
-        running = true;
-        lastT = performance.now();
-        requestAnimationFrame(smokeFrame);
-        requestAnimationFrame(charsFrame);
-      }
-      function stopLoops(){ running = false; }
-
-      // Page-visibility pause (the canvases are now full-viewport fixed, so they
-      // are always "intersecting"; only stop when the tab is backgrounded).
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) stopLoops();
-        else if (palettes[0]) startLoops();
-      });
-
-      // Hero-in-view: toggle body class so the cream article-veil lifts on the hero
-      const heroEl = document.getElementById('heroSection');
-      if (heroEl) {
-        new IntersectionObserver((entries) => {
-          for (const e of entries) {
-            document.body.classList.toggle('hero-in-view', e.intersectionRatio > 0.35);
-          }
-        }, { threshold: [0, 0.35, 0.7] }).observe(heroEl);
-      }
-      // Start in "hero-in-view" state so the painting reads from the first frame
-      document.body.classList.add('hero-in-view');
-
-      // Section-driven painting transitions — each [data-monet] element declares
-      // which Monet it wants behind it. We use IntersectionObserver (NOT scroll
-      // events) so this works correctly with Lenis smooth-scroll, programmatic
-      // scrolls, anchor jumps, and native scrolling alike.
-      const sectionEls = Array.from(document.querySelectorAll('[data-monet]'));
-      if (heroEl && !heroEl.hasAttribute('data-monet')) {
-        heroEl.setAttribute('data-monet', '0');
-        sectionEls.unshift(heroEl);
-      }
-      const sectionRatios = new Map();
-      function pickActiveSection(){
-        let bestEl = null, bestRatio = 0;
-        for (const [el, ratio] of sectionRatios) {
-          if (ratio > bestRatio) { bestRatio = ratio; bestEl = el; }
-        }
-        if (bestEl && bestRatio > 0.02) {
-          const idx = parseInt(bestEl.getAttribute('data-monet'), 10) || 0;
-          if (seedTextures[idx]) requestPainting(idx);
-        }
-      }
-      // rootMargin shrinks the viewport's "active band" to the middle 40% — an
-      // element only counts as visible when it crosses into that band, so the
-      // painting changes when a chapter is centered, not as soon as it peeks in.
-      const sectionObserver = new IntersectionObserver((entries) => {
-        for (const e of entries) {
-          sectionRatios.set(e.target, e.intersectionRatio);
-        }
-        pickActiveSection();
-      }, {
-        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
-        rootMargin: '-30% 0px -30% 0px'
-      });
-      sectionEls.forEach(el => {
-        sectionRatios.set(el, 0);
-        sectionObserver.observe(el);
-      });
-
-      // expose for debug / external probes
-      window.__monetState = () => ({
-        indexA, indexB, seedMix, targetIndex,
-        loaded: seedTextures.map((t, i) => !!t),
-        fadeStartAt,
-        sectionEls: sectionEls.length,
-        ratios: Array.from(sectionRatios.entries()).map(([el, r]) => ({
-          tag: el.tagName + '.' + (el.className || '').split(' ')[0],
-          monet: el.getAttribute('data-monet'),
-          ratio: r.toFixed(2)
-        }))
-      });
-      window.__pickActiveSection = pickActiveSection;
-
-      let resizeTimer;
-      addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => { fitChars(); rebuildFBOs(); }, 100);
-      });
-    })();
-    </script>
 </body>
 </html>
