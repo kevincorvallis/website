@@ -668,6 +668,114 @@
             .chapter .video-inset.portrait video { max-width: 440px; }
         }
 
+        /* ===== Sunset moment — cinematic showcase ===== */
+        .sunset-moment {
+            position: relative;
+            padding: 3.5rem 1rem 3rem;
+            margin: 1rem auto 1rem;
+            text-align: center;
+            max-width: 720px;
+        }
+        .sunset-moment::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 75% 60% at 50% 55%,
+                rgba(255, 168, 87, 0.20) 0%,
+                rgba(255, 168, 87, 0.08) 40%,
+                transparent 75%);
+            pointer-events: none;
+            z-index: 0;
+            transition: background 0.4s ease;
+        }
+        [data-theme="dark"] .sunset-moment::before {
+            background: radial-gradient(ellipse 75% 60% at 50% 55%,
+                rgba(255, 168, 87, 0.28) 0%,
+                rgba(255, 168, 87, 0.10) 40%,
+                transparent 75%);
+        }
+        .sunset-moment > * { position: relative; z-index: 1; }
+
+        .sunset-moment .field-log {
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.25rem;
+            opacity: 0.88;
+            transition: color 0.3s ease;
+        }
+        .sunset-moment .field-log .sep { opacity: 0.35; margin: 0 0.6em; }
+
+        .sunset-moment .frame {
+            display: inline-block;
+            position: relative;
+            padding: 10px;
+            background: linear-gradient(160deg, #1c1816, #2b2421);
+            border-radius: 4px;
+            box-shadow:
+                0 30px 80px -30px rgba(0,0,0,0.55),
+                0 8px 24px -8px rgba(0,0,0,0.3),
+                0 0 90px -20px rgba(255, 168, 87, 0.45);
+        }
+        [data-theme="dark"] .sunset-moment .frame {
+            background: linear-gradient(160deg, #0e0c0b, #1a1614);
+            box-shadow:
+                0 30px 80px -30px rgba(0,0,0,0.9),
+                0 0 100px -10px rgba(255, 168, 87, 0.30);
+        }
+        .sunset-moment .frame::before,
+        .sunset-moment .frame::after {
+            content: '';
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            width: 1px; height: 28px;
+            background: rgba(255, 168, 87, 0.55);
+        }
+        .sunset-moment .frame::before { left: 3px; }
+        .sunset-moment .frame::after  { right: 3px; }
+
+        .sunset-moment .frame video {
+            display: block;
+            width: auto;
+            max-width: 380px;
+            max-height: 68vh;
+            aspect-ratio: 9 / 16;
+            border-radius: 2px;
+            background: #000;
+        }
+        @media (min-width: 768px) {
+            .sunset-moment { padding: 3rem 2rem 2.5rem; }
+            .sunset-moment .frame video { max-width: 400px; max-height: 70vh; }
+        }
+
+        .sunset-moment .shot-card {
+            margin-top: 1.5rem;
+            font-family: var(--font-display);
+            font-style: italic;
+            color: var(--caption);
+            font-size: 14px;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+        .sunset-moment .shot-card .coords {
+            display: block;
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-style: normal;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text);
+            opacity: 0.6;
+            margin-bottom: 0.35rem;
+            transition: color 0.3s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sunset-moment::before { background: none; }
+        }
+
         /* Field card — a small placard for the camping location */
         .field-card {
             max-width: 360px;
@@ -1576,11 +1684,23 @@
             <p>The sunset was the kind that makes a non-photographer instinctively reach for their phone. Mine was on airplane mode. I reached for it anyway.</p>
         </div>
 
-        <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Sunset over Big Bear from camp">
-                <source src="/newsletter/005/images/sunset.mp4" type="video/mp4">
-            </video>
-            <div class="photo-caption">somewhere off CA-18 &middot; 7:42 PM</div>
+        <div class="sunset-moment reveal">
+            <p class="field-log">
+                <span>Field log</span>
+                <span class="sep">&middot;</span>
+                <span>2026.05.23</span>
+                <span class="sep">&middot;</span>
+                <span>19:42 PT</span>
+            </p>
+            <div class="frame">
+                <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Sunset over Big Bear from camp">
+                    <source src="/newsletter/005/images/sunset.mp4" type="video/mp4">
+                </video>
+            </div>
+            <p class="shot-card">
+                <span class="coords">Big Bear &middot; approx 34.27&deg;N 116.93&deg;W</span>
+                the sky did what it does
+            </p>
         </div>
 
         <!-- Song of the week, woven into the chapter -->
