@@ -1745,6 +1745,340 @@
         @media (prefers-reduced-motion: reduce) {
             .sunset-moment .field-log .rec-dot { animation: none; opacity: 0.85; transform: none; }
         }
+
+        /* ===== Text thread — Kevin & Justin's running "come thru" bit ===== */
+        .text-chat {
+            max-width: 420px;
+            margin: 1.5rem auto 0.5rem;
+            padding: 0 1rem;
+        }
+        .chat-frame {
+            background: rgba(160, 130, 109, 0.04);
+            border: 1px solid var(--rule);
+            border-radius: 20px;
+            padding: 0.9rem 0.9rem 1rem;
+            box-shadow: 0 18px 50px -28px rgba(31, 30, 29, 0.30);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        [data-theme="dark"] .chat-frame {
+            background: rgba(196, 168, 130, 0.05);
+            box-shadow: 0 18px 50px -28px rgba(0, 0, 0, 0.55);
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0 0.4rem 0.7rem;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+        .chat-handle {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text);
+            transition: color 0.3s ease;
+        }
+        .chat-meta {
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 9px;
+            letter-spacing: 0.18em;
+            color: var(--caption);
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+        .chat-thread {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .bubble {
+            max-width: 78%;
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.35;
+            word-wrap: break-word;
+            opacity: 0;
+            transform: translateY(8px) scale(0.96);
+            transition: opacity 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        .bubble em { font-style: italic; }
+        .bubble.in {
+            align-self: flex-start;
+            background: #ececec;
+            color: #1f1e1d;
+            border-bottom-left-radius: 6px;
+        }
+        [data-theme="dark"] .bubble.in {
+            background: #2c2c2e;
+            color: #f0eee6;
+        }
+        .bubble.out {
+            align-self: flex-end;
+            background: #4c7185;
+            color: #fafafa;
+            border-bottom-right-radius: 6px;
+        }
+        [data-theme="dark"] .bubble.out {
+            background: #6a8fac;
+        }
+        .bubble.in + .bubble.out,
+        .bubble.out + .bubble.in {
+            margin-top: 7px;
+        }
+        .bubble.image {
+            padding: 4px;
+            overflow: hidden;
+            max-width: 60%;
+        }
+        .bubble.image img {
+            display: block;
+            border-radius: 14px;
+            width: 100%;
+        }
+        .bubble.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        /* Reaction badge — small heart/sticker on a previous message */
+        .bubble.reaction {
+            align-self: flex-start;
+            background: none;
+            padding: 0;
+            margin-top: -8px;
+            margin-left: 6px;
+            font-size: 11px;
+            color: var(--caption);
+            letter-spacing: 0.05em;
+            font-style: italic;
+        }
+        .chat-caption {
+            margin-top: 0.9rem;
+            text-align: center;
+            font-family: var(--font-display);
+            font-style: italic;
+            color: var(--caption);
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+        /* Typing indicator — three dots, used between the bubbles for a beat */
+        .bubble.typing {
+            max-width: 62px;
+            padding: 10px 14px;
+            display: flex;
+            gap: 4px;
+        }
+        .bubble.typing .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #8a8880;
+            opacity: 0.45;
+            animation: chat-dot 1.2s ease-in-out infinite;
+        }
+        .bubble.typing .dot:nth-child(2) { animation-delay: 0.18s; }
+        .bubble.typing .dot:nth-child(3) { animation-delay: 0.36s; }
+        @keyframes chat-dot {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+            40%           { transform: translateY(-3px); opacity: 0.9; }
+        }
+        .bubble.typing.hidden { display: none; }
+
+        /* ===== Topographic field card — replaces the flat .field-card for SUN ===== */
+        .topo-card {
+            max-width: 540px;
+            margin: 2rem auto;
+            padding: 0;
+            background: rgba(160, 130, 109, 0.04);
+            border-top: 1px solid var(--accent);
+            border-bottom: 1px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+        [data-theme="dark"] .topo-card {
+            background: rgba(196, 168, 130, 0.05);
+        }
+        .topo-card .topo-svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            overflow: visible;
+        }
+        .topo-card .topo-ring {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1;
+            opacity: 0;
+            stroke-dasharray: 1500;
+            stroke-dashoffset: 1500;
+            transition: stroke 0.3s ease;
+        }
+        .topo-card .topo-ring.r1 { opacity: 0.55; }
+        .topo-card .topo-ring.r2 { opacity: 0.45; }
+        .topo-card .topo-ring.r3 { opacity: 0.35; }
+        .topo-card .topo-ring.r4 { opacity: 0.28; }
+        .topo-card .topo-ring.r5 { opacity: 0.22; }
+        .topo-card .topo-ring.r6 { opacity: 0.16; }
+        .topo-card .topo-road {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1.2;
+            stroke-dasharray: 4 6;
+            opacity: 0.55;
+            stroke-dashoffset: 800;
+            transition: stroke 0.3s ease;
+        }
+        .topo-card .topo-pin {
+            stroke: var(--accent);
+            stroke-width: 1.5;
+            fill: var(--accent);
+            opacity: 0;
+            transform: scale(0.4);
+            transform-origin: center;
+            transform-box: fill-box;
+            transition: stroke 0.3s ease, fill 0.3s ease;
+        }
+        .topo-card .topo-pin-ring {
+            stroke: var(--accent);
+            stroke-width: 1;
+            fill: none;
+            opacity: 0;
+            transition: stroke 0.3s ease;
+        }
+        .topo-card .topo-label {
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 9px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            fill: var(--accent);
+            opacity: 0;
+            transition: fill 0.3s ease;
+        }
+        .topo-card .topo-compass {
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 11px;
+            font-weight: 700;
+            fill: var(--accent);
+            opacity: 0.6;
+            transition: fill 0.3s ease;
+        }
+        .topo-card .topo-compass-line {
+            stroke: var(--accent);
+            stroke-width: 0.8;
+            opacity: 0.5;
+        }
+        .topo-card .topo-corner {
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 9px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            fill: var(--caption);
+            opacity: 0.6;
+        }
+        /* Animation triggers — applied via JS once on viewport entry */
+        .topo-card.topo-go .topo-ring {
+            animation: topo-draw 1.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        }
+        .topo-card.topo-go .topo-ring.r1 { animation-delay: 0.0s;  }
+        .topo-card.topo-go .topo-ring.r2 { animation-delay: 0.18s; }
+        .topo-card.topo-go .topo-ring.r3 { animation-delay: 0.32s; }
+        .topo-card.topo-go .topo-ring.r4 { animation-delay: 0.45s; }
+        .topo-card.topo-go .topo-ring.r5 { animation-delay: 0.58s; }
+        .topo-card.topo-go .topo-ring.r6 { animation-delay: 0.70s; }
+        .topo-card.topo-go .topo-road {
+            animation: topo-road-draw 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.6s forwards;
+        }
+        .topo-card.topo-go .topo-pin {
+            animation: topo-pin-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.4s forwards;
+        }
+        .topo-card.topo-go .topo-pin-ring {
+            animation: topo-ring-pulse 2s ease-out 1.6s forwards;
+        }
+        .topo-card.topo-go .topo-label {
+            animation: topo-label-in 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) 1.8s forwards;
+        }
+        @keyframes topo-draw {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes topo-road-draw {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes topo-pin-in {
+            to { opacity: 0.95; transform: scale(1); }
+        }
+        @keyframes topo-ring-pulse {
+            0%   { opacity: 0.7; transform: scale(0.4); transform-origin: center; transform-box: fill-box; }
+            70%  { opacity: 0.35; transform: scale(1.6); }
+            100% { opacity: 0; transform: scale(1.8); }
+        }
+        @keyframes topo-label-in {
+            to { opacity: 1; }
+        }
+
+        /* Legend below topo (replaces the old .field-card text layout) */
+        .topo-legend {
+            padding: 1.1rem 1.5rem 1.3rem;
+            text-align: center;
+            font-family: var(--font-display);
+            color: var(--text);
+            position: relative;
+            z-index: 1;
+        }
+        .topo-legend .tl-label {
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        .topo-legend .tl-name {
+            font-size: 22px;
+            font-style: italic;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            line-height: 1.15;
+            margin-bottom: 0.65rem;
+            transition: color 0.3s ease;
+        }
+        .topo-legend .tl-stats {
+            font-family: var(--font);
+            font-size: 13px;
+            color: var(--caption);
+            letter-spacing: 0.04em;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+        .topo-legend .tl-stats .tl-sep { opacity: 0.4; margin: 0 0.5rem; }
+        .topo-legend .tl-coords {
+            margin-top: 0.6rem;
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: var(--caption);
+            opacity: 0.7;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bubble { opacity: 1; transform: none; transition: none; }
+            .bubble.typing .dot { animation: none; }
+            .topo-card .topo-ring,
+            .topo-card .topo-road { stroke-dashoffset: 0; }
+            .topo-card .topo-pin { opacity: 0.95; transform: scale(1); animation: none; }
+            .topo-card .topo-pin-ring { opacity: 0; animation: none; }
+            .topo-card .topo-label { opacity: 1; animation: none; }
+        }
     </style>
 </head>
 <body>
@@ -1869,6 +2203,35 @@
         <div class="text-block reveal">
             <p>Memorial Day weekend started Friday afternoon, when an internal email I almost archived turned out to be a screening invite &mdash; <em>The Passenger</em>, on the Paramount lot, that night, plus-one included.</p>
             <p>Justin lives in Frogtown. I live closer to the lot. For months now we've been running the same bit on each other &mdash; <em>come thru</em>, <em>no, you come thru</em> &mdash; neither of us willing to make the drive over for a coffee. The screening was one of the rare cases where the geography wasn't negotiable: the movie was at Paramount, so Justin had to come thru. He did. He also let me know, with feeling, that I had not solved the parking problem on his behalf, and that this was, in fact, on me.</p>
+        </div>
+
+        <!-- The bit, in chat form. Composite of a months-long thread. -->
+        <div class="text-chat reveal" aria-label="A text exchange between Kevin and Justin">
+            <div class="chat-frame">
+                <div class="chat-header">
+                    <span class="chat-handle">Justin</span>
+                    <span class="chat-meta">iMessage &middot; ongoing</span>
+                </div>
+                <ol class="chat-thread" id="chatThread">
+                    <li class="bubble in"  data-d="0">come thru</li>
+                    <li class="bubble out" data-d="500">no u come thru</li>
+                    <li class="bubble in"  data-d="1100">fam. come thru.</li>
+                    <li class="bubble typing in" data-d="1800" data-hide="900" aria-hidden="true">
+                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    </li>
+                    <li class="bubble in image" data-d="2700">
+                        <img src="/newsletter/005/images/kobe-still.jpg" alt="Kobe on the patio looking up">
+                    </li>
+                    <li class="bubble in"  data-d="3200">kobe says come thru</li>
+                    <li class="bubble out" data-d="4000">low blow</li>
+                    <li class="bubble out" data-d="4500">also there's a screening Friday at paramount. <em>you</em> come thru.</li>
+                    <li class="bubble in"  data-d="5400">fine. find me parking.</li>
+                </ol>
+            </div>
+            <p class="chat-caption">composite of a months-long thread, lightly compressed</p>
+        </div>
+
+        <div class="text-block reveal">
             <p>Here's Justin: gray tee, light jeans, and the standing-still face of a person who has forgotten what to do with his hands. Behind him the rounded marquee with <em>Paramount</em> scripted across it, two stone planters of red flowers flanking the path, the last of the side-light catching the cream stucco. I've been at this lot long enough that I should be over the marquee. I'm not over it. Neither was he.</p>
         </div>
         <div class="photo-inset reveal">
@@ -1929,16 +2292,57 @@
             <p>By mid-afternoon I had decided I needed dirt. I went home, threw a bag and a single camp chair in the RAV4, and pointed it east. I'm a recent convert to <strong>dispersed camping</strong> &mdash; for anyone unfamiliar, it's camping without a campsite. You drive into a national forest until the asphalt becomes gravel and the gravel becomes a suggestion, then you find a flat patch far enough from anyone else to pretend you've left civilization. The trade is no bathroom, no neighbors, no Wi-Fi, no rules. Mostly worth it.</p>
         </div>
 
-        <div class="field-card reveal-fade">
-            <p class="fc-label">Location</p>
-            <p class="fc-name">San Bernardino<br>National Forest</p>
-            <p class="fc-stats">
-                367,357 acres
-                <span class="fc-sep">&middot;</span>
-                USFS
-                <span class="fc-sep">&middot;</span>
-                CA-18, north of Big Bear
-            </p>
+        <div class="topo-card reveal-fade" id="topoCard">
+            <svg class="topo-svg" viewBox="0 0 540 300" aria-label="Topographic sketch of the San Bernardino National Forest camp area">
+                <!-- 6 contour rings, irregular ellipses simulating a peak with elevation -->
+                <g class="topo-rings">
+                    <ellipse class="topo-ring r6" cx="300" cy="160" rx="260" ry="135" transform="rotate(6 300 160)"/>
+                    <ellipse class="topo-ring r5" cx="300" cy="160" rx="210" ry="112" transform="rotate(4 300 160)"/>
+                    <ellipse class="topo-ring r4" cx="300" cy="160" rx="165" ry="92"  transform="rotate(2 300 160)"/>
+                    <ellipse class="topo-ring r3" cx="300" cy="160" rx="120" ry="72"  transform="rotate(-2 300 160)"/>
+                    <ellipse class="topo-ring r2" cx="300" cy="160" rx="80"  ry="52"  transform="rotate(-6 300 160)"/>
+                    <ellipse class="topo-ring r1" cx="300" cy="160" rx="42"  ry="30"  transform="rotate(-10 300 160)"/>
+                </g>
+
+                <!-- A stylized CA-18 arc — dashed, sweeping in from the south -->
+                <path class="topo-road" d="M 40 280 Q 180 240 260 215 Q 340 195 410 165 Q 470 140 530 90"/>
+
+                <!-- Camp pin: crosshair + dot + sonar ring -->
+                <g class="topo-pin-group">
+                    <circle class="topo-pin-ring" cx="300" cy="158" r="6"/>
+                    <line   class="topo-pin" x1="300" y1="144" x2="300" y2="172" stroke="currentColor"/>
+                    <line   class="topo-pin" x1="286" y1="158" x2="314" y2="158" stroke="currentColor"/>
+                    <circle class="topo-pin" cx="300" cy="158" r="2.5"/>
+                </g>
+
+                <!-- Coord label near pin -->
+                <text class="topo-label" x="316" y="146">34.27&deg;N · 116.93&deg;W</text>
+
+                <!-- Compass — top right -->
+                <g class="topo-compass-group" transform="translate(498 32)">
+                    <line class="topo-compass-line" x1="0" y1="-12" x2="0" y2="14"/>
+                    <line class="topo-compass-line" x1="-4" y1="-8" x2="0" y2="-12"/>
+                    <line class="topo-compass-line" x1="4"  y1="-8" x2="0" y2="-12"/>
+                    <text class="topo-compass" y="-18" text-anchor="middle">N</text>
+                </g>
+
+                <!-- Corner markers (paper-edge feel) -->
+                <text class="topo-corner" x="20"  y="24">USFS &middot; SECTOR 18</text>
+                <text class="topo-corner" x="520" y="290" text-anchor="end">CA-18 ▸ FIRE RD</text>
+            </svg>
+
+            <div class="topo-legend">
+                <p class="tl-label">Location</p>
+                <p class="tl-name">San Bernardino National Forest</p>
+                <p class="tl-stats">
+                    367,357 acres
+                    <span class="tl-sep">&middot;</span>
+                    USFS
+                    <span class="tl-sep">&middot;</span>
+                    CA-18, north of Big Bear
+                </p>
+                <p class="tl-coords">34.27&deg;N &middot; 116.93&deg;W &middot; ~6,750 ft</p>
+            </div>
         </div>
 
         <div class="text-block reveal">
@@ -2020,14 +2424,25 @@
         <p class="chapter-mark"><span class="day">MON</span><span class="day-title">Domestic</span></p>
         <div class="text-block reveal">
             <p>Monday I refused to put on real pants. The to-do list was: nothing. The actual list, naturally, was a few things.</p>
-            <p>I had a U-Haul U-Box to crack open and the wrong tool to do it with &mdash; the little wire seal on the door latch, the bolt cutters someone had left around, a paper mask pulled down to my chin, the red-painted block wall of the storage yard for an audience. I had reasonable assumptions about how hard this would be. It being a tool literally <em>named</em> for the thing it's supposed to cut. The seal, at the time of this writing, remains uncut. My ego, less so.</p>
+            <p>I had a U-Haul U-Box to open at the storage yard. There were two locks on it. I had also, with great consistency, forgotten the keys at home. That gave me a choice: drive 35 minutes back, do it again the other way, lose an hour and ten to my own brain &mdash; or hit the Home Depot ten minutes up the road and buy a pair of bolt cutters. I bought the bolt cutters. It felt, briefly, like a clever move.</p>
         </div>
 
         <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Attempting to cut the wire seal on a U-Haul U-Box with bolt cutters">
+            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Kevin attempting to cut the lock on a U-Haul U-Box with newly purchased bolt cutters">
                 <source src="/newsletter/005/images/bolt-cutters.mp4" type="video/mp4">
             </video>
-            <div class="photo-caption">U-Box, wire seal, gray tee, mask on the chin &mdash; posted so my ancestors know what I am made of</div>
+            <div class="photo-caption">Home Depot bolt cutters, the smaller of the two locks, my paper mask on the chin, the red wall watching &mdash; brand-new tool, brand-new humility</div>
+        </div>
+
+        <div class="text-block reveal">
+            <p>The lock did not move. I leaned. I jumped on the handles. I made the small focused noise of a man losing an argument with a piece of metal. Justin had come along for the ride, the way you bring a friend to a coin flip you suspect might go badly. He took the cutters out of my hands.</p>
+        </div>
+
+        <div class="video-inset portrait reveal">
+            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Justin cutting the U-Box lock with the bolt cutters with apparent ease">
+                <source src="/newsletter/005/images/justin-cuts.mp4" type="video/mp4">
+            </video>
+            <div class="photo-caption">Justin, same cutters, same lock, demonstrably less effort &mdash; I have decided this is a posture issue and not a strength issue</div>
         </div>
 
         <div class="text-block reveal">
@@ -2056,7 +2471,7 @@
         </div>
 
         <div class="text-block reveal">
-            <p>Three days. One night in the dirt. One movie on a lot I still can't believe I work at. One trip from Justin's neighborhood to mine that I'm told I should have paid for in parking. One wire seal that won the bolt cutter standoff. A dog under whose chin I will continue to find solace.</p>
+            <p>Three days. One night in the dirt. One movie on a lot I still can't believe I work at. One trip from Justin's neighborhood to mine that I'm told I should have paid for in parking. Two padlocks, one set of brand-new bolt cutters, and a clean reminder that Justin handles them better than I do. A dog under whose chin I will continue to find solace.</p>
             <p>Happy Memorial Day to those it's for. To the rest: take the long weekend wherever you can find it.</p>
         </div>
     </div>
@@ -2293,6 +2708,72 @@
         })();
     </script>
     <script>
+        // ==================== TEXT-CHAT REVEAL ====================
+        // Plays the "come thru" thread one bubble at a time when scrolled into
+        // view. The typing indicator bubble shows for `data-hide` ms then hides.
+        (function() {
+            var thread = document.getElementById('chatThread');
+            if (!thread) return;
+            var bubbles = Array.prototype.slice.call(thread.querySelectorAll('.bubble'));
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                bubbles.forEach(function(b) {
+                    if (b.classList.contains('typing')) { b.style.display = 'none'; return; }
+                    b.classList.add('visible');
+                });
+                return;
+            }
+            if (!('IntersectionObserver' in window)) {
+                bubbles.forEach(function(b) {
+                    if (b.classList.contains('typing')) { b.style.display = 'none'; return; }
+                    b.classList.add('visible');
+                });
+                return;
+            }
+            var played = false;
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (!e.isIntersecting || played) return;
+                    played = true;
+                    bubbles.forEach(function(b) {
+                        var d    = parseInt(b.getAttribute('data-d')    || '0', 10);
+                        var hide = parseInt(b.getAttribute('data-hide') || '0', 10);
+                        setTimeout(function() { b.classList.add('visible'); }, d);
+                        if (hide && b.classList.contains('typing')) {
+                            setTimeout(function() {
+                                b.classList.remove('visible');
+                                b.style.display = 'none';
+                            }, d + hide);
+                        }
+                    });
+                    io.disconnect();
+                });
+            }, { threshold: 0.35 });
+            io.observe(thread);
+        })();
+
+        // ==================== TOPO CARD — draw on enter ====================
+        (function() {
+            var card = document.getElementById('topoCard');
+            if (!card) return;
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                card.classList.add('topo-go');
+                return;
+            }
+            if (!('IntersectionObserver' in window)) {
+                card.classList.add('topo-go');
+                return;
+            }
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        card.classList.add('topo-go');
+                        io.disconnect();
+                    }
+                });
+            }, { threshold: 0.25 });
+            io.observe(card);
+        })();
+
         // ==================== LAZY-PLAY INLINE VIDEOS ====================
         // Any <video class="lazy-video"> in the body plays when scrolled into view,
         // pauses when scrolled out. Respects prefers-reduced-motion.
