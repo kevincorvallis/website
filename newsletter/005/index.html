@@ -95,6 +95,12 @@
             --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
         }
 
+        /* Bilingual toggle — show only the active language's spans/divs */
+        [data-lang="en"] [data-l="ko"],
+        [data-lang="ko"] [data-l="en"] {
+            display: none !important;
+        }
+
         html {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -2083,15 +2089,22 @@
     <!-- ==================== PASSWORD GATE ==================== -->
     <div class="gate" id="gate">
         <div class="gate-content">
-            <p class="gate-meta">No. 005 &middot; Long weekend</p>
+            <p class="gate-meta">
+                <span data-l="en">No. 005 &middot; Long weekend</span>
+                <span data-l="ko">No. 005 &middot; 긴 주말</span>
+            </p>
             <h1 class="gate-title">Dispatch</h1>
-            <p class="gate-subtitle">This letter is for friends and family.</p>
+            <p class="gate-subtitle">
+                <span data-l="en">This letter is for friends and family.</span>
+                <span data-l="ko">친구와 가족에게만 보내는 편지예요.</span>
+            </p>
             <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
                 <input
                     type="text"
                     class="gate-input"
                     id="gateInput"
-                    placeholder="this week's word"
+                    data-ph-en="this week's word"
+                    data-ph-ko="이번 주의 단어"
                     aria-describedby="gateAside"
                     autocomplete="off"
                     autocorrect="off"
@@ -2103,8 +2116,14 @@
                 >
                 <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
             </form>
-            <p class="gate-hint" id="gateHint">Hmm, that's not it.</p>
-            <p class="gate-aside" id="gateAside">Japanese noun &mdash; romaji or kanji</p>
+            <p class="gate-hint" id="gateHint">
+                <span data-l="en">Hmm, that's not it.</span>
+                <span data-l="ko">음, 아닌데?</span>
+            </p>
+            <p class="gate-aside" id="gateAside">
+                <span data-l="en">Japanese noun &mdash; romaji or kanji</span>
+                <span data-l="ko">일본어 명사 &mdash; 로마자 또는 한자</span>
+            </p>
         </div>
     </div>
 
@@ -2143,11 +2162,18 @@
             <p class="komorebi-romaji" id="komorebiRomaji">yohaku</p>
             <p class="komorebi-noun" id="komorebiNoun">noun &middot; Japanese</p>
             <p class="komorebi-meaning" id="komorebiMeaning">
-                The blank space deliberately left around a thing &mdash; the margin, the breathing room, the part you choose not to fill.
+                <span data-l="en">The blank space deliberately left around a thing &mdash; the margin, the breathing room, the part you choose not to fill.</span>
+                <span data-l="ko">어떤 것의 가장자리에 일부러 비워둔 자리 &mdash; 여백, 숨 쉴 공간, 굳이 채우지 않기로 한 부분.</span>
             </p>
             <div class="komorebi-divider" id="komorebiDivider"></div>
-            <p class="komorebi-tagline" id="komorebiTagline">A letter for friends and family.</p>
-            <button class="komorebi-dismiss" id="komorebiDismiss">Continue &rarr;</button>
+            <p class="komorebi-tagline" id="komorebiTagline">
+                <span data-l="en">A letter for friends and family.</span>
+                <span data-l="ko">친구와 가족에게 보내는 편지.</span>
+            </p>
+            <button class="komorebi-dismiss" id="komorebiDismiss">
+                <span data-l="en">Continue &rarr;</span>
+                <span data-l="ko">계속 &rarr;</span>
+            </button>
         </div>
     </div>
 
@@ -2155,8 +2181,13 @@
     <div class="progress-bar" id="progressBar"></div>
 
     <!-- Navigation -->
-    <a href="/newsletter" class="back-link">&larr; Dispatch</a>
+    <a href="/newsletter" class="back-link">&larr; <span data-l="en">Dispatch</span><span data-l="ko">디스패치</span></a>
     <div class="top-controls">
+        <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
+            <span class="lang-pill-label lang-pill-en">EN</span>
+            <span class="lang-pill-label lang-pill-ko">한</span>
+            <span class="lang-pill-dot"></span>
+        </div>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle">
             <label for="theme-toggle"></label>
@@ -2170,12 +2201,22 @@
         </video>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="hero-label">Dispatch 005 &middot; Long weekend</div>
-            <h1 class="hero-title" style="font-style: italic;">Margin</h1>
-            <p class="hero-description">three days, mostly outdoors &mdash; a screening, a forest road, a courtyard, a dog</p>
+            <div class="hero-label">
+                <span data-l="en">Dispatch 005 &middot; Long weekend</span>
+                <span data-l="ko">디스패치 005 &middot; 긴 주말</span>
+            </div>
+            <h1 class="hero-title" style="font-style: italic;">
+                <span data-l="en">Margin</span>
+                <span data-l="ko">여백</span>
+            </h1>
+            <p class="hero-description">
+                <span data-l="en">three days, mostly outdoors &mdash; a screening, a forest road, a courtyard, a dog</span>
+                <span data-l="ko">사흘, 거의 바깥 &mdash; 시사회 하나, 임도 하나, 안마당 하나, 개 한 마리</span>
+            </p>
         </div>
         <div class="scroll-hint">
-            <span>Scroll</span>
+            <span data-l="en">Scroll</span>
+            <span data-l="ko">스크롤</span>
             <div class="scroll-line"></div>
         </div>
     </section>
@@ -2184,8 +2225,14 @@
 
     <div class="issue-intro reveal">
         <p class="issue-number">No. 005</p>
-        <h2 class="issue-date">Margin</h2>
-        <p class="issue-opener">Memorial Day weekend &middot; May 22&ndash;25, 2026</p>
+        <h2 class="issue-date">
+            <span data-l="en">Margin</span>
+            <span data-l="ko">여백</span>
+        </h2>
+        <p class="issue-opener">
+            <span data-l="en">Memorial Day weekend &middot; May 22&ndash;25, 2026</span>
+            <span data-l="ko">메모리얼데이 주말 &middot; 2026년 5월 22&ndash;25일</span>
+        </p>
     </div>
 
     <div class="divider reveal-fade"></div>
@@ -2196,10 +2243,18 @@
          FRIDAY — The Lot
          ============================================================ -->
     <div class="chapter">
-        <p class="chapter-mark"><span class="day">FRI</span><span class="day-title">The Lot</span></p>
+        <p class="chapter-mark">
+            <span class="day"><span data-l="en">FRI</span><span data-l="ko">금</span></span><span class="day-title"><span data-l="en">The Lot</span><span data-l="ko">파라마운트 부지</span></span>
+        </p>
         <div class="text-block reveal">
-            <p>Memorial Day weekend started Friday afternoon, when an internal email I almost archived turned out to be a screening invite &mdash; <em>The Passenger</em>, on the Paramount lot, that night, plus-one included.</p>
-            <p>Justin lives in Frogtown. I live closer to the lot. For months now we've been running the same bit on each other &mdash; <em>come thru</em>, <em>no, you come thru</em> &mdash; neither of us willing to make the drive over for a coffee. The screening was one of the rare cases where the geography wasn't negotiable: the movie was at Paramount, so Justin had to come thru. He did. He also let me know, with feeling, that I had not solved the parking problem on his behalf, and that this was, in fact, on me.</p>
+            <div data-l="en">
+                <p>Memorial Day weekend started Friday afternoon, when an internal email I almost archived turned out to be a screening invite &mdash; <em>The Passenger</em>, on the Paramount lot, that night, plus-one included.</p>
+                <p>Justin lives in Frogtown. I live closer to the lot. For months now we've been running the same bit on each other &mdash; <em>come thru</em>, <em>no, you come thru</em> &mdash; neither of us willing to make the drive over for a coffee. The screening was one of the rare cases where the geography wasn't negotiable: the movie was at Paramount, so Justin had to come thru. He did. He also let me know, with feeling, that I had not solved the parking problem on his behalf, and that this was, in fact, on me.</p>
+            </div>
+            <div data-l="ko">
+                <p>메모리얼데이 주말은 금요일 오후에 시작됐다. 거의 보관함으로 보낼 뻔한 사내 메일이 알고 보니 시사회 초대장이었던 것이다 &mdash; <em>The Passenger</em>, 파라마운트 부지, 그날 밤, 플러스원 포함.</p>
+                <p>저스틴은 프로그타운에 산다. 나는 부지에서 더 가깝다. 우리는 몇 달째 똑같은 농담을 주고받고 있었다 &mdash; <em>come thru</em>, <em>아니, 네가 come thru</em> &mdash; 둘 다 커피 한 잔 마시러 차 끌고 갈 마음이 없다. 시사회는 그 지리적 협상이 통하지 않는 드문 경우였다. 영화가 파라마운트에서 하는데, 그건 저스틴이 come thru 할 수밖에 없다는 뜻이다. 저스틴은 왔다. 그리고 내가 자기 주차 문제를 해결해놓지 않은 것에 대해 꽤 진심으로 한 마디 했다 &mdash; 그 책임이, 명백히, 나에게 있다고.</p>
+            </div>
         </div>
 
         <!-- The bit, in chat form. Composite of a months-long thread. -->
@@ -2210,37 +2265,65 @@
                     <span class="chat-meta">iMessage &middot; ongoing</span>
                 </div>
                 <ol class="chat-thread" id="chatThread">
-                    <li class="bubble in"  data-d="0">come thru</li>
-                    <li class="bubble out" data-d="500">no u come thru</li>
-                    <li class="bubble in"  data-d="1100">fam. come thru.</li>
+                    <li class="bubble in"  data-d="0"><span data-l="en">come thru</span><span data-l="ko">come thru</span></li>
+                    <li class="bubble out" data-d="500"><span data-l="en">no u come thru</span><span data-l="ko">아니 네가 come thru</span></li>
+                    <li class="bubble in"  data-d="1100"><span data-l="en">fam. come thru.</span><span data-l="ko">형. come thru.</span></li>
                     <li class="bubble typing in" data-d="1800" data-hide="900" aria-hidden="true">
                         <span class="dot"></span><span class="dot"></span><span class="dot"></span>
                     </li>
                     <li class="bubble in image" data-d="2700">
-                        <img src="/newsletter/005/images/kobe-still.jpg" alt="Kobe on the patio looking up">
+                        <img src="/newsletter/005/images/kobe-still.jpg"
+                            data-alt-en="Kobe on the patio looking up"
+                            data-alt-ko="안마당에서 위를 올려다보는 코비"
+                            alt="Kobe on the patio looking up">
                     </li>
-                    <li class="bubble in"  data-d="3200">kobe says come thru</li>
-                    <li class="bubble out" data-d="4000">low blow</li>
-                    <li class="bubble out" data-d="4500">also there's a screening Friday at paramount. <em>you</em> come thru.</li>
-                    <li class="bubble in"  data-d="5400">fine. find me parking.</li>
+                    <li class="bubble in"  data-d="3200"><span data-l="en">kobe says come thru</span><span data-l="ko">코비도 come thru 하래</span></li>
+                    <li class="bubble out" data-d="4000"><span data-l="en">low blow</span><span data-l="ko">반칙이다</span></li>
+                    <li class="bubble out" data-d="4500"><span data-l="en">also there's a screening Friday at paramount. <em>you</em> come thru.</span><span data-l="ko">근데 금요일에 파라마운트에서 시사회 있어. 이번엔 <em>네가</em> come thru.</span></li>
+                    <li class="bubble in"  data-d="5400"><span data-l="en">fine. find me parking.</span><span data-l="ko">알았어. 주차 자리 찾아놔.</span></li>
                 </ol>
             </div>
-            <p class="chat-caption">composite of a months-long thread, lightly compressed</p>
+            <p class="chat-caption">
+                <span data-l="en">composite of a months-long thread, lightly compressed</span>
+                <span data-l="ko">몇 달짜리 대화를 살짝 압축한 합성본</span>
+            </p>
         </div>
 
         <div class="text-block reveal">
-            <p>Here's Justin: gray tee, light jeans, and the standing-still face of a person who has forgotten what to do with his hands. Behind him the rounded marquee with <em>Paramount</em> scripted across it, two stone planters of red flowers flanking the path, the last of the side-light catching the cream stucco. I've been at this lot long enough that I should be over the marquee. I'm not over it. Neither was he.</p>
+            <div data-l="en">
+                <p>Here's Justin: gray tee, light jeans, and the standing-still face of a person who has forgotten what to do with his hands. Behind him the rounded marquee with <em>Paramount</em> scripted across it, two stone planters of red flowers flanking the path, the last of the side-light catching the cream stucco. I've been at this lot long enough that I should be over the marquee. I'm not over it. Neither was he.</p>
+            </div>
+            <div data-l="ko">
+                <p>저스틴이다. 회색 티, 옅은 청바지, 그리고 자기 손을 어디에 둬야 할지 잠시 잊어버린 사람의 가만히 선 얼굴. 뒤로는 <em>Paramount</em>라고 흘려 쓴 둥근 마키가 보이고, 길 양쪽엔 빨간 꽃이 심긴 돌 화분이 두 개, 늦은 햇빛이 크림색 외벽을 마지막으로 훑고 있다. 이 부지에 다닌 지 충분히 오래되었으니 이제는 마키쯤은 무덤덤할 만도 한데, 안 그래진다. 저스틴도 그랬다.</p>
+            </div>
         </div>
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/paramount-lot.jpg" alt="Justin in a gray tee standing on the path in front of the Paramount Theatre marquee at golden hour">
-            <div class="photo-caption">for the man who drove in from Frogtown, the marquee is the receipt</div>
+            <img src="/newsletter/005/images/paramount-lot.jpg"
+                data-alt-en="Justin in a gray tee standing on the path in front of the Paramount Theatre marquee at golden hour"
+                data-alt-ko="해질 무렵 파라마운트 극장 마키 앞 길에 서 있는 회색 티 차림의 저스틴"
+                alt="Justin in a gray tee standing on the path in front of the Paramount Theatre marquee at golden hour">
+            <div class="photo-caption">
+                <span data-l="en">for the man who drove in from Frogtown, the marquee is the receipt</span>
+                <span data-l="ko">프로그타운에서 차 끌고 온 사람에게, 이 마키는 일종의 영수증이다</span>
+            </div>
         </div>
         <div class="text-block reveal">
-            <p>The screening itself was at one of the lot theaters &mdash; not the grand-old room I had pictured, just a clean modern auditorium with the title card glowing up front: <strong>PASSENGER &middot; share your excitement</strong>. They handed out Paramount Pictures popcorn bags at the door, the kind with the mountain logo stamped on the side. Justin had Sour Patch Kids on his lap. Somebody in a red dress was still finding her seat as the lights went down. We sat through the credits like we were going to learn something. We did not learn anything. It was still nice.</p>
+            <div data-l="en">
+                <p>The screening itself was at one of the lot theaters &mdash; not the grand-old room I had pictured, just a clean modern auditorium with the title card glowing up front: <strong>PASSENGER &middot; share your excitement</strong>. They handed out Paramount Pictures popcorn bags at the door, the kind with the mountain logo stamped on the side. Justin had Sour Patch Kids on his lap. Somebody in a red dress was still finding her seat as the lights went down. We sat through the credits like we were going to learn something. We did not learn anything. It was still nice.</p>
+            </div>
+            <div data-l="ko">
+                <p>시사회는 부지 안에 있는 극장 중 하나에서 열렸다 &mdash; 내가 상상하던 옛 느낌의 큰 홀이 아니라, 깔끔하게 정돈된 현대식 강당이었다. 앞쪽엔 타이틀 카드가 환하게 떠 있었다: <strong>PASSENGER &middot; share your excitement</strong>. 입구에서 파라마운트 픽처스 팝콘 봉투를 하나씩 나눠줬다. 옆면에 마운틴 로고가 박힌 그 봉투. 저스틴은 무릎 위에 사워패치 키즈를 올려뒀다. 누군가 빨간 드레스를 입고 자기 자리를 찾아가는 중에 불이 꺼졌다. 우리는 뭔가 배울 사람처럼 끝까지 크레딧을 봤다. 배운 건 없었다. 그래도 좋았다.</p>
+            </div>
         </div>
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/passenger-screening.jpg" alt="Inside the screening — Paramount Pictures popcorn bag held up, Passenger title card on screen, Sour Patch Kids on lap">
-            <div class="photo-caption">popcorn bag, Sour Patch Kids, the title card already up &mdash; the moment before learning nothing</div>
+            <img src="/newsletter/005/images/passenger-screening.jpg"
+                data-alt-en="Inside the screening — Paramount Pictures popcorn bag held up, Passenger title card on screen, Sour Patch Kids on lap"
+                data-alt-ko="시사회 내부 — 들고 있는 파라마운트 픽처스 팝콘 봉투, 스크린 위 Passenger 타이틀 카드, 무릎 위 사워패치 키즈"
+                alt="Inside the screening — Paramount Pictures popcorn bag held up, Passenger title card on screen, Sour Patch Kids on lap">
+            <div class="photo-caption">
+                <span data-l="en">popcorn bag, Sour Patch Kids, the title card already up &mdash; the moment before learning nothing</span>
+                <span data-l="ko">팝콘 봉투, 사워패치 키즈, 이미 떠 있는 타이틀 카드 &mdash; 아무것도 배우지 않게 될 직전</span>
+            </div>
         </div>
     </div>
 
@@ -2248,14 +2331,28 @@
          SUNDAY — Out (church, then up the ridge)
          ============================================================ -->
     <div class="chapter">
-        <p class="chapter-mark"><span class="day">SUN</span><span class="day-title">Out</span></p>
+        <p class="chapter-mark">
+            <span class="day"><span data-l="en">SUN</span><span data-l="ko">일</span></span><span class="day-title"><span data-l="en">Out</span><span data-l="ko">밖으로</span></span>
+        </p>
         <div class="text-block reveal">
-            <p>Sunday started slow and indoors. Service at Citizens Church with Crystal, Josh, Minyoung, and Justin. Crystal and Josh had to slip out before we got to the courtyard, so the photo evidence is short two people &mdash; consider this their footnote.</p>
-            <p>The selfie that did happen: me in a denim shirt grinning at nothing in particular, Minyoung in white with a green tank under it, Justin in a textured cream polo looking, as he always does, two inches taller than the frame can hold.</p>
+            <div data-l="en">
+                <p>Sunday started slow and indoors. Service at Citizens Church with Crystal, Josh, Minyoung, and Justin. Crystal and Josh had to slip out before we got to the courtyard, so the photo evidence is short two people &mdash; consider this their footnote.</p>
+                <p>The selfie that did happen: me in a denim shirt grinning at nothing in particular, Minyoung in white with a green tank under it, Justin in a textured cream polo looking, as he always does, two inches taller than the frame can hold.</p>
+            </div>
+            <div data-l="ko">
+                <p>일요일은 천천히, 그리고 실내에서 시작됐다. 크리스탈, 조시, 민영, 저스틴과 함께 시티즌스 처치 예배. 크리스탈과 조시는 안마당 사진을 찍기 전에 먼저 자리를 떠야 해서, 사진엔 두 명이 빠져 있다 &mdash; 이 문장을 그 두 사람의 각주로 받아주길.</p>
+                <p>그래도 찍힌 셀카: 나는 데님 셔츠를 입고 별 이유 없이 웃고 있고, 민영은 흰 옷에 초록색 탱크탑을 받쳐 입었고, 저스틴은 늘 그렇듯 프레임이 감당 못 할 만큼 키가 두 인치쯤 더 커 보이는 자세로 크림색 폴로를 입고 있다.</p>
+            </div>
         </div>
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/citizens-church.jpg" alt="Selfie with Minyoung and Justin in the courtyard outside Citizens Church — concrete overpass behind us, overcast sky. Crystal and Josh had already left.">
-            <div class="photo-caption">with Minyoung and Justin, post-service, pre-coffee &mdash; Crystal &amp; Josh attended in spirit</div>
+            <img src="/newsletter/005/images/citizens-church.jpg"
+                data-alt-en="Selfie with Minyoung and Justin in the courtyard outside Citizens Church — concrete overpass behind us, overcast sky. Crystal and Josh had already left."
+                data-alt-ko="시티즌스 처치 안마당에서 민영, 저스틴과 함께 찍은 셀카 — 뒤로 콘크리트 다리, 흐린 하늘. 크리스탈과 조시는 이미 떠난 뒤."
+                alt="Selfie with Minyoung and Justin in the courtyard outside Citizens Church — concrete overpass behind us, overcast sky. Crystal and Josh had already left.">
+            <div class="photo-caption">
+                <span data-l="en">with Minyoung and Justin, post-service, pre-coffee &mdash; Crystal &amp; Josh attended in spirit</span>
+                <span data-l="ko">민영, 저스틴과 함께. 예배 끝, 커피 시작 전 &mdash; 크리스탈 &amp; 조시는 마음으로 함께</span>
+            </div>
         </div>
 
         <!-- Scroll-drawn route line: church (lower-left) -> Big Bear ridge (upper-right),
@@ -2282,11 +2379,19 @@
                          L 426 50
                          L 434 38"></path>
             </svg>
-            <span class="rl-caption">Hollywood to the ridge &middot; ~1h 30m</span>
+            <span class="rl-caption">
+                <span data-l="en">Hollywood to the ridge &middot; ~1h 30m</span>
+                <span data-l="ko">할리우드에서 능선까지 &middot; 약 1시간 30분</span>
+            </span>
         </div>
 
         <div class="text-block reveal">
-            <p>By mid-afternoon I had decided I needed dirt. I went home, threw a bag and a single camp chair in the RAV4, and pointed it east. I'm a recent convert to <strong>dispersed camping</strong> &mdash; for anyone unfamiliar, it's camping without a campsite. You drive into a national forest until the asphalt becomes gravel and the gravel becomes a suggestion, then you find a flat patch far enough from anyone else to pretend you've left civilization. The trade is no bathroom, no neighbors, no Wi-Fi, no rules. Mostly worth it.</p>
+            <div data-l="en">
+                <p>By mid-afternoon I had decided I needed dirt. I went home, threw a bag and a single camp chair in the RAV4, and pointed it east. I'm a recent convert to <strong>dispersed camping</strong> &mdash; for anyone unfamiliar, it's camping without a campsite. You drive into a national forest until the asphalt becomes gravel and the gravel becomes a suggestion, then you find a flat patch far enough from anyone else to pretend you've left civilization. The trade is no bathroom, no neighbors, no Wi-Fi, no rules. Mostly worth it.</p>
+            </div>
+            <div data-l="ko">
+                <p>오후가 중반쯤 됐을 때, 흙이 필요하다는 결론에 도달했다. 집에 들러 가방 하나랑 캠핑 의자 한 개를 RAV4에 싣고, 동쪽으로 차를 돌렸다. <strong>분산 캠핑(dispersed camping)</strong>으로 갈아탄 지 얼마 안 됐다 &mdash; 모르는 분들을 위해 설명하자면, 정해진 캠프사이트 없이 하는 캠핑이다. 국유림 안으로 차를 몰고 들어가다 보면 아스팔트가 어느 순간 자갈이 되고, 자갈은 다시 권유 정도로 흐려지는데, 그쯤에서 다른 사람들과 충분히 떨어진 평평한 자리를 찾아 텐트를 친다. 거래 조건은: 화장실 없음, 이웃 없음, 와이파이 없음, 규칙 없음. 대체로 그럴 만하다.</p>
+            </div>
         </div>
 
         <div class="topo-card reveal-fade" id="topoCard">
@@ -2329,41 +2434,83 @@
             </svg>
 
             <div class="topo-legend">
-                <p class="tl-label">Location</p>
-                <p class="tl-name">San Bernardino National Forest</p>
-                <p class="tl-stats">
-                    367,357 acres
-                    <span class="tl-sep">&middot;</span>
-                    USFS
-                    <span class="tl-sep">&middot;</span>
-                    CA-18, north of Big Bear
+                <p class="tl-label">
+                    <span data-l="en">Location</span>
+                    <span data-l="ko">위치</span>
                 </p>
-                <p class="tl-coords">34.27&deg;N &middot; 116.93&deg;W &middot; ~6,750 ft</p>
+                <p class="tl-name">
+                    <span data-l="en">San Bernardino National Forest</span>
+                    <span data-l="ko">샌버나디노 국유림</span>
+                </p>
+                <p class="tl-stats">
+                    <span data-l="en">367,357 acres
+                        <span class="tl-sep">&middot;</span>
+                        USFS
+                        <span class="tl-sep">&middot;</span>
+                        CA-18, north of Big Bear</span>
+                    <span data-l="ko">367,357 에이커
+                        <span class="tl-sep">&middot;</span>
+                        미국 산림청
+                        <span class="tl-sep">&middot;</span>
+                        CA-18, 빅베어 북쪽</span>
+                </p>
+                <p class="tl-coords">
+                    <span data-l="en">34.27&deg;N &middot; 116.93&deg;W &middot; ~6,750 ft</span>
+                    <span data-l="ko">북위 34.27&deg; &middot; 서경 116.93&deg; &middot; 약 2,057 m</span>
+                </p>
             </div>
         </div>
 
         <div class="text-block reveal">
-            <p>Big Bear is about an hour and a half from me. Pacific Crest country, lake at the bottom, fire roads going every direction up the ridge. I aired the RAV4 down &mdash; yes, the RAV4 &mdash; and pointed it uphill.</p>
+            <div data-l="en">
+                <p>Big Bear is about an hour and a half from me. Pacific Crest country, lake at the bottom, fire roads going every direction up the ridge. I aired the RAV4 down &mdash; yes, the RAV4 &mdash; and pointed it uphill.</p>
+            </div>
+            <div data-l="ko">
+                <p>빅베어는 내 집에서 한 시간 반쯤 걸린다. 퍼시픽 크레스트 일대, 산 아래엔 호수, 능선 위로는 사방으로 뻗은 임도. RAV4의 타이어 공기압을 낮추고 &mdash; 그래, RAV4다 &mdash; 위쪽으로 차를 돌렸다.</p>
+            </div>
         </div>
 
         <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="RAV4 cutting through a sandy bank on a fire road">
+            <video class="lazy-video" muted loop playsinline
+                preload="metadata"
+                data-aria-en="RAV4 cutting through a sandy bank on a fire road"
+                data-aria-ko="임도의 모래 둑을 가로지르는 RAV4"
+                aria-label="RAV4 cutting through a sandy bank on a fire road">
                 <source src="/newsletter/005/images/rav4-offroad.mp4" type="video/mp4">
             </video>
-            <div class="photo-caption">a 4-cylinder crossover doing things it was politely not designed to do</div>
+            <div class="photo-caption">
+                <span data-l="en">a 4-cylinder crossover doing things it was politely not designed to do</span>
+                <span data-l="ko">정중하게 말해서, 이런 용도로 설계되지 않은 4기통 크로스오버</span>
+            </div>
         </div>
 
         <div class="text-block reveal">
-            <p>Found a flat-ish patch on a sandy ridge with the whole San Bernardino range hazing out into layers behind it. Backed the RAV4 in with the tailgate open and the one chair set up next to it &mdash; that was the whole operation. There's a very specific moment in dispersed camping when the engine finally clicks off and your ears reset &mdash; and you realize how loud the things you live with normally are.</p>
+            <div data-l="en">
+                <p>Found a flat-ish patch on a sandy ridge with the whole San Bernardino range hazing out into layers behind it. Backed the RAV4 in with the tailgate open and the one chair set up next to it &mdash; that was the whole operation. There's a very specific moment in dispersed camping when the engine finally clicks off and your ears reset &mdash; and you realize how loud the things you live with normally are.</p>
+            </div>
+            <div data-l="ko">
+                <p>모래 섞인 능선 위에서 그럭저럭 평평한 자리를 찾았다. 뒤로는 샌버나디노 산맥 전체가 안개 너머로 층층이 흐려져 있었다. RAV4를 후진으로 대고, 테일게이트를 열고, 그 옆에 캠핑 의자 하나를 펼쳤다 &mdash; 그게 전부의 세팅이었다. 분산 캠핑에는 아주 특정한 순간이 있다. 엔진이 마침내 꺼지고, 귀가 리셋되는 순간 &mdash; 그러면서 평소에 살면서 듣고 있던 것들이 얼마나 시끄러웠는지 새삼 알게 된다.</p>
+            </div>
         </div>
 
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/camp-setup.jpg" alt="RAV4 parked on a sandy ridge with the tailgate open, a single camp chair beside it, hazy mountain layers receding into the distance">
-            <div class="photo-caption">camp, eventually &mdash; no permit, no neighbors, no plumbing</div>
+            <img src="/newsletter/005/images/camp-setup.jpg"
+                data-alt-en="RAV4 parked on a sandy ridge with the tailgate open, a single camp chair beside it, hazy mountain layers receding into the distance"
+                data-alt-ko="모래 능선에 테일게이트를 연 채 주차된 RAV4, 옆에는 캠핑 의자 하나, 뒤로는 안개 속으로 멀어지는 산자락"
+                alt="RAV4 parked on a sandy ridge with the tailgate open, a single camp chair beside it, hazy mountain layers receding into the distance">
+            <div class="photo-caption">
+                <span data-l="en">camp, eventually &mdash; no permit, no neighbors, no plumbing</span>
+                <span data-l="ko">결국엔 캠프 &mdash; 허가증 없음, 이웃 없음, 배관 없음</span>
+            </div>
         </div>
 
         <div class="text-block reveal">
-            <p>The sun was still high when I got there, sun-dog smeared across a cirrus sky. Later, the kind of sunset that makes a non-photographer instinctively reach for their phone. Mine was on airplane mode. I reached for it anyway.</p>
+            <div data-l="en">
+                <p>The sun was still high when I got there, sun-dog smeared across a cirrus sky. Later, the kind of sunset that makes a non-photographer instinctively reach for their phone. Mine was on airplane mode. I reached for it anyway.</p>
+            </div>
+            <div data-l="ko">
+                <p>도착했을 땐 해가 아직 꽤 높았고, 새털구름 위로 무리해가 번져 있었다. 시간이 지나면서, 사진가가 아닌 사람도 본능적으로 폰을 집어 들게 하는 종류의 노을이 왔다. 내 폰은 비행기 모드였다. 그래도 집어 들었다.</p>
+            </div>
         </div>
 
         <div class="sunset-moment reveal">
@@ -2377,28 +2524,43 @@
             </svg>
             <p class="field-log">
                 <span class="rec-dot" aria-hidden="true"></span>
-                <span>Field log</span>
+                <span data-l="en">Field log</span>
+                <span data-l="ko">필드 로그</span>
                 <span class="sep">&middot;</span>
                 <span>2026.05.24</span>
                 <span class="sep">&middot;</span>
                 <span>19:42 PT</span>
             </p>
             <div class="frame">
-                <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Sunset over Big Bear from camp">
+                <video class="lazy-video" muted loop playsinline
+                    preload="metadata"
+                    data-aria-en="Sunset over Big Bear from camp"
+                    data-aria-ko="캠프에서 본 빅베어의 일몰"
+                    aria-label="Sunset over Big Bear from camp">
                     <source src="/newsletter/005/images/sunset.mp4" type="video/mp4">
                 </video>
             </div>
             <p class="shot-card">
-                <span class="coords">Big Bear &middot; approx 34.27&deg;N 116.93&deg;W</span>
-                the sky did what it does
+                <span class="coords">
+                    <span data-l="en">Big Bear &middot; approx 34.27&deg;N 116.93&deg;W</span>
+                    <span data-l="ko">빅베어 &middot; 약 북위 34.27&deg; 서경 116.93&deg;</span>
+                </span>
+                <span data-l="en">the sky did what it does</span>
+                <span data-l="ko">하늘이 하늘 같은 일을 했다</span>
             </p>
         </div>
 
         <!-- Song of the week — inline card; plays the same <audio> the mini-player uses -->
         <div class="song-card reveal" id="songCard">
-            <p class="song-label">Song of the week</p>
+            <p class="song-label">
+                <span data-l="en">Song of the week</span>
+                <span data-l="ko">이번 주의 노래</span>
+            </p>
             <div class="song-row">
-                <button class="song-play" id="songCardPlay" type="button" aria-label="Play Holocene" data-state="paused">
+                <button class="song-play" id="songCardPlay" type="button"
+                    data-aria-en="Play Holocene"
+                    data-aria-ko="Holocene 재생"
+                    aria-label="Play Holocene" data-state="paused">
                     <svg class="song-play-icon" viewBox="0 0 24 24" aria-hidden="true">
                         <path class="icon-play"  d="M8 5 L8 19 L20 12 Z"></path>
                         <path class="icon-pause" d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z"></path>
@@ -2406,11 +2568,17 @@
                 </button>
                 <div class="song-meta">
                     <p class="song-title">Holocene</p>
-                    <p class="song-artist">Bon Iver &middot; <em>Bon Iver, Bon Iver</em> &middot; 2011</p>
+                    <p class="song-artist">
+                        <span data-l="en">Bon Iver &middot; <em>Bon Iver, Bon Iver</em> &middot; 2011</span>
+                        <span data-l="ko">본 이베어 &middot; <em>Bon Iver, Bon Iver</em> &middot; 2011</span>
+                    </p>
                 </div>
                 <p class="song-time" id="songCardTime">5:43</p>
             </div>
-            <p class="song-aside">played on the drive up at exactly the speed it asks for</p>
+            <p class="song-aside">
+                <span data-l="en">played on the drive up at exactly the speed it asks for</span>
+                <span data-l="ko">올라가는 길에 이 노래가 청하는 속도 그대로 틀었다</span>
+            </p>
         </div>
     </div>
 
@@ -2418,58 +2586,117 @@
          MONDAY — Domestic
          ============================================================ -->
     <div class="chapter">
-        <p class="chapter-mark"><span class="day">MON</span><span class="day-title">Domestic</span></p>
+        <p class="chapter-mark">
+            <span class="day"><span data-l="en">MON</span><span data-l="ko">월</span></span><span class="day-title"><span data-l="en">Domestic</span><span data-l="ko">집안일</span></span>
+        </p>
         <div class="text-block reveal">
-            <p>Monday I refused to put on real pants. The to-do list was: nothing. The actual list, naturally, was a few things.</p>
-            <p>I had a U-Haul U-Box to open at the storage yard. There were two locks on it. I had also, with great consistency, forgotten the keys at home. That gave me a choice: drive 35 minutes back, do it again the other way, lose an hour and ten to my own brain &mdash; or hit the Home Depot ten minutes up the road and buy a pair of bolt cutters. I bought the bolt cutters. It felt, briefly, like a clever move.</p>
+            <div data-l="en">
+                <p>Monday I refused to put on real pants. The to-do list was: nothing. The actual list, naturally, was a few things.</p>
+                <p>I had a U-Haul U-Box to open at the storage yard. There were two locks on it. I had also, with great consistency, forgotten the keys at home. That gave me a choice: drive 35 minutes back, do it again the other way, lose an hour and ten to my own brain &mdash; or hit the Home Depot ten minutes up the road and buy a pair of bolt cutters. I bought the bolt cutters. It felt, briefly, like a clever move.</p>
+            </div>
+            <div data-l="ko">
+                <p>월요일엔 진짜 바지를 안 입기로 했다. 할 일 목록은: 아무것도 없음. 실제 목록은 당연하게도 몇 개 있었다.</p>
+                <p>창고 부지에서 유홀 유박스를 열어야 했다. 거기에 자물쇠가 두 개 걸려 있었다. 그리고 나는 또 충실하게 열쇠를 집에 두고 왔다. 선택지는 두 개였다 &mdash; 35분 운전해서 다시 다녀오기 (왕복 1시간 10분, 내 머리 탓에 그 시간이 사라짐), 아니면 10분 떨어진 홈디포에 들러 볼트 커터를 사 오기. 나는 볼트 커터를 샀다. 잠깐은, 꽤 영리한 선택처럼 느껴졌다.</p>
+            </div>
         </div>
 
         <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Kevin attempting to cut the lock on a U-Haul U-Box with newly purchased bolt cutters">
+            <video class="lazy-video" muted loop playsinline preload="metadata"
+                data-aria-en="Kevin attempting to cut the lock on a U-Haul U-Box with newly purchased bolt cutters"
+                data-aria-ko="새로 산 볼트 커터로 유홀 유박스의 자물쇠를 자르려는 케빈"
+                aria-label="Kevin attempting to cut the lock on a U-Haul U-Box with newly purchased bolt cutters">
                 <source src="/newsletter/005/images/bolt-cutters.mp4" type="video/mp4">
             </video>
-            <div class="photo-caption">brand-new bolt cutters, brand-new humility</div>
+            <div class="photo-caption">
+                <span data-l="en">brand-new bolt cutters, brand-new humility</span>
+                <span data-l="ko">새 볼트 커터, 새 겸손</span>
+            </div>
         </div>
 
         <div class="text-block reveal">
-            <p>The lock did not move. I leaned. I jumped on the handles. I made the small focused noise of a man losing an argument with a piece of metal. Justin had come along for the ride, the way you bring a friend to a coin flip you suspect might go badly. He took the cutters out of my hands.</p>
+            <div data-l="en">
+                <p>The lock did not move. I leaned. I jumped on the handles. I made the small focused noise of a man losing an argument with a piece of metal. Justin had come along for the ride, the way you bring a friend to a coin flip you suspect might go badly. He took the cutters out of my hands.</p>
+            </div>
+            <div data-l="ko">
+                <p>자물쇠는 꿈쩍도 안 했다. 체중을 실었다. 손잡이 위에 올라타 보기도 했다. 쇠붙이와의 말다툼에서 지고 있는 사람 특유의 작고 집중된 소리를 냈다. 저스틴은 결과가 안 좋을 것 같은 동전 던지기에 친구를 데려가듯, 그날 따라와 있었다. 그가 내 손에서 커터를 가져갔다.</p>
+            </div>
         </div>
 
         <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Justin cutting the U-Box lock with the bolt cutters with apparent ease">
+            <video class="lazy-video" muted loop playsinline preload="metadata"
+                data-aria-en="Justin cutting the U-Box lock with the bolt cutters with apparent ease"
+                data-aria-ko="같은 볼트 커터로 별로 힘들지 않게 자물쇠를 자르는 저스틴"
+                aria-label="Justin cutting the U-Box lock with the bolt cutters with apparent ease">
                 <source src="/newsletter/005/images/justin-cuts.mp4" type="video/mp4">
             </video>
-            <div class="photo-caption">same cutters, same lock &mdash; I have decided this is a posture issue, not a strength issue</div>
+            <div class="photo-caption">
+                <span data-l="en">same cutters, same lock &mdash; I have decided this is a posture issue, not a strength issue</span>
+                <span data-l="ko">같은 커터, 같은 자물쇠 &mdash; 결론: 이건 근력 문제가 아니라 자세 문제다</span>
+            </div>
         </div>
 
         <div class="text-block reveal">
-            <p>Then it was Kobe time. Kobe is the resident dog of the patio out back &mdash; black-and-tan, ears that snap upright when you say his name, a collar he tolerates. He has a strong preference for being touched in one very specific area: the soft spot right under the chin, between the front paws. Bury your hand in there and he goes catatonic. It is one of the few perfectly efficient happiness loops I have access to, and I lean on it.</p>
+            <div data-l="en">
+                <p>Then it was Kobe time. Kobe is the resident dog of the patio out back &mdash; black-and-tan, ears that snap upright when you say his name, a collar he tolerates. He has a strong preference for being touched in one very specific area: the soft spot right under the chin, between the front paws. Bury your hand in there and he goes catatonic. It is one of the few perfectly efficient happiness loops I have access to, and I lean on it.</p>
+            </div>
+            <div data-l="ko">
+                <p>그러고 나서 코비 타임. 코비는 뒤뜰을 차지하고 사는 개다 &mdash; 검정과 황갈색이 섞인 털, 이름을 부르면 곧장 쫑긋 서는 귀, 그럭저럭 견뎌주는 목줄. 만져주는 자리에 대해 아주 분명한 취향이 있다: 턱 바로 아래, 앞발 사이 부드러운 자리. 그 안에 손을 묻으면 정신이 멍해진다. 내가 접근 가능한 몇 안 되는 완벽한 행복 루프 중 하나라, 자주 의지한다.</p>
+            </div>
         </div>
 
         <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" aria-label="Petting Kobe under the chin on the patio">
+            <video class="lazy-video" muted loop playsinline preload="metadata"
+                data-aria-en="Petting Kobe under the chin on the patio"
+                data-aria-ko="안마당에서 코비의 턱 밑을 쓰다듬는 장면"
+                aria-label="Petting Kobe under the chin on the patio">
                 <source src="/newsletter/005/images/kobe-paws.mp4" type="video/mp4">
             </video>
-            <div class="photo-caption">the spot &mdash; he will not contest your method</div>
+            <div class="photo-caption">
+                <span data-l="en">the spot &mdash; he will not contest your method</span>
+                <span data-l="ko">그 자리 &mdash; 방법에 대해 이의 제기 안 함</span>
+            </div>
         </div>
 
         <div class="text-block reveal">
-            <p>The rest of Monday was margin. The actual word. Sitting at the work station for no reason. Reading a chapter, abandoning it, reading another. Watching the late light pass across the wide-plank floor of the living room for longer than I had any business watching it.</p>
+            <div data-l="en">
+                <p>The rest of Monday was margin. The actual word. Sitting at the work station for no reason. Reading a chapter, abandoning it, reading another. Watching the late light pass across the wide-plank floor of the living room for longer than I had any business watching it.</p>
+            </div>
+            <div data-l="ko">
+                <p>월요일의 나머지는 여백이었다. 단어 그대로의 여백. 별 이유 없이 책상에 앉아 있기. 한 챕터를 읽다가, 덮고, 다른 책을 펴기. 거실의 넓은 원목 바닥 위로 늦은 햇빛이 지나가는 걸, 굳이 그렇게 오래 볼 일은 아닌데도 한참 보기.</p>
+            </div>
         </div>
 
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/living-room.jpg" alt="Living room: white sectional and ottoman, a black floating shelf of small potted plants above it, a tall bird-of-paradise in the corner, a rubber tree on the console, wide-plank floors">
-            <div class="photo-caption">the living room &mdash; cleaned for the photo, I will not pretend otherwise</div>
+            <img src="/newsletter/005/images/living-room.jpg"
+                data-alt-en="Living room: white sectional and ottoman, a black floating shelf of small potted plants above it, a tall bird-of-paradise in the corner, a rubber tree on the console, wide-plank floors"
+                data-alt-ko="거실: 흰색 섹셔널 소파와 오토만, 그 위에 화분이 놓인 검정색 플로팅 선반, 구석엔 키 큰 극락조화, 콘솔 위엔 고무나무, 넓은 원목 바닥"
+                alt="Living room: white sectional and ottoman, a black floating shelf of small potted plants above it, a tall bird-of-paradise in the corner, a rubber tree on the console, wide-plank floors">
+            <div class="photo-caption">
+                <span data-l="en">the living room &mdash; cleaned for the photo, I will not pretend otherwise</span>
+                <span data-l="ko">거실 &mdash; 사진 찍으려고 청소했다, 아닌 척 안 하겠다</span>
+            </div>
         </div>
 
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/workstation.jpg" alt="Work station: dual monitors, monitor light bar, mechanical keyboard, ceramic mug, Stanley Kubrick book, Paramount-logo mousepad, blackout shade pulled most of the way down">
-            <div class="photo-caption">the work station &mdash; same disclaimer</div>
+            <img src="/newsletter/005/images/workstation.jpg"
+                data-alt-en="Work station: dual monitors, monitor light bar, mechanical keyboard, ceramic mug, Stanley Kubrick book, Paramount-logo mousepad, blackout shade pulled most of the way down"
+                data-alt-ko="작업 공간: 듀얼 모니터, 모니터 라이트 바, 기계식 키보드, 세라믹 머그, 스탠리 큐브릭 책, 파라마운트 로고 마우스패드, 거의 다 내려져 있는 암막 블라인드"
+                alt="Work station: dual monitors, monitor light bar, mechanical keyboard, ceramic mug, Stanley Kubrick book, Paramount-logo mousepad, blackout shade pulled most of the way down">
+            <div class="photo-caption">
+                <span data-l="en">the work station &mdash; same disclaimer</span>
+                <span data-l="ko">작업 공간 &mdash; 같은 면책 사항</span>
+            </div>
         </div>
 
         <div class="text-block reveal">
-            <p>Three days. One night in the dirt. One movie on a lot I still can't believe I work at. One trip from Justin's neighborhood to mine that I'm told I should have paid for in parking. Two padlocks, one set of brand-new bolt cutters, and a clean reminder that Justin handles them better than I do. A dog under whose chin I will continue to find solace.</p>
-            <p>Happy Memorial Day to those it's for. To the rest: take the long weekend wherever you can find it.</p>
+            <div data-l="en">
+                <p>Three days. One night in the dirt. One movie on a lot I still can't believe I work at. One trip from Justin's neighborhood to mine that I'm told I should have paid for in parking. Two padlocks, one set of brand-new bolt cutters, and a clean reminder that Justin handles them better than I do. A dog under whose chin I will continue to find solace.</p>
+                <p>Happy Memorial Day to those it's for. To the rest: take the long weekend wherever you can find it.</p>
+            </div>
+            <div data-l="ko">
+                <p>사흘. 흙바닥에서 하룻밤. 내가 다니는 줄이 아직도 안 믿기는 부지에서 본 영화 한 편. 저스틴의 동네에서 내 동네로 와준 운전 한 번 &mdash; 그건 주차비로 갚았어야 한다고 들었다. 자물쇠 두 개, 새 볼트 커터 한 세트, 그리고 저스틴이 그걸 나보다 잘 다룬다는 깔끔한 리마인더. 그 턱 아래에서 계속 위로를 찾을 개 한 마리.</p>
+                <p>해당되는 분들껜 즐거운 메모리얼데이를. 나머지에겐: 긴 주말을, 찾을 수 있는 곳에서 챙겨 쓰시길.</p>
+            </div>
         </div>
     </div>
 
@@ -2483,17 +2710,37 @@
 
     <!-- ——— Subscribe ——— -->
     <div class="subscribe reveal" id="subscribe">
-        <p class="subscribe-label">Stay in the Loop</p>
-        <h2 class="subscribe-title">Want this weekly?</h2>
-        <p class="subscribe-desc">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</p>
+        <p class="subscribe-label">
+            <span data-l="en">Stay in the Loop</span>
+            <span data-l="ko">소식 받기</span>
+        </p>
+        <h2 class="subscribe-title">
+            <span data-l="en">Want this weekly?</span>
+            <span data-l="ko">매주 받고 싶다면?</span>
+        </h2>
+        <p class="subscribe-desc">
+            <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
+            <span data-l="ko">이메일 주소를 남겨주면 Dispatch를 받은편지함으로 바로 보내드려요. 스팸 없음, 그냥 내 근황만.</span>
+        </p>
         <form class="subscribe-form" id="subscribeForm">
             <input type="email" class="subscribe-input" id="subscribeEmail"
+                data-ph-en="your@email.com"
+                data-ph-ko="your@email.com"
                 placeholder="your@email.com"
                 required autocomplete="email">
-            <button type="submit" class="subscribe-btn" id="subscribeBtn">Subscribe</button>
+            <button type="submit" class="subscribe-btn" id="subscribeBtn">
+                <span data-l="en">Subscribe</span>
+                <span data-l="ko">구독</span>
+            </button>
         </form>
-        <p class="subscribe-success" id="subscribeSuccess">You're in. See you next week.</p>
-        <p class="subscribe-note">Just between us &mdash; no third parties, ever.</p>
+        <p class="subscribe-success" id="subscribeSuccess">
+            <span data-l="en">You're in. See you next week.</span>
+            <span data-l="ko">등록 완료. 다음 주에 봐요.</span>
+        </p>
+        <p class="subscribe-note">
+            <span data-l="en">Just between us &mdash; no third parties, ever.</span>
+            <span data-l="ko">우리끼리만 &mdash; 절대 외부 공유 없음.</span>
+        </p>
     </div>
 
     <div class="divider reveal-fade"></div>
@@ -2501,23 +2748,45 @@
     <!-- ==================== COMMENTS ==================== -->
     <div class="comments reveal" id="comments">
         <div class="comments-header">
-            <p class="comments-label">Discussion</p>
-            <h2 class="comments-title">Leave a note</h2>
+            <p class="comments-label">
+                <span data-l="en">Discussion</span>
+                <span data-l="ko">댓글</span>
+            </p>
+            <h2 class="comments-title">
+                <span data-l="en">Leave a note</span>
+                <span data-l="ko">한마디 남기기</span>
+            </h2>
         </div>
         <form class="comments-form" id="commentsForm">
-            <input type="text" class="comments-input" id="commentName" placeholder="Your name" maxlength="100" required>
-            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." maxlength="2000" required></textarea>
-            <button type="submit" class="comments-btn" id="commentBtn">Post</button>
+            <input type="text" class="comments-input" id="commentName"
+                data-ph-en="Your name"
+                data-ph-ko="이름"
+                placeholder="Your name" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText"
+                data-ph-en="Write a comment..."
+                data-ph-ko="댓글 작성..."
+                placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <button type="submit" class="comments-btn" id="commentBtn">
+                <span data-l="en">Post</span>
+                <span data-l="ko">게시</span>
+            </button>
         </form>
         <div class="comments-list" id="commentsList"></div>
-        <p class="comments-empty" id="commentsEmpty" style="display:none;">No comments yet. Be the first.</p>
+        <p class="comments-empty" id="commentsEmpty" style="display:none;">
+            <span data-l="en">No comments yet. Be the first.</span>
+            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨주세요.</span>
+        </p>
     </div>
 
     <div class="spacer-lg"></div>
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="story-footer">
-        <p>Dispatch No. 005 &middot; Margin &middot; <a href="/">klee.page</a></p>
+        <p>
+            <span data-l="en">Dispatch No. 005 &middot; Margin &middot;</span>
+            <span data-l="ko">Dispatch No. 005 &middot; 여백 &middot;</span>
+            <a href="/">klee.page</a>
+        </p>
     </footer>
 
     <!-- ==================== SONG OF THE WEEK — shared audio + mini player ==================== -->
@@ -2535,9 +2804,15 @@
         </button>
         <div class="mini-player-meta">
             <div class="mini-player-title">Holocene</div>
-            <div class="mini-player-artist">Bon Iver &middot; 2011</div>
+            <div class="mini-player-artist">
+                <span data-l="en">Bon Iver &middot; 2011</span>
+                <span data-l="ko">본 이베어 &middot; 2011</span>
+            </div>
         </div>
-        <button class="mini-player-close" id="miniPlayerClose" type="button" aria-label="Close mini player">&times;</button>
+        <button class="mini-player-close" id="miniPlayerClose" type="button"
+            data-aria-en="Close mini player"
+            data-aria-ko="미니 플레이어 닫기"
+            aria-label="Close mini player">&times;</button>
     </div>
 
     <!-- Analytics -->
@@ -2705,6 +2980,49 @@
         })();
     </script>
     <script>
+        // ==================== I18N (placeholders / alt / aria) ====================
+        (function() {
+            function getLang() {
+                return document.documentElement.getAttribute('data-lang') || 'en';
+            }
+            function applyI18n() {
+                var lang = getLang();
+                document.querySelectorAll('[data-ph-en]').forEach(function(el) {
+                    el.placeholder = el.getAttribute('data-ph-' + lang) || el.getAttribute('data-ph-en');
+                });
+                document.querySelectorAll('[data-alt-en]').forEach(function(el) {
+                    el.alt = el.getAttribute('data-alt-' + lang) || el.getAttribute('data-alt-en');
+                });
+                document.querySelectorAll('[data-aria-en]').forEach(function(el) {
+                    el.setAttribute('aria-label',
+                        el.getAttribute('data-aria-' + lang) || el.getAttribute('data-aria-en'));
+                });
+                document.querySelectorAll('[data-title-en]').forEach(function(el) {
+                    el.title = el.getAttribute('data-title-' + lang) || el.getAttribute('data-title-en');
+                });
+            }
+            window.dispatchApplyI18n = applyI18n;
+            applyI18n();
+        })();
+
+        // ==================== LANGUAGE TOGGLE ====================
+        (function() {
+            var pill = document.getElementById('langPill');
+            if (!pill) return;
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+            function toggle() {
+                current = current === 'en' ? 'ko' : 'en';
+                document.documentElement.setAttribute('data-lang', current);
+                document.documentElement.setAttribute('lang', current);
+                localStorage.setItem('dispatch-lang', current);
+                if (window.dispatchApplyI18n) window.dispatchApplyI18n();
+            }
+            pill.addEventListener('click', toggle);
+            pill.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+            });
+        })();
+
         // ==================== TEXT-CHAT REVEAL ====================
         // Plays the "come thru" thread one bubble at a time when scrolled into
         // view. The typing indicator bubble shows for `data-hide` ms then hides.
