@@ -246,11 +246,17 @@
         }
 
         /* ========== GATE (005) ========== */
-        /* The gate is transparent so the sunset hero video shows through.
-           A frosted-glass card holds the form; a soft cream veil sits between. */
+        /* The gate is a near-solid cream scrim with a heavy backdrop blur so
+           the sunset video tints through but the article content behind is
+           completely obscured. A frosted-glass card holds the form. */
         .gate {
-            background: transparent;
+            background: rgba(240, 238, 230, 0.92);
+            backdrop-filter: blur(40px) saturate(1.05);
+            -webkit-backdrop-filter: blur(40px) saturate(1.05);
             overflow: hidden;
+        }
+        [data-theme="dark"] .gate {
+            background: rgba(31, 30, 29, 0.94);
         }
         .gate::after {
             content: '';
@@ -258,12 +264,12 @@
             inset: 0;
             z-index: -1;
             background:
-                radial-gradient(ellipse 55% 80% at center, rgba(240,238,230,0.05) 0%, rgba(240,238,230,0.30) 55%, rgba(240,238,230,0.55) 100%);
+                radial-gradient(ellipse 60% 80% at center, rgba(240,238,230,0.10) 0%, rgba(240,238,230,0.40) 55%, rgba(240,238,230,0.65) 100%);
             pointer-events: none;
         }
         [data-theme="dark"] .gate::after {
             background:
-                radial-gradient(ellipse 55% 80% at center, rgba(31,30,29,0.10) 0%, rgba(31,30,29,0.45) 55%, rgba(31,30,29,0.70) 100%);
+                radial-gradient(ellipse 60% 80% at center, rgba(31,30,29,0.15) 0%, rgba(31,30,29,0.50) 55%, rgba(31,30,29,0.75) 100%);
         }
 
         /* Hold the hero text dark until the gate opens — let the reveal land */
