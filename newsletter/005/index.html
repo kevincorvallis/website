@@ -48,11 +48,14 @@
 
             // Pre-paint URL-key bypass: hide password UI so it never flashes.
             // The yohaku welcome interstitial still plays after unlock().
+            // tsundoku/積ん読/積読 also accepted — grace-period alias for the
+            // old Coquelicots edition that previously occupied this slot.
             var urlKey = params.get('key');
             if (urlKey) {
                 var raw = urlKey.trim();
                 var lower = raw.toLowerCase();
-                if (lower === 'yohaku' || lower === 'komorebi' || raw === '余白') {
+                if (lower === 'yohaku' || lower === 'komorebi' || lower === 'tsundoku'
+                    || raw === '余白' || raw === '積ん読' || raw === '積読') {
                     document.documentElement.setAttribute('data-prebypass', '1');
                 }
             }
@@ -1524,6 +1527,11 @@
                     placeholder="this week's word"
                     aria-describedby="gateAside"
                     autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    inputmode="text"
+                    enterkeyhint="go"
                     autofocus
                 >
                 <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
@@ -1946,10 +1954,13 @@
 
             function checkPassword(val, callback) {
                 // 005's word of the week is the password.
+                // tsundoku/積ん読/積読 are accepted as a grace-period alias for the
+                // old Coquelicots edition that previously occupied this slot.
                 // Falls through to /api/gate which still honors DISPATCH_PASS (komorebi) as a master.
                 var raw = val.trim();
                 var lower = raw.toLowerCase();
-                if (lower === 'yohaku' || lower === 'komorebi' || raw === '余白') {
+                if (lower === 'yohaku' || lower === 'komorebi' || lower === 'tsundoku'
+                    || raw === '余白' || raw === '積ん読' || raw === '積読') {
                     callback(true);
                     return;
                 }
