@@ -368,11 +368,17 @@
 
         /* ===== Block renders ===== */
         [contenteditable] { outline: none; }
-        [contenteditable][data-empty]::before {
+        /* Placeholder shows ONLY when the field is empty. Three matchers cover the
+           cases: truly empty, contains only a <br> (left after deleting), or
+           contains a single empty <p>/<div> (contenteditable behavior). */
+        [contenteditable][data-empty]:empty::before,
+        [contenteditable][data-empty]:has(> br:only-child)::before,
+        [contenteditable][data-empty]:has(> p:only-child:empty)::before,
+        [contenteditable][data-empty]:has(> div:only-child:empty)::before {
             content: attr(data-empty);
             color: var(--caption);
             font-style: italic;
-            opacity: 0.6;
+            opacity: 0.55;
             pointer-events: none;
         }
 
