@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatch — Write the letters worth keeping.</title>
+    <meta name="description" content="A quiet place for the people who still write to their people. No algorithm. No metrics. Just a URL.">
+    <meta name="author" content="Kevin Lee">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://klee.page/dispatch">
+    <meta property="og:title" content="Dispatch — Write the letters worth keeping.">
+    <meta property="og:description" content="A quiet place for the people who still write to their people.">
+    <meta property="og:image" content="https://klee.page/newsletter/005/images/camp-setup.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dispatch">
+    <meta name="twitter:description" content="A quiet place for the people who still write to their people.">
+    <meta name="twitter:image" content="https://klee.page/newsletter/005/images/camp-setup.jpg">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✶</text></svg>">
+
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --bg-warm: #e9e3d4;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --accent-soft: #c4a882;
+            --rule: rgba(31, 30, 29, 0.1);
+            --paper: #ffffff;
+            --shadow: 0 24px 60px -20px rgba(31, 30, 29, 0.18), 0 8px 24px -8px rgba(31, 30, 29, 0.08);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --bg-warm: #2a2723;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --accent-soft: #a0826d;
+            --rule: rgba(240, 238, 230, 0.08);
+            --paper: #2a2723;
+            --shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.5), 0 8px 24px -8px rgba(0, 0, 0, 0.25);
+        }
+
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.6s ease, color 0.3s ease;
+        }
+
+        ::selection { background: rgba(160, 130, 109, 0.3); color: inherit; }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: opacity 0.2s ease, color 0.3s ease;
+        }
+        a:hover { opacity: 0.6; }
+
+        /* ========== CURSOR INK ========== */
+        .cursor-ink {
+            position: fixed;
+            pointer-events: none;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(160, 130, 109, 0.08) 0%, rgba(160, 130, 109, 0) 70%);
+            transform: translate(-50%, -50%);
+            transition: opacity 0.4s ease;
+            z-index: 1;
+            mix-blend-mode: multiply;
+            opacity: 0;
+        }
+        [data-theme="dark"] .cursor-ink { mix-blend-mode: screen; background: radial-gradient(circle, rgba(196, 168, 130, 0.12) 0%, rgba(196, 168, 130, 0) 70%); }
+        @media (hover: hover) and (pointer: fine) {
+            body:hover .cursor-ink { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) { .cursor-ink { display: none; } }
+
+        /* ========== HEADER ========== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            padding: 18px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(0px);
+            transition: backdrop-filter 0.4s ease, background-color 0.4s ease;
+        }
+        header.scrolled {
+            backdrop-filter: blur(20px) saturate(1.05);
+            background: rgba(240, 238, 230, 0.6);
+            border-bottom: 1px solid var(--rule);
+        }
+        [data-theme="dark"] header.scrolled { background: rgba(31, 30, 29, 0.6); }
+
+        .nav-wordmark {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 22px;
+            letter-spacing: -0.01em;
+        }
+        .nav-wordmark::after {
+            content: '✶';
+            margin-left: 6px;
+            color: var(--accent);
+            font-style: normal;
+            font-size: 12px;
+            vertical-align: super;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            opacity: 0.7;
+        }
+        .nav-link:hover { opacity: 1; }
+
+        .nav-cta {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border: 1px solid var(--text);
+            border-radius: 100px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .nav-cta:hover {
+            background: var(--text);
+            color: var(--bg);
+            opacity: 1;
+        }
+
+        .theme-pill {
+            width: 36px;
+            height: 18px;
+            border-radius: 100px;
+            background: var(--text);
+            position: relative;
+            cursor: pointer;
+        }
+        .theme-pill::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--bg);
+            transition: transform 0.2s ease;
+        }
+        [data-theme="dark"] .theme-pill::after { transform: translateX(18px); }
+        .theme-pill input { display: none; }
+
+        /* ========== HERO ========== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top, rgba(160, 130, 109, 0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 32px;
+            opacity: 0;
+            transform: translateY(8px);
+            animation: fadeUp 0.9s 0.1s ease forwards;
+        }
+        .hero-eyebrow::before, .hero-eyebrow::after {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 1px;
+            background: currentColor;
+            vertical-align: middle;
+            margin: 0 14px;
+            opacity: 0.5;
+        }
+
+        .hero-headline {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(48px, 8.5vw, 116px);
+            line-height: 0.98;
+            letter-spacing: -0.025em;
+            margin-bottom: 36px;
+            max-width: 1100px;
+        }
+        .hero-headline em {
+            font-style: italic;
+            font-weight: 600;
+            color: var(--accent);
+            position: relative;
+        }
+        .hero-headline em::after {
+            content: '';
+            position: absolute;
+            bottom: 0.1em;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: currentColor;
+            opacity: 0.25;
+            transform-origin: left;
+            transform: scaleX(0);
+            animation: drawLine 1.2s 1.8s ease forwards;
+        }
+        .hero-headline .word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(0.4em);
+        }
+        .hero-headline .word.in {
+            animation: rise 0.9s ease forwards;
+        }
+
+        @keyframes rise {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes drawLine {
+            to { transform: scaleX(1); }
+        }
+
+        .hero-sub {
+            font-size: clamp(17px, 1.5vw, 22px);
+            line-height: 1.55;
+            max-width: 560px;
+            color: var(--caption);
+            margin-bottom: 48px;
+            opacity: 0;
+            transform: translateY(8px);
+            animation: fadeUp 0.9s 1.6s ease forwards;
+        }
+        .hero-sub em { font-style: italic; color: var(--text); }
+
+        .hero-cta-row {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(8px);
+            animation: fadeUp 0.9s 1.9s ease forwards;
+        }
+
+        .cta-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 28px;
+            background: var(--text);
+            color: var(--bg);
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: var(--font);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.25s ease, background-color 0.3s ease;
+        }
+        .cta-primary:hover { transform: translateY(-2px); opacity: 1; }
+        .cta-primary .arrow {
+            transition: transform 0.25s ease;
+        }
+        .cta-primary:hover .arrow { transform: translateX(4px); }
+
+        .cta-text {
+            font-size: 15px;
+            opacity: 0.65;
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 2px;
+        }
+
+        /* ========== FLOATING POLAROID STACK ========== */
+        .poly-stack {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .poly {
+            position: absolute;
+            background: var(--paper);
+            padding: 14px 14px 56px;
+            box-shadow: var(--shadow);
+            border-radius: 4px;
+            opacity: 0;
+            transform: translate(var(--tx, 0), var(--ty, 0)) rotate(var(--rot, 0deg));
+            animation: polyIn 1.4s ease forwards, polyFloat 7s ease-in-out infinite;
+            animation-delay: var(--delay, 0s), calc(var(--delay, 0s) + 1.4s);
+        }
+        .poly img {
+            display: block;
+            width: var(--w, 220px);
+            height: var(--h, 160px);
+            object-fit: cover;
+            border-radius: 2px;
+            filter: saturate(1.05);
+        }
+        .poly .poly-caption {
+            position: absolute;
+            bottom: 18px;
+            left: 14px;
+            right: 14px;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 14px;
+            color: var(--caption);
+            text-align: center;
+        }
+        .poly-1 { top: 14%; left: 4%; --rot: -8deg; --delay: 0.6s; }
+        .poly-2 { top: 20%; right: 6%; --rot: 7deg; --delay: 1.0s; }
+        .poly-3 { bottom: 8%; left: 8%; --rot: -4deg; --delay: 1.3s; --w: 180px; --h: 240px; }
+        .poly-4 { bottom: 14%; right: 4%; --rot: 9deg; --delay: 1.6s; --w: 200px; --h: 140px; }
+
+        @keyframes polyIn {
+            to { opacity: 1; }
+        }
+        @keyframes polyFloat {
+            0%, 100% { transform: translate(0, 0) rotate(var(--rot, 0deg)); }
+            50% { transform: translate(0, -10px) rotate(calc(var(--rot, 0deg) + 1.5deg)); }
+        }
+
+        @media (max-width: 900px) {
+            .poly-1, .poly-2, .poly-3, .poly-4 { display: none; }
+            .hero { padding-top: 100px; }
+        }
+
+        /* ========== MANIFESTO ========== */
+        .manifesto {
+            padding: 140px 24px 120px;
+            background: var(--bg);
+            position: relative;
+        }
+        .manifesto-inner {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+        .pull {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 400;
+            font-size: clamp(32px, 5.2vw, 64px);
+            line-height: 1.15;
+            letter-spacing: -0.015em;
+            max-width: 880px;
+            margin: 0 auto 100px;
+            text-align: center;
+            color: var(--text);
+        }
+        .pull::before, .pull::after {
+            font-family: var(--font-display);
+            color: var(--accent);
+            opacity: 0.5;
+        }
+        .pull::before { content: '"'; margin-right: 0.05em; }
+        .pull::after { content: '"'; margin-left: 0.05em; }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 56px;
+            border-top: 1px solid var(--rule);
+            padding-top: 48px;
+        }
+        .three-col h3 {
+            font-family: var(--font);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 18px;
+        }
+        .three-col p {
+            font-size: 19px;
+            line-height: 1.5;
+            color: var(--text);
+        }
+        .three-col em {
+            font-style: italic;
+            color: var(--caption);
+        }
+
+        @media (max-width: 800px) {
+            .three-col { grid-template-columns: 1fr; gap: 40px; }
+        }
+
+        /* ========== EDITOR PEEK ========== */
+        .editor-peek {
+            padding: 140px 24px 160px;
+            background: var(--bg-warm);
+            position: relative;
+        }
+        .editor-peek-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .section-head {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(38px, 5.5vw, 68px);
+            line-height: 1.05;
+            letter-spacing: -0.015em;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .section-head em { font-style: italic; color: var(--accent); }
+        .section-sub {
+            text-align: center;
+            font-size: 18px;
+            color: var(--caption);
+            max-width: 560px;
+            margin: 0 auto 72px;
+        }
+
+        .editor-frame {
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            max-width: 920px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .editor-frame-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--rule);
+            background: var(--bg-warm);
+        }
+        .ef-dots { display: flex; gap: 7px; }
+        .ef-dots span {
+            width: 11px; height: 11px; border-radius: 50%;
+            background: var(--rule);
+        }
+        .ef-status {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+        .ef-status::before {
+            content: '●';
+            margin-right: 6px;
+            font-size: 8px;
+            color: var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .ef-body {
+            padding: 56px 64px 72px;
+            min-height: 400px;
+        }
+        .ef-block {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            margin-bottom: 28px;
+        }
+        .ef-block.in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .ef-cover-title {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: clamp(36px, 4.5vw, 56px);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+        .ef-cover-sub {
+            color: var(--caption);
+            font-size: 17px;
+            font-style: italic;
+        }
+        .ef-chapter {
+            margin: 40px 0 8px;
+        }
+        .ef-chapter-mark {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            color: var(--accent);
+        }
+        .ef-chapter-sub {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 22px;
+            color: var(--text);
+        }
+        .ef-prose p {
+            font-size: 17px;
+            line-height: 1.65;
+        }
+        .ef-prose .caret {
+            display: inline-block;
+            width: 2px;
+            height: 1.05em;
+            background: var(--accent);
+            vertical-align: -2px;
+            margin-left: 1px;
+            animation: blink 1.05s steps(2, jump-none) infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .ef-photo {
+            margin: 32px auto;
+            display: block;
+            width: 280px;
+            background: var(--paper);
+            padding: 12px 12px 44px;
+            box-shadow: var(--shadow);
+            transform: rotate(-1.2deg);
+            border-radius: 4px;
+        }
+        .ef-photo img {
+            display: block;
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+        .ef-photo .cap {
+            position: absolute;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 13px;
+            color: var(--caption);
+            margin-top: 12px;
+            text-align: center;
+            width: 256px;
+        }
+        .ef-photo-wrap { position: relative; width: 280px; margin: 32px auto; }
+
+        .ef-insert {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+        }
+        .ef-insert::before {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; top: 50%;
+            height: 1px;
+            background: var(--rule);
+        }
+        .ef-insert span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-size: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 720px) {
+            .ef-body { padding: 36px 28px; }
+        }
+
+        /* ========== TEMPLATES ========== */
+        .templates {
+            padding: 140px 24px 160px;
+            background: var(--bg);
+        }
+        .templates-inner { max-width: 1200px; margin: 0 auto; }
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            perspective: 1200px;
+        }
+        .t-card {
+            background: var(--paper);
+            border: 1px solid var(--rule);
+            border-radius: 14px;
+            padding: 28px 28px 32px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        [data-theme="dark"] .t-card { background: var(--bg-warm); }
+        .t-card:hover {
+            box-shadow: var(--shadow);
+        }
+        .t-preview {
+            aspect-ratio: 16 / 11;
+            border-radius: 8px;
+            margin-bottom: 22px;
+            overflow: hidden;
+            position: relative;
+            background: var(--bg-warm);
+        }
+        .t-preview img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .t-card:hover .t-preview img { transform: scale(1.04); }
+        .t-preview-overlay {
+            position: absolute; inset: 0;
+            padding: 22px;
+            display: flex;
+            align-items: flex-end;
+            background: linear-gradient(180deg, transparent 40%, rgba(31,30,29,0.55) 100%);
+        }
+        .t-preview-overlay span {
+            font-family: var(--font-display);
+            font-style: italic;
+            color: #f0eee6;
+            font-size: 22px;
+            line-height: 1.1;
+        }
+        .t-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .t-title {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 26px;
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+        .t-desc {
+            font-size: 16px;
+            color: var(--caption);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .t-blocks {
+            font-size: 12px;
+            color: var(--caption);
+            font-style: italic;
+            letter-spacing: 0.02em;
+        }
+        .t-blocks span {
+            color: var(--accent);
+            margin: 0 4px;
+            font-style: normal;
+        }
+
+        @media (max-width: 900px) {
+            .template-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ========== SIGN-UP ========== */
+        .signup {
+            padding: 160px 24px 180px;
+            background: var(--bg-warm);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .signup::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(160, 130, 109, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .signup-form {
+            display: flex;
+            gap: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--text);
+            padding-bottom: 10px;
+            position: relative;
+        }
+        .signup-form input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            font-family: var(--font);
+            font-size: 20px;
+            color: var(--text);
+            outline: none;
+            padding: 4px 0;
+        }
+        .signup-form input::placeholder {
+            color: var(--caption);
+            font-style: italic;
+        }
+        .signup-form button {
+            background: transparent;
+            border: none;
+            font-family: var(--font);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            padding: 4px 0 4px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+        .signup-form button:hover { color: var(--accent); }
+        .signup-form button .arrow {
+            transition: transform 0.2s ease;
+        }
+        .signup-form button:hover .arrow { transform: translateX(4px); }
+
+        .signup-meta {
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--caption);
+        }
+        .signup-meta a {
+            color: var(--text);
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 1px;
+        }
+
+        .signup-status {
+            margin-top: 28px;
+            font-size: 15px;
+            font-style: italic;
+            min-height: 22px;
+            transition: color 0.3s ease;
+        }
+        .signup-status.success { color: var(--accent); }
+        .signup-status.error { color: #b35a3d; }
+
+        /* ========== FOOTER ========== */
+        footer {
+            padding: 60px 36px 50px;
+            border-top: 1px solid var(--rule);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--caption);
+        }
+        footer a {
+            color: var(--text);
+            opacity: 0.7;
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 1px;
+        }
+        footer a:hover { opacity: 1; }
+        footer .footer-right { font-style: italic; }
+
+        /* ========== REVEAL ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.in { opacity: 1; transform: translateY(0); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal { opacity: 1; transform: none; }
+            .hero-headline .word { opacity: 1; transform: none; }
+        }
+
+        @media (max-width: 720px) {
+            header { padding: 14px 18px; }
+            .nav-link { display: none; }
+            .nav-right { gap: 14px; }
+            .hero-cta-row { flex-direction: column; gap: 18px; }
+            .manifesto, .editor-peek, .templates, .signup { padding: 80px 20px 90px; }
+            footer { padding: 36px 20px 30px; flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-ink" id="cursorInk"></div>
+
+    <header id="siteHeader">
+        <a href="/dispatch/" class="nav-wordmark">Dispatch</a>
+        <div class="nav-right">
+            <a href="#manifesto" class="nav-link">Why</a>
+            <a href="#templates" class="nav-link">Templates</a>
+            <a href="/newsletter/" class="nav-link">Read</a>
+            <label class="theme-pill" for="theme-toggle">
+                <input type="checkbox" id="theme-toggle">
+            </label>
+            <a href="/dispatch/sign-in/" class="nav-cta">Sign in</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="poly-stack" aria-hidden="true">
+            <div class="poly poly-1"><img src="/newsletter/005/images/camp-setup.jpg" alt=""><span class="poly-caption">Big Bear · May</span></div>
+            <div class="poly poly-2"><img src="/newsletter/002/images/mammoth-sunset.jpeg" alt=""><span class="poly-caption">Mammoth · March</span></div>
+            <div class="poly poly-3"><img src="/newsletter/005/images/citizens-church.jpg" alt=""><span class="poly-caption">Sunday</span></div>
+            <div class="poly poly-4"><img src="/newsletter/004/images/matthew-graduation.jpeg" alt=""><span class="poly-caption">Open house</span></div>
+        </div>
+
+        <p class="hero-eyebrow">Dispatch · A new place to write</p>
+        <h1 class="hero-headline" id="heroHeadline">
+            <span class="word">Write</span>
+            <span class="word">the&nbsp;letters</span>
+            <span class="word">worth</span>
+            <em class="word">keeping.</em>
+        </h1>
+        <p class="hero-sub">A quiet place for the people who still write to their people. <em>No algorithm. No metrics.</em> Just a URL.</p>
+        <div class="hero-cta-row">
+            <a href="/dispatch/sign-in/" class="cta-primary">
+                Start writing
+                <span class="arrow">→</span>
+            </a>
+            <a href="#editor-peek" class="cta-text">See the editor</a>
+        </div>
+    </section>
+
+    <section class="manifesto" id="manifesto">
+        <div class="manifesto-inner">
+            <p class="pull reveal">Today's letters got loud. Make a quiet one.</p>
+            <div class="three-col">
+                <div class="reveal">
+                    <h3>Hand-set typography</h3>
+                    <p>Newsreader and Cormorant Garamond, set the way a printed paper sets them. <em>No emoji-led headlines. No engagement bait.</em></p>
+                </div>
+                <div class="reveal">
+                    <h3>Three templates</h3>
+                    <p>Field Notes, Photo Essay, Receipt — or start from a blank page. <em>The structure shows up so you don't have to design it.</em></p>
+                </div>
+                <div class="reveal">
+                    <h3>Your own URL</h3>
+                    <p><code style="font-family: var(--font); font-style: italic;">klee.page/@you/the-trip</code>. <em>Send it to the four people who actually want it. Skip the feed.</em></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="editor-peek" id="editor-peek">
+        <div class="editor-peek-inner">
+            <p class="section-label reveal">The editor</p>
+            <h2 class="section-head reveal">It writes <em>back to you.</em></h2>
+            <p class="section-sub reveal">Block-based, like Notion — but in a serif font, with no toolbar floating in your face. Insert. Tweak. Drag. Done.</p>
+
+            <div class="editor-frame reveal" id="editorFrame">
+                <div class="editor-frame-bar">
+                    <div class="ef-dots"><span></span><span></span><span></span></div>
+                    <div class="ef-status">Saved · 12:04 PM</div>
+                    <div style="font-size: 12px; color: var(--caption); font-style: italic;">@kevin / margin</div>
+                </div>
+                <div class="ef-body">
+                    <div class="ef-block" data-step="1">
+                        <div class="ef-cover-title">Margin</div>
+                        <div class="ef-cover-sub">A long weekend.</div>
+                    </div>
+
+                    <div class="ef-block ef-chapter" data-step="2">
+                        <div class="ef-chapter-mark">FRI</div>
+                        <div class="ef-chapter-sub">the lot</div>
+                    </div>
+
+                    <div class="ef-block ef-prose" data-step="3">
+                        <p>Friday opened with a screening at the Paramount lot — the kind of room where the projector still hums and the velvet absorbs everyone's polite laugh<span class="caret"></span></p>
+                    </div>
+
+                    <div class="ef-insert" data-step="4"><span>+</span></div>
+
+                    <div class="ef-block" data-step="5">
+                        <div class="ef-photo-wrap">
+                            <div class="ef-photo">
+                                <img src="/newsletter/005/images/passenger-screening.jpg" alt="">
+                            </div>
+                            <div class="cap">the moment before</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="templates" id="templates">
+        <div class="templates-inner">
+            <p class="section-label reveal">Templates</p>
+            <h2 class="section-head reveal">Three ways <em>to start.</em></h2>
+            <p class="section-sub reveal">Each one is built from real dispatches. Pick the shape that fits — change anything once you're in.</p>
+
+            <div class="template-grid">
+                <a href="/dispatch/sign-in/?template=field-notes" class="t-card reveal" data-tilt>
+                    <div class="t-preview">
+                        <img src="/newsletter/005/images/camp-setup.jpg" alt="">
+                        <div class="t-preview-overlay"><span>FRI · the lot<br>SUN · off-grid</span></div>
+                    </div>
+                    <div class="t-label">Field notes</div>
+                    <div class="t-title">A long-weekend recap.</div>
+                    <p class="t-desc">Multi-day chapters with day-of-week marks. Photos, video, location cards, the occasional iMessage thread.</p>
+                    <div class="t-blocks">Cover<span>·</span>Chapter<span>·</span>Photo<span>·</span>Video<span>·</span>Field card</div>
+                </a>
+
+                <a href="/dispatch/sign-in/?template=photo-essay" class="t-card reveal" data-tilt>
+                    <div class="t-preview">
+                        <img src="/newsletter/006/images/coquelicots.jpg" alt="">
+                        <div class="t-preview-overlay"><span>One subject.<br><em>One thread.</em></span></div>
+                    </div>
+                    <div class="t-label">Photo essay</div>
+                    <div class="t-title">One subject, on the page.</div>
+                    <p class="t-desc">Photo-forward, with full-bleed images and pull quotes. For the trip, the show, the obsession.</p>
+                    <div class="t-blocks">Hero<span>·</span>Photo grid<span>·</span>Pull quote<span>·</span>Prose</div>
+                </a>
+
+                <a href="/dispatch/sign-in/?template=receipt" class="t-card reveal" data-tilt>
+                    <div class="t-preview">
+                        <img src="/newsletter/004/images/matthew-graduation.jpeg" alt="">
+                        <div class="t-preview-overlay"><span>Itemized.<br><em>Like a week's receipt.</em></span></div>
+                    </div>
+                    <div class="t-label">Receipt</div>
+                    <div class="t-title">Small things, in order.</div>
+                    <p class="t-desc">A list of the week — a guest who came, a thing you ate, a thought you had — separated by thin rules.</p>
+                    <div class="t-blocks">Head<span>·</span>Items<span>·</span>Quote<span>·</span>Close</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="signup" id="signup">
+        <div class="manifesto-inner">
+            <p class="section-label reveal">Sign up</p>
+            <h2 class="section-head reveal">Open <em>to friends.</em></h2>
+            <p class="section-sub reveal">Drop your email. We send a magic link. You pick a handle. You write.</p>
+
+            <form class="signup-form reveal" id="signupForm" novalidate>
+                <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" required>
+                <button type="submit">
+                    Send link
+                    <span class="arrow">→</span>
+                </button>
+            </form>
+            <p class="signup-meta reveal">By signing in you agree to the friendly use policy. Already have a Dispatch? <a href="/dispatch/sign-in/">Sign in</a>.</p>
+            <p class="signup-status" id="signupStatus" role="status" aria-live="polite"></p>
+        </div>
+    </section>
+
+    <footer>
+        <div>Made by <a href="/">Kevin Lee</a> in LA · &copy; <span id="year"></span></div>
+        <div class="footer-right">A quiet place for letters.</div>
+    </footer>
+
+    <script>
+        // ===== Theme toggle =====
+        (function() {
+            var toggle = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            toggle.checked = root.getAttribute('data-theme') === 'dark';
+            toggle.addEventListener('change', function() {
+                var theme = toggle.checked ? 'dark' : 'light';
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            });
+        })();
+
+        // ===== Year =====
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // ===== Cursor ink =====
+        (function() {
+            var ink = document.getElementById('cursorInk');
+            if (!ink) return;
+            var x = 0, y = 0, tx = 0, ty = 0;
+            document.addEventListener('mousemove', function(e) { tx = e.clientX; ty = e.clientY; });
+            (function raf() {
+                x += (tx - x) * 0.18;
+                y += (ty - y) * 0.18;
+                ink.style.transform = 'translate(' + x + 'px, ' + y + 'px) translate(-50%, -50%)';
+                requestAnimationFrame(raf);
+            })();
+        })();
+
+        // ===== Hero word stagger =====
+        (function() {
+            var words = document.querySelectorAll('#heroHeadline .word');
+            words.forEach(function(w, i) {
+                w.style.animationDelay = (0.45 + i * 0.18) + 's';
+                requestAnimationFrame(function() {
+                    setTimeout(function() { w.classList.add('in'); }, 100);
+                });
+            });
+        })();
+
+        // ===== Scroll-driven header scrim =====
+        (function() {
+            var header = document.getElementById('siteHeader');
+            function onScroll() {
+                if (window.scrollY > 32) header.classList.add('scrolled');
+                else header.classList.remove('scrolled');
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+
+        // ===== Reveal on enter =====
+        (function() {
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('in');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+            document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
+        })();
+
+        // ===== Editor peek scrubbed reveal =====
+        (function() {
+            var frame = document.getElementById('editorFrame');
+            if (!frame) return;
+            var steps = frame.querySelectorAll('[data-step]');
+            var triggered = false;
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting && !triggered) {
+                        triggered = true;
+                        steps.forEach(function(s, i) {
+                            setTimeout(function() { s.classList.add('in'); }, i * 420);
+                        });
+                    }
+                });
+            }, { threshold: 0.32 });
+            io.observe(frame);
+        })();
+
+        // ===== Template card 3D tilt =====
+        (function() {
+            var cards = document.querySelectorAll('[data-tilt]');
+            cards.forEach(function(card) {
+                card.addEventListener('mousemove', function(e) {
+                    var r = card.getBoundingClientRect();
+                    var px = (e.clientX - r.left) / r.width;
+                    var py = (e.clientY - r.top) / r.height;
+                    var rx = (py - 0.5) * -8;
+                    var ry = (px - 0.5) * 10;
+                    card.style.transform = 'perspective(1200px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-4px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    card.style.transform = '';
+                });
+            });
+        })();
+
+        // ===== Signup =====
+        (function() {
+            var form = document.getElementById('signupForm');
+            var email = document.getElementById('signupEmail');
+            var status = document.getElementById('signupStatus');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var v = (email.value || '').trim();
+                if (!v || v.indexOf('@') === -1) {
+                    status.className = 'signup-status error';
+                    status.textContent = 'That doesn’t look like an email.';
+                    return;
+                }
+                status.className = 'signup-status';
+                status.textContent = 'Sending…';
+                fetch('/api/auth/send-link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: v })
+                }).then(function(r) {
+                    if (r.ok) {
+                        status.className = 'signup-status success';
+                        status.textContent = 'Check your inbox — the link is on its way.';
+                        email.value = '';
+                    } else {
+                        // Fallback: store and redirect to sign-in with prefill
+                        localStorage.setItem('dispatch.pending-email', v);
+                        window.location.href = '/dispatch/sign-in/?email=' + encodeURIComponent(v);
+                    }
+                }).catch(function() {
+                    localStorage.setItem('dispatch.pending-email', v);
+                    window.location.href = '/dispatch/sign-in/?email=' + encodeURIComponent(v);
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in — Dispatch</title>
+    <meta name="description" content="Sign in to write a Dispatch.">
+    <meta name="robots" content="noindex">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✶</text></svg>">
+
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --font: 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+        }
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+        }
+
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.6s ease, color 0.3s ease;
+        }
+
+        a { color: inherit; text-decoration: none; transition: opacity 0.2s ease; }
+        a:hover { opacity: 0.6; }
+
+        /* Atmospheric backdrop */
+        .backdrop {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .backdrop::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse at top, rgba(160, 130, 109, 0.18), transparent 60%);
+            opacity: 0;
+            animation: fadeIn 1.8s 0.2s ease forwards;
+        }
+        .backdrop::after {
+            content: '';
+            position: absolute;
+            bottom: -200px;
+            left: -200px;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(160, 130, 109, 0.08), transparent 60%);
+            opacity: 0;
+            animation: fadeIn 2s 0.5s ease forwards;
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        header {
+            padding: 20px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+            position: relative;
+        }
+        .back-link {
+            font-size: 14px;
+            opacity: 0.55;
+        }
+        .nav-wordmark {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .nav-wordmark::after {
+            content: '✶';
+            margin-left: 4px;
+            color: var(--accent);
+            font-style: normal;
+            font-size: 10px;
+            vertical-align: super;
+        }
+        .theme-pill {
+            width: 36px;
+            height: 18px;
+            border-radius: 100px;
+            background: var(--text);
+            position: relative;
+            cursor: pointer;
+        }
+        .theme-pill::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--bg);
+            transition: transform 0.2s ease;
+        }
+        [data-theme="dark"] .theme-pill::after { transform: translateX(18px); }
+        .theme-pill input { display: none; }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 5;
+            position: relative;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: rise 0.9s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+        .crest {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 22px;
+            margin-bottom: 80px;
+        }
+        .crest::before, .crest::after {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 1px;
+            background: var(--rule);
+            vertical-align: middle;
+            margin: 0 14px;
+        }
+
+        .title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 32px;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            margin-bottom: 14px;
+        }
+        .title em { font-style: italic; color: var(--accent); }
+
+        .subtitle {
+            font-size: 17px;
+            color: var(--caption);
+            margin-bottom: 56px;
+        }
+
+        form { margin-bottom: 24px; }
+        .field {
+            position: relative;
+            margin-bottom: 36px;
+        }
+        .field input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--rule);
+            padding: 12px 0;
+            font-family: var(--font);
+            font-size: 22px;
+            color: var(--text);
+            outline: none;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+        .field input::placeholder {
+            color: var(--caption);
+            font-style: italic;
+        }
+        .field input:focus { border-bottom-color: var(--accent); }
+        .field::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.4s ease, left 0.4s ease;
+        }
+        .field:focus-within::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .submit {
+            background: transparent;
+            border: none;
+            font-family: var(--font);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0 0 3px;
+            border-bottom: 1px solid var(--text);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.3s ease, border-bottom-color 0.3s ease, transform 0.2s ease;
+        }
+        .submit:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .submit:hover .arrow { transform: translateX(4px); }
+        .submit .arrow { transition: transform 0.2s ease; }
+        .submit:disabled {
+            opacity: 0.4;
+            cursor: wait;
+        }
+
+        /* OAuth buttons */
+        .oauth-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        .oauth-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 18px;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--rule);
+            border-radius: 100px;
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+        }
+        .oauth-btn:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+        .oauth-btn:disabled { opacity: 0.5; cursor: wait; transform: none; }
+        .oauth-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .oauth-btn.apple svg path {
+            fill: var(--text);
+            transition: fill 0.3s ease;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 12px 0 32px;
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--caption);
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--rule);
+        }
+
+        .policy {
+            margin-top: 32px;
+            font-size: 13px;
+            color: var(--caption);
+        }
+
+        .status {
+            margin-top: 36px;
+            font-size: 15px;
+            font-style: italic;
+            min-height: 22px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+        .status.success { color: var(--accent); }
+        .status.error { color: #b35a3d; }
+
+        .footnote {
+            margin-top: 64px;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--caption);
+        }
+
+        footer {
+            padding: 22px;
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--caption);
+            opacity: 0.55;
+            z-index: 5;
+            position: relative;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="backdrop"></div>
+
+    <header>
+        <a href="/dispatch/" class="back-link">&larr; back</a>
+        <a href="/dispatch/" class="nav-wordmark">Dispatch</a>
+        <label class="theme-pill" for="theme-toggle"><input type="checkbox" id="theme-toggle"></label>
+    </header>
+
+    <main>
+        <div class="card">
+            <div class="crest">Dispatch</div>
+            <h1 class="title">Sign in <em>to write.</em></h1>
+            <p class="subtitle">No password. Pick a handle after.</p>
+
+            <div class="oauth-row">
+                <button type="button" class="oauth-btn google" id="googleBtn">
+                    <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+                        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                    </svg>
+                    <span>Continue with Google</span>
+                </button>
+                <button type="button" class="oauth-btn apple" id="appleBtn">
+                    <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M14.04 9.567c-.024-2.42 1.973-3.583 2.064-3.64-1.124-1.643-2.872-1.867-3.49-1.893-1.484-.15-2.9.873-3.654.873-.762 0-1.92-.852-3.156-.829-1.622.023-3.117.94-3.953 2.391-1.685 2.918-.431 7.232 1.207 9.594.802 1.16 1.756 2.46 3.005 2.414 1.21-.047 1.665-.78 3.124-.78 1.452 0 1.866.78 3.143.756 1.297-.024 2.118-1.182 2.91-2.348.917-1.345 1.293-2.649 1.314-2.717-.029-.011-2.523-.967-2.514-3.821zM11.74 2.494c.661-.802 1.107-1.916.986-3.026-.953.038-2.108.635-2.791 1.434-.611.71-1.146 1.844-1.001 2.93 1.063.083 2.146-.541 2.806-1.338z" fill="currentColor"/>
+                    </svg>
+                    <span>Continue with Apple</span>
+                </button>
+            </div>
+
+            <div class="divider"><span>or by email</span></div>
+
+            <form id="form" novalidate>
+                <div class="field">
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        autocorrect="off"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        inputmode="email"
+                        enterkeyhint="go"
+                        required
+                    >
+                </div>
+                <button type="submit" class="submit" id="submitBtn">
+                    Send link <span class="arrow">→</span>
+                </button>
+            </form>
+
+            <p class="policy">By signing in you agree to the friendly use policy.</p>
+            <p class="status" id="status" role="status" aria-live="polite"></p>
+            <p class="footnote">New here? Pick a handle after sign-in.</p>
+        </div>
+    </main>
+
+    <footer>klee.page · Dispatch is open to friends</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/dispatch/js/dispatch-config.js"></script>
+    <script src="/dispatch/js/dispatch-api.js"></script>
+    <script>
+        (function() {
+            var toggle = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            toggle.checked = root.getAttribute('data-theme') === 'dark';
+            toggle.addEventListener('change', function() {
+                var theme = toggle.checked ? 'dark' : 'light';
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            });
+        })();
+
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var pref = params.get('email') || localStorage.getItem('dispatch.pending-email');
+            var email = document.getElementById('email');
+            if (pref) email.value = pref;
+            email.focus();
+
+            var template = params.get('template');
+            if (template) localStorage.setItem('dispatch.pending-template', template);
+            var inviteCode = params.get('code') || params.get('invite') || localStorage.getItem('dispatch.invite-code');
+            if (inviteCode) localStorage.setItem('dispatch.invite-code', inviteCode);
+
+            var form = document.getElementById('form');
+            var status = document.getElementById('status');
+            var btn = document.getElementById('submitBtn');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var v = (email.value || '').trim();
+                if (!v || v.indexOf('@') === -1 || v.indexOf('.') === -1) {
+                    status.className = 'status error';
+                    status.textContent = "That doesn't look like an email.";
+                    return;
+                }
+                btn.disabled = true;
+                status.className = 'status';
+                status.textContent = 'Sending…';
+
+                // Remember where to send the user after the magic link verifies
+                if (template) {
+                    sessionStorage.setItem('dispatch.post-auth', '/dispatch/editor/?template=' + encodeURIComponent(template));
+                } else {
+                    sessionStorage.setItem('dispatch.post-auth', '/dispatch/editor/');
+                }
+                if (inviteCode) sessionStorage.setItem('dispatch.invite-code', inviteCode);
+
+                fetch('/api/auth/send-link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: v, code: inviteCode || undefined })
+                }).then(function(r) {
+                    return r.json().then(function(data) { return { ok: r.ok, status: r.status, data: data }; }, function() { return { ok: r.ok, status: r.status, data: null }; });
+                }).then(function(res) {
+                    if (res.ok) {
+                        status.className = 'status success';
+                        status.textContent = 'Link sent. Check ' + v + '.';
+                        localStorage.removeItem('dispatch.pending-email');
+                        email.value = '';
+                        btn.disabled = false;
+                    } else if (res.status === 403) {
+                        status.className = 'status error';
+                        status.textContent = (res.data && res.data.error) || "That email isn't on the invite list yet.";
+                        btn.disabled = false;
+                    } else if (res.status === 429) {
+                        status.className = 'status error';
+                        status.textContent = 'Too many tries — give it a minute.';
+                        btn.disabled = false;
+                    } else {
+                        status.className = 'status error';
+                        status.textContent = (res.data && res.data.error) || 'Could not send. Try again in a moment.';
+                        btn.disabled = false;
+                    }
+                }).catch(function() {
+                    status.className = 'status error';
+                    status.textContent = "Couldn't reach the server. Check your connection.";
+                    btn.disabled = false;
+                });
+            });
+
+            // ---- Google / Apple OAuth ----
+            async function oauth(provider) {
+                if (!window.Dispatch) {
+                    status.className = 'status error';
+                    status.textContent = 'Auth not configured.';
+                    return;
+                }
+                var client = window.Dispatch.init();
+                if (!client) {
+                    status.className = 'status error';
+                    status.textContent = 'Auth not configured. Check Supabase keys.';
+                    return;
+                }
+                // Persist post-auth intent so the callback knows where to land
+                if (template) sessionStorage.setItem('dispatch.post-auth', '/dispatch/editor/?template=' + encodeURIComponent(template));
+                else sessionStorage.setItem('dispatch.post-auth', '/dispatch/editor/');
+                if (inviteCode) sessionStorage.setItem('dispatch.invite-code', inviteCode);
+
+                var googleBtn = document.getElementById('googleBtn');
+                var appleBtn = document.getElementById('appleBtn');
+                googleBtn.disabled = true;
+                appleBtn.disabled = true;
+                status.className = 'status';
+                status.textContent = 'Opening ' + provider + '…';
+
+                try {
+                    var redirectTo = window.location.origin + '/dispatch/auth/callback/';
+                    if (inviteCode) redirectTo += '?invite=' + encodeURIComponent(inviteCode);
+                    var { error } = await client.auth.signInWithOAuth({
+                        provider: provider,
+                        options: { redirectTo: redirectTo }
+                    });
+                    if (error) throw error;
+                    // Browser is redirecting to the provider — no further action needed
+                } catch (err) {
+                    status.className = 'status error';
+                    status.textContent = err.message || ('Could not sign in with ' + provider + '.');
+                    googleBtn.disabled = false;
+                    appleBtn.disabled = false;
+                }
+            }
+            document.getElementById('googleBtn').addEventListener('click', function () { oauth('google'); });
+            document.getElementById('appleBtn').addEventListener('click', function () { oauth('apple'); });
+        })();
+    </script>
+</body>
+</html>

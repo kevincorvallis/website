@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor — Dispatch</title>
+    <meta name="robots" content="noindex">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✶</text></svg>">
+
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0eee6;
+            --bg-warm: #e9e3d4;
+            --paper: #ffffff;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --accent-soft: #c4a882;
+            --rule: rgba(31, 30, 29, 0.1);
+            --rule-strong: rgba(31, 30, 29, 0.18);
+            --select: rgba(160, 130, 109, 0.35);
+            --shadow-card: 0 24px 60px -28px rgba(31, 30, 29, 0.18), 0 8px 24px -12px rgba(31, 30, 29, 0.06);
+            --font: 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+            color-scheme: light dark;
+        }
+        [data-theme="dark"] {
+            --bg: #1a1918;
+            --bg-warm: #2a2723;
+            --paper: #2a2723;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --accent-soft: #a0826d;
+            --rule: rgba(240, 238, 230, 0.08);
+            --rule-strong: rgba(240, 238, 230, 0.14);
+            --select: rgba(196, 168, 130, 0.32);
+            --shadow-card: 0 24px 60px -28px rgba(0, 0, 0, 0.5), 0 8px 24px -12px rgba(0, 0, 0, 0.3);
+        }
+
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 17px;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.4s ease, color 0.3s ease;
+        }
+
+        ::selection { background: var(--select); color: inherit; }
+
+        a { color: inherit; text-decoration: none; }
+        button { font-family: var(--font); cursor: pointer; }
+        input, textarea { font-family: inherit; color: inherit; }
+
+        /* ========== TOP BAR ========== */
+        .topbar {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--rule);
+            background: var(--bg);
+            z-index: 30;
+        }
+        .tb-left { display: flex; align-items: center; gap: 16px; }
+        .tb-back {
+            font-size: 13px;
+            opacity: 0.55;
+            transition: opacity 0.2s ease;
+        }
+        .tb-back:hover { opacity: 1; }
+        .tb-wordmark {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .tb-wordmark::after {
+            content: '✶';
+            margin-left: 4px;
+            color: var(--accent);
+            font-style: normal;
+            font-size: 9px;
+            vertical-align: super;
+        }
+        .tb-divider {
+            width: 1px;
+            height: 18px;
+            background: var(--rule);
+        }
+        .tb-title-input {
+            width: 360px;
+            max-width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text);
+            outline: none;
+        }
+        .tb-title-input::placeholder { color: var(--caption); opacity: 0.6; }
+
+        .tb-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 18px;
+        }
+        .tb-status {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--caption);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tb-status::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .tb-status.saving::before { animation: pulse 1s ease-in-out infinite; }
+        .tb-status.saved::before { background: var(--accent); }
+        .tb-status.dirty::before { background: var(--caption); }
+        @keyframes pulse { 50% { opacity: 0.25; } }
+
+        .tb-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            position: relative;
+            transition: color 0.2s ease;
+        }
+        .tb-btn::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; bottom: 2px;
+            height: 1px;
+            background: currentColor;
+            opacity: 0.7;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .tb-btn:hover::after { transform: scaleX(1); }
+        .tb-btn:hover { color: var(--accent); }
+        .tb-btn.primary { color: var(--accent); }
+
+        .tb-theme {
+            width: 36px;
+            height: 18px;
+            border-radius: 100px;
+            background: var(--text);
+            position: relative;
+            cursor: pointer;
+        }
+        .tb-theme::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--bg);
+            transition: transform 0.2s ease;
+        }
+        [data-theme="dark"] .tb-theme::after { transform: translateX(18px); }
+        .tb-theme input { display: none; }
+
+        /* ========== LAYOUT ========== */
+        .workspace {
+            display: grid;
+            grid-template-columns: 72px 1fr 320px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* ========== LEFT RAIL ========== */
+        .rail {
+            border-right: 1px solid var(--rule);
+            background: var(--bg);
+            padding: 18px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            overflow-y: auto;
+        }
+        .rail-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--caption);
+            margin: 8px 0 6px;
+            opacity: 0.7;
+        }
+        .rail-divider {
+            width: 32px;
+            height: 1px;
+            background: var(--rule);
+            margin: 8px 0;
+        }
+        .rail-btn {
+            width: 56px;
+            padding: 12px 4px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+        .rail-btn:hover {
+            background: var(--bg-warm);
+            border-color: var(--rule);
+            color: var(--accent);
+        }
+        .rail-btn .glyph {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 22px;
+            line-height: 1;
+        }
+        .rail-btn .name {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        /* ========== CANVAS ========== */
+        .canvas-scroll {
+            overflow-y: auto;
+            padding: 56px 0 240px;
+            scroll-behavior: smooth;
+        }
+        .canvas {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 32px;
+            position: relative;
+        }
+
+        .block-wrap {
+            position: relative;
+            padding: 12px 0;
+            margin: 4px 0;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+        .block-wrap:hover { background: rgba(160, 130, 109, 0.04); }
+        .block-wrap.selected {
+            background: rgba(160, 130, 109, 0.08);
+            outline: 1px dashed rgba(160, 130, 109, 0.4);
+            outline-offset: 4px;
+        }
+        .block-wrap.dragging { opacity: 0.4; }
+        .block-wrap.drag-over::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 0; right: 0;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .block-handle {
+            position: absolute;
+            left: -36px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--caption);
+            opacity: 0;
+            cursor: grab;
+            transition: opacity 0.2s ease, color 0.2s ease;
+            user-select: none;
+        }
+        .block-wrap:hover .block-handle,
+        .block-wrap.selected .block-handle { opacity: 0.6; }
+        .block-handle:hover { color: var(--accent); opacity: 1 !important; }
+        .block-handle:active { cursor: grabbing; }
+        .block-handle svg { width: 12px; height: 12px; }
+
+        .block-actions {
+            position: absolute;
+            right: -36px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .block-wrap.selected .block-actions { display: flex; }
+        .block-actions button {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: var(--caption);
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+        .block-actions button:hover { color: var(--accent); background: var(--bg-warm); }
+
+        /* ===== Block renders ===== */
+        [contenteditable] { outline: none; }
+        [contenteditable][data-empty]::before {
+            content: attr(data-empty);
+            color: var(--caption);
+            font-style: italic;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Cover */
+        .b-cover { padding: 36px 0 18px; }
+        .b-cover-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-style: italic;
+            font-size: 56px;
+            line-height: 1.02;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            min-height: 1.05em;
+        }
+        .b-cover-sub {
+            font-family: var(--font);
+            font-style: italic;
+            font-size: 19px;
+            color: var(--caption);
+            min-height: 1.5em;
+        }
+
+        /* Chapter */
+        .b-chapter { padding: 32px 0 6px; }
+        .b-chapter-mark {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--accent);
+            min-height: 1em;
+        }
+        .b-chapter-sub {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 24px;
+            color: var(--text);
+            min-height: 1.2em;
+            margin-top: 4px;
+        }
+
+        /* Prose */
+        .b-prose {
+            font-size: 19px;
+            line-height: 1.65;
+            min-height: 1.65em;
+        }
+        .b-prose p { margin-bottom: 1em; }
+        .b-prose p:last-child { margin-bottom: 0; }
+        .b-prose em { font-style: italic; }
+        .b-prose strong { font-weight: 600; }
+
+        /* Photo */
+        .b-photo {
+            text-align: center;
+            padding: 24px 0;
+        }
+        .b-photo-frame {
+            display: inline-block;
+            background: var(--paper);
+            padding: 14px 14px 56px;
+            box-shadow: var(--shadow-card);
+            border-radius: 4px;
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .b-photo[data-frame="polaroid"] .b-photo-frame { transform: rotate(-1.4deg); }
+        .b-photo[data-frame="bleed"] .b-photo-frame {
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            transform: none;
+        }
+        .b-photo[data-frame="none"] .b-photo-frame {
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            transform: none;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .b-photo img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 2px;
+        }
+        .b-photo[data-frame="bleed"] img,
+        .b-photo[data-frame="none"] img { border-radius: 8px; }
+        .b-photo-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 320px;
+            height: 200px;
+            border: 1px dashed var(--rule-strong);
+            border-radius: 8px;
+            color: var(--caption);
+            font-style: italic;
+            font-size: 14px;
+            background: var(--bg-warm);
+            cursor: pointer;
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+        .b-photo-empty:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .b-photo-caption {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: 18px;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 14px;
+            color: var(--caption);
+            text-align: center;
+        }
+        .b-photo[data-frame="bleed"] .b-photo-caption,
+        .b-photo[data-frame="none"] .b-photo-caption {
+            position: static;
+            margin-top: 12px;
+        }
+
+        /* Insert button between blocks */
+        .insert-rail {
+            position: relative;
+            height: 14px;
+            margin: 2px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .insert-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid var(--rule-strong);
+            background: var(--bg);
+            color: var(--caption);
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.7);
+            transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+        .insert-rail:hover .insert-btn,
+        .insert-rail.active .insert-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .insert-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        .insert-line {
+            position: absolute;
+            left: 0; right: 0; top: 50%;
+            height: 1px;
+            background: var(--rule);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .insert-rail:hover .insert-line,
+        .insert-rail.active .insert-line { opacity: 0.6; }
+
+        /* Insert popover */
+        .insert-popover {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(-6px);
+            background: var(--paper);
+            border: 1px solid var(--rule-strong);
+            border-radius: 10px;
+            box-shadow: var(--shadow-card);
+            padding: 8px;
+            min-width: 220px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 20;
+        }
+        .insert-rail.active .insert-popover {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .insert-popover button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 14px;
+            text-align: left;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .insert-popover button:hover { background: var(--bg-warm); color: var(--accent); }
+        .insert-popover .glyph {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+            color: var(--accent);
+        }
+        .insert-popover .desc {
+            display: block;
+            font-size: 11px;
+            color: var(--caption);
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        /* ========== RIGHT PANEL ========== */
+        .panel {
+            border-left: 1px solid var(--rule);
+            background: var(--bg);
+            overflow-y: auto;
+            padding: 28px 22px;
+        }
+        .panel-empty {
+            color: var(--caption);
+            font-style: italic;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        .panel-empty::before {
+            content: '✶';
+            display: block;
+            color: var(--accent);
+            font-size: 16px;
+            font-style: normal;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+        .panel h3 {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .panel .panel-kind {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--caption);
+            margin-bottom: 22px;
+        }
+        .panel-field {
+            margin-bottom: 18px;
+        }
+        .panel-field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--caption);
+            margin-bottom: 6px;
+        }
+        .panel-field input[type="text"],
+        .panel-field textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--rule);
+            padding: 6px 0;
+            font-size: 15px;
+            color: var(--text);
+            outline: none;
+            font-family: var(--font);
+            transition: border-bottom-color 0.2s ease;
+        }
+        .panel-field input:focus,
+        .panel-field textarea:focus { border-bottom-color: var(--accent); }
+        .panel-field textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: var(--font);
+            line-height: 1.5;
+        }
+        .panel-field .radio-group {
+            display: flex;
+            gap: 4px;
+            border: 1px solid var(--rule);
+            border-radius: 6px;
+            padding: 3px;
+        }
+        .panel-field .radio-group button {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 6px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--caption);
+            border-radius: 4px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .panel-field .radio-group button.active {
+            background: var(--accent);
+            color: var(--bg);
+        }
+        .panel-field .radio-group button:hover:not(.active) {
+            color: var(--text);
+        }
+        .panel-field .file-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .panel-field .file-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            background: var(--bg-warm);
+            border: 1px solid var(--rule);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .panel-field .file-row .replace {
+            font-size: 13px;
+            color: var(--accent);
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 1px;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .panel-delete {
+            display: block;
+            margin-top: 32px;
+            background: transparent;
+            border: none;
+            color: var(--caption);
+            font-size: 13px;
+            font-style: italic;
+            border-bottom: 1px solid var(--rule);
+            padding: 0 0 2px;
+            transition: color 0.2s ease, border-bottom-color 0.2s ease;
+        }
+        .panel-delete:hover {
+            color: #b35a3d;
+            border-bottom-color: #b35a3d;
+        }
+
+        /* ========== TEMPLATE PICKER OVERLAY ========== */
+        .picker-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(31, 30, 29, 0.45);
+            backdrop-filter: blur(16px);
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .picker-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        [data-theme="dark"] .picker-overlay { background: rgba(10, 9, 8, 0.6); }
+
+        .picker {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 48px 44px 40px;
+            max-width: 880px;
+            width: 100%;
+            box-shadow: var(--shadow-card);
+            transform: translateY(20px) scale(0.97);
+            transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .picker-overlay.show .picker {
+            transform: translateY(0) scale(1);
+        }
+        .picker h2 {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 38px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .picker p {
+            text-align: center;
+            color: var(--caption);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+        .picker-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .picker-tile {
+            background: var(--paper);
+            border: 1px solid var(--rule);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        [data-theme="dark"] .picker-tile { background: var(--bg-warm); }
+        .picker-tile:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: var(--shadow-card);
+        }
+        .picker-tile .pt-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+        .picker-tile .pt-title {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+        .picker-tile .pt-desc {
+            font-size: 13px;
+            color: var(--caption);
+            line-height: 1.45;
+        }
+        .picker-blank {
+            margin-top: 28px;
+            text-align: center;
+        }
+        .picker-blank button {
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-style: italic;
+            color: var(--caption);
+            border-bottom: 1px solid currentColor;
+            padding: 0 0 2px;
+            transition: color 0.2s ease;
+        }
+        .picker-blank button:hover { color: var(--text); }
+
+        /* ========== TOAST ========== */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 12px 22px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 95;
+            box-shadow: var(--shadow-card);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ========== PREVIEW MODE ========== */
+        body.preview .rail,
+        body.preview .panel,
+        body.preview .insert-rail,
+        body.preview .block-handle,
+        body.preview .block-actions { display: none !important; }
+        body.preview .workspace { grid-template-columns: 1fr; }
+        body.preview .canvas { max-width: 620px; }
+        body.preview .block-wrap:hover,
+        body.preview .block-wrap.selected {
+            background: transparent;
+            outline: none;
+        }
+        body.preview [contenteditable] { pointer-events: none; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1080px) {
+            .workspace { grid-template-columns: 56px 1fr 280px; }
+            .panel { padding: 22px 18px; }
+        }
+        @media (max-width: 820px) {
+            .workspace { grid-template-columns: 1fr; }
+            .rail, .panel { display: none; }
+            .canvas { padding: 0 20px; }
+            .b-cover-title { font-size: 40px; }
+            .topbar { grid-template-columns: 1fr auto; padding: 12px 16px; }
+            .tb-left { display: none; }
+            .tb-title-input { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="tb-left">
+            <a href="/dispatch/" class="tb-back">← back</a>
+            <span class="tb-wordmark">Dispatch</span>
+            <span class="tb-divider"></span>
+            <input class="tb-title-input" id="titleInput" placeholder="Untitled dispatch" type="text" maxlength="80">
+        </div>
+        <div></div>
+        <div class="tb-right">
+            <span class="tb-status saved" id="statusIndicator">Saved</span>
+            <a class="tb-btn" id="viewLiveBtn" target="_blank" rel="noopener" style="display:none;">View live</a>
+            <button class="tb-btn" id="previewBtn">Preview</button>
+            <button class="tb-btn primary" id="publishBtn">Publish</button>
+            <span class="tb-auth" id="tbAuth" style="font-size:12px;color:var(--caption);font-style:italic;"></span>
+            <label class="tb-theme" for="theme-toggle"><input type="checkbox" id="theme-toggle"></label>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <aside class="rail" id="rail">
+            <span class="rail-label">Add</span>
+            <button class="rail-btn" data-add="cover" title="Cover"><span class="glyph">C</span><span class="name">Cover</span></button>
+            <button class="rail-btn" data-add="chapter" title="Chapter"><span class="glyph">§</span><span class="name">Chapter</span></button>
+            <button class="rail-btn" data-add="prose" title="Prose"><span class="glyph">¶</span><span class="name">Prose</span></button>
+            <button class="rail-btn" data-add="photo" title="Photo"><span class="glyph">◇</span><span class="name">Photo</span></button>
+            <span class="rail-divider"></span>
+            <span class="rail-label">Tools</span>
+            <button class="rail-btn" id="exportBtn" title="Export JSON"><span class="glyph">↓</span><span class="name">Export</span></button>
+        </aside>
+
+        <main class="canvas-scroll" id="canvasScroll">
+            <div class="canvas" id="canvas"></div>
+        </main>
+
+        <aside class="panel" id="panel">
+            <div class="panel-empty">Select a block to edit its settings.</div>
+        </aside>
+    </div>
+
+    <!-- Template picker -->
+    <div class="picker-overlay" id="picker">
+        <div class="picker">
+            <h2>Start your dispatch.</h2>
+            <p>Pick a shape. You can change anything once you're in.</p>
+            <div class="picker-grid">
+                <button class="picker-tile" data-template="field-notes">
+                    <div class="pt-label">Field notes</div>
+                    <div class="pt-title">A long-weekend recap.</div>
+                    <p class="pt-desc">Day-of-week chapters, photos, and short prose. Good for trips and weekends.</p>
+                </button>
+                <button class="picker-tile" data-template="photo-essay">
+                    <div class="pt-label">Photo essay</div>
+                    <div class="pt-title">One subject, on the page.</div>
+                    <p class="pt-desc">Photo-forward with a pull quote and a closing thought. For the obsession of the week.</p>
+                </button>
+                <button class="picker-tile" data-template="receipt">
+                    <div class="pt-label">Receipt</div>
+                    <div class="pt-title">Small things, in order.</div>
+                    <p class="pt-desc">Itemized. A guest, a meal, a thought. Like reading a receipt of the week.</p>
+                </button>
+            </div>
+            <div class="picker-blank">
+                <button id="blankStart">or start from a blank page →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publish modal -->
+    <div class="picker-overlay" id="publishOverlay" role="dialog" aria-modal="true" aria-labelledby="publishHead">
+        <div class="picker" style="max-width: 560px;">
+            <div style="text-align:left; margin-bottom:24px;">
+                <div style="font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Publish</div>
+                <h2 id="publishHead" style="text-align:left;font-size:30px;margin-bottom:6px;">Ready when you are.</h2>
+                <p style="text-align:left;color:var(--caption);font-size:15px;margin-bottom:0;">Pick a slug. This becomes the shareable URL.</p>
+            </div>
+
+            <div class="panel-field" style="margin-bottom:20px;">
+                <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--caption);margin-bottom:8px;">URL</label>
+                <div style="display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--rule);padding-bottom:6px;">
+                    <span style="font-size:16px;color:var(--caption);">klee.page/@<span id="pubHandle">you</span>/</span>
+                    <input type="text" id="pubSlug" placeholder="your-slug" autocorrect="off" autocapitalize="none" spellcheck="false"
+                           style="flex:1;border:none;background:transparent;outline:none;font-family:var(--font);font-size:16px;color:var(--text);">
+                </div>
+                <p style="font-size:12px;color:var(--caption);font-style:italic;margin-top:8px;">Lowercase letters, numbers, dashes. Yours forever.</p>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;">
+                <button id="pubCancel" type="button" class="panel-delete" style="margin-top:0;">Cancel</button>
+                <button id="pubConfirm" type="button" class="tb-btn primary" style="font-size:15px;">
+                    <span id="pubConfirmLabel">Publish &amp; share</span> <span class="arrow">→</span>
+                </button>
+            </div>
+
+            <p id="pubError" style="margin-top:18px;color:#b35a3d;font-size:13px;font-style:italic;display:none;"></p>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- Supabase SDK + Dispatch client (loaded before the editor IIFE) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/dispatch/js/dispatch-config.js"></script>
+    <script src="/dispatch/js/dispatch-api.js"></script>
+
+    <script>
+        // ========== State ==========
+        var state = {
+            id: null,            // local draft id (always set)
+            cloud_id: null,      // server article id once it exists
+            slug: null,          // server-side slug (set after publish or first cloud save)
+            status: 'draft',     // 'draft' | 'published'
+            visibility: 'public',
+            published_url: null,
+            title: '',
+            template: null,
+            blocks: [],
+            updatedAt: null
+        };
+        var cloudReady = false;  // true once Dispatch SDK confirms a signed-in user with a profile
+        var selectedId = null;
+        var saveTimer = null;
+        var dragId = null;
+
+        var BLOCK_DEFS = {
+            cover:   { name: 'Cover',   glyph: 'C', defaults: { title: '', subtitle: '' } },
+            chapter: { name: 'Chapter', glyph: '§', defaults: { mark: 'I', subtitle: '' } },
+            prose:   { name: 'Prose',   glyph: '¶', defaults: { html: '' } },
+            photo:   { name: 'Photo',   glyph: '◇', defaults: { src: '', caption: '', alt: '', frame: 'polaroid' } }
+        };
+
+        var TEMPLATES = {
+            'field-notes': {
+                title: 'Margin',
+                blocks: [
+                    { type: 'cover',   data: { title: 'Margin', subtitle: 'A long weekend.' } },
+                    { type: 'chapter', data: { mark: 'FRI', subtitle: 'the lot' } },
+                    { type: 'prose',   data: { html: '<p>Friday started early — and somehow that always means it gets long, in the best way. <em>Write what happened.</em></p>' } },
+                    { type: 'photo',   data: { src: '', caption: 'the moment before', alt: '', frame: 'polaroid' } },
+                    { type: 'chapter', data: { mark: 'SUN', subtitle: 'off-grid' } },
+                    { type: 'prose',   data: { html: '<p>Sunday opened with a service and ended with a sunset. <em>Talk about what was between them.</em></p>' } }
+                ]
+            },
+            'photo-essay': {
+                title: 'Untitled essay',
+                blocks: [
+                    { type: 'cover',   data: { title: 'Untitled essay', subtitle: 'One subject.' } },
+                    { type: 'photo',   data: { src: '', caption: '', alt: '', frame: 'bleed' } },
+                    { type: 'prose',   data: { html: '<p>Open with the why. Why are we looking at this? <em>What did you see?</em></p>' } },
+                    { type: 'photo',   data: { src: '', caption: '', alt: '', frame: 'polaroid' } },
+                    { type: 'prose',   data: { html: '<p>The close — what you took away. Keep it short.</p>' } }
+                ]
+            },
+            'receipt': {
+                title: 'Receipt — week of',
+                blocks: [
+                    { type: 'cover',   data: { title: 'Receipt', subtitle: 'Week of ___.' } },
+                    { type: 'prose',   data: { html: '<p>A small list of things, in the order they happened.</p>' } },
+                    { type: 'chapter', data: { mark: '01', subtitle: 'a guest' } },
+                    { type: 'prose',   data: { html: '<p>Who came over. What they brought. <em>What we ate.</em></p>' } },
+                    { type: 'chapter', data: { mark: '02', subtitle: 'a thought' } },
+                    { type: 'prose',   data: { html: '<p>One sentence the week wouldn’t let go of.</p>' } },
+                    { type: 'chapter', data: { mark: '03', subtitle: 'a song' } },
+                    { type: 'prose',   data: { html: '<p>What played twice.</p>' } }
+                ]
+            },
+            'blank': {
+                title: '',
+                blocks: [
+                    { type: 'cover',  data: { title: '', subtitle: '' } },
+                    { type: 'prose',  data: { html: '' } }
+                ]
+            }
+        };
+
+        // ========== Utils ==========
+        function uid() { return 'b' + Math.random().toString(36).slice(2, 10); }
+        function debounce(fn, ms) {
+            return function() {
+                clearTimeout(saveTimer);
+                var args = arguments;
+                var ctx = this;
+                saveTimer = setTimeout(function() { fn.apply(ctx, args); }, ms);
+            };
+        }
+        function escapeAttr(s) { return (s || '').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+        function toast(msg) {
+            var el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(function() { el.classList.remove('show'); }, 1800);
+        }
+
+        function setStatus(kind, label) {
+            var s = document.getElementById('statusIndicator');
+            s.className = 'tb-status ' + kind;
+            s.textContent = label;
+        }
+
+        // ========== Persistence ==========
+        function loadDraft(id) {
+            try {
+                var raw = localStorage.getItem('dispatch.draft.' + id);
+                return raw ? JSON.parse(raw) : null;
+            } catch (e) { return null; }
+        }
+        function saveDraft() {
+            state.updatedAt = new Date().toISOString();
+            try {
+                localStorage.setItem('dispatch.draft.' + state.id, JSON.stringify(state));
+                localStorage.setItem('dispatch.last-draft', state.id);
+                setStatus(cloudReady ? 'saving' : 'saved', cloudReady ? 'Syncing…' : 'Local');
+            } catch (e) {
+                setStatus('dirty', 'Save failed');
+            }
+            if (cloudReady && typeof cloudSync === 'function') {
+                cloudSync().then(function (ok) {
+                    setStatus(ok ? 'saved' : 'dirty', ok ? 'Saved' : 'Local only');
+                });
+            }
+        }
+        var queueSave = debounce(saveDraft, 500);
+        function markDirty() {
+            setStatus('saving', 'Saving…');
+            queueSave();
+        }
+
+        // ========== Block ops ==========
+        function makeBlock(type, data) {
+            var def = BLOCK_DEFS[type];
+            if (!def) return null;
+            var d = Object.assign({}, def.defaults, data || {});
+            return { id: uid(), type: type, data: d };
+        }
+
+        function insertBlock(type, afterId) {
+            var nb = makeBlock(type);
+            if (!nb) return;
+            if (afterId == null) {
+                state.blocks.push(nb);
+            } else {
+                var idx = state.blocks.findIndex(function(b) { return b.id === afterId; });
+                state.blocks.splice(idx + 1, 0, nb);
+            }
+            selectedId = nb.id;
+            render();
+            markDirty();
+            requestAnimationFrame(function() {
+                var el = document.querySelector('[data-block-id="' + nb.id + '"]');
+                if (el) {
+                    var editable = el.querySelector('[contenteditable]');
+                    if (editable) editable.focus();
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
+
+        function deleteBlock(id) {
+            state.blocks = state.blocks.filter(function(b) { return b.id !== id; });
+            if (selectedId === id) selectedId = null;
+            render();
+            markDirty();
+        }
+
+        function moveBlock(fromId, toId, position) {
+            if (fromId === toId) return;
+            var fromIdx = state.blocks.findIndex(function(b) { return b.id === fromId; });
+            var toIdx = state.blocks.findIndex(function(b) { return b.id === toId; });
+            if (fromIdx < 0 || toIdx < 0) return;
+            var moved = state.blocks.splice(fromIdx, 1)[0];
+            var insertAt = toIdx;
+            if (fromIdx < toIdx && position === 'before') insertAt = toIdx - 1;
+            if (fromIdx > toIdx && position === 'after') insertAt = toIdx + 1;
+            if (position === 'before') insertAt = state.blocks.findIndex(function(b) { return b.id === toId; });
+            else insertAt = state.blocks.findIndex(function(b) { return b.id === toId; }) + 1;
+            state.blocks.splice(insertAt, 0, moved);
+            render();
+            markDirty();
+        }
+
+        // ========== Render ==========
+        var canvas = document.getElementById('canvas');
+
+        function renderBlockBody(b) {
+            switch (b.type) {
+                case 'cover':
+                    return '<div class="b-cover">' +
+                        '<div class="b-cover-title" contenteditable="true" data-field="title" data-empty="Untitled">' + escapeAttr(b.data.title || '') + '</div>' +
+                        '<div class="b-cover-sub" contenteditable="true" data-field="subtitle" data-empty="A subtitle (optional).">' + escapeAttr(b.data.subtitle || '') + '</div>' +
+                    '</div>';
+                case 'chapter':
+                    return '<div class="b-chapter">' +
+                        '<div class="b-chapter-mark" contenteditable="true" data-field="mark" data-empty="MARK">' + escapeAttr(b.data.mark || '') + '</div>' +
+                        '<div class="b-chapter-sub" contenteditable="true" data-field="subtitle" data-empty="chapter title">' + escapeAttr(b.data.subtitle || '') + '</div>' +
+                    '</div>';
+                case 'prose':
+                    var html = b.data.html || '';
+                    return '<div class="b-prose" contenteditable="true" data-field="html" data-empty="Type a paragraph…">' + html + '</div>';
+                case 'photo':
+                    var frame = b.data.frame || 'polaroid';
+                    var inner;
+                    if (b.data.src) {
+                        inner = '<div class="b-photo-frame">' +
+                            '<img src="' + escapeAttr(b.data.src) + '" alt="' + escapeAttr(b.data.alt || '') + '">' +
+                            (b.data.caption ? '<div class="b-photo-caption">' + escapeAttr(b.data.caption) + '</div>' : '') +
+                        '</div>';
+                    } else {
+                        inner = '<div class="b-photo-empty" data-action="upload">click or drop a photo</div>';
+                    }
+                    return '<div class="b-photo" data-frame="' + frame + '">' + inner + '</div>';
+            }
+            return '';
+        }
+
+        function render() {
+            canvas.innerHTML = '';
+            // Insert rail at top
+            canvas.appendChild(makeInsertRail(null));
+            state.blocks.forEach(function(b) {
+                var wrap = document.createElement('div');
+                wrap.className = 'block-wrap' + (selectedId === b.id ? ' selected' : '');
+                wrap.setAttribute('data-block-id', b.id);
+                wrap.setAttribute('draggable', 'true');
+                wrap.innerHTML =
+                    '<div class="block-handle" title="Drag to reorder" data-handle="1">' +
+                    '<svg viewBox="0 0 12 12" fill="currentColor"><circle cx="3" cy="2" r="1"/><circle cx="9" cy="2" r="1"/><circle cx="3" cy="6" r="1"/><circle cx="9" cy="6" r="1"/><circle cx="3" cy="10" r="1"/><circle cx="9" cy="10" r="1"/></svg>' +
+                    '</div>' +
+                    renderBlockBody(b) +
+                    '<div class="block-actions">' +
+                        '<button data-act="up" title="Move up">↑</button>' +
+                        '<button data-act="down" title="Move down">↓</button>' +
+                        '<button data-act="del" title="Delete">×</button>' +
+                    '</div>';
+                canvas.appendChild(wrap);
+                canvas.appendChild(makeInsertRail(b.id));
+            });
+            renderPanel();
+        }
+
+        function makeInsertRail(afterId) {
+            var rail = document.createElement('div');
+            rail.className = 'insert-rail';
+            rail.setAttribute('data-after-id', afterId == null ? '' : afterId);
+            rail.innerHTML =
+                '<div class="insert-line"></div>' +
+                '<button class="insert-btn" title="Insert block">+</button>' +
+                '<div class="insert-popover" role="menu">' +
+                    Object.keys(BLOCK_DEFS).map(function(k) {
+                        var d = BLOCK_DEFS[k];
+                        var desc = {
+                            cover: 'Title and subtitle.',
+                            chapter: 'A mark and a chapter name.',
+                            prose: 'A paragraph of writing.',
+                            photo: 'An image with caption.'
+                        }[k] || '';
+                        return '<button data-insert="' + k + '"><span class="glyph">' + d.glyph + '</span><span><strong>' + d.name + '</strong><span class="desc">' + desc + '</span></span></button>';
+                    }).join('') +
+                '</div>';
+            return rail;
+        }
+
+        // ========== Right panel ==========
+        function renderPanel() {
+            var panel = document.getElementById('panel');
+            if (!selectedId) {
+                panel.innerHTML = '<div class="panel-empty">Select a block to edit its settings.</div>';
+                return;
+            }
+            var b = state.blocks.find(function(x) { return x.id === selectedId; });
+            if (!b) {
+                panel.innerHTML = '<div class="panel-empty">Select a block to edit its settings.</div>';
+                return;
+            }
+            var def = BLOCK_DEFS[b.type];
+            var fields = '';
+            if (b.type === 'cover') {
+                fields =
+                    field('Title', '<input type="text" data-panel="title" value="' + escapeAttr(b.data.title || '') + '" placeholder="Untitled">') +
+                    field('Subtitle', '<input type="text" data-panel="subtitle" value="' + escapeAttr(b.data.subtitle || '') + '" placeholder="A subtitle">');
+            } else if (b.type === 'chapter') {
+                fields =
+                    field('Mark', '<input type="text" data-panel="mark" value="' + escapeAttr(b.data.mark || '') + '" placeholder="FRI">') +
+                    field('Subtitle', '<input type="text" data-panel="subtitle" value="' + escapeAttr(b.data.subtitle || '') + '" placeholder="chapter name">');
+            } else if (b.type === 'prose') {
+                fields = '<div class="panel-empty" style="margin-top:0;text-align:left;">Edit the prose directly in the canvas. <strong>**bold**</strong> and <em>*italic*</em> shortcuts work.</div>';
+            } else if (b.type === 'photo') {
+                var thumb = b.data.src ? '<img class="file-thumb" src="' + escapeAttr(b.data.src) + '">' : '<div class="file-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--caption);font-style:italic;font-size:11px;">none</div>';
+                fields =
+                    field('Image', '<div class="file-row">' + thumb + '<button class="replace" data-panel-action="upload">' + (b.data.src ? 'Replace' : 'Upload') + '</button></div>') +
+                    field('Caption', '<input type="text" data-panel="caption" value="' + escapeAttr(b.data.caption || '') + '" placeholder="A short caption">') +
+                    field('Alt text', '<input type="text" data-panel="alt" value="' + escapeAttr(b.data.alt || '') + '" placeholder="For screen readers">') +
+                    field('Frame', radioGroup('frame', b.data.frame || 'polaroid', ['polaroid', 'bleed', 'none']));
+            }
+            panel.innerHTML =
+                '<div class="panel-kind">' + def.name + ' block</div>' +
+                '<h3>Settings</h3>' +
+                fields +
+                '<button class="panel-delete" data-panel-action="delete">Delete this block</button>';
+        }
+
+        function field(label, body) {
+            return '<div class="panel-field"><label>' + label + '</label>' + body + '</div>';
+        }
+        function radioGroup(name, current, options) {
+            return '<div class="radio-group" data-radio="' + name + '">' +
+                options.map(function(o) {
+                    return '<button data-value="' + o + '" class="' + (current === o ? 'active' : '') + '">' + o + '</button>';
+                }).join('') +
+            '</div>';
+        }
+
+        // ========== Event wiring ==========
+        // Title
+        document.getElementById('titleInput').addEventListener('input', function(e) {
+            state.title = e.target.value;
+            markDirty();
+        });
+
+        // Theme
+        (function() {
+            var t = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            t.checked = root.getAttribute('data-theme') === 'dark';
+            t.addEventListener('change', function() {
+                var v = t.checked ? 'dark' : 'light';
+                root.setAttribute('data-theme', v);
+                localStorage.setItem('theme', v);
+            });
+        })();
+
+        // Rail add buttons
+        document.getElementById('rail').addEventListener('click', function(e) {
+            var btn = e.target.closest('[data-add]');
+            if (btn) {
+                insertBlock(btn.getAttribute('data-add'), state.blocks.length ? state.blocks[state.blocks.length - 1].id : null);
+                return;
+            }
+            if (e.target.closest('#exportBtn')) {
+                var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = (state.title || 'dispatch') + '.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                toast('Exported as JSON');
+            }
+        });
+
+        // Canvas delegated events
+        canvas.addEventListener('click', function(e) {
+            var insertBtn = e.target.closest('.insert-btn');
+            if (insertBtn) {
+                var rail = insertBtn.closest('.insert-rail');
+                document.querySelectorAll('.insert-rail.active').forEach(function(r) { if (r !== rail) r.classList.remove('active'); });
+                rail.classList.toggle('active');
+                e.stopPropagation();
+                return;
+            }
+            var insertItem = e.target.closest('.insert-popover [data-insert]');
+            if (insertItem) {
+                var rail2 = insertItem.closest('.insert-rail');
+                var afterId = rail2.getAttribute('data-after-id') || null;
+                insertBlock(insertItem.getAttribute('data-insert'), afterId);
+                rail2.classList.remove('active');
+                return;
+            }
+            var photoEmpty = e.target.closest('[data-action="upload"]');
+            if (photoEmpty) {
+                var wrap = photoEmpty.closest('[data-block-id]');
+                selectBlock(wrap.getAttribute('data-block-id'));
+                triggerUpload();
+                return;
+            }
+            var action = e.target.closest('[data-act]');
+            if (action) {
+                var wrap2 = action.closest('[data-block-id]');
+                var id = wrap2.getAttribute('data-block-id');
+                var act = action.getAttribute('data-act');
+                if (act === 'del') deleteBlock(id);
+                else if (act === 'up' || act === 'down') {
+                    var idx = state.blocks.findIndex(function(b) { return b.id === id; });
+                    var swap = act === 'up' ? idx - 1 : idx + 1;
+                    if (swap >= 0 && swap < state.blocks.length) {
+                        var tmp = state.blocks[idx];
+                        state.blocks[idx] = state.blocks[swap];
+                        state.blocks[swap] = tmp;
+                        render();
+                        markDirty();
+                    }
+                }
+                return;
+            }
+            var wrap3 = e.target.closest('[data-block-id]');
+            if (wrap3) {
+                selectBlock(wrap3.getAttribute('data-block-id'));
+            }
+        });
+
+        // Inline contenteditable input
+        canvas.addEventListener('input', function(e) {
+            var ed = e.target.closest('[contenteditable][data-field]');
+            if (!ed) return;
+            var wrap = ed.closest('[data-block-id]');
+            if (!wrap) return;
+            var b = state.blocks.find(function(x) { return x.id === wrap.getAttribute('data-block-id'); });
+            if (!b) return;
+            var field = ed.getAttribute('data-field');
+            if (field === 'html') {
+                b.data.html = ed.innerHTML;
+            } else {
+                b.data[field] = ed.textContent;
+            }
+            // Update panel input mirror if visible
+            var mirror = document.querySelector('[data-panel="' + field + '"]');
+            if (mirror && mirror !== ed) mirror.value = ed.textContent;
+            markDirty();
+        });
+
+        // Markdown-ish shortcuts in prose
+        canvas.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.closest('.b-cover-title, .b-cover-sub, .b-chapter-mark, .b-chapter-sub')) {
+                e.preventDefault();
+                // Move to next block or insert prose
+                var wrap = e.target.closest('[data-block-id]');
+                if (wrap) {
+                    var next = wrap.nextElementSibling;
+                    while (next && !next.matches('[data-block-id]')) next = next.nextElementSibling;
+                    if (next) {
+                        var ed = next.querySelector('[contenteditable]');
+                        if (ed) ed.focus();
+                    } else {
+                        insertBlock('prose', wrap.getAttribute('data-block-id'));
+                    }
+                }
+            }
+        });
+
+        function selectBlock(id) {
+            selectedId = id;
+            document.querySelectorAll('.block-wrap.selected').forEach(function(w) { w.classList.remove('selected'); });
+            var w = document.querySelector('[data-block-id="' + id + '"]');
+            if (w) w.classList.add('selected');
+            renderPanel();
+        }
+
+        // Panel events
+        document.getElementById('panel').addEventListener('input', function(e) {
+            if (!selectedId) return;
+            var input = e.target.closest('[data-panel]');
+            if (!input) return;
+            var b = state.blocks.find(function(x) { return x.id === selectedId; });
+            if (!b) return;
+            var field = input.getAttribute('data-panel');
+            b.data[field] = input.value;
+            // Mirror to canvas contenteditable
+            var ed = document.querySelector('[data-block-id="' + selectedId + '"] [data-field="' + field + '"]');
+            if (ed && ed !== input) ed.textContent = input.value;
+            markDirty();
+        });
+
+        document.getElementById('panel').addEventListener('click', function(e) {
+            var radio = e.target.closest('[data-radio] button');
+            if (radio) {
+                var group = radio.closest('[data-radio]');
+                var name = group.getAttribute('data-radio');
+                group.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
+                radio.classList.add('active');
+                var b = state.blocks.find(function(x) { return x.id === selectedId; });
+                if (b) {
+                    b.data[name] = radio.getAttribute('data-value');
+                    render();
+                    selectBlock(selectedId);
+                    markDirty();
+                }
+                return;
+            }
+            var action = e.target.closest('[data-panel-action]');
+            if (!action) return;
+            var act = action.getAttribute('data-panel-action');
+            if (act === 'delete') deleteBlock(selectedId);
+            else if (act === 'upload') triggerUpload();
+        });
+
+        function triggerUpload() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function () {
+                var file = input.files && input.files[0];
+                if (!file) return;
+                if (file.size > 10 * 1024 * 1024) {
+                    toast('Image is over 10 MB — try a smaller one.');
+                    return;
+                }
+                uploadAndSet(file, selectedId);
+            };
+            input.click();
+        }
+
+        function uploadAndSet(file, blockId) {
+            var b = state.blocks.find(function (x) { return x.id === blockId; });
+            if (!b || b.type !== 'photo') return;
+            if (file.size > 10 * 1024 * 1024) {
+                toast('Image is over 10 MB — try a smaller one.');
+                return;
+            }
+            function setLocalPreview(src) {
+                if (b.data._previewUrl && b.data._previewUrl !== src) {
+                    try { URL.revokeObjectURL(b.data._previewUrl); } catch (_) {}
+                }
+                b.data.src = src;
+                b.data._local = true;
+                if (src.indexOf('blob:') === 0) b.data._previewUrl = src;
+                render();
+                selectBlock(blockId);
+                markDirty();
+            }
+
+            // Signed-in authors get a lightweight blob preview while Cloudinary uploads.
+            // Local-only drafting keeps the old dataURL path so offline drafts still show images.
+            if (cloudReady && window.URL) {
+                setLocalPreview(URL.createObjectURL(file));
+            } else {
+                var reader = new FileReader();
+                reader.onload = function () { setLocalPreview(reader.result); };
+                reader.readAsDataURL(file);
+            }
+
+            // If signed in, also upload to Cloudinary and replace the dataURL with the hosted URL
+            if (cloudReady && window.Dispatch) {
+                toast('Uploading…');
+                window.Dispatch.uploadPhoto(file).then(function (result) {
+                    var b2 = state.blocks.find(function (x) { return x.id === blockId; });
+                    if (!b2 || b2.type !== 'photo') return;
+                    if (b2.data._previewUrl) {
+                        try { URL.revokeObjectURL(b2.data._previewUrl); } catch (_) {}
+                    }
+                    b2.data.src = result.url;
+                    delete b2.data._local;
+                    delete b2.data._previewUrl;
+                    render();
+                    if (selectedId === blockId) selectBlock(blockId);
+                    markDirty();
+                    toast('Uploaded');
+                }).catch(function (err) {
+                    toast(err.message || 'Upload failed — kept the local preview.');
+                });
+            }
+        }
+
+        // Drag and drop (photo into block)
+        var dropTarget = null;
+        canvas.addEventListener('dragover', function(e) {
+            if (e.dataTransfer.types.indexOf('Files') !== -1) {
+                e.preventDefault();
+                var wrap = e.target.closest('[data-block-id]');
+                if (wrap && wrap !== dropTarget) {
+                    if (dropTarget) dropTarget.classList.remove('drag-over');
+                    dropTarget = wrap;
+                    wrap.classList.add('drag-over');
+                }
+                return;
+            }
+            // Block reorder drag
+            if (dragId) {
+                e.preventDefault();
+                var wrap2 = e.target.closest('[data-block-id]');
+                if (wrap2 && wrap2.getAttribute('data-block-id') !== dragId) {
+                    if (dropTarget && dropTarget !== wrap2) dropTarget.classList.remove('drag-over');
+                    dropTarget = wrap2;
+                    wrap2.classList.add('drag-over');
+                }
+            }
+        });
+        canvas.addEventListener('dragleave', function(e) {
+            if (dropTarget && !dropTarget.contains(e.relatedTarget)) {
+                dropTarget.classList.remove('drag-over');
+                dropTarget = null;
+            }
+        });
+        canvas.addEventListener('drop', function(e) {
+            e.preventDefault();
+            var wrap = e.target.closest('[data-block-id]');
+            // File drop on photo
+            if (e.dataTransfer.files && e.dataTransfer.files.length) {
+                var file = e.dataTransfer.files[0];
+                if (file.type.indexOf('image/') === 0 && wrap) {
+                    var id = wrap.getAttribute('data-block-id');
+                    var b = state.blocks.find(function(x) { return x.id === id; });
+                    if (b && b.type === 'photo') {
+                        uploadAndSet(file, id);
+                    } else {
+                        // Insert a new photo block after this one
+                        var nb = makeBlock('photo');
+                        var idx = state.blocks.findIndex(function(x) { return x.id === id; });
+                        state.blocks.splice(idx + 1, 0, nb);
+                        selectedId = nb.id;
+                        render();
+                        markDirty();
+                        uploadAndSet(file, nb.id);
+                    }
+                }
+            } else if (dragId && wrap) {
+                var toId = wrap.getAttribute('data-block-id');
+                moveBlock(dragId, toId, 'after');
+            }
+            if (dropTarget) { dropTarget.classList.remove('drag-over'); dropTarget = null; }
+            dragId = null;
+        });
+        canvas.addEventListener('dragstart', function(e) {
+            var wrap = e.target.closest('[data-block-id]');
+            if (!wrap) return;
+            // Only start drag from handle to avoid conflict with text selection
+            if (!e.target.closest('[data-handle]')) {
+                e.preventDefault();
+                return;
+            }
+            dragId = wrap.getAttribute('data-block-id');
+            wrap.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        canvas.addEventListener('dragend', function() {
+            document.querySelectorAll('.dragging').forEach(function(w) { w.classList.remove('dragging'); });
+            if (dropTarget) { dropTarget.classList.remove('drag-over'); dropTarget = null; }
+            dragId = null;
+        });
+
+        // Close insert popover on outside click
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.insert-rail')) {
+                document.querySelectorAll('.insert-rail.active').forEach(function(r) { r.classList.remove('active'); });
+            }
+        });
+
+        // Preview mode
+        document.getElementById('previewBtn').addEventListener('click', function() {
+            document.body.classList.toggle('preview');
+            this.textContent = document.body.classList.contains('preview') ? 'Edit' : 'Preview';
+        });
+
+        // Publish — opens slug-preview modal, then PUTs to /api/articles
+        document.getElementById('publishBtn').addEventListener('click', function () {
+            openPublishModal();
+        });
+
+        // ========== Boot ==========
+        function startWith(template) {
+            var t = TEMPLATES[template] || TEMPLATES.blank;
+            state.id = 'd_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+            state.title = t.title || '';
+            state.template = template;
+            state.blocks = t.blocks.map(function(b) { return makeBlock(b.type, b.data); });
+            document.getElementById('titleInput').value = state.title;
+            selectedId = null;
+            render();
+            saveDraft();
+            hidePicker();
+        }
+
+        function showPicker() { document.getElementById('picker').classList.add('show'); }
+        function hidePicker() { document.getElementById('picker').classList.remove('show'); }
+
+        document.getElementById('picker').addEventListener('click', function (e) {
+            var tile = e.target.closest('[data-template]');
+            if (tile) startWith(tile.getAttribute('data-template'));
+            if (e.target.closest('#blankStart')) startWith('blank');
+        });
+
+        // ========== Cloud sync ==========
+        // Strips internal-only fields (_local) before sending to API; keeps localStorage as offline cache.
+        function blocksForApi() {
+            return state.blocks.map(function (b) {
+                var data = {};
+                for (var k in b.data) if (k.charAt(0) !== '_') data[k] = b.data[k];
+                if (b.type === 'photo' && (b.data._local || isLocalMediaUrl(b.data.src))) data.src = '';
+                return { id: b.id, type: b.type, data: data };
+            });
+        }
+
+        function isLocalMediaUrl(src) {
+            return typeof src === 'string' && (src.indexOf('data:') === 0 || src.indexOf('blob:') === 0);
+        }
+
+        var cloudInFlight = false;
+        var cloudPending = false;
+        async function cloudSync() {
+            if (!cloudReady || !window.Dispatch) return false;
+            if (cloudInFlight) { cloudPending = true; return false; }
+            cloudInFlight = true;
+            try {
+                if (!state.cloud_id) {
+                    var created = await window.Dispatch.createArticle({
+                        title: state.title || '',
+                        template_key: state.template || null,
+                        body_json: blocksForApi(),
+                    });
+                    if (created) {
+                        state.cloud_id = created.id;
+                        state.slug = created.slug;
+                        state.status = created.status;
+                        state.visibility = created.visibility || 'public';
+                    }
+                } else {
+                    await window.Dispatch.updateArticle(state.cloud_id, {
+                        title: state.title || '',
+                        body_json: blocksForApi(),
+                    });
+                }
+                // Persist new cloud_id/slug into local cache
+                try { localStorage.setItem('dispatch.draft.' + state.id, JSON.stringify(state)); } catch (_) {}
+                return true;
+            } catch (err) {
+                console.warn('cloudSync failed:', err && err.message);
+                return false;
+            } finally {
+                cloudInFlight = false;
+                if (cloudPending) {
+                    cloudPending = false;
+                    setTimeout(function () { cloudSync(); }, 50);
+                }
+            }
+        }
+
+        // ========== Publish modal ==========
+        function suggestSlug(title) {
+            return String(title || '').toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-').replace(/-+/g, '-')
+                .replace(/^-|-$/g, '').slice(0, 80);
+        }
+
+        function openPublishModal() {
+            if (!cloudReady) {
+                toast('Sign in first — your handle becomes part of the URL.');
+                sessionStorage.setItem('dispatch.post-auth', '/dispatch/editor/');
+                setTimeout(function () { window.location.href = '/dispatch/sign-in/'; }, 700);
+                return;
+            }
+            var titleHasContent = false;
+            for (var i = 0; i < state.blocks.length; i++) {
+                var b = state.blocks[i];
+                if (b.type === 'cover' && (b.data.title || '').trim()) titleHasContent = true;
+            }
+            if (!state.title.trim() && !titleHasContent) {
+                toast('Add a title before publishing.');
+                document.getElementById('titleInput').focus();
+                return;
+            }
+
+            var profile = window.Dispatch.getProfile();
+            document.getElementById('pubHandle').textContent = profile ? (profile.handle || profile.username) : 'you';
+            var slugInput = document.getElementById('pubSlug');
+            slugInput.value = state.slug || suggestSlug(state.title || (state.blocks[0] && state.blocks[0].data.title) || '');
+            document.getElementById('pubError').style.display = 'none';
+            document.getElementById('publishOverlay').classList.add('show');
+            setTimeout(function () { slugInput.focus(); slugInput.select(); }, 80);
+        }
+        function closePublishModal() { document.getElementById('publishOverlay').classList.remove('show'); }
+
+        document.getElementById('pubCancel').addEventListener('click', closePublishModal);
+
+        document.getElementById('pubConfirm').addEventListener('click', async function () {
+            var slug = (document.getElementById('pubSlug').value || '').trim().toLowerCase();
+            var errEl = document.getElementById('pubError');
+            errEl.style.display = 'none';
+            if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(slug)) {
+                errEl.textContent = 'Slug must start with a letter or number and use only lowercase letters, numbers, and dashes.';
+                errEl.style.display = 'block';
+                return;
+            }
+            var btn = document.getElementById('pubConfirm');
+            var lbl = document.getElementById('pubConfirmLabel');
+            btn.disabled = true;
+            lbl.textContent = 'Publishing…';
+            try {
+                var localPhoto = state.blocks.find(function (b) {
+                    return b.type === 'photo' && b.data && (b.data._local || isLocalMediaUrl(b.data.src));
+                });
+                if (localPhoto) {
+                    throw new Error('A photo is still local. Replace or re-upload it before publishing.');
+                }
+                // Make sure latest draft is synced first
+                await cloudSync();
+                if (!state.cloud_id) {
+                    var created = await window.Dispatch.createArticle({
+                        title: state.title || '',
+                        template_key: state.template || null,
+                        body_json: blocksForApi(),
+                    });
+                    state.cloud_id = created.id;
+                    state.slug = created.slug;
+                }
+                var updated = await window.Dispatch.publishArticle(state.cloud_id, {
+                    slug: slug,
+                    title: state.title || '',
+                    body_json: blocksForApi(),
+                });
+                state.slug = updated.slug;
+                state.status = updated.status;
+                state.visibility = updated.visibility || 'public';
+                var profile = window.Dispatch.getProfile();
+                state.published_url = profile ? ('/@' + (profile.handle || profile.username) + '/' + state.slug) : null;
+                try { localStorage.setItem('dispatch.draft.' + state.id, JSON.stringify(state)); } catch (_) {}
+                updateAuthBar();
+                closePublishModal();
+                toast('Published. Share the URL.');
+            } catch (err) {
+                errEl.textContent = err.message || 'Publish failed.';
+                errEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                lbl.textContent = 'Publish & share';
+            }
+        });
+
+        // ========== Auth indicator ==========
+        function updateAuthBar() {
+            var el = document.getElementById('tbAuth');
+            var view = document.getElementById('viewLiveBtn');
+            if (cloudReady && window.Dispatch.getProfile()) {
+                var p = window.Dispatch.getProfile();
+                var hp = p.handle || p.username;
+                el.innerHTML = '@<a href="/@' + hp + '" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor;">' + hp + '</a>';
+            } else {
+                el.innerHTML = '<a href="/dispatch/sign-in/" style="color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor;">Sign in to publish</a>';
+            }
+            if (state.status === 'published' && state.slug && window.Dispatch.getProfile()) {
+                var profileFL = window.Dispatch.getProfile();
+                var url = '/@' + (profileFL.handle || profileFL.username) + '/' + state.slug;
+                view.style.display = '';
+                view.setAttribute('href', url);
+            } else {
+                view.style.display = 'none';
+            }
+        }
+
+        // ========== Boot ==========
+        (async function boot() {
+            // Bring up Supabase SDK and check session BEFORE touching state
+            try {
+                if (window.Dispatch) {
+                    window.Dispatch.init();
+                    var session = await window.Dispatch.session();
+                    if (session) {
+                        // Has session — try to load profile + articles
+                        try {
+                            var list = await window.Dispatch.listArticles();
+                            if (list && list.profile) cloudReady = true;
+                        } catch (e) {
+                            if (e.status === 403) {
+                                // No profile yet — bounce to claim
+                                sessionStorage.setItem('dispatch.post-auth', '/dispatch/editor/' + window.location.search);
+                                window.location.href = '/dispatch/auth/callback/';
+                                return;
+                            }
+                            console.warn('listArticles failed:', e && e.message);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('auth init skipped:', e && e.message);
+            }
+            updateAuthBar();
+
+            var params = new URLSearchParams(window.location.search);
+            var template = params.get('template') || localStorage.getItem('dispatch.pending-template');
+            var id = params.get('id');
+            var cloudArticleId = params.get('cloud');
+
+            // If a cloud article is named in the URL and we're signed in, load it
+            if (cloudArticleId && cloudReady) {
+                try {
+                    var full = await window.Dispatch.getArticle(cloudArticleId);
+                    if (full) {
+                        state.id = 'd_cloud_' + full.id;
+                        state.cloud_id = full.id;
+                        state.slug = full.slug;
+                        state.title = full.title || '';
+                        state.template = full.template_key || null;
+                        state.status = full.status || 'draft';
+                        state.visibility = full.visibility || 'public';
+                        state.blocks = Array.isArray(full.body_json)
+                            ? full.body_json.map(function (b) { return makeBlock(b.type, b.data); })
+                            : [];
+                        document.getElementById('titleInput').value = state.title;
+                        selectedId = null;
+                        render();
+                        updateAuthBar();
+                        return;
+                    }
+                } catch (e) { console.warn('cloud load failed:', e && e.message); }
+            }
+
+            if (id) {
+                var d = loadDraft(id);
+                if (d) {
+                    state = Object.assign(state, d);
+                    document.getElementById('titleInput').value = state.title || '';
+                    render();
+                    updateAuthBar();
+                    return;
+                }
+            }
+            var last = localStorage.getItem('dispatch.last-draft');
+            if (last && !template) {
+                var d2 = loadDraft(last);
+                if (d2 && d2.blocks && d2.blocks.length) {
+                    state = Object.assign(state, d2);
+                    document.getElementById('titleInput').value = state.title || '';
+                    render();
+                    updateAuthBar();
+                    // Push local draft to cloud so it gets a uuid + slug
+                    if (cloudReady) cloudSync();
+                    return;
+                }
+            }
+            if (template) {
+                localStorage.removeItem('dispatch.pending-template');
+                startWith(template);
+                if (cloudReady) cloudSync();
+            } else {
+                showPicker();
+            }
+            updateAuthBar();
+        })();
+    </script>
+</body>
+</html>

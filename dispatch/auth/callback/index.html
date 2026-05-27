@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signing in… — Dispatch</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✶</text></svg>">
+
+    <script>
+        (function () {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #f0eee6; --text: #1f1e1d; --caption: #8a8880; --accent: #a0826d;
+            --rule: rgba(31,30,29,0.1);
+            --font: 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+        }
+        [data-theme="dark"] { --bg: #1f1e1d; --text: #f0eee6; --caption: #7a7a75; --accent: #c4a882; --rule: rgba(240,238,230,0.08); }
+
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font);
+            background: var(--bg); color: var(--text);
+            font-size: 18px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        .wordmark {
+            font-family: var(--font-display); font-style: italic; font-weight: 600;
+            font-size: 22px; margin-bottom: 56px;
+        }
+        .wordmark::after {
+            content: '✶'; margin-left: 6px; color: var(--accent);
+            font-style: normal; font-size: 12px; vertical-align: super;
+        }
+
+        .card { width: 100%; max-width: 420px; text-align: center; }
+
+        h1 {
+            font-family: var(--font-display); font-weight: 600; font-style: italic;
+            font-size: 32px; line-height: 1.1; margin-bottom: 14px;
+        }
+        h1 em { color: var(--accent); font-style: italic; }
+        p { color: var(--caption); margin-bottom: 36px; }
+        p .accent { color: var(--text); }
+
+        .status-line {
+            font-size: 14px; font-style: italic; color: var(--caption);
+            min-height: 22px;
+        }
+        .status-line.error { color: #b35a3d; }
+
+        .field { margin: 18px 0 28px; position: relative; }
+        .field input {
+            width: 100%; background: transparent; border: none;
+            border-bottom: 1px solid var(--rule);
+            padding: 12px 0; font-size: 22px; font-family: var(--font);
+            color: var(--text); outline: none; text-align: center;
+            transition: border-bottom-color 0.3s ease;
+        }
+        .field input::placeholder { color: var(--caption); font-style: italic; }
+        .field input:focus { border-bottom-color: var(--accent); }
+        .field-hint {
+            font-size: 13px; color: var(--caption); font-style: italic;
+            margin-top: 8px; text-align: center;
+        }
+
+        .btn {
+            background: transparent; border: none; cursor: pointer;
+            font-family: var(--font); font-size: 18px; font-weight: 600;
+            color: var(--text); padding: 0 0 3px;
+            border-bottom: 1px solid var(--text);
+            display: inline-flex; align-items: center; gap: 10px;
+            transition: color 0.3s ease, border-bottom-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn:hover { color: var(--accent); border-bottom-color: var(--accent); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.4; cursor: wait; transform: none; }
+        .btn .arrow { transition: transform 0.2s ease; }
+        .btn:hover .arrow { transform: translateX(4px); }
+
+        .spinner {
+            display: inline-block; width: 18px; height: 18px;
+            border: 2px solid var(--rule); border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.9s linear infinite;
+            vertical-align: middle; margin-right: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="wordmark">Dispatch</div>
+
+    <div class="card" id="card">
+        <div id="loadingState">
+            <h1>Signing you in<em>.</em></h1>
+            <p><span class="spinner"></span>One moment.</p>
+        </div>
+
+        <div id="claimState" style="display:none;">
+            <h1>Pick a <em>handle.</em></h1>
+            <p>This is your URL: <span class="accent">klee.page/@<span id="previewHandle">you</span></span></p>
+            <form id="claimForm">
+                <div class="field">
+                    <input type="text" id="usernameInput" placeholder="yourname" autocomplete="username"
+                           autocorrect="off" autocapitalize="none" spellcheck="false"
+                           maxlength="20" required>
+                </div>
+                <button class="btn" id="claimBtn" type="submit">
+                    Claim &amp; start writing <span class="arrow">→</span>
+                </button>
+            </form>
+            <p class="status-line" id="claimStatus" role="status" aria-live="polite"></p>
+        </div>
+
+        <div id="errorState" style="display:none;">
+            <h1>That link <em>didn't work.</em></h1>
+            <p id="errorMsg">It may have expired. Try requesting a new one.</p>
+            <a class="btn" href="/dispatch/sign-in/">Back to sign in <span class="arrow">→</span></a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/dispatch/js/dispatch-config.js"></script>
+    <script src="/dispatch/js/dispatch-api.js"></script>
+    <script>
+        var loading = document.getElementById('loadingState');
+        var claim   = document.getElementById('claimState');
+        var errorEl = document.getElementById('errorState');
+        var errorMsg = document.getElementById('errorMsg');
+        var claimStatus = document.getElementById('claimStatus');
+        var preview = document.getElementById('previewHandle');
+        var usernameInput = document.getElementById('usernameInput');
+        var claimBtn = document.getElementById('claimBtn');
+        var callbackParams = new URLSearchParams(window.location.search);
+        var callbackInvite = callbackParams.get('invite');
+        if (callbackInvite) {
+            sessionStorage.setItem('dispatch.invite-code', callbackInvite);
+            localStorage.setItem('dispatch.invite-code', callbackInvite);
+        }
+
+        function show(which) {
+            loading.style.display = which === 'loading' ? '' : 'none';
+            claim.style.display   = which === 'claim'   ? '' : 'none';
+            errorEl.style.display = which === 'error'   ? '' : 'none';
+        }
+
+        function failWith(msg) {
+            errorMsg.textContent = msg || 'It may have expired. Try requesting a new one.';
+            show('error');
+        }
+
+        (async function () {
+            // Wait for Supabase library to load
+            if (!window.supabase || !window.Dispatch) {
+                failWith('Supabase client failed to load.');
+                return;
+            }
+            window.Dispatch.init();
+
+            // Supabase parses ?code=... or #access_token=... automatically when detectSessionInUrl is true
+            var session = null;
+            for (var i = 0; i < 12 && !session; i++) {
+                session = await window.Dispatch.session();
+                if (session) break;
+                await new Promise(function (r) { setTimeout(r, 200); });
+            }
+            if (!session) {
+                failWith('We couldn\'t verify your link. Try requesting a new one.');
+                return;
+            }
+
+            // Clean tokens out of the URL
+            try { history.replaceState({}, '', '/dispatch/auth/callback/'); } catch (_) {}
+
+            // Try to load profile — if API says "claim a handle", show the claim form
+            try {
+                var result = await window.Dispatch.listArticles();
+                // We have a profile already → go where they intended
+                var dest = sessionStorage.getItem('dispatch.post-auth') || '/dispatch/editor/';
+                sessionStorage.removeItem('dispatch.post-auth');
+                sessionStorage.removeItem('dispatch.invite-code');
+                localStorage.removeItem('dispatch.invite-code');
+                window.location.href = dest;
+                return;
+            } catch (err) {
+                if (err.status === 403) {
+                    // Needs to claim a handle
+                    show('claim');
+                    usernameInput.focus();
+                    return;
+                }
+                failWith(err.message || 'Could not load your account.');
+                return;
+            }
+        })();
+
+        // Live preview of handle (3–20 lowercase letters, numbers, underscores — matches profiles_handle_format)
+        usernameInput && usernameInput.addEventListener('input', function () {
+            var v = (usernameInput.value || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+            preview.textContent = v || 'you';
+        });
+
+        // Submit handle
+        var form = document.getElementById('claimForm');
+        form && form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var v = (usernameInput.value || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+            if (!v || v.length < 3) {
+                claimStatus.className = 'status-line error';
+                claimStatus.textContent = 'At least three characters.';
+                return;
+            }
+            claimBtn.disabled = true;
+            claimStatus.className = 'status-line';
+            claimStatus.textContent = 'Claiming…';
+            try {
+                var inviteCode = sessionStorage.getItem('dispatch.invite-code') || localStorage.getItem('dispatch.invite-code');
+                await window.Dispatch.claimUsername(v, inviteCode ? { invitation_code: inviteCode } : {});
+                sessionStorage.removeItem('dispatch.invite-code');
+                localStorage.removeItem('dispatch.invite-code');
+                claimStatus.textContent = 'Got it.';
+                var dest = sessionStorage.getItem('dispatch.post-auth') || '/dispatch/editor/';
+                sessionStorage.removeItem('dispatch.post-auth');
+                setTimeout(function () { window.location.href = dest; }, 400);
+            } catch (err) {
+                claimStatus.className = 'status-line error';
+                claimStatus.textContent = err.message || 'Could not claim that handle.';
+                claimBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
