@@ -3,10 +3,20 @@
   "version": "1.0.0",
   "description": "Personal portfolio — klee.page",
   "scripts": {
-    "dev": "npx http-server . -p 8080 -o"
+    "dev": "npx http-server . -p 8080 -o",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "PWDEBUG=1 playwright test",
+    "test:smoke": "playwright test tests/smoke tests/cli",
+    "test:visual": "playwright test tests/visual",
+    "test:install": "playwright install chromium"
   },
   "dependencies": {
     "http-server": "^14.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
   },
   "author": "Kevin Lee",
   "license": "ISC"
