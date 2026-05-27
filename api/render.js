@@ -341,14 +341,17 @@ footer a { color: var(--text); opacity: 0.8; }
 </head>
 <body>
 <header>
-<a href="/@${escapeHtml(username)}" class="back-link">← @${escapeHtml(username)}</a>
-<a href="/@${escapeHtml(username)}" class="author-handle">${escapeHtml(displayName || username)}</a>
+${username
+    ? `<a href="/@${escapeHtml(username)}" class="back-link">← @${escapeHtml(username)}</a>
+<a href="/@${escapeHtml(username)}" class="author-handle">${escapeHtml(displayName || username)}</a>`
+    : `<a href="/dispatch/" class="back-link">← Dispatch</a>
+<a href="/dispatch/" class="author-handle">Dispatch</a>`}
 <label class="theme-pill" for="theme-toggle"><input type="checkbox" id="theme-toggle"></label>
 </header>
 ${body}
 <footer>
 <div>Published with <a href="/dispatch/">Dispatch</a></div>
-<div class="made">${escapeHtml(displayName || username)} · ${escapeHtml(slug || '')}</div>
+<div class="made">${username ? escapeHtml(displayName || username) + (slug ? ` · ${escapeHtml(slug)}` : '') : ''}</div>
 </footer>
 <script>
 (function() {
@@ -454,7 +457,8 @@ module.exports = async function handler(req, res) {
         const profile = await fetchProfile(u);
         if (!profile) {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+            // 404s: cache briefly at the edge but never in browsers — a slug may go live later
+            res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
             return res.status(404).send(notFoundPage());
         }
 
@@ -512,7 +516,8 @@ module.exports = async function handler(req, res) {
         const article = await fetchArticle(profile.id, s);
         if (!article) {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+            // 404s: cache briefly at the edge but never in browsers — a slug may go live later
+            res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
             return res.status(404).send(notFoundPage());
         }
 
