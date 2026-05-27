@@ -4,23 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="canonical" href="https://klee.page/newsletter/005/">
-    <title>Dispatch 005: Margin — Kevin Lee</title>
-    <meta name="description" content="A long weekend — a Friday screening on the Paramount lot with Justin (who lives in Frogtown and was not happy about parking), a Sunday that started in a church courtyard and ended on a sandy ridge above Big Bear, and a Monday that refused to put on real pants.">
+    <title>Dispatch 005: Coquelicots — Kevin Lee</title>
+    <meta name="description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
     <meta name="author" content="Kevin Lee">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://klee.page/newsletter/005/">
-    <meta property="og:title" content="Dispatch 005: Margin — Kevin Lee">
-    <meta property="og:description" content="A long weekend — a Friday screening on the Paramount lot, a Sunday that started in a church courtyard and ended on a sandy ridge above Big Bear, and a Monday that refused to put on real pants.">
-    <meta property="og:image" content="https://klee.page/newsletter/005/images/camp-setup.jpg">
+    <meta property="og:title" content="Dispatch 005: Coquelicots — Kevin Lee">
+    <meta property="og:description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
+    <meta property="og:image" content="https://klee.page/newsletter/005/images/coquelicots.jpg">
     <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ko_KR">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Dispatch 005: Margin — Kevin Lee">
-    <meta name="twitter:description" content="A long weekend — a Friday screening on the Paramount lot, a Sunday that started in a church courtyard and ended on a sandy ridge above Big Bear, and a Monday that refused to put on real pants.">
-    <meta name="twitter:image" content="https://klee.page/newsletter/005/images/camp-setup.jpg">
+    <meta name="twitter:title" content="Dispatch 005: Coquelicots — Kevin Lee">
+    <meta name="twitter:description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
+    <meta name="twitter:image" content="https://klee.page/newsletter/005/images/coquelicots.jpg">
+
+    <!-- Smart App Banner -->
+    <meta name="apple-itunes-app" content="app-id=6761163892">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
@@ -44,15 +48,12 @@
             document.documentElement.setAttribute('lang', lang);
 
             // Pre-paint URL-key bypass: hide password UI so it never flashes.
-            // The yohaku welcome interstitial still plays after unlock().
-            // tsundoku/積ん読/積読 also accepted — grace-period alias for the
-            // old Coquelicots edition that previously occupied this slot.
+            // The tsundoku welcome interstitial still plays after unlock().
             var urlKey = params.get('key');
             if (urlKey) {
                 var raw = urlKey.trim();
                 var lower = raw.toLowerCase();
-                if (lower === 'yohaku' || lower === 'komorebi' || lower === 'tsundoku'
-                    || raw === '余白' || raw === '積ん読' || raw === '積読') {
+                if (lower === 'tsundoku' || lower === 'komorebi' || raw === '積ん読' || raw === '積読') {
                     document.documentElement.setAttribute('data-prebypass', '1');
                 }
             }
@@ -95,7 +96,7 @@
             --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
         }
 
-        /* Bilingual toggle — show only the active language's spans/divs */
+        /* Language toggle */
         [data-lang="en"] [data-l="ko"],
         [data-lang="ko"] [data-l="en"] {
             display: none !important;
@@ -133,7 +134,7 @@
         }
 
         /* When ?key= bypass is present, hide ONLY the password input + ambient gate
-           light. The yohaku welcome interstitial still plays. */
+           light. The tsundoku welcome interstitial still plays. */
         [data-prebypass="1"] .gate,
         [data-prebypass="1"] .gate-light {
             display: none !important;
@@ -248,18 +249,12 @@
             opacity: 1;
         }
 
-        /* ========== GATE (005) ========== */
-        /* The gate is a near-solid cream scrim with a heavy backdrop blur so
-           the sunset video tints through but the article content behind is
-           completely obscured. A frosted-glass card holds the form. */
+        /* ========== GATE — Monet revamp (005) ========== */
+        /* The gate is transparent so the live hero flow-field shows through.
+           A frosted-glass card holds the form; a soft cream veil sits between. */
         .gate {
-            background: rgba(240, 238, 230, 0.92);
-            backdrop-filter: blur(40px) saturate(1.05);
-            -webkit-backdrop-filter: blur(40px) saturate(1.05);
+            background: transparent;
             overflow: hidden;
-        }
-        [data-theme="dark"] .gate {
-            background: rgba(31, 30, 29, 0.94);
         }
         .gate::after {
             content: '';
@@ -267,12 +262,12 @@
             inset: 0;
             z-index: -1;
             background:
-                radial-gradient(ellipse 60% 80% at center, rgba(240,238,230,0.10) 0%, rgba(240,238,230,0.40) 55%, rgba(240,238,230,0.65) 100%);
+                radial-gradient(ellipse 55% 80% at center, rgba(240,238,230,0.05) 0%, rgba(240,238,230,0.30) 55%, rgba(240,238,230,0.55) 100%);
             pointer-events: none;
         }
         [data-theme="dark"] .gate::after {
             background:
-                radial-gradient(ellipse 60% 80% at center, rgba(31,30,29,0.15) 0%, rgba(31,30,29,0.50) 55%, rgba(31,30,29,0.75) 100%);
+                radial-gradient(ellipse 55% 80% at center, rgba(31,30,29,0.10) 0%, rgba(31,30,29,0.45) 55%, rgba(31,30,29,0.70) 100%);
         }
 
         /* Hold the hero text dark until the gate opens — let the reveal land */
@@ -587,49 +582,104 @@
             overflow: hidden;
         }
 
-        /* Hero video — fills the hero, behind overlay */
-        .hero-video {
-            position: absolute;
+        /* Monet flow-field — fixed background across the entire article (005) */
+        .hero-smoke, .hero-chars {
+            position: fixed;
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            z-index: 0;
+            display: block;
+        }
+        .hero-smoke { z-index: -3; }
+        .hero-chars { z-index: -2; pointer-events: none; }
+        .hero-fallback {
+            position: fixed; inset: 0; z-index: -4;
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 0.6s ease;
+            transform: scale(1);
             will-change: transform;
         }
+        .hero-fallback.show { opacity: 1; }
 
-        /* ==================== CHAPTERS ==================== */
+        /* The journey: the painting IS the medium. The veil is a very soft tint,
+           not a wash; legibility lives in per-text-block scrims (.chapter .text-block). */
+        .article-veil {
+            position: fixed; inset: 0; z-index: -1;
+            background: rgba(240, 238, 230, 0.0);  /* effectively transparent; kept for theme transition only */
+            pointer-events: none;
+            opacity: 1;
+            transition: background-color 0.5s ease;
+        }
+        [data-theme="dark"] .article-veil {
+            background: rgba(31, 30, 29, 0.0);
+        }
+
+        /* ==================== JOURNEY CHAPTERS ==================== */
+        /* Each .chapter is a room: full-viewport tall, content centered, painting in full bloom behind. */
         .chapter {
             position: relative;
-            padding: 4rem 0 3rem;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12vh 0;
+            gap: 2.5rem;
         }
         .chapter > * { width: 100%; }
 
-        /* Day placard — small uppercase mark above each chapter */
+        /* Museum placard — sticks to the top of the viewport while you're in this chapter,
+           hands off when the next chapter's mark sticks past it. */
         .chapter-mark {
+            position: sticky;
+            top: 1.5rem;
+            z-index: 5;
             text-align: center;
-            margin: 0 0 1.5rem;
+            margin: 0;
             font-family: var(--font-display);
             color: var(--accent);
             letter-spacing: 0.22em;
             text-transform: uppercase;
             font-size: 12px;
             opacity: 0.9;
+            pointer-events: none;
+            mix-blend-mode: multiply;
         }
-        .chapter-mark .day {
+        .chapter-mark .numeral {
             font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.3em;
             margin-right: 0.9rem;
         }
-        .chapter-mark .day-title {
+        .chapter-mark .painting-title {
             font-style: italic;
             letter-spacing: 0.12em;
             text-transform: none;
         }
+        [data-theme="dark"] .chapter-mark { mix-blend-mode: screen; opacity: 0.85; }
+
+        /* The text-block sits on the painting; a soft radial halo provides reading legibility */
+        .chapter .text-block {
+            position: relative;
+            z-index: 1;
+        }
+        .chapter .text-block::before {
+            content: '';
+            position: absolute;
+            inset: -2rem -1.5rem;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, rgba(240,238,230,0.78) 0%, rgba(240,238,230,0.62) 50%, rgba(240,238,230,0.0) 100%);
+            border-radius: 6px;
+            pointer-events: none;
+            transition: background 0.4s ease;
+        }
+        [data-theme="dark"] .chapter .text-block::before {
+            background: radial-gradient(ellipse at center, rgba(31,30,29,0.78) 0%, rgba(31,30,29,0.62) 50%, rgba(31,30,29,0.0) 100%);
+        }
 
         /* Photos within a chapter: soft white frame ("polaroid-ish"), gentle shadow,
-           barely-there tilt for a hand-pinned feel */
+           barely-there tilt so they feel pinned to the painting */
         .chapter .photo-inset img {
             box-shadow: 0 18px 60px -22px rgba(31, 30, 29, 0.45),
                         0 4px 12px -4px rgba(31, 30, 29, 0.15);
@@ -644,289 +694,14 @@
         }
         .chapter .photo-inset:nth-of-type(even) img { transform: rotate(0.6deg); }
 
-        /* Inline video — same polaroid treatment */
-        .chapter .video-inset {
-            padding: 1rem 1.5rem;
-            max-width: 620px;
-            margin: 0 auto;
-        }
-        .chapter .video-inset video {
-            width: 100%;
-            display: block;
-            border-radius: 3px;
-            background: #000;
-            box-shadow: 0 18px 60px -22px rgba(31, 30, 29, 0.45),
-                        0 4px 12px -4px rgba(31, 30, 29, 0.15);
-        }
-        [data-theme="dark"] .chapter .video-inset video {
-            box-shadow: 0 18px 60px -22px rgba(0, 0, 0, 0.6);
-        }
-        .chapter .video-inset .photo-caption {
-            margin-top: 0.75rem;
-            color: var(--caption);
-            transition: color 0.3s ease;
-        }
-        @media (min-width: 768px) {
-            .chapter .video-inset { padding: 2rem 3rem; max-width: 700px; }
-        }
-
-        /* Vertical-format videos (phone footage) get a smaller column so they don't
-           dominate the page; horizontal videos use the full 620px / 700px */
-        .chapter .video-inset.portrait video {
-            max-width: 380px;
-            margin: 0 auto;
-        }
-        @media (min-width: 768px) {
-            .chapter .video-inset.portrait video { max-width: 440px; }
-        }
-
-        /* ===== Sunset moment — cinematic showcase ===== */
-        .sunset-moment {
-            position: relative;
-            padding: 3.5rem 1rem 3rem;
-            margin: 1rem auto 1rem;
-            text-align: center;
-            max-width: 720px;
-        }
-        .sunset-moment::before {
+        /* Body must be transparent so the canvases show through */
+        body { background: transparent; }
+        body::before {
             content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse 75% 60% at 50% 55%,
-                rgba(255, 168, 87, 0.20) 0%,
-                rgba(255, 168, 87, 0.08) 40%,
-                transparent 75%);
-            pointer-events: none;
-            z-index: 0;
-            transition: background 0.4s ease;
+            position: fixed; inset: 0; z-index: -5;
+            background: var(--bg);
+            transition: background-color 0.3s ease;
         }
-        [data-theme="dark"] .sunset-moment::before {
-            background: radial-gradient(ellipse 75% 60% at 50% 55%,
-                rgba(255, 168, 87, 0.28) 0%,
-                rgba(255, 168, 87, 0.10) 40%,
-                transparent 75%);
-        }
-        .sunset-moment > * { position: relative; z-index: 1; }
-
-        .sunset-moment .field-log {
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 10px;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 1.25rem;
-            opacity: 0.88;
-            transition: color 0.3s ease;
-        }
-        .sunset-moment .field-log .sep { opacity: 0.35; margin: 0 0.6em; }
-
-        .sunset-moment .frame {
-            display: inline-block;
-            position: relative;
-            padding: 10px;
-            background: linear-gradient(160deg, #1c1816, #2b2421);
-            border-radius: 4px;
-            box-shadow:
-                0 30px 80px -30px rgba(0,0,0,0.55),
-                0 8px 24px -8px rgba(0,0,0,0.3),
-                0 0 90px -20px rgba(255, 168, 87, 0.45);
-        }
-        [data-theme="dark"] .sunset-moment .frame {
-            background: linear-gradient(160deg, #0e0c0b, #1a1614);
-            box-shadow:
-                0 30px 80px -30px rgba(0,0,0,0.9),
-                0 0 100px -10px rgba(255, 168, 87, 0.30);
-        }
-        .sunset-moment .frame::before,
-        .sunset-moment .frame::after {
-            content: '';
-            position: absolute;
-            top: 50%; transform: translateY(-50%);
-            width: 1px; height: 28px;
-            background: rgba(255, 168, 87, 0.55);
-        }
-        .sunset-moment .frame::before { left: 3px; }
-        .sunset-moment .frame::after  { right: 3px; }
-
-        .sunset-moment .frame video {
-            display: block;
-            width: auto;
-            max-width: 380px;
-            max-height: 68vh;
-            aspect-ratio: 9 / 16;
-            border-radius: 2px;
-            background: #000;
-        }
-        @media (min-width: 768px) {
-            .sunset-moment { padding: 3rem 2rem 2.5rem; }
-            .sunset-moment .frame video { max-width: 400px; max-height: 70vh; }
-        }
-
-        .sunset-moment .shot-card {
-            margin-top: 1.5rem;
-            font-family: var(--font-display);
-            font-style: italic;
-            color: var(--caption);
-            font-size: 14px;
-            line-height: 1.6;
-            transition: color 0.3s ease;
-        }
-        .sunset-moment .shot-card .coords {
-            display: block;
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-style: normal;
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--text);
-            opacity: 0.6;
-            margin-bottom: 0.35rem;
-            transition: color 0.3s ease;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .sunset-moment::before { background: none; }
-        }
-
-        /* ===== Song of the week — inline card ===== */
-        .song-card {
-            max-width: 480px;
-            margin: 2.5rem auto 0;
-            padding: 1.4rem 1.6rem;
-            background: linear-gradient(180deg, rgba(160,130,109,0.06), rgba(160,130,109,0.02));
-            border-top: 1px solid var(--rule);
-            border-bottom: 1px solid var(--rule);
-            border-radius: 2px;
-            transition: background 0.3s ease, border-color 0.3s ease;
-        }
-        [data-theme="dark"] .song-card {
-            background: linear-gradient(180deg, rgba(196,168,130,0.07), rgba(196,168,130,0.02));
-        }
-        .song-card .song-label {
-            font-family: var(--font-display);
-            font-style: italic;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            transition: color 0.3s ease;
-        }
-        .song-card .song-row {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 1rem;
-        }
-        .song-card .song-play {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--text);
-            color: var(--bg);
-            border: none;
-            display: grid;
-            place-items: center;
-            cursor: pointer;
-            flex: 0 0 auto;
-            transition: transform 0.18s cubic-bezier(0.22, 0.61, 0.36, 1),
-                        background-color 0.3s ease, color 0.3s ease;
-        }
-        .song-card .song-play:hover  { transform: scale(1.05); }
-        .song-card .song-play:active { transform: scale(0.92); }
-        .song-card .song-play-icon {
-            width: 16px; height: 16px;
-            fill: currentColor; display: block; overflow: visible;
-        }
-        .song-card .song-play-icon path {
-            transition: opacity 0.22s cubic-bezier(0.22, 0.61, 0.36, 1),
-                        transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-origin: 12px 12px;
-            transform-box: fill-box;
-        }
-        .song-card .song-play-icon .icon-play  { opacity: 1; transform: scale(1) rotate(0deg); }
-        .song-card .song-play-icon .icon-pause { opacity: 0; transform: scale(0.6) rotate(-90deg); }
-        .song-card .song-play[data-state="playing"] .icon-play  { opacity: 0; transform: scale(0.6) rotate(90deg); }
-        .song-card .song-play[data-state="playing"] .icon-pause { opacity: 1; transform: scale(1) rotate(0deg); }
-        .song-card .song-meta { min-width: 0; }
-        .song-card .song-title {
-            font-family: var(--font-display);
-            font-style: italic;
-            font-size: 22px;
-            font-weight: 600;
-            line-height: 1.1;
-            letter-spacing: -0.005em;
-            color: var(--text);
-            margin-bottom: 0.2rem;
-            transition: color 0.3s ease;
-        }
-        .song-card .song-artist {
-            font-size: 13px;
-            color: var(--caption);
-            letter-spacing: 0.02em;
-            line-height: 1.3;
-            transition: color 0.3s ease;
-        }
-        .song-card .song-time {
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 12px;
-            letter-spacing: 0.06em;
-            color: var(--caption);
-            white-space: nowrap;
-            transition: color 0.3s ease;
-        }
-        .song-card .song-aside {
-            margin-top: 1rem;
-            font-family: var(--font-display);
-            font-style: italic;
-            font-size: 14px;
-            color: var(--caption);
-            line-height: 1.5;
-            transition: color 0.3s ease;
-        }
-        @media (max-width: 480px) {
-            .song-card { padding: 1.2rem; }
-            .song-card .song-title { font-size: 19px; }
-        }
-
-        /* Field card — a small placard for the camping location */
-        .field-card {
-            max-width: 360px;
-            margin: 2rem auto;
-            padding: 1.25rem 1.5rem;
-            border-top: 1px solid var(--accent);
-            border-bottom: 1px solid var(--accent);
-            text-align: center;
-            font-family: var(--font-display);
-            color: var(--text);
-            opacity: 0.92;
-        }
-        .field-card .fc-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-        .field-card .fc-name {
-            font-size: 18px;
-            font-style: italic;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            line-height: 1.2;
-            margin-bottom: 0.6rem;
-        }
-        .field-card .fc-stats {
-            font-family: var(--font);
-            font-size: 13px;
-            color: var(--caption);
-            letter-spacing: 0.04em;
-            line-height: 1.6;
-            transition: color 0.3s ease;
-        }
-        .field-card .fc-stats .fc-sep { opacity: 0.4; margin: 0 0.5rem; }
 
         .hero-overlay {
             position: absolute;
@@ -1620,468 +1395,6 @@
                 transition-duration: 0.01ms !important;
             }
         }
-
-        /* ============================================================
-           FIELD-LOG ADDITIONS — small cinematic moments for Dispatch 005
-           Three pieces, same universe: a REC pulse on the field log,
-           a scroll-drawn route line from church to ridge, and a faint
-           sun arc behind the sunset moment.
-           ============================================================ */
-
-        /* --- 1) REC pulse on the sunset-moment field log --- */
-        .sunset-moment .field-log {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4em;
-        }
-        .sunset-moment .field-log .rec-dot {
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #c0563e;
-            box-shadow: 0 0 6px rgba(192, 86, 62, 0.55);
-            margin-right: 0.15em;
-            transform-origin: center;
-            animation: recPulse 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-            flex: 0 0 auto;
-        }
-        [data-theme="dark"] .sunset-moment .field-log .rec-dot {
-            background: #d96a4f;
-            box-shadow: 0 0 8px rgba(217, 106, 79, 0.6);
-        }
-        @keyframes recPulse {
-            0%, 100% { opacity: 0.55; transform: scale(1); }
-            50%      { opacity: 1;    transform: scale(1.35); }
-        }
-
-        /* --- 2) Scroll-drawn route line (church to ridge) --- */
-        .route-line {
-            max-width: 620px;
-            margin: 1.5rem auto 0.5rem;
-            padding: 0 1.5rem;
-            text-align: center;
-        }
-        .route-line svg {
-            display: block;
-            width: 100%;
-            height: auto;
-            max-width: 480px;
-            margin: 0 auto;
-            overflow: visible;
-        }
-        .route-line .rl-path {
-            fill: none;
-            stroke: var(--accent);
-            stroke-width: 1.4;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            opacity: 0.85;
-            /* Natural state: fully drawn. JS overrides via inline style
-               to animate stroke-dashoffset; reduced-motion users see the
-               completed line because we never set the inline override. */
-        }
-        .route-line .rl-dot {
-            fill: var(--accent);
-        }
-        .route-line .rl-dot-ring {
-            fill: none;
-            stroke: var(--accent);
-            stroke-width: 1;
-            opacity: 0.4;
-        }
-        .route-line .rl-label {
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 9px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            fill: var(--caption);
-            opacity: 0.85;
-        }
-        .route-line .rl-caption {
-            display: block;
-            margin-top: 0.5rem;
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--caption);
-            opacity: 0.7;
-            transition: color 0.3s ease;
-        }
-
-        /* --- 3) Sun arc behind the sunset moment ---
-           Sits behind the radial glow + frame. The `.sunset-moment > *`
-           rule at line 706 forces children to z-index 1; we override
-           with a class-on-descendant selector and push to z-index 0. */
-        .sunset-moment .sun-arc {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            display: block;
-            width: 100%;
-            height: 100%;
-            overflow: visible;
-        }
-        .sunset-moment .sun-arc .arc-path {
-            fill: none;
-            stroke: rgba(255, 168, 87, 0.45);
-            stroke-width: 1;
-            stroke-linecap: round;
-            stroke-dasharray: 3 5;
-            stroke-dashoffset: 0;
-            opacity: 0.7;
-        }
-        [data-theme="dark"] .sunset-moment .sun-arc .arc-path {
-            stroke: rgba(255, 168, 87, 0.55);
-        }
-        .sunset-moment .sun-arc .arc-sun {
-            fill: rgba(255, 168, 87, 0.7);
-            opacity: 0.85;
-        }
-        [data-theme="dark"] .sunset-moment .sun-arc .arc-sun {
-            fill: rgba(255, 190, 110, 0.85);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .sunset-moment .field-log .rec-dot { animation: none; opacity: 0.85; transform: none; }
-        }
-
-        /* ===== Text thread — Kevin & Justin's running "come thru" bit ===== */
-        .text-chat {
-            max-width: 420px;
-            margin: 1.5rem auto 0.5rem;
-            padding: 0 1rem;
-        }
-        .chat-frame {
-            background: rgba(160, 130, 109, 0.04);
-            border: 1px solid var(--rule);
-            border-radius: 20px;
-            padding: 0.9rem 0.9rem 1rem;
-            box-shadow: 0 18px 50px -28px rgba(31, 30, 29, 0.30);
-            transition: background 0.3s ease, border-color 0.3s ease;
-        }
-        [data-theme="dark"] .chat-frame {
-            background: rgba(196, 168, 130, 0.05);
-            box-shadow: 0 18px 50px -28px rgba(0, 0, 0, 0.55);
-        }
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding: 0 0.4rem 0.7rem;
-            margin-bottom: 0.8rem;
-            border-bottom: 1px solid var(--rule);
-            transition: border-color 0.3s ease;
-        }
-        .chat-handle {
-            font-family: var(--font-display);
-            font-style: italic;
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--text);
-            transition: color 0.3s ease;
-        }
-        .chat-meta {
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 9px;
-            letter-spacing: 0.18em;
-            color: var(--caption);
-            text-transform: uppercase;
-            transition: color 0.3s ease;
-        }
-        .chat-thread {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-        .bubble {
-            max-width: 78%;
-            padding: 8px 14px;
-            border-radius: 18px;
-            font-size: 15px;
-            line-height: 1.35;
-            word-wrap: break-word;
-            opacity: 0;
-            transform: translateY(8px) scale(0.96);
-            transition: opacity 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
-                        transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
-        }
-        .bubble em { font-style: italic; }
-        .bubble.in {
-            align-self: flex-start;
-            background: #ececec;
-            color: #1f1e1d;
-            border-bottom-left-radius: 6px;
-        }
-        [data-theme="dark"] .bubble.in {
-            background: #2c2c2e;
-            color: #f0eee6;
-        }
-        .bubble.out {
-            align-self: flex-end;
-            background: #4c7185;
-            color: #fafafa;
-            border-bottom-right-radius: 6px;
-        }
-        [data-theme="dark"] .bubble.out {
-            background: #6a8fac;
-        }
-        .bubble.in + .bubble.out,
-        .bubble.out + .bubble.in {
-            margin-top: 7px;
-        }
-        .bubble.image {
-            padding: 4px;
-            overflow: hidden;
-            max-width: 60%;
-        }
-        .bubble.image img {
-            display: block;
-            border-radius: 14px;
-            width: 100%;
-        }
-        .bubble.visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        /* Reaction badge — small heart/sticker on a previous message */
-        .bubble.reaction {
-            align-self: flex-start;
-            background: none;
-            padding: 0;
-            margin-top: -8px;
-            margin-left: 6px;
-            font-size: 11px;
-            color: var(--caption);
-            letter-spacing: 0.05em;
-            font-style: italic;
-        }
-        .chat-caption {
-            margin-top: 0.9rem;
-            text-align: center;
-            font-family: var(--font-display);
-            font-style: italic;
-            color: var(--caption);
-            font-size: 13px;
-            transition: color 0.3s ease;
-        }
-        /* Typing indicator — three dots, used between the bubbles for a beat */
-        .bubble.typing {
-            max-width: 62px;
-            padding: 10px 14px;
-            display: flex;
-            gap: 4px;
-        }
-        .bubble.typing .dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: #8a8880;
-            opacity: 0.45;
-            animation: chat-dot 1.2s ease-in-out infinite;
-        }
-        .bubble.typing .dot:nth-child(2) { animation-delay: 0.18s; }
-        .bubble.typing .dot:nth-child(3) { animation-delay: 0.36s; }
-        @keyframes chat-dot {
-            0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
-            40%           { transform: translateY(-3px); opacity: 0.9; }
-        }
-        .bubble.typing.hidden { display: none; }
-
-        /* ===== Topographic field card — replaces the flat .field-card for SUN ===== */
-        .topo-card {
-            max-width: 540px;
-            margin: 2rem auto;
-            padding: 0;
-            background: rgba(160, 130, 109, 0.04);
-            border-top: 1px solid var(--accent);
-            border-bottom: 1px solid var(--accent);
-            position: relative;
-            overflow: hidden;
-            transition: background 0.3s ease;
-        }
-        [data-theme="dark"] .topo-card {
-            background: rgba(196, 168, 130, 0.05);
-        }
-        .topo-card .topo-svg {
-            display: block;
-            width: 100%;
-            height: auto;
-            overflow: visible;
-        }
-        .topo-card .topo-ring {
-            fill: none;
-            stroke: var(--accent);
-            stroke-width: 1;
-            opacity: 0;
-            stroke-dasharray: 1500;
-            stroke-dashoffset: 1500;
-            transition: stroke 0.3s ease;
-        }
-        .topo-card .topo-ring.r1 { opacity: 0.55; }
-        .topo-card .topo-ring.r2 { opacity: 0.45; }
-        .topo-card .topo-ring.r3 { opacity: 0.35; }
-        .topo-card .topo-ring.r4 { opacity: 0.28; }
-        .topo-card .topo-ring.r5 { opacity: 0.22; }
-        .topo-card .topo-ring.r6 { opacity: 0.16; }
-        .topo-card .topo-road {
-            fill: none;
-            stroke: var(--accent);
-            stroke-width: 1.2;
-            stroke-dasharray: 4 6;
-            opacity: 0.55;
-            stroke-dashoffset: 800;
-            transition: stroke 0.3s ease;
-        }
-        .topo-card .topo-pin {
-            stroke: var(--accent);
-            stroke-width: 1.5;
-            fill: var(--accent);
-            opacity: 0;
-            transform: scale(0.4);
-            transform-origin: center;
-            transform-box: fill-box;
-            transition: stroke 0.3s ease, fill 0.3s ease;
-        }
-        .topo-card .topo-pin-ring {
-            stroke: var(--accent);
-            stroke-width: 1;
-            fill: none;
-            opacity: 0;
-            transition: stroke 0.3s ease;
-        }
-        .topo-card .topo-label {
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 9px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            fill: var(--accent);
-            opacity: 0;
-            transition: fill 0.3s ease;
-        }
-        .topo-card .topo-compass {
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 11px;
-            font-weight: 700;
-            fill: var(--accent);
-            opacity: 0.6;
-            transition: fill 0.3s ease;
-        }
-        .topo-card .topo-compass-line {
-            stroke: var(--accent);
-            stroke-width: 0.8;
-            opacity: 0.5;
-        }
-        .topo-card .topo-corner {
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 9px;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            fill: var(--caption);
-            opacity: 0.6;
-        }
-        /* Animation triggers — applied via JS once on viewport entry */
-        .topo-card.topo-go .topo-ring {
-            animation: topo-draw 1.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-        }
-        .topo-card.topo-go .topo-ring.r1 { animation-delay: 0.0s;  }
-        .topo-card.topo-go .topo-ring.r2 { animation-delay: 0.18s; }
-        .topo-card.topo-go .topo-ring.r3 { animation-delay: 0.32s; }
-        .topo-card.topo-go .topo-ring.r4 { animation-delay: 0.45s; }
-        .topo-card.topo-go .topo-ring.r5 { animation-delay: 0.58s; }
-        .topo-card.topo-go .topo-ring.r6 { animation-delay: 0.70s; }
-        .topo-card.topo-go .topo-road {
-            animation: topo-road-draw 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.6s forwards;
-        }
-        .topo-card.topo-go .topo-pin {
-            animation: topo-pin-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.4s forwards;
-        }
-        .topo-card.topo-go .topo-pin-ring {
-            animation: topo-ring-pulse 2s ease-out 1.6s forwards;
-        }
-        .topo-card.topo-go .topo-label {
-            animation: topo-label-in 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) 1.8s forwards;
-        }
-        @keyframes topo-draw {
-            to { stroke-dashoffset: 0; }
-        }
-        @keyframes topo-road-draw {
-            to { stroke-dashoffset: 0; }
-        }
-        @keyframes topo-pin-in {
-            to { opacity: 0.95; transform: scale(1); }
-        }
-        @keyframes topo-ring-pulse {
-            0%   { opacity: 0.7; transform: scale(0.4); transform-origin: center; transform-box: fill-box; }
-            70%  { opacity: 0.35; transform: scale(1.6); }
-            100% { opacity: 0; transform: scale(1.8); }
-        }
-        @keyframes topo-label-in {
-            to { opacity: 1; }
-        }
-
-        /* Legend below topo (replaces the old .field-card text layout) */
-        .topo-legend {
-            padding: 1.1rem 1.5rem 1.3rem;
-            text-align: center;
-            font-family: var(--font-display);
-            color: var(--text);
-            position: relative;
-            z-index: 1;
-        }
-        .topo-legend .tl-label {
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-            transition: color 0.3s ease;
-        }
-        .topo-legend .tl-name {
-            font-size: 22px;
-            font-style: italic;
-            font-weight: 600;
-            letter-spacing: 0.01em;
-            line-height: 1.15;
-            margin-bottom: 0.65rem;
-            transition: color 0.3s ease;
-        }
-        .topo-legend .tl-stats {
-            font-family: var(--font);
-            font-size: 13px;
-            color: var(--caption);
-            letter-spacing: 0.04em;
-            line-height: 1.6;
-            transition: color 0.3s ease;
-        }
-        .topo-legend .tl-stats .tl-sep { opacity: 0.4; margin: 0 0.5rem; }
-        .topo-legend .tl-coords {
-            margin-top: 0.6rem;
-            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-            font-size: 11px;
-            letter-spacing: 0.18em;
-            color: var(--caption);
-            opacity: 0.7;
-            text-transform: uppercase;
-            transition: color 0.3s ease;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .bubble { opacity: 1; transform: none; transition: none; }
-            .bubble.typing .dot { animation: none; }
-            .topo-card .topo-ring,
-            .topo-card .topo-road { stroke-dashoffset: 0; }
-            .topo-card .topo-pin { opacity: 0.95; transform: scale(1); animation: none; }
-            .topo-card .topo-pin-ring { opacity: 0; animation: none; }
-            .topo-card .topo-label { opacity: 1; animation: none; }
-        }
     </style>
 </head>
 <body>
@@ -2089,14 +1402,11 @@
     <!-- ==================== PASSWORD GATE ==================== -->
     <div class="gate" id="gate">
         <div class="gate-content">
-            <p class="gate-meta">
-                <span data-l="en">No. 005 &middot; Long weekend</span>
-                <span data-l="ko">No. 005 &middot; 긴 주말</span>
-            </p>
+            <p class="gate-meta">No. 005 &middot; Coquelicots</p>
             <h1 class="gate-title">Dispatch</h1>
             <p class="gate-subtitle">
                 <span data-l="en">This letter is for friends and family.</span>
-                <span data-l="ko">친구와 가족에게만 보내는 편지예요.</span>
+                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
             </p>
             <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
                 <input
@@ -2104,14 +1414,9 @@
                     class="gate-input"
                     id="gateInput"
                     data-ph-en="this week's word"
-                    data-ph-ko="이번 주의 단어"
+                    data-ph-ko="이번 주 단어"
                     aria-describedby="gateAside"
                     autocomplete="off"
-                    autocorrect="off"
-                    autocapitalize="none"
-                    spellcheck="false"
-                    inputmode="text"
-                    enterkeyhint="go"
                     autofocus
                 >
                 <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
@@ -2158,17 +1463,17 @@
             <div class="komorebi-spot"></div>
         </div>
         <div class="komorebi-content">
-            <p class="komorebi-kanji" id="komorebiKanji">余白</p>
-            <p class="komorebi-romaji" id="komorebiRomaji">yohaku</p>
+            <p class="komorebi-kanji" id="komorebiKanji">積ん読</p>
+            <p class="komorebi-romaji" id="komorebiRomaji">tsundoku</p>
             <p class="komorebi-noun" id="komorebiNoun">noun &middot; Japanese</p>
             <p class="komorebi-meaning" id="komorebiMeaning">
-                <span data-l="en">The blank space deliberately left around a thing &mdash; the margin, the breathing room, the part you choose not to fill.</span>
-                <span data-l="ko">어떤 것의 가장자리에 일부러 비워둔 자리 &mdash; 여백, 숨 쉴 공간, 굳이 채우지 않기로 한 부분.</span>
+                <span data-l="en">The practice of buying books and letting them pile up unread on a shelf &mdash; a named architectural failure of intention.</span>
+                <span data-l="ko">책을 사놓고 읽지 않은 채 책장에 쌓아두는 일 &mdash; 의도가 무너지는 방식에 따로 이름을 붙여둔 단어.</span>
             </p>
             <div class="komorebi-divider" id="komorebiDivider"></div>
             <p class="komorebi-tagline" id="komorebiTagline">
                 <span data-l="en">A letter for friends and family.</span>
-                <span data-l="ko">친구와 가족에게 보내는 편지.</span>
+                <span data-l="ko">가까운 사람들한테 보내는 편지.</span>
             </p>
             <button class="komorebi-dismiss" id="komorebiDismiss">
                 <span data-l="en">Continue &rarr;</span>
@@ -2181,7 +1486,7 @@
     <div class="progress-bar" id="progressBar"></div>
 
     <!-- Navigation -->
-    <a href="/newsletter" class="back-link">&larr; <span data-l="en">Dispatch</span><span data-l="ko">디스패치</span></a>
+    <a href="/newsletter" class="back-link">&larr; Dispatch</a>
     <div class="top-controls">
         <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
             <span class="lang-pill-label lang-pill-en">EN</span>
@@ -2194,24 +1499,24 @@
         </div>
     </div>
 
+    <!-- ==================== MONET BACKGROUND (fixed, page-wide) ==================== -->
+    <div class="hero-fallback" id="heroFallback" style="background-image: url('/newsletter/005/images/coquelicots.jpg');"></div>
+    <canvas class="hero-smoke" id="heroSmoke"></canvas>
+    <canvas class="hero-chars" id="heroChars"></canvas>
+    <div class="article-veil" id="articleVeil"></div>
+
     <!-- ==================== HERO ==================== -->
     <section class="hero" id="heroSection">
-        <video class="hero-video" id="heroVideo" autoplay muted loop playsinline preload="auto" poster="/newsletter/005/images/camp-setup.jpg" aria-hidden="true">
-            <source src="/newsletter/005/images/sunset.mp4" type="video/mp4">
-        </video>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="hero-label">
-                <span data-l="en">Dispatch 005 &middot; Long weekend</span>
-                <span data-l="ko">디스패치 005 &middot; 긴 주말</span>
+                <span data-l="en">Dispatch 005 &middot; A Journey Through Monet</span>
+                <span data-l="ko">디스패치 005호 &middot; 모네의 그림을 따라</span>
             </div>
-            <h1 class="hero-title" style="font-style: italic;">
-                <span data-l="en">Margin</span>
-                <span data-l="ko">여백</span>
-            </h1>
+            <h1 class="hero-title" style="font-style: italic;">Coquelicots</h1>
             <p class="hero-description">
-                <span data-l="en">three days, mostly outdoors &mdash; a screening, a forest road, a courtyard, a dog</span>
-                <span data-l="ko">사흘, 거의 바깥 &mdash; 시사회 하나, 임도 하나, 안마당 하나, 개 한 마리</span>
+                <span data-l="en">after Monet, 1873 &mdash; letters drift through pigment</span>
+                <span data-l="ko">모네의 들판, 1873 &mdash; 글자가 안료 사이를 떠다닌다</span>
             </p>
         </div>
         <div class="scroll-hint">
@@ -2221,17 +1526,17 @@
         </div>
     </section>
 
-    <!-- ==================== ISSUE 005 — Margin ==================== -->
+    <!-- ==================== ISSUE 005 — Coquelicots ==================== -->
 
     <div class="issue-intro reveal">
         <p class="issue-number">No. 005</p>
         <h2 class="issue-date">
-            <span data-l="en">Margin</span>
-            <span data-l="ko">여백</span>
+            <span data-l="en">Coquelicots</span>
+            <span data-l="ko">개양귀비</span>
         </h2>
         <p class="issue-opener">
-            <span data-l="en">Memorial Day weekend &middot; May 22&ndash;25, 2026</span>
-            <span data-l="ko">메모리얼데이 주말 &middot; 2026년 5월 22&ndash;25일</span>
+            <span data-l="en">May 21, 2026</span>
+            <span data-l="ko">2026년 5월 21일</span>
         </p>
     </div>
 
@@ -2240,465 +1545,165 @@
     <!-- ——— The Letter ——— -->
 
     <!-- ============================================================
-         FRIDAY — The Lot
+         CHAPTER I — Coquelicots (the body, the field, sunset paddling)
          ============================================================ -->
-    <div class="chapter">
-        <p class="chapter-mark">
-            <span class="day"><span data-l="en">FRI</span><span data-l="ko">금</span></span><span class="day-title"><span data-l="en">The Lot</span><span data-l="ko">파라마운트 부지</span></span>
-        </p>
+    <div class="chapter" data-monet="0">
+        <p class="chapter-mark"><span class="numeral">I</span><span class="painting-title">Coquelicots</span></p>
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Memorial Day weekend started Friday afternoon, when an internal email I almost archived turned out to be a screening invite &mdash; <em>The Passenger</em>, on the Paramount lot, that night, plus-one included.</p>
-                <p>Justin lives in Frogtown. I live closer to the lot. For months now we've been running the same bit on each other &mdash; <em>come thru</em>, <em>no, you come thru</em> &mdash; neither of us willing to make the drive over for a coffee. The screening was one of the rare cases where the geography wasn't negotiable: the movie was at Paramount, so Justin had to come thru. He did. He also let me know, with feeling, that I had not solved the parking problem on his behalf, and that this was, in fact, on me.</p>
+                <p>I weighed myself last week. 192. I've been around 170 my whole adult life. I knew I'd put on a few since the move, but not that &mdash; and the number sat with me for a minute before I put on a shirt. The plan is to get back. Not all the way. Just enough that the next time I paddle out, my belly doesn't catch me off guard.</p>
             </div>
             <div data-l="ko">
-                <p>메모리얼데이 주말은 금요일 오후에 시작됐다. 거의 보관함으로 보낼 뻔한 사내 메일이 알고 보니 시사회 초대장이었던 것이다 &mdash; <em>The Passenger</em>, 파라마운트 부지, 그날 밤, 플러스원 포함.</p>
-                <p>저스틴은 프로그타운에 산다. 나는 부지에서 더 가깝다. 우리는 몇 달째 똑같은 농담을 주고받고 있었다 &mdash; <em>come thru</em>, <em>아니, 네가 come thru</em> &mdash; 둘 다 커피 한 잔 마시러 차 끌고 갈 마음이 없다. 시사회는 그 지리적 협상이 통하지 않는 드문 경우였다. 영화가 파라마운트에서 하는데, 그건 저스틴이 come thru 할 수밖에 없다는 뜻이다. 저스틴은 왔다. 그리고 내가 자기 주차 문제를 해결해놓지 않은 것에 대해 꽤 진심으로 한 마디 했다 &mdash; 그 책임이, 명백히, 나에게 있다고.</p>
-            </div>
-        </div>
-
-        <!-- The bit, in chat form. Composite of a months-long thread. -->
-        <div class="text-chat reveal" aria-label="A text exchange between Kevin and Justin">
-            <div class="chat-frame">
-                <div class="chat-header">
-                    <span class="chat-handle">Justin</span>
-                    <span class="chat-meta">iMessage &middot; ongoing</span>
-                </div>
-                <ol class="chat-thread" id="chatThread">
-                    <li class="bubble out" data-d="0"><span data-l="en">come thru</span><span data-l="ko">come thru</span></li>
-                    <li class="bubble in"  data-d="500"><span data-l="en">no u come thru</span><span data-l="ko">아니 네가 come thru</span></li>
-                    <li class="bubble out" data-d="1100"><span data-l="en">fam. come thru.</span><span data-l="ko">형. come thru.</span></li>
-                    <li class="bubble typing in" data-d="1800" data-hide="900" aria-hidden="true">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    </li>
-                    <li class="bubble in image" data-d="2700">
-                        <img src="/newsletter/005/images/kobe-still.jpg"
-                            data-alt-en="Kobe on the patio looking up"
-                            data-alt-ko="안마당에서 위를 올려다보는 코비"
-                            alt="Kobe on the patio looking up">
-                    </li>
-                    <li class="bubble in"  data-d="3200"><span data-l="en">kobe says come thru</span><span data-l="ko">코비도 come thru 하래</span></li>
-                    <li class="bubble out" data-d="4000"><span data-l="en">low blow</span><span data-l="ko">반칙이다</span></li>
-                    <li class="bubble out" data-d="4500"><span data-l="en">also there's a screening Friday at paramount. <em>you</em> come thru.</span><span data-l="ko">근데 금요일에 파라마운트에서 시사회 있어. 이번엔 <em>네가</em> come thru.</span></li>
-                    <li class="bubble in"  data-d="5400"><span data-l="en">fine. find me parking.</span><span data-l="ko">알았어. 주차 자리 찾아놔.</span></li>
-                </ol>
-            </div>
-            <p class="chat-caption">
-                <span data-l="en">composite of a months-long thread, lightly compressed</span>
-                <span data-l="ko">몇 달짜리 대화를 살짝 압축한 합성본</span>
-            </p>
-        </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>Here's Justin: gray tee, light jeans, and the standing-still face of a person who has forgotten what to do with his hands. Behind him the rounded marquee with <em>Paramount</em> scripted across it, two stone planters of red flowers flanking the path, the last of the side-light catching the cream stucco. I've been at this lot long enough that I should be over the marquee. I'm not over it. Neither was he.</p>
-            </div>
-            <div data-l="ko">
-                <p>저스틴이다. 회색 티, 옅은 청바지, 그리고 자기 손을 어디에 둬야 할지 잠시 잊어버린 사람의 가만히 선 얼굴. 뒤로는 <em>Paramount</em>라고 흘려 쓴 둥근 마키가 보이고, 길 양쪽엔 빨간 꽃이 심긴 돌 화분이 두 개, 늦은 햇빛이 크림색 외벽을 마지막으로 훑고 있다. 이 부지에 다닌 지 충분히 오래되었으니 이제는 마키쯤은 무덤덤할 만도 한데, 안 그래진다. 저스틴도 그랬다.</p>
-            </div>
-        </div>
-        <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/paramount-lot.jpg"
-                data-alt-en="Justin in a gray tee standing on the path in front of the Paramount Theatre marquee at golden hour"
-                data-alt-ko="해질 무렵 파라마운트 극장 마키 앞 길에 서 있는 회색 티 차림의 저스틴"
-                alt="Justin in a gray tee standing on the path in front of the Paramount Theatre marquee at golden hour">
-            <div class="photo-caption">
-                <span data-l="en">for the man who drove in from Frogtown, the marquee is the receipt</span>
-                <span data-l="ko">프로그타운에서 차 끌고 온 사람에게, 이 마키는 일종의 영수증이다</span>
-            </div>
-        </div>
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>The screening itself was at one of the lot theaters &mdash; not the grand-old room I had pictured, just a clean modern auditorium with the title card glowing up front: <strong>PASSENGER &middot; share your excitement</strong>. They handed out Paramount Pictures popcorn bags at the door, the kind with the mountain logo stamped on the side. Justin had Sour Patch Kids on his lap. Somebody in a red dress was still finding her seat as the lights went down. We sat through the credits like we were going to learn something. We did not learn anything. It was still nice.</p>
-            </div>
-            <div data-l="ko">
-                <p>시사회는 부지 안에 있는 극장 중 하나에서 열렸다 &mdash; 내가 상상하던 옛 느낌의 큰 홀이 아니라, 깔끔하게 정돈된 현대식 강당이었다. 앞쪽엔 타이틀 카드가 환하게 떠 있었다: <strong>PASSENGER &middot; share your excitement</strong>. 입구에서 파라마운트 픽처스 팝콘 봉투를 하나씩 나눠줬다. 옆면에 마운틴 로고가 박힌 그 봉투. 저스틴은 무릎 위에 사워패치 키즈를 올려뒀다. 누군가 빨간 드레스를 입고 자기 자리를 찾아가는 중에 불이 꺼졌다. 우리는 뭔가 배울 사람처럼 끝까지 크레딧을 봤다. 배운 건 없었다. 그래도 좋았다.</p>
-            </div>
-        </div>
-        <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/passenger-screening.jpg"
-                data-alt-en="Inside the screening — Paramount Pictures popcorn bag held up, Passenger title card on screen, Sour Patch Kids on lap"
-                data-alt-ko="시사회 내부 — 들고 있는 파라마운트 픽처스 팝콘 봉투, 스크린 위 Passenger 타이틀 카드, 무릎 위 사워패치 키즈"
-                alt="Inside the screening — Paramount Pictures popcorn bag held up, Passenger title card on screen, Sour Patch Kids on lap">
-            <div class="photo-caption">
-                <span data-l="en">popcorn bag, Sour Patch Kids, the title card already up &mdash; the moment before learning nothing</span>
-                <span data-l="ko">팝콘 봉투, 사워패치 키즈, 이미 떠 있는 타이틀 카드 &mdash; 아무것도 배우지 않게 될 직전</span>
+                <p>지난주에 몸무게를 쟀다. 192. 어른이 된 이후로 줄곧 170 언저리였다. 이사 와서 몇 파운드 붙었을 거라곤 짐작했지만, 192일 줄은 몰랐다 &mdash; 셔츠를 입기 전, 잠시 그 숫자를 들여다봤다. 다시 돌아갈 계획이다. 끝까지는 아니고. 다음에 패들보드를 타고 나갈 때, 배가 나를 놀라게 하지 않을 정도까지만.</p>
             </div>
         </div>
     </div>
 
     <!-- ============================================================
-         SUNDAY — Out (church, then up the ridge)
+         CHAPTER II — Tulip Fields at Sassenheim (work, the structure)
          ============================================================ -->
-    <div class="chapter">
-        <p class="chapter-mark">
-            <span class="day"><span data-l="en">SUN</span><span data-l="ko">일</span></span><span class="day-title"><span data-l="en">Out</span><span data-l="ko">밖으로</span></span>
-        </p>
+    <div class="chapter" data-monet="1">
+        <p class="chapter-mark"><span class="numeral">II</span><span class="painting-title">Tulip Fields at Sassenheim</span></p>
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Sunday started slow and indoors. Service at Citizens Church with Crystal, Josh, Minyoung, and Justin. Crystal and Josh had to slip out before we got to the courtyard, so the photo evidence is short two people &mdash; consider this their footnote.</p>
-                <p>The selfie that did happen: me in a denim shirt grinning at nothing in particular, Minyoung in white with a green tank under it, Justin in a textured cream polo looking, as he always does, two inches taller than the frame can hold.</p>
+                <p>Work is a lot right now. I manage six people. We might add three more this quarter, which would put the team at nine. I used to think this was what I wanted &mdash; the responsibility, the room to make calls. Now that I have it I'm learning that wanting it and doing it are two different conversations.</p>
+                <p>I went to the Burbank office today &mdash; the Nickelodeon one. Stood in the lobby for a minute before going up. Some weeks I do better than others at keeping the burnout at arm's length. This was one of the harder ones.</p>
             </div>
             <div data-l="ko">
-                <p>일요일은 천천히, 그리고 실내에서 시작됐다. 크리스탈, 조시, 민영, 저스틴과 함께 시티즌스 처치 예배. 크리스탈과 조시는 안마당 사진을 찍기 전에 먼저 자리를 떠야 해서, 사진엔 두 명이 빠져 있다 &mdash; 이 문장을 그 두 사람의 각주로 받아주길.</p>
-                <p>그래도 찍힌 셀카: 나는 데님 셔츠를 입고 별 이유 없이 웃고 있고, 민영은 흰 옷에 초록색 탱크탑을 받쳐 입었고, 저스틴은 늘 그렇듯 프레임이 감당 못 할 만큼 키가 두 인치쯤 더 커 보이는 자세로 크림색 폴로를 입고 있다.</p>
+                <p>요즘 회사 일이 많다. 6명을 매니징하고 있고, 이번 분기 안에 3명 정도 더 합류할 것 같다. 그러면 팀이 9명이 된다. 예전엔 이게 내가 원하는 거라고 생각했다 &mdash; 책임이라든가, 결정할 수 있는 여지 같은 거. 막상 가져보니, 원하는 것과 해내는 건 별개의 대화라는 걸 배우고 있다.</p>
+                <p>오늘은 버뱅크 사무실에 있었다 &mdash; 니켈로디언 쪽. 로비에서 잠깐 서 있다가 올라갔다. 번아웃을 어떻게든 손이 닿지 않는 거리에 두려고 하는데, 어떤 주는 잘되고 어떤 주는 잘 안 된다. 이번 주는 후자였다.</p>
             </div>
         </div>
+    </div>
+
+    <!-- ============================================================
+         CHAPTER III — Spring in Giverny (beginning again)
+         ============================================================ -->
+    <div class="chapter" data-monet="3">
+        <p class="chapter-mark"><span class="numeral">III</span><span class="painting-title">Spring in Giverny</span></p>
+        <div class="text-block reveal">
+            <div data-l="en">
+                <p>In between, I'm taking Japanese lessons. Hiragana, slowly. I don't really know what I'll do with it yet. It's just nice to be a beginner at something again &mdash; to sit with a teacher and not be the one anyone expects to have the answers.</p>
+                <p>Hunter is driving up from San Diego this weekend. We've known each other since high school; he's been in the Marine Corps for a few years now. There's a kind of friendship where you don't have to be impressive &mdash; you just have to show up. I'm grateful for the ones that have lasted long enough to become that.</p>
+            </div>
+            <div data-l="ko">
+                <p>그 사이사이에 일본어 수업을 받고 있다. 히라가나, 천천히. 이걸로 뭘 하게 될지는 아직 모르겠다. 그냥 다시 초보가 되는 게 좋다 &mdash; 선생님 앞에 앉아서, 답을 알고 있어야 하는 사람이 아닌 상태로.</p>
+                <p>이번 주말엔 헌터가 샌디에이고에서 차를 몰고 올라온다. 고등학교 때부터 친구고, 몇 년째 해병대에 있다. 어떤 우정은 잘 보이려고 애쓰지 않아도 되는 종류다 &mdash; 그냥 나타나기만 하면 된다. 그런 우정이 오래 살아남아 줘서 고맙다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         CHAPTER IV — Parc Monceau (overgrown garden / feed)
+         ============================================================ -->
+    <div class="chapter" data-monet="2">
+        <p class="chapter-mark"><span class="numeral">IV</span><span class="painting-title">Parc Monceau</span></p>
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/citizens-church.jpg"
-                data-alt-en="Selfie with Minyoung and Justin in the courtyard outside Citizens Church — concrete overpass behind us, overcast sky. Crystal and Josh had already left."
-                data-alt-ko="시티즌스 처치 안마당에서 민영, 저스틴과 함께 찍은 셀카 — 뒤로 콘크리트 다리, 흐린 하늘. 크리스탈과 조시는 이미 떠난 뒤."
-                alt="Selfie with Minyoung and Justin in the courtyard outside Citizens Church — concrete overpass behind us, overcast sky. Crystal and Josh had already left.">
+            <img src="/newsletter/005/images/newprofilepic.jpg"
+                data-alt-en="Kevin's new profile photo"
+                data-alt-ko="케빈의 새 프로필 사진"
+                alt="Kevin's new profile photo">
             <div class="photo-caption">
-                <span data-l="en">with Minyoung and Justin, post-service, pre-coffee &mdash; Crystal &amp; Josh attended in spirit</span>
-                <span data-l="ko">민영, 저스틴과 함께. 예배 끝, 커피 시작 전 &mdash; 크리스탈 &amp; 조시는 마음으로 함께</span>
+                <span data-l="en">the new headshot &mdash; 엄마 said I look serious</span>
+                <span data-l="ko">새 프로필 사진 &mdash; 엄마는 내가 너무 심각해 보인다고 했다</span>
             </div>
         </div>
-
-        <!-- Scroll-drawn route line: church (lower-left) -> Big Bear ridge (upper-right),
-             with a small fire-road switchback at the tail. Hand-drawn-looking curve. -->
-        <div class="route-line reveal-fade" aria-hidden="true">
-            <svg id="routeLine" viewBox="0 0 480 140" preserveAspectRatio="xMidYMid meet">
-                <!-- start dot: church / LA -->
-                <circle class="rl-dot-ring" cx="40" cy="108" r="6"></circle>
-                <circle class="rl-dot"      cx="40" cy="108" r="2.4"></circle>
-                <text class="rl-label" x="40" y="128" text-anchor="middle">LA &middot; church</text>
-
-                <!-- end dot: Big Bear ridge -->
-                <circle class="rl-dot-ring" cx="440" cy="38" r="6"></circle>
-                <circle class="rl-dot"      cx="440" cy="38" r="2.4"></circle>
-                <text class="rl-label" x="440" y="22" text-anchor="middle">Big Bear</text>
-
-                <!-- the route: gentle climb east, then a switchback near the ridge -->
-                <path id="routeLinePath" class="rl-path"
-                      d="M 46 106
-                         C 110 100, 170 92, 230 76
-                         S 330 50, 380 44
-                         L 400 56
-                         L 414 40
-                         L 426 50
-                         L 434 38"></path>
-            </svg>
-            <span class="rl-caption">
-                <span data-l="en">Hollywood to the ridge &middot; ~1h 30m</span>
-                <span data-l="ko">할리우드에서 능선까지 &middot; 약 1시간 30분</span>
-            </span>
-        </div>
-
         <div class="text-block reveal">
             <div data-l="en">
-                <p>By mid-afternoon I had decided I needed dirt. I went home, threw a bag and a single camp chair in the RAV4, and pointed it east. I'm a recent convert to <strong>dispersed camping</strong> &mdash; for anyone unfamiliar, it's camping without a campsite. You drive into a national forest until the asphalt becomes gravel and the gravel becomes a suggestion, then you find a flat patch far enough from anyone else to pretend you've left civilization. The trade is no bathroom, no neighbors, no Wi-Fi, no rules. Mostly worth it.</p>
+                <p>I posted a new headshot this week. I don't usually take photos of myself. <strong>엄마</strong> texted to ask why I looked so serious; everyone else was quiet, which is roughly how the internet works.</p>
+                <p>The next morning I opened my phone to an AI-generated video of a cat doing kung fu. It made me laugh, and then it made me a little sad &mdash; that we built a world where five seconds of compute can turn a housecat into a martial artist, and the same five seconds can't fix any of the things that actually hurt.</p>
             </div>
             <div data-l="ko">
-                <p>오후가 중반쯤 됐을 때, 흙이 필요하다는 결론에 도달했다. 집에 들러 가방 하나랑 캠핑 의자 한 개를 RAV4에 싣고, 동쪽으로 차를 돌렸다. <strong>분산 캠핑(dispersed camping)</strong>으로 갈아탄 지 얼마 안 됐다 &mdash; 모르는 분들을 위해 설명하자면, 정해진 캠프사이트 없이 하는 캠핑이다. 국유림 안으로 차를 몰고 들어가다 보면 아스팔트가 어느 순간 자갈이 되고, 자갈은 다시 권유 정도로 흐려지는데, 그쯤에서 다른 사람들과 충분히 떨어진 평평한 자리를 찾아 텐트를 친다. 거래 조건은: 화장실 없음, 이웃 없음, 와이파이 없음, 규칙 없음. 대체로 그럴 만하다.</p>
+                <p>이번 주에 새 프로필 사진을 올렸다. 평소 내 사진은 잘 안 찍는다. <strong>엄마</strong>가 왜 그렇게 심각해 보이냐고 문자를 보냈고, 다른 사람들은 조용했다. 인터넷이 대체로 그렇다.</p>
+                <p>다음 날 아침 폰을 켰는데, 고양이가 쿵후를 하는 AI 영상이 떠 있었다. 웃겼고, 곧 좀 슬펐다 &mdash; 5초의 연산으로 집고양이를 무술가로 만들 수 있는 세상은 만들어 놓고, 그 5초로 실제로 아픈 것들은 하나도 못 고친다는 게.</p>
             </div>
         </div>
-
-        <div class="topo-card reveal-fade" id="topoCard">
-            <svg class="topo-svg" viewBox="0 0 540 300" aria-label="Topographic sketch of the San Bernardino National Forest camp area">
-                <!-- 6 contour rings, irregular ellipses simulating a peak with elevation -->
-                <g class="topo-rings">
-                    <ellipse class="topo-ring r6" cx="300" cy="160" rx="260" ry="135" transform="rotate(6 300 160)"/>
-                    <ellipse class="topo-ring r5" cx="300" cy="160" rx="210" ry="112" transform="rotate(4 300 160)"/>
-                    <ellipse class="topo-ring r4" cx="300" cy="160" rx="165" ry="92"  transform="rotate(2 300 160)"/>
-                    <ellipse class="topo-ring r3" cx="300" cy="160" rx="120" ry="72"  transform="rotate(-2 300 160)"/>
-                    <ellipse class="topo-ring r2" cx="300" cy="160" rx="80"  ry="52"  transform="rotate(-6 300 160)"/>
-                    <ellipse class="topo-ring r1" cx="300" cy="160" rx="42"  ry="30"  transform="rotate(-10 300 160)"/>
-                </g>
-
-                <!-- A stylized CA-18 arc — dashed, sweeping in from the south -->
-                <path class="topo-road" d="M 40 280 Q 180 240 260 215 Q 340 195 410 165 Q 470 140 530 90"/>
-
-                <!-- Camp pin: crosshair + dot + sonar ring -->
-                <g class="topo-pin-group">
-                    <circle class="topo-pin-ring" cx="300" cy="158" r="6"/>
-                    <line   class="topo-pin" x1="300" y1="144" x2="300" y2="172" stroke="currentColor"/>
-                    <line   class="topo-pin" x1="286" y1="158" x2="314" y2="158" stroke="currentColor"/>
-                    <circle class="topo-pin" cx="300" cy="158" r="2.5"/>
-                </g>
-
-                <!-- Coord label near pin -->
-                <text class="topo-label" x="316" y="146">34.27&deg;N · 116.93&deg;W</text>
-
-                <!-- Compass — top right -->
-                <g class="topo-compass-group" transform="translate(498 32)">
-                    <line class="topo-compass-line" x1="0" y1="-12" x2="0" y2="14"/>
-                    <line class="topo-compass-line" x1="-4" y1="-8" x2="0" y2="-12"/>
-                    <line class="topo-compass-line" x1="4"  y1="-8" x2="0" y2="-12"/>
-                    <text class="topo-compass" y="-18" text-anchor="middle">N</text>
-                </g>
-
-                <!-- Corner markers (paper-edge feel) -->
-                <text class="topo-corner" x="20"  y="24">USFS &middot; SECTOR 18</text>
-                <text class="topo-corner" x="520" y="290" text-anchor="end">CA-18 ▸ FIRE RD</text>
-            </svg>
-
-            <div class="topo-legend">
-                <p class="tl-label">
-                    <span data-l="en">Location</span>
-                    <span data-l="ko">위치</span>
-                </p>
-                <p class="tl-name">
-                    <span data-l="en">San Bernardino National Forest</span>
-                    <span data-l="ko">샌버나디노 국유림</span>
-                </p>
-                <p class="tl-stats">
-                    <span data-l="en">367,357 acres
-                        <span class="tl-sep">&middot;</span>
-                        USFS
-                        <span class="tl-sep">&middot;</span>
-                        CA-18, north of Big Bear</span>
-                    <span data-l="ko">367,357 에이커
-                        <span class="tl-sep">&middot;</span>
-                        미국 산림청
-                        <span class="tl-sep">&middot;</span>
-                        CA-18, 빅베어 북쪽</span>
-                </p>
-                <p class="tl-coords">
-                    <span data-l="en">34.27&deg;N &middot; 116.93&deg;W &middot; ~6,750 ft</span>
-                    <span data-l="ko">북위 34.27&deg; &middot; 서경 116.93&deg; &middot; 약 2,057 m</span>
-                </p>
-            </div>
-        </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>Big Bear is about an hour and a half from me. Pacific Crest country, lake at the bottom, fire roads going every direction up the ridge. I aired the RAV4 down &mdash; yes, the RAV4 &mdash; and pointed it uphill.</p>
-            </div>
-            <div data-l="ko">
-                <p>빅베어는 내 집에서 한 시간 반쯤 걸린다. 퍼시픽 크레스트 일대, 산 아래엔 호수, 능선 위로는 사방으로 뻗은 임도. RAV4의 타이어 공기압을 낮추고 &mdash; 그래, RAV4다 &mdash; 위쪽으로 차를 돌렸다.</p>
-            </div>
-        </div>
-
-        <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline
-                preload="metadata"
-                data-aria-en="RAV4 cutting through a sandy bank on a fire road"
-                data-aria-ko="임도의 모래 둑을 가로지르는 RAV4"
-                aria-label="RAV4 cutting through a sandy bank on a fire road">
-                <source src="/newsletter/005/images/rav4-offroad.mp4" type="video/mp4">
+        <div style="max-width: 620px; margin: 2rem auto 0; padding: 0 1.5rem;" class="reveal">
+            <video id="catKungfuVideo" muted loop playsinline preload="none"
+                data-aria-en="AI-generated video of a cat performing kung fu"
+                data-aria-ko="쿵후를 하는 고양이 AI 생성 영상"
+                style="width: 100%; border-radius: 3px; display: block;">
+                <source src="/newsletter/005/images/catkungfu.mp4" type="video/mp4">
             </video>
-            <div class="photo-caption">
-                <span data-l="en">a 4-cylinder crossover doing things it was politely not designed to do</span>
-                <span data-l="ko">정중하게 말해서, 이런 용도로 설계되지 않은 4기통 크로스오버</span>
+            <div class="photo-caption" style="margin-top: 0.75rem; color: var(--caption);">
+                <span data-l="en">five seconds of processing, one new master of the martial arts</span>
+                <span data-l="ko">5초의 연산, 한 명의 새로운 무술의 대가</span>
             </div>
         </div>
+    </div>
 
+    <!-- ============================================================
+         CHAPTER V — Poppy Field at Argenteuil (Dakota + Berly + Debussy)
+         ============================================================ -->
+    <div class="chapter" data-monet="4">
+        <p class="chapter-mark"><span class="numeral">V</span><span class="painting-title">Poppy Field at Argenteuil</span></p>
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Found a flat-ish patch on a sandy ridge with the whole San Bernardino range hazing out into layers behind it. Backed the RAV4 in with the tailgate open and the one chair set up next to it &mdash; that was the whole operation. There's a very specific moment in dispersed camping when the engine finally clicks off and your ears reset &mdash; and you realize how loud the things you live with normally are.</p>
+                <p>I had dinner with Dakota tonight. We were talking about the way things are right now &mdash; people losing their jobs, the strange suddenness of it &mdash; and somewhere between the entrées he asked, "Who's your role model?" I didn't have a name. I tried for a minute and came up with nothing.</p>
+                <p>What I told him instead was something Berly said to me once: <em>comparison is the thief of joy.</em> I think about it more than I let on. I see what other people my age have built &mdash; the wealth, the headlines, the velocity &mdash; and there's a version of me that gets very small. But the truth is I'm okay. I have breath in my lungs and food on my plate and people I love sitting across the table. That's the part that matters, even if it doesn't sound like much.</p>
+                <p>I've been playing <em>La fille aux cheveux de lin</em> on loop while I work. It's a Debussy prelude, two and a half minutes long, written in 1910 when half of Europe was trying to be Wagner. Debussy just wrote a small piece about a girl. He didn't try to be impressive. He just was. That's closer to a role model than anything I could name.</p>
             </div>
             <div data-l="ko">
-                <p>모래 섞인 능선 위에서 그럭저럭 평평한 자리를 찾았다. 뒤로는 샌버나디노 산맥 전체가 안개 너머로 층층이 흐려져 있었다. RAV4를 후진으로 대고, 테일게이트를 열고, 그 옆에 캠핑 의자 하나를 펼쳤다 &mdash; 그게 전부의 세팅이었다. 분산 캠핑에는 아주 특정한 순간이 있다. 엔진이 마침내 꺼지고, 귀가 리셋되는 순간 &mdash; 그러면서 평소에 살면서 듣고 있던 것들이 얼마나 시끄러웠는지 새삼 알게 된다.</p>
+                <p>오늘 저녁엔 다코타와 밥을 먹었다. 요즘 세상 돌아가는 얘기를 했다 &mdash; 일자리를 잃는 사람들, 그 묘하게 빠른 속도. 식사 중간쯤 그가 물었다. "네 롤모델은 누구야?" 떠오르는 이름이 없었다. 한참 생각해봤지만 빈칸이었다.</p>
+                <p>대신 얼마 전 버리가 해준 말을 꺼냈다. <em>비교는 기쁨을 앗아간다.</em> 입 밖에 잘 안 내지만, 자주 생각한다. 또래들이 쌓아 올린 걸 보면 나의 어떤 버전이 작아진다. 하지만 사실 나는 괜찮다. 폐로 들이마시는 숨이 있고, 접시 위에 음식이 있고, 식탁 건너편에 사랑하는 사람들이 있다. 그게 중요한 부분이다. 별 거 아닌 것처럼 들려도.</p>
+                <p>요즘은 일하는 동안 <em>La fille aux cheveux de lin</em>을 반복 재생한다. 드뷔시가 1910년에 쓴 2분 30초짜리 전주곡이다. 유럽의 절반이 바그너처럼 쓰려 애쓸 때, 드뷔시는 그냥 소녀에 관한 짧은 곡을 썼다. 굳이 인상 깊으려 하지 않았다. 그냥 그 자체로 있었다. 내가 떠올릴 수 있는 그 어떤 롤모델보다도 그쪽이 가깝다.</p>
             </div>
         </div>
-
-        <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/camp-setup.jpg"
-                data-alt-en="RAV4 parked on a sandy ridge with the tailgate open, a single camp chair beside it, hazy mountain layers receding into the distance"
-                data-alt-ko="모래 능선에 테일게이트를 연 채 주차된 RAV4, 옆에는 캠핑 의자 하나, 뒤로는 안개 속으로 멀어지는 산자락"
-                alt="RAV4 parked on a sandy ridge with the tailgate open, a single camp chair beside it, hazy mountain layers receding into the distance">
-            <div class="photo-caption">
-                <span data-l="en">camp, eventually &mdash; no permit, no neighbors, no plumbing</span>
-                <span data-l="ko">결국엔 캠프 &mdash; 허가증 없음, 이웃 없음, 배관 없음</span>
+        <!-- Debussy embed, in-chapter — the song is part of this room, not a separate feature -->
+        <div style="max-width: 560px; margin: 1rem auto 0; padding: 0 1.5rem;" class="reveal">
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 3px;">
+                <iframe
+                    src="https://www.youtube.com/embed/OfXD6ceEPT4?rel=0&modestbranding=1"
+                    data-title-en="La fille aux cheveux de lin — Debussy"
+                    data-title-ko="아마빛 머리의 소녀 — 드뷔시"
+                    title="La fille aux cheveux de lin — Debussy"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                ></iframe>
             </div>
-        </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>The sun was still high when I got there, sun-dog smeared across a cirrus sky. Later, the kind of sunset that makes a non-photographer instinctively reach for their phone. Mine was on airplane mode. I reached for it anyway.</p>
-            </div>
-            <div data-l="ko">
-                <p>도착했을 땐 해가 아직 꽤 높았고, 새털구름 위로 무리해가 번져 있었다. 시간이 지나면서, 사진가가 아닌 사람도 본능적으로 폰을 집어 들게 하는 종류의 노을이 왔다. 내 폰은 비행기 모드였다. 그래도 집어 들었다.</p>
-            </div>
-        </div>
-
-        <div class="sunset-moment reveal">
-            <!-- Faint dashed sun arc tracing the day's path. Sits behind the
-                 radial glow + frame. Sun pinned to the right edge where it
-                 actually sets in the video. Draws once on enter; static after. -->
-            <svg class="sun-arc" id="sunArc" viewBox="0 0 720 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                <path id="sunArcPath" class="arc-path"
-                      d="M 40 470 C 200 60, 520 60, 660 220"></path>
-                <circle id="sunArcSun" class="arc-sun" cx="660" cy="220" r="6"></circle>
-            </svg>
-            <p class="field-log">
-                <span class="rec-dot" aria-hidden="true"></span>
-                <span data-l="en">Field log</span>
-                <span data-l="ko">필드 로그</span>
-                <span class="sep">&middot;</span>
-                <span>2026.05.24</span>
-                <span class="sep">&middot;</span>
-                <span>19:42 PT</span>
-            </p>
-            <div class="frame">
-                <video class="lazy-video" muted loop playsinline
-                    preload="metadata"
-                    data-aria-en="Sunset over Big Bear from camp"
-                    data-aria-ko="캠프에서 본 빅베어의 일몰"
-                    aria-label="Sunset over Big Bear from camp">
-                    <source src="/newsletter/005/images/sunset.mp4" type="video/mp4">
-                </video>
-            </div>
-            <p class="shot-card">
-                <span class="coords">
-                    <span data-l="en">Big Bear &middot; approx 34.27&deg;N 116.93&deg;W</span>
-                    <span data-l="ko">빅베어 &middot; 약 북위 34.27&deg; 서경 116.93&deg;</span>
-                </span>
-                <span data-l="en">the sky did what it does</span>
-                <span data-l="ko">하늘이 하늘 같은 일을 했다</span>
-            </p>
-        </div>
-
-        <!-- Song of the week — inline card; plays the same <audio> the mini-player uses -->
-        <div class="song-card reveal" id="songCard">
-            <p class="song-label">
-                <span data-l="en">Song of the week</span>
-                <span data-l="ko">이번 주의 노래</span>
-            </p>
-            <div class="song-row">
-                <button class="song-play" id="songCardPlay" type="button"
-                    data-aria-en="Play Holocene"
-                    data-aria-ko="Holocene 재생"
-                    aria-label="Play Holocene" data-state="paused">
-                    <svg class="song-play-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path class="icon-play"  d="M8 5 L8 19 L20 12 Z"></path>
-                        <path class="icon-pause" d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z"></path>
-                    </svg>
-                </button>
-                <div class="song-meta">
-                    <p class="song-title">Holocene</p>
-                    <p class="song-artist">
-                        <span data-l="en">Bon Iver &middot; <em>Bon Iver, Bon Iver</em> &middot; 2011</span>
-                        <span data-l="ko">본 이베어 &middot; <em>Bon Iver, Bon Iver</em> &middot; 2011</span>
-                    </p>
-                </div>
-                <p class="song-time" id="songCardTime">5:43</p>
-            </div>
-            <p class="song-aside">
-                <span data-l="en">played on the drive up at exactly the speed it asks for</span>
-                <span data-l="ko">올라가는 길에 이 노래가 청하는 속도 그대로 틀었다</span>
+            <p class="photo-caption" style="margin-top: 0.6rem; color: var(--caption); text-align: center; font-style: italic;">
+                <span data-l="en">Claude Debussy &middot; <em>Préludes, Book I</em> &middot; 1910</span>
+                <span data-l="ko">클로드 드뷔시 &middot; <em>전주곡집 1권</em> &middot; 1910</span>
             </p>
         </div>
     </div>
 
     <!-- ============================================================
-         MONDAY — Domestic
+         CHAPTER VI — Coquelicots, revisited (May ends; tsundoku; books)
          ============================================================ -->
-    <div class="chapter">
-        <p class="chapter-mark">
-            <span class="day"><span data-l="en">MON</span><span data-l="ko">월</span></span><span class="day-title"><span data-l="en">Domestic</span><span data-l="ko">집안일</span></span>
-        </p>
+    <div class="chapter" data-monet="0">
+        <p class="chapter-mark"><span class="numeral">VI</span><span class="painting-title">Coquelicots, revisited</span></p>
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Monday I refused to put on real pants. The to-do list was: nothing. The actual list, naturally, was a few things.</p>
-                <p>I had a U-Haul U-Box to open at the storage yard. There were two locks on it. I had also, with great consistency, forgotten the keys at home. That gave me a choice: drive 35 minutes back, do it again the other way, lose an hour and ten to my own brain &mdash; or hit the Home Depot ten minutes up the road and buy a pair of bolt cutters. I bought the bolt cutters. It felt, briefly, like a clever move.</p>
+                <p>May is almost over. I'll be twenty-eight in three months. There's a stack of books on my nightstand I haven't read &mdash; things I bought thinking I'd get to. There's a Japanese word for it: <span style="font-family: 'Noto Serif JP', serif;">積ん読</span>, <em>tsundoku.</em> The pile of books you meant to read.</p>
+                <p>Most of my life is shaped like that right now. Intention outrunning execution. The 170 I want to be. The Japanese I want to know. The chapters of this letter I keep meaning to send sooner. I'm trying to be gentler with the gap than I used to be.</p>
+                <p>If you've read something lately that actually changed how you saw a Tuesday afternoon, send it my way. My goodreads is <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank" rel="noopener noreferrer">here</a>. I'm not asking for productivity-bro lists. I want the ones that did something for you, even if you can't name what.</p>
             </div>
             <div data-l="ko">
-                <p>월요일엔 진짜 바지를 안 입기로 했다. 할 일 목록은: 아무것도 없음. 실제 목록은 당연하게도 몇 개 있었다.</p>
-                <p>창고 부지에서 유홀 유박스를 열어야 했다. 거기에 자물쇠가 두 개 걸려 있었다. 그리고 나는 또 충실하게 열쇠를 집에 두고 왔다. 선택지는 두 개였다 &mdash; 35분 운전해서 다시 다녀오기 (왕복 1시간 10분, 내 머리 탓에 그 시간이 사라짐), 아니면 10분 떨어진 홈디포에 들러 볼트 커터를 사 오기. 나는 볼트 커터를 샀다. 잠깐은, 꽤 영리한 선택처럼 느껴졌다.</p>
+                <p>5월이 거의 끝나간다. 석 달 뒤면 스물여덟이다. 침대 옆에 안 읽은 책이 쌓여 있다 &mdash; 언젠가 읽겠지 하고 사놓은 것들. 일본어에 그걸 가리키는 단어가 있다. <span style="font-family: 'Noto Serif JP', serif;">積ん読</span>, <em>tsundoku.</em> 읽으려고 사놓고 쌓아둔 책들.</p>
+                <p>요즘 내 삶이 대체로 그 모양이다. 의도가 실행을 앞서 달리는. 되고 싶은 170. 알고 싶은 일본어. 더 일찍 보내야지 하면서 미루는 이 편지의 챕터들. 그 간극에 좀 더 너그러워지려 노력 중이다.</p>
+                <p>최근 화요일 오후를 바라보는 시선을 진짜로 바꿔놓은 책이 있다면 보내달라. 내 goodreads는 <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank" rel="noopener noreferrer">여기</a>. 자기계발 책 목록 말고. 너에게 뭔가 일어나게 한 책. 그게 뭔지 말로 못 해도.</p>
             </div>
         </div>
-
-        <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata"
-                data-aria-en="Kevin attempting to cut the lock on a U-Haul U-Box with newly purchased bolt cutters"
-                data-aria-ko="새로 산 볼트 커터로 유홀 유박스의 자물쇠를 자르려는 케빈"
-                aria-label="Kevin attempting to cut the lock on a U-Haul U-Box with newly purchased bolt cutters">
-                <source src="/newsletter/005/images/bolt-cutters.mp4" type="video/mp4">
-            </video>
-            <div class="photo-caption">
-                <span data-l="en">brand-new bolt cutters, brand-new humility</span>
-                <span data-l="ko">새 볼트 커터, 새 겸손</span>
-            </div>
-        </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>The lock did not move. I leaned. I jumped on the handles. I made the small focused noise of a man losing an argument with a piece of metal. Justin had come along for the ride, the way you bring a friend to a coin flip you suspect might go badly. He took the cutters out of my hands.</p>
-            </div>
-            <div data-l="ko">
-                <p>자물쇠는 꿈쩍도 안 했다. 체중을 실었다. 손잡이 위에 올라타 보기도 했다. 쇠붙이와의 말다툼에서 지고 있는 사람 특유의 작고 집중된 소리를 냈다. 저스틴은 결과가 안 좋을 것 같은 동전 던지기에 친구를 데려가듯, 그날 따라와 있었다. 그가 내 손에서 커터를 가져갔다.</p>
-            </div>
-        </div>
-
-        <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata"
-                data-aria-en="Justin cutting the U-Box lock with the bolt cutters with apparent ease"
-                data-aria-ko="같은 볼트 커터로 별로 힘들지 않게 자물쇠를 자르는 저스틴"
-                aria-label="Justin cutting the U-Box lock with the bolt cutters with apparent ease">
-                <source src="/newsletter/005/images/justin-cuts.mp4" type="video/mp4">
-            </video>
-            <div class="photo-caption">
-                <span data-l="en">same cutters, same lock &mdash; I have decided this is a posture issue, not a strength issue</span>
-                <span data-l="ko">같은 커터, 같은 자물쇠 &mdash; 결론: 이건 근력 문제가 아니라 자세 문제다</span>
-            </div>
-        </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>Then it was Kobe time. Kobe is the resident dog of the patio out back &mdash; black-and-tan, ears that snap upright when you say his name, a collar he tolerates. He has a strong preference for being touched in one very specific area: the soft spot right under the chin, between the front paws. Bury your hand in there and he goes catatonic. It is one of the few perfectly efficient happiness loops I have access to, and I lean on it.</p>
-            </div>
-            <div data-l="ko">
-                <p>그러고 나서 코비 타임. 코비는 뒤뜰을 차지하고 사는 개다 &mdash; 검정과 황갈색이 섞인 털, 이름을 부르면 곧장 쫑긋 서는 귀, 그럭저럭 견뎌주는 목줄. 만져주는 자리에 대해 아주 분명한 취향이 있다: 턱 바로 아래, 앞발 사이 부드러운 자리. 그 안에 손을 묻으면 정신이 멍해진다. 내가 접근 가능한 몇 안 되는 완벽한 행복 루프 중 하나라, 자주 의지한다.</p>
-            </div>
-        </div>
-
-        <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata"
-                data-aria-en="Petting Kobe under the chin on the patio"
-                data-aria-ko="안마당에서 코비의 턱 밑을 쓰다듬는 장면"
-                aria-label="Petting Kobe under the chin on the patio">
-                <source src="/newsletter/005/images/kobe-paws.mp4" type="video/mp4">
-            </video>
-            <div class="photo-caption">
-                <span data-l="en">the spot &mdash; he will not contest your method</span>
-                <span data-l="ko">그 자리 &mdash; 방법에 대해 이의 제기 안 함</span>
-            </div>
-        </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>The rest of Monday was margin. The actual word. Sitting at the work station for no reason. Reading a chapter, abandoning it, reading another. Watching the late light pass across the wide-plank floor of the living room for longer than I had any business watching it.</p>
-            </div>
-            <div data-l="ko">
-                <p>월요일의 나머지는 여백이었다. 단어 그대로의 여백. 별 이유 없이 책상에 앉아 있기. 한 챕터를 읽다가, 덮고, 다른 책을 펴기. 거실의 넓은 원목 바닥 위로 늦은 햇빛이 지나가는 걸, 굳이 그렇게 오래 볼 일은 아닌데도 한참 보기.</p>
-            </div>
-        </div>
-
         <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/living-room.jpg"
-                data-alt-en="Living room: white sectional and ottoman, a black floating shelf of small potted plants above it, a tall bird-of-paradise in the corner, a rubber tree on the console, wide-plank floors"
-                data-alt-ko="거실: 흰색 섹셔널 소파와 오토만, 그 위에 화분이 놓인 검정색 플로팅 선반, 구석엔 키 큰 극락조화, 콘솔 위엔 고무나무, 넓은 원목 바닥"
-                alt="Living room: white sectional and ottoman, a black floating shelf of small potted plants above it, a tall bird-of-paradise in the corner, a rubber tree on the console, wide-plank floors">
+            <img src="/newsletter/005/images/dogonmyshoulders.jpg"
+                data-alt-en="A dog using Kevin's shoulders as a landing pad"
+                data-alt-ko="케빈의 어깨를 착륙장으로 쓴 개"
+                alt="A dog using Kevin's shoulders as a landing pad">
             <div class="photo-caption">
-                <span data-l="en">the living room &mdash; cleaned for the photo, I will not pretend otherwise</span>
-                <span data-l="ko">거실 &mdash; 사진 찍으려고 청소했다, 아닌 척 안 하겠다</span>
-            </div>
-        </div>
-
-        <div class="photo-inset reveal">
-            <img src="/newsletter/005/images/workstation.jpg"
-                data-alt-en="Work station: dual monitors, monitor light bar, mechanical keyboard, ceramic mug, Stanley Kubrick book, Paramount-logo mousepad, blackout shade pulled most of the way down"
-                data-alt-ko="작업 공간: 듀얼 모니터, 모니터 라이트 바, 기계식 키보드, 세라믹 머그, 스탠리 큐브릭 책, 파라마운트 로고 마우스패드, 거의 다 내려져 있는 암막 블라인드"
-                alt="Work station: dual monitors, monitor light bar, mechanical keyboard, ceramic mug, Stanley Kubrick book, Paramount-logo mousepad, blackout shade pulled most of the way down">
-            <div class="photo-caption">
-                <span data-l="en">the work station &mdash; same disclaimer</span>
-                <span data-l="ko">작업 공간 &mdash; 같은 면책 사항</span>
-            </div>
-        </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>Three days. One night in the dirt. One movie on a lot I still can't believe I work at. One trip from Justin's neighborhood to mine that I'm told I should have paid for in parking. Two padlocks, one set of brand-new bolt cutters, and a clean reminder that Justin handles them better than I do. A dog under whose chin I will continue to find solace.</p>
-                <p>Happy Memorial Day to those it's for. To the rest: take the long weekend wherever you can find it.</p>
-            </div>
-            <div data-l="ko">
-                <p>사흘. 흙바닥에서 하룻밤. 내가 다니는 줄이 아직도 안 믿기는 부지에서 본 영화 한 편. 저스틴의 동네에서 내 동네로 와준 운전 한 번 &mdash; 그건 주차비로 갚았어야 한다고 들었다. 자물쇠 두 개, 새 볼트 커터 한 세트, 그리고 저스틴이 그걸 나보다 잘 다룬다는 깔끔한 리마인더. 그 턱 아래에서 계속 위로를 찾을 개 한 마리.</p>
-                <p>해당되는 분들껜 즐거운 메모리얼데이를. 나머지에겐: 긴 주말을, 찾을 수 있는 곳에서 챙겨 쓰시길.</p>
+                <span data-l="en">my cousin's friend's dog, unannounced &mdash; he looked at me like he had something to say, and then he didn't say it</span>
+                <span data-l="ko">사촌 친구의 개, 통보 없이 어깨로 &mdash; 뭔가 할 말이 있는 표정으로 나를 보더니, 결국 아무 말도 하지 않았다</span>
             </div>
         </div>
     </div>
+
+    <!-- The Word of the Week and Song of the Week have been folded into the prose
+         of Chapters V (Debussy) and VI (tsundoku) so they read as part of the letter,
+         not as separate features. The standalone section blocks are intentionally
+         removed in this issue. -->
 
     <!-- ——— Sign Off — quiet, just the name ——— -->
     <div class="sign-off reveal">
@@ -2720,13 +1725,11 @@
         </h2>
         <p class="subscribe-desc">
             <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
-            <span data-l="ko">이메일 주소를 남겨주면 Dispatch를 받은편지함으로 바로 보내드려요. 스팸 없음, 그냥 내 근황만.</span>
+            <span data-l="ko">이메일 남겨주면 매주 보내줄게. 스팸 같은 거 없고 그냥 내 근황.</span>
         </p>
         <form class="subscribe-form" id="subscribeForm">
             <input type="email" class="subscribe-input" id="subscribeEmail"
-                data-ph-en="your@email.com"
-                data-ph-ko="your@email.com"
-                placeholder="your@email.com"
+                data-ph-en="your@email.com" data-ph-ko="your@email.com"
                 required autocomplete="email">
             <button type="submit" class="subscribe-btn" id="subscribeBtn">
                 <span data-l="en">Subscribe</span>
@@ -2735,11 +1738,11 @@
         </form>
         <p class="subscribe-success" id="subscribeSuccess">
             <span data-l="en">You're in. See you next week.</span>
-            <span data-l="ko">등록 완료. 다음 주에 봐요.</span>
+            <span data-l="ko">등록됨. 다음 주에 보자.</span>
         </p>
         <p class="subscribe-note">
-            <span data-l="en">Just between us &mdash; no third parties, ever.</span>
-            <span data-l="ko">우리끼리만 &mdash; 절대 외부 공유 없음.</span>
+            <span data-l="en">Just between us — no third parties, ever.</span>
+            <span data-l="ko">우리끼리만. 어디 넘기거나 그런 거 절대 없음.</span>
         </p>
     </div>
 
@@ -2758,14 +1761,8 @@
             </h2>
         </div>
         <form class="comments-form" id="commentsForm">
-            <input type="text" class="comments-input" id="commentName"
-                data-ph-en="Your name"
-                data-ph-ko="이름"
-                placeholder="Your name" maxlength="100" required>
-            <textarea class="comments-input comments-textarea" id="commentText"
-                data-ph-en="Write a comment..."
-                data-ph-ko="댓글 작성..."
-                placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <input type="text" class="comments-input" id="commentName" data-ph-en="Your name" data-ph-ko="이름" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" data-ph-en="Write a comment..." data-ph-ko="댓글 작성..." maxlength="2000" required></textarea>
             <button type="submit" class="comments-btn" id="commentBtn">
                 <span data-l="en">Post</span>
                 <span data-l="ko">게시</span>
@@ -2774,7 +1771,7 @@
         <div class="comments-list" id="commentsList"></div>
         <p class="comments-empty" id="commentsEmpty" style="display:none;">
             <span data-l="en">No comments yet. Be the first.</span>
-            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨주세요.</span>
+            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨 주세요.</span>
         </p>
     </div>
 
@@ -2783,16 +1780,16 @@
     <!-- ==================== FOOTER ==================== -->
     <footer class="story-footer">
         <p>
-            <span data-l="en">Dispatch No. 005 &middot; Margin &middot;</span>
-            <span data-l="ko">Dispatch No. 005 &middot; 여백 &middot;</span>
+            <span data-l="en">Dispatch No. 005 &middot; Coquelicots &middot;</span>
+            <span data-l="ko">Dispatch 005호 &middot; 개양귀비 &middot;</span>
             <a href="/">klee.page</a>
         </p>
     </footer>
 
-    <!-- ==================== SONG OF THE WEEK — shared audio + mini player ==================== -->
-    <audio id="songOfTheWeek" src="/newsletter/005/images/holocene-bon-iver.mp3" preload="metadata" loop></audio>
+    <!-- ==================== SONG OF THE WEEK — audio + mini player ==================== -->
+    <audio id="songOfTheWeek" src="/newsletter/005/images/la-fille-aux-cheveux-de-lin.mp3" preload="metadata" loop></audio>
     <div class="mini-player" id="miniPlayer" hidden aria-label="Song of the week mini player">
-        <button class="mini-player-btn" id="miniPlayerBtn" type="button" aria-label="Play or pause Holocene" data-state="paused">
+        <button class="mini-player-btn" id="miniPlayerBtn" type="button" aria-label="Play or pause song of the week" data-state="paused">
             <svg class="mini-player-ring" viewBox="0 0 36 36" aria-hidden="true">
                 <circle class="ring-track"    cx="18" cy="18" r="16"></circle>
                 <circle class="ring-progress" cx="18" cy="18" r="16" id="miniPlayerRing"></circle>
@@ -2803,16 +1800,10 @@
             </svg>
         </button>
         <div class="mini-player-meta">
-            <div class="mini-player-title">Holocene</div>
-            <div class="mini-player-artist">
-                <span data-l="en">Bon Iver &middot; 2011</span>
-                <span data-l="ko">본 이베어 &middot; 2011</span>
-            </div>
+            <div class="mini-player-title"><span data-l="en">La fille aux cheveux de lin</span><span data-l="ko">아마빛 머리의 소녀</span></div>
+            <div class="mini-player-artist"><span data-l="en">Debussy &middot; 1910</span><span data-l="ko">드뷔시 &middot; 1910</span></div>
         </div>
-        <button class="mini-player-close" id="miniPlayerClose" type="button"
-            data-aria-en="Close mini player"
-            data-aria-ko="미니 플레이어 닫기"
-            aria-label="Close mini player">&times;</button>
+        <button class="mini-player-close" id="miniPlayerClose" type="button" aria-label="Close mini player">&times;</button>
     </div>
 
     <!-- Analytics -->
@@ -2932,13 +1923,10 @@
 
             function checkPassword(val, callback) {
                 // 005's word of the week is the password.
-                // tsundoku/積ん読/積読 are accepted as a grace-period alias for the
-                // old Coquelicots edition that previously occupied this slot.
                 // Falls through to /api/gate which still honors DISPATCH_PASS (komorebi) as a master.
                 var raw = val.trim();
                 var lower = raw.toLowerCase();
-                if (lower === 'yohaku' || lower === 'komorebi' || lower === 'tsundoku'
-                    || raw === '余白' || raw === '積ん読' || raw === '積読') {
+                if (lower === 'tsundoku' || lower === 'komorebi' || raw === '積ん読' || raw === '積読') {
                     callback(true);
                     return;
                 }
@@ -2980,11 +1968,12 @@
         })();
     </script>
     <script>
-        // ==================== I18N (placeholders / alt / aria) ====================
+        // ==================== DISPATCH I18N ====================
         (function() {
             function getLang() {
                 return document.documentElement.getAttribute('data-lang') || 'en';
             }
+
             function applyI18n() {
                 var lang = getLang();
                 document.querySelectorAll('[data-ph-en]').forEach(function(el) {
@@ -3000,7 +1989,11 @@
                 document.querySelectorAll('[data-title-en]').forEach(function(el) {
                     el.title = el.getAttribute('data-title-' + lang) || el.getAttribute('data-title-en');
                 });
+                if (typeof window.dispatchCommentsRefresh === 'function') {
+                    window.dispatchCommentsRefresh();
+                }
             }
+
             window.dispatchApplyI18n = applyI18n;
             applyI18n();
         })();
@@ -3008,108 +2001,40 @@
         // ==================== LANGUAGE TOGGLE ====================
         (function() {
             var pill = document.getElementById('langPill');
-            if (!pill) return;
             var current = document.documentElement.getAttribute('data-lang') || 'en';
+
             function toggle() {
                 current = current === 'en' ? 'ko' : 'en';
                 document.documentElement.setAttribute('data-lang', current);
                 document.documentElement.setAttribute('lang', current);
                 localStorage.setItem('dispatch-lang', current);
-                if (window.dispatchApplyI18n) window.dispatchApplyI18n();
+                window.dispatchApplyI18n();
             }
+
             pill.addEventListener('click', toggle);
             pill.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
             });
         })();
 
-        // ==================== TEXT-CHAT REVEAL ====================
-        // Plays the "come thru" thread one bubble at a time when scrolled into
-        // view. The typing indicator bubble shows for `data-hide` ms then hides.
+        // ==================== LAZY VIDEO (cat kung fu) ====================
         (function() {
-            var thread = document.getElementById('chatThread');
-            if (!thread) return;
-            var bubbles = Array.prototype.slice.call(thread.querySelectorAll('.bubble'));
-            if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                bubbles.forEach(function(b) {
-                    if (b.classList.contains('typing')) { b.style.display = 'none'; return; }
-                    b.classList.add('visible');
-                });
-                return;
-            }
-            if (!('IntersectionObserver' in window)) {
-                bubbles.forEach(function(b) {
-                    if (b.classList.contains('typing')) { b.style.display = 'none'; return; }
-                    b.classList.add('visible');
-                });
-                return;
-            }
-            var played = false;
-            var io = new IntersectionObserver(function(entries) {
-                entries.forEach(function(e) {
-                    if (!e.isIntersecting || played) return;
-                    played = true;
-                    bubbles.forEach(function(b) {
-                        var d    = parseInt(b.getAttribute('data-d')    || '0', 10);
-                        var hide = parseInt(b.getAttribute('data-hide') || '0', 10);
-                        setTimeout(function() { b.classList.add('visible'); }, d);
-                        if (hide && b.classList.contains('typing')) {
-                            setTimeout(function() {
-                                b.classList.remove('visible');
-                                b.style.display = 'none';
-                            }, d + hide);
-                        }
-                    });
-                    io.disconnect();
-                });
-            }, { threshold: 0.35 });
-            io.observe(thread);
-        })();
-
-        // ==================== TOPO CARD — draw on enter ====================
-        (function() {
-            var card = document.getElementById('topoCard');
-            if (!card) return;
-            if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                card.classList.add('topo-go');
-                return;
-            }
-            if (!('IntersectionObserver' in window)) {
-                card.classList.add('topo-go');
-                return;
-            }
-            var io = new IntersectionObserver(function(entries) {
-                entries.forEach(function(e) {
-                    if (e.isIntersecting) {
-                        card.classList.add('topo-go');
-                        io.disconnect();
-                    }
-                });
-            }, { threshold: 0.25 });
-            io.observe(card);
-        })();
-
-        // ==================== LAZY-PLAY INLINE VIDEOS ====================
-        // Any <video class="lazy-video"> in the body plays when scrolled into view,
-        // pauses when scrolled out. Respects prefers-reduced-motion.
-        (function() {
+            var video = document.getElementById('catKungfuVideo');
+            if (!video) return;
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
             if (!('IntersectionObserver' in window)) return;
-            var videos = document.querySelectorAll('video.lazy-video');
-            if (!videos.length) return;
 
             var io = new IntersectionObserver(function(entries) {
                 entries.forEach(function(entry) {
-                    var v = entry.target;
                     if (entry.isIntersecting) {
-                        var p = v.play();
+                        var p = video.play();
                         if (p && p.catch) p.catch(function() {});
                     } else {
-                        v.pause();
+                        video.pause();
                     }
                 });
-            }, { threshold: 0.25 });
-            videos.forEach(function(v) { io.observe(v); });
+            }, { threshold: 0.2 });
+            io.observe(video);
         })();
 
         // ==================== SUBSCRIBE ====================
@@ -3254,45 +2179,31 @@
             loadComments();
         })();
 
-        // ==================== SONG OF THE WEEK ====================
-        // One <audio> element drives two UIs: the inline song-card in the SAT
-        // chapter and the floating mini-player at bottom-left. Both reflect
-        // the same play/pause state; both can be clicked to toggle.
+        // ==================== MINI PLAYER (song of the week, autoplay) ====================
         (function() {
             var audio    = document.getElementById('songOfTheWeek');
             var player   = document.getElementById('miniPlayer');
-            var miniBtn  = document.getElementById('miniPlayerBtn');
+            var btn      = document.getElementById('miniPlayerBtn');
             var ring     = document.getElementById('miniPlayerRing');
             var closeBtn = document.getElementById('miniPlayerClose');
-            var cardBtn  = document.getElementById('songCardPlay');
-            var cardTime = document.getElementById('songCardTime');
-            if (!audio) return;
+            if (!audio || !player || !btn || !ring) return;
 
             var RING_C = 2 * Math.PI * 16;
-            if (ring) {
-                ring.style.strokeDasharray  = RING_C;
-                ring.style.strokeDashoffset = RING_C;
-            }
+            ring.style.strokeDasharray  = RING_C;
+            ring.style.strokeDashoffset = RING_C;
 
             var triedAutoplay = false;
             var dismissed = false;
             var rafId = null;
 
-            function fmt(t) {
-                if (!isFinite(t) || t < 0) return '0:00';
-                var m = Math.floor(t / 60);
-                var s = Math.floor(t % 60);
-                return m + ':' + (s < 10 ? '0' : '') + s;
-            }
-            function setState(s) {
-                if (miniBtn) miniBtn.setAttribute('data-state', s);
-                if (cardBtn) cardBtn.setAttribute('data-state', s === 'buffering' ? 'paused' : s);
-                if (s === 'playing' && player) player.classList.remove('needs-tap');
-            }
             function showPlayer() {
-                if (dismissed || !player) return;
+                if (dismissed) return;
                 player.hidden = false;
                 requestAnimationFrame(function() { player.classList.add('visible'); });
+            }
+            function setState(s) {
+                btn.setAttribute('data-state', s);
+                if (s === 'playing') player.classList.remove('needs-tap');
             }
             function updateRing() {
                 if (!audio.duration || !isFinite(audio.duration)) {
@@ -3300,13 +2211,7 @@
                     return;
                 }
                 var pct = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
-                if (ring) ring.style.strokeDashoffset = RING_C * (1 - pct);
-                if (cardTime) {
-                    var remaining = audio.duration - audio.currentTime;
-                    cardTime.textContent = audio.paused
-                        ? fmt(audio.duration)
-                        : '-' + fmt(remaining);
-                }
+                ring.style.strokeDashoffset = RING_C * (1 - pct);
                 if (!audio.paused) rafId = requestAnimationFrame(updateRing);
             }
             function startRingLoop() {
@@ -3318,38 +2223,31 @@
                 updateRing();
             }
 
-            audio.addEventListener('play',           function() { setState('playing'); startRingLoop(); });
-            audio.addEventListener('playing',        function() { setState('playing'); startRingLoop(); });
-            audio.addEventListener('pause',          function() { setState('paused');  stopRingLoop();  });
-            audio.addEventListener('ended',          function() { setState('paused');  stopRingLoop();  });
-            audio.addEventListener('waiting',        function() { setState('buffering'); });
-            audio.addEventListener('seeking',        function() { setState('buffering'); });
-            audio.addEventListener('loadedmetadata', function() {
-                if (cardTime) cardTime.textContent = fmt(audio.duration);
-                updateRing();
-            });
+            audio.addEventListener('play',     function() { setState('playing'); startRingLoop(); });
+            audio.addEventListener('playing',  function() { setState('playing'); startRingLoop(); });
+            audio.addEventListener('pause',    function() { setState('paused');  stopRingLoop();  });
+            audio.addEventListener('ended',    function() { setState('paused');  stopRingLoop();  });
+            audio.addEventListener('waiting',  function() { setState('buffering'); });
+            audio.addEventListener('seeking',  function() { setState('buffering'); });
+            audio.addEventListener('loadedmetadata', updateRing);
 
-            function toggle() {
-                showPlayer();
+            btn.addEventListener('click', function() {
                 if (audio.paused) {
                     var p = audio.play();
                     if (p && p.catch) p.catch(function() {});
                 } else {
                     audio.pause();
                 }
-            }
-            if (miniBtn) miniBtn.addEventListener('click', toggle);
-            if (cardBtn) cardBtn.addEventListener('click', toggle);
-
+            });
             document.addEventListener('keydown', function(e) {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-                if (!player || player.hidden) return;
-                if (e.key === 'k' || (e.key === ' ' && document.activeElement === miniBtn)) {
+                if (player.hidden) return;
+                if (e.key === 'k' || (e.key === ' ' && document.activeElement === btn)) {
                     e.preventDefault();
-                    toggle();
+                    btn.click();
                 }
             });
-            if (closeBtn) closeBtn.addEventListener('click', function() {
+            closeBtn.addEventListener('click', function() {
                 audio.pause();
                 dismissed = true;
                 player.classList.remove('visible');
@@ -3360,29 +2258,25 @@
                 if (triedAutoplay) return;
                 triedAutoplay = true;
                 showPlayer();
-                audio.volume = 0.4;  // gentle — sit under, don't compete with reading
+                audio.volume = 0.5; // gentle piano — keep it quiet
                 var p = audio.play();
                 if (p && p.catch) {
-                    p.catch(function() { if (player) player.classList.add('needs-tap'); });
+                    p.catch(function() { player.classList.add('needs-tap'); });
                 }
             }
 
-            // Autoplay attempts: when the user dismisses the komorebi splash,
-            // or when they submit the gate form (both count as a user gesture
-            // that lets browsers permit audio playback).
             var dismiss = document.getElementById('komorebiDismiss');
             if (dismiss) dismiss.addEventListener('click', tryAutoplay);
             var gateForm = document.getElementById('gateForm');
             if (gateForm) gateForm.addEventListener('submit', tryAutoplay);
 
-            // Returning visitor — gate already passed, surface the mini-player
-            // with a "needs-tap" pulse since we don't have a fresh user gesture.
+            // Returning visitor — gate already passed, surface the player with needs-tap
             var path = window.location.pathname.replace(/\/$/, '') || '/';
             var alreadyAuthed = sessionStorage.getItem('dispatch-auth-' + path) === '1';
             if (alreadyAuthed) {
                 setTimeout(function() {
                     showPlayer();
-                    if (player) player.classList.add('needs-tap');
+                    player.classList.add('needs-tap');
                 }, 1200);
             }
         })();
@@ -3426,9 +2320,10 @@
                 .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
                 .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
 
-            // Hero video parallax — gentle downward drift as you scroll past the hero
-            gsap.to('#heroVideo', {
-                yPercent: 12,
+            // Hero Ken Burns (fallback painting behind canvas)
+            gsap.to('#heroFallback', {
+                scale: 1.06,
+                transformOrigin: 'center center',
                 ease: 'none',
                 scrollTrigger: {
                     trigger: '.hero',
@@ -3482,67 +2377,555 @@
                     scrollTrigger: { trigger: el, start: 'top 85%', once: true }
                 });
             });
-
-            // ===== Field-log additions =====
-            // All scroll-coupled drawing is gated behind reduced-motion. When
-            // reduced-motion is on, the SVG paths fall back to their natural,
-            // fully-drawn state (no inline style override), so the user sees
-            // a complete line/arc without animation.
-            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            if (!reduceMotion) {
-                // Scroll-drawn route line — draws from church dot to Big Bear
-                // dot as the user scrolls through the "needed dirt" paragraph.
-                var routePath = document.getElementById('routeLinePath');
-                if (routePath) {
-                    var routeLen = routePath.getTotalLength();
-                    gsap.set(routePath, {
-                        strokeDasharray: routeLen,
-                        strokeDashoffset: routeLen
-                    });
-                    gsap.to(routePath, {
-                        strokeDashoffset: 0,
-                        ease: 'none',
-                        scrollTrigger: {
-                            trigger: '.route-line',
-                            start: 'top 80%',
-                            end: 'bottom 55%',
-                            scrub: 0.6
-                        }
-                    });
-                }
-
-                // Sun arc — draws itself once as the sunset moment enters
-                // the viewport, then stays. Faint, low-priority, behind glow.
-                var arcPath = document.getElementById('sunArcPath');
-                var arcSun  = document.getElementById('sunArcSun');
-                if (arcPath) {
-                    var arcLen = arcPath.getTotalLength();
-                    gsap.set(arcPath, {
-                        strokeDasharray: arcLen,
-                        strokeDashoffset: arcLen
-                    });
-                    if (arcSun) gsap.set(arcSun, { opacity: 0 });
-                    gsap.timeline({
-                        scrollTrigger: {
-                            trigger: '.sunset-moment',
-                            start: 'top 75%',
-                            once: true
-                        }
-                    })
-                    .to(arcPath, {
-                        strokeDashoffset: 0,
-                        duration: 2.4,
-                        ease: 'power1.inOut'
-                    })
-                    .to(arcSun, {
-                        opacity: 0.85,
-                        duration: 0.6,
-                        ease: 'power2.out'
-                    }, '-=0.4');
-                }
-            }
         }
     </script>
 
+    <!-- ==================== HERO — Monet flow-field ==================== -->
+    <script>
+    (function(){
+      "use strict";
+      const smoke = document.getElementById('heroSmoke');
+      const chars = document.getElementById('heroChars');
+      const fallback = document.getElementById('heroFallback');
+      if (!smoke || !chars) return;
+
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const gl = smoke.getContext('webgl2', { antialias:false, premultipliedAlpha:false, alpha:false });
+      if (reduced || !gl) {
+        // graceful fallback: show the painting still
+        if (fallback) fallback.classList.add('show');
+        smoke.style.display = 'none'; chars.style.display = 'none';
+        return;
+      }
+
+      const DPR = Math.min(devicePixelRatio || 1, 2);
+      const IS_NARROW = innerWidth < 700;
+      const SIM_SCALE = IS_NARROW ? 0.45 : 0.55;
+
+      // ---- interactive state: cursor (UV coords, GL convention y-up) + scatter target px coords
+      let cursorUV = [0.5, 0.5];
+      let cursorPower = 0;
+      let cursorPX = -9999, cursorPY = -9999;
+      function setCursor(clientX, clientY){
+        cursorPX = clientX;
+        cursorPY = clientY;
+        cursorUV[0] = clientX / innerWidth;
+        cursorUV[1] = 1 - clientY / innerHeight;   // GL y-up
+        cursorPower = 1.0;
+      }
+      addEventListener('mousemove', (e) => setCursor(e.clientX, e.clientY), { passive: true });
+      addEventListener('touchmove', (e) => {
+        if (e.touches.length) setCursor(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+      addEventListener('mouseleave', () => { cursorPX = -9999; cursorPY = -9999; });
+      const halfFloatExt = gl.getExtension('EXT_color_buffer_float');
+      const FBO_INTERNAL = halfFloatExt ? gl.RGBA16F : gl.RGBA;
+      const FBO_TYPE    = halfFloatExt ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE;
+      const t0 = performance.now();
+
+      function fitSmoke(){
+        smoke.width  = Math.max(1, Math.floor(smoke.clientWidth  * DPR));
+        smoke.height = Math.max(1, Math.floor(smoke.clientHeight * DPR));
+      }
+      fitSmoke();
+
+      function compile(t, src){
+        const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+        return s;
+      }
+      function program(vs, fs){
+        const p = gl.createProgram();
+        gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
+        gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+        gl.linkProgram(p);
+        return p;
+      }
+
+      const VS = `#version 300 es
+in vec2 a_pos; out vec2 v_uv;
+void main(){ v_uv = a_pos*0.5+0.5; gl_Position = vec4(a_pos,0.,1.); }`;
+
+      const FS_ADVECT = `#version 300 es
+precision highp float;
+in vec2 v_uv;
+uniform sampler2D u_prev;
+uniform sampler2D u_seedA;
+uniform sampler2D u_seedB;
+uniform float u_seedMix;
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_cursor;       // UV coords, [0..1], origin top-left flipped to bottom-left
+uniform float u_cursorPower; // 0..1 decaying after movement
+out vec4 outColor;
+vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+vec2 mod289(vec2 x){return x-floor(x*(1./289.))*289.;}
+vec3 permute(vec3 x){return mod289(((x*34.)+1.)*x);}
+float snoise(vec2 v){
+  const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);
+  vec2 i=floor(v+dot(v,C.yy));
+  vec2 x0=v-i+dot(i,C.xx);
+  vec2 i1=(x0.x>x0.y)?vec2(1.,0.):vec2(0.,1.);
+  vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1;
+  i=mod289(i);
+  vec3 p=permute(permute(i.y+vec3(0.,i1.y,1.))+i.x+vec3(0.,i1.x,1.));
+  vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.);
+  m=m*m; m=m*m;
+  vec3 x=2.*fract(p*C.www)-1.;
+  vec3 h=abs(x)-0.5;
+  vec3 ox=floor(x+0.5);
+  vec3 a0=x-ox;
+  m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);
+  vec3 g; g.x=a0.x*x0.x+h.x*x0.y;
+  g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+  return 130.*dot(m,g);
+}
+vec2 curl(vec2 p){
+  float e=0.018;
+  return vec2(snoise(p+vec2(0,e))-snoise(p-vec2(0,e)),
+              -(snoise(p+vec2(e,0))-snoise(p-vec2(e,0))))/(2.*e);
+}
+void main(){
+  vec2 uv = v_uv;
+  vec2 p  = uv*2.-1.;
+  p.x *= u_resolution.x/u_resolution.y;
+  vec2 vel = curl(p*0.75 + vec2(0., u_time*0.045));
+  vel    += 0.40*curl(p*2.0 + vec2(-u_time*0.030, u_time*0.024));
+  // cursor swirl — local vortex around mouse/touch
+  vec2 cd = uv - u_cursor;
+  cd.x *= u_resolution.x / u_resolution.y;
+  vec2 swirl = vec2(-cd.y, cd.x) * exp(-dot(cd,cd) * 35.0) * 3.0;
+  vel += swirl * u_cursorPower;
+  float dt = 0.0024;
+  vec2 prevUV = uv - vel*dt;
+  vec3 prev     = texture(u_prev, prevUV).rgb;
+  vec3 paintA   = texture(u_seedA, uv).rgb;
+  vec3 paintB   = texture(u_seedB, uv).rgb;
+  vec3 painting = mix(paintA, paintB, smoothstep(0.0, 1.0, u_seedMix));
+  // push painting harder so transitions read; the drift in prev still provides motion
+  vec3 col = prev*0.52 + painting*0.48;
+  outColor = vec4(col, 1.0);
+}`;
+      const FS_PRESENT = `#version 300 es
+precision highp float;
+in vec2 v_uv;
+uniform sampler2D u_src;
+out vec4 outColor;
+void main(){
+  vec3 c = texture(u_src, v_uv).rgb;
+  c = pow(max(c, 0.0), vec3(0.95));
+  float L = dot(c, vec3(0.299, 0.587, 0.114));
+  c = mix(vec3(L), c, 1.25);
+  vec2 q = v_uv - 0.5;
+  c *= smoothstep(1.25, 0.25, dot(q,q)*1.25);
+  outColor = vec4(c, 1.0);
+}`;
+      const FS_BLIT = `#version 300 es
+precision highp float;
+in vec2 v_uv; uniform sampler2D u_seedA; out vec4 outColor;
+void main(){ outColor = vec4(texture(u_seedA, v_uv).rgb, 1.0); }`;
+
+      const progAdvect  = program(VS, FS_ADVECT);
+      const progPresent = program(VS, FS_PRESENT);
+      const progBlit    = program(VS, FS_BLIT);
+
+      const quad = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+      function bindQuad(prog){
+        const loc = gl.getAttribLocation(prog, 'a_pos');
+        gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      }
+      function makeFBO(w, h){
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, FBO_INTERNAL, w, h, 0, gl.RGBA, FBO_TYPE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        const fbo = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+        return { fbo, tex, w, h };
+      }
+
+      // Multiple Monet seed textures, cycling slowly with crossfade.
+      // Order is chosen so adjacent paintings differ in palette (no two greens in a row).
+      const PAINTING_SRCS = [
+        '/newsletter/005/images/coquelicots.jpg',       // red poppies, sage
+        '/newsletter/005/images/monet-tulips.jpg',      // cool blues, pink/red tulip stripes
+        '/newsletter/005/images/monet-parc.jpg',        // green park, pink florals, warm light
+        '/newsletter/005/images/monet-spring.jpg',      // pastel pinks, soft greens
+        '/newsletter/005/images/monet-poppies.jpg'      // lavender + cool blue, peachy clouds
+      ];
+      const HOLD_S = 12.0;   // (unused now — kept for back-compat with older builds)
+      const FADE_S = 2.2;    // seconds of crossfade between paintings
+      const palW = 320, palH = 240;
+
+      let seedTextures = [];          // GPU textures, one per painting
+      let palettes = [];              // CPU palette caches, one per painting
+      let painImgs = [];              // <img> elements (kept for GC)
+      let A, B;
+      let indexA = 0, indexB = 0;     // both start at painting 0 → seedMix=0 shows painting 0
+      let seedMix = 0;                // 0 → 1 during the crossfade
+      let loadedCount = 0;
+
+      function uploadTexture(img){
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        return tex;
+      }
+      function cachePalette(img){
+        const pal = document.createElement('canvas');
+        pal.width = palW; pal.height = palH;
+        const pctx = pal.getContext('2d');
+        pctx.drawImage(img, 0, 0, palW, palH);
+        return pctx.getImageData(0, 0, palW, palH).data;
+      }
+
+      // Load each painting; once the FIRST one is in, start the loop. Others
+      // join the rotation as they arrive (they're at index >= 1 by definition).
+      PAINTING_SRCS.forEach((src, i) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = src;
+        img.onload = () => {
+          seedTextures[i] = uploadTexture(img);
+          palettes[i] = cachePalette(img);
+          painImgs[i] = img;
+          loadedCount++;
+          if (i === 0) {           // first painting ready → start
+            rebuildFBOs();
+            startLoops();
+          }
+        };
+        img.onerror = () => {
+          if (i === 0 && fallback) fallback.classList.add('show');
+        };
+      });
+
+      function rebuildFBOs(){
+        if (!seedTextures[0]) return;
+        fitSmoke();
+        const w = Math.max(2, Math.floor(smoke.width * SIM_SCALE));
+        const h = Math.max(2, Math.floor(smoke.height * SIM_SCALE));
+        A = makeFBO(w, h); B = makeFBO(w, h);
+        gl.useProgram(progBlit);
+        bindQuad(progBlit);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, seedTextures[0]);
+        gl.uniform1i(gl.getUniformLocation(progBlit, 'u_seedA'), 0);
+        for (const f of [A, B]){
+          gl.bindFramebuffer(gl.FRAMEBUFFER, f.fbo);
+          gl.viewport(0, 0, f.w, f.h);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
+      }
+
+      // Scroll-driven painting transition: each section declares data-monet="N";
+      // an observer picks the section currently most-visible and we lerp seedMix
+      // toward that section's painting over FADE_S seconds.
+      let targetIndex = 0;       // painting we're heading toward
+      let fadeStartAt = null;    // performance.now()/1000 when current fade started
+
+      function visiblePainting(){
+        // When seedMix==0 we show indexA; when ==1 we show indexB; in between, the blend.
+        return seedMix >= 1 ? indexB : (seedMix <= 0 ? indexA : null);
+      }
+
+      function requestPainting(idx){
+        if (idx === targetIndex && fadeStartAt !== null) return;   // already heading there
+        const vp = visiblePainting();
+        if (idx === vp && fadeStartAt === null) return;            // already shown, no fade running
+        // snapshot whatever is currently visible into indexA so the next fade starts cleanly
+        if (fadeStartAt !== null) {
+          if (seedMix >= 0.5) indexA = indexB;
+          // else keep indexA as-is — closer to A than B
+        }
+        indexB = idx;
+        seedMix = 0;
+        fadeStartAt = performance.now() / 1000;
+        targetIndex = idx;
+      }
+
+      function tickCycle(){
+        if (fadeStartAt == null) return;                  // settled
+        const elapsed = performance.now()/1000 - fadeStartAt;
+        if (elapsed >= FADE_S) {
+          indexA = indexB;
+          seedMix = 0;
+          fadeStartAt = null;
+        } else {
+          seedMix = elapsed / FADE_S;
+        }
+      }
+
+      function sampleColor(u, v){
+        // Use index A's palette (the dominant one — accurate during HOLD, slightly off mid-FADE)
+        const palData = palettes[indexA] || palettes[0];
+        if (!palData) return [200, 200, 200];
+        const x = Math.min(palW-1, Math.max(0, (u*palW)|0));
+        const y = Math.min(palH-1, Math.max(0, (v*palH)|0));
+        const i = (y*palW + x)*4;
+        return [palData[i], palData[i+1], palData[i+2]];
+      }
+
+      // ---- chars layer ----
+      const cctx = chars.getContext('2d', { alpha: true });
+      const POOL = ('a a b c d e f g h i j k l m n o o p q r s t t u v w x y z '
+                  + '. . . , , ; \' / — '
+                  + '木 漏 れ 日 風 空 光 雲 雨 想 夢 静 '
+                  + 'ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅇ ㅎ '
+                  + 'A I L K M S').split(/\s+/).filter(Boolean);
+      function fitChars(){
+        const w = chars.clientWidth, h = chars.clientHeight;
+        chars.width  = Math.max(1, Math.floor(w * DPR));
+        chars.height = Math.max(1, Math.floor(h * DPR));
+        cctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        cctx.textBaseline = 'middle';
+        cctx.textAlign = 'center';
+      }
+      fitChars();
+
+      const SIZE_PX = [16, 22, 30];
+      const FONTS = ['"Newsreader", Georgia, serif', '"Noto Serif JP", serif', '"Noto Serif KR", serif'];
+      function fontKey(ch){
+        const cp = ch.codePointAt(0);
+        if (cp >= 0x3000 && cp <= 0x9FFF) return 1;
+        if ((cp >= 0x1100 && cp <= 0x11FF) || (cp >= 0x3130 && cp <= 0x318F)) return 2;
+        return 0;
+      }
+      const PARTICLE_TARGET = IS_NARROW ? 380 : 700;
+      const particles = [];
+      function spawn(p, fresh){
+        const w = chars.clientWidth, h = chars.clientHeight;
+        p.x = Math.random() * w;
+        p.y = Math.random() * h;
+        p.vx = 0; p.vy = 0;
+        p.ch = POOL[(Math.random()*POOL.length)|0];
+        p.sizeClass = (Math.random() < 0.6) ? 0 : (Math.random() < 0.75 ? 1 : 2);
+        p.weight = Math.random() < 0.15 ? 600 : 400;
+        p.life = fresh ? 0 : Math.random() * 220;
+        p.maxLife = 240 + Math.random() * 380;
+        p.fontKey = fontKey(p.ch);
+      }
+      for (let i=0; i<PARTICLE_TARGET; i++){ const p = {}; spawn(p, false); particles.push(p); }
+
+      function flow(x, y, t){
+        const ax = 0.0036, ay = 0.0030, bx = 0.0078, by = 0.0066;
+        const u = Math.sin(y*ay + t*0.26)
+                + 0.55*Math.sin(y*by + x*ax*1.8 + t*0.46)
+                + 0.28*Math.cos(x*ax*0.6 - t*0.36);
+        const v = Math.cos(x*ax + t*0.24)
+                + 0.55*Math.cos(x*bx + y*ay*1.8 + t*0.42)
+                + 0.28*Math.sin(y*ay*0.6 - t*0.46);
+        return [u*0.8, v*0.8];
+      }
+      const SPEED = 48, VEL_SMOOTH = 0.90;
+      const BUCKETS = [];
+      for (let f=0; f<FONTS.length; f++)
+        for (let w of [400, 600])
+          for (let s=0; s<SIZE_PX.length; s++)
+            BUCKETS.push({ font: `italic ${w} ${SIZE_PX[s]}px ${FONTS[f]}`, list: [] });
+      function bucketIndex(p){
+        const w = p.weight === 600 ? 1 : 0;
+        return ((p.fontKey*2 + w)*SIZE_PX.length + p.sizeClass);
+      }
+
+      let running = false;
+      let lastT = performance.now();
+      function smokeFrame(){
+        if (!running) return;
+        tickCycle();
+        const t = (performance.now() - t0)/1000;
+        const seedA = seedTextures[indexA] || seedTextures[0];
+        const seedB = seedTextures[indexB] || seedTextures[indexA] || seedTextures[0];
+        gl.useProgram(progAdvect);
+        bindQuad(progAdvect);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, B.fbo);
+        gl.viewport(0,0,B.w,B.h);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, A.tex);
+        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_prev'),  0);
+        gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, seedA);
+        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_seedA'), 1);
+        gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, seedB);
+        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_seedB'), 2);
+        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_seedMix'), seedMix);
+        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_time'), t);
+        gl.uniform2f(gl.getUniformLocation(progAdvect,'u_resolution'), B.w, B.h);
+        gl.uniform2f(gl.getUniformLocation(progAdvect,'u_cursor'), cursorUV[0], cursorUV[1]);
+        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_cursorPower'), cursorPower);
+        cursorPower *= 0.94;   // exponential decay each frame
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        gl.useProgram(progPresent);
+        bindQuad(progPresent);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, smoke.width, smoke.height);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, B.tex);
+        gl.uniform1i(gl.getUniformLocation(progPresent,'u_src'), 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        const tmp = A; A = B; B = tmp;
+        requestAnimationFrame(smokeFrame);
+      }
+
+      function charsFrame(now){
+        if (!running) return;
+        const t = (now - t0) / 1000;
+        let dt = (now - lastT) / 1000;
+        if (dt > 0.05) dt = 0.05;
+        lastT = now;
+        const w = chars.clientWidth, h = chars.clientHeight;
+        cctx.clearRect(0, 0, w, h);
+        for (const b of BUCKETS) b.list.length = 0;
+        const CURSOR_R = 160;
+        const CURSOR_R2 = CURSOR_R * CURSOR_R;
+        for (const p of particles){
+          const f = flow(p.x, p.y, t);
+          p.vx = p.vx * VEL_SMOOTH + f[0] * (1 - VEL_SMOOTH);
+          p.vy = p.vy * VEL_SMOOTH + f[1] * (1 - VEL_SMOOTH);
+          // cursor scatter — push letters out of a ~160px radius around the cursor
+          if (cursorPX > -1000) {
+            const dx = p.x - cursorPX, dy = p.y - cursorPY;
+            const d2 = dx*dx + dy*dy;
+            if (d2 < CURSOR_R2 && d2 > 4) {
+              const d = Math.sqrt(d2);
+              const force = (CURSOR_R - d) / CURSOR_R;  // 0..1
+              const kick = force * force * 6.5;          // sharper falloff
+              p.x += (dx/d) * kick;
+              p.y += (dy/d) * kick;
+              // also impart a small persistent velocity nudge
+              p.vx += (dx/d) * force * 0.18;
+              p.vy += (dy/d) * force * 0.18;
+            }
+          }
+          p.x += p.vx * SPEED * dt;
+          p.y += p.vy * SPEED * dt;
+          if (p.x < -30) p.x = w + 30;
+          if (p.x > w + 30) p.x = -30;
+          if (p.y < -30) p.y = h + 30;
+          if (p.y > h + 30) p.y = -30;
+          p.life += dt * 60;
+          if (p.life > p.maxLife){ spawn(p, true); continue; }
+          const fadeIn  = Math.min(1, p.life / 40);
+          const fadeOut = Math.min(1, (p.maxLife - p.life) / 40);
+          const vFade = p.y < h * 0.55 ? 1.0
+                      : 1.0 - Math.min(1, (p.y - h*0.55) / (h*0.35));
+          p.alpha = fadeIn * fadeOut * vFade;
+          if (p.alpha < 0.04) continue;
+          const c = sampleColor(p.x / w, p.y / h);
+          p.r = Math.max(0, c[0]-30)|0;
+          p.g = Math.max(0, c[1]-30)|0;
+          p.b = Math.max(0, c[2]-30)|0;
+          BUCKETS[bucketIndex(p)].list.push(p);
+        }
+        for (const b of BUCKETS){
+          if (b.list.length === 0) continue;
+          cctx.font = b.font;
+          for (const p of b.list){
+            cctx.globalAlpha = p.alpha * 0.85;
+            cctx.fillStyle = `rgb(${p.r},${p.g},${p.b})`;
+            cctx.fillText(p.ch, p.x, p.y);
+          }
+        }
+        cctx.globalAlpha = 1;
+        requestAnimationFrame(charsFrame);
+      }
+
+      function startLoops(){
+        if (running) return;
+        running = true;
+        lastT = performance.now();
+        requestAnimationFrame(smokeFrame);
+        requestAnimationFrame(charsFrame);
+      }
+      function stopLoops(){ running = false; }
+
+      // Page-visibility pause (the canvases are now full-viewport fixed, so they
+      // are always "intersecting"; only stop when the tab is backgrounded).
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stopLoops();
+        else if (palettes[0]) startLoops();
+      });
+
+      // Hero-in-view: toggle body class so the cream article-veil lifts on the hero
+      const heroEl = document.getElementById('heroSection');
+      if (heroEl) {
+        new IntersectionObserver((entries) => {
+          for (const e of entries) {
+            document.body.classList.toggle('hero-in-view', e.intersectionRatio > 0.35);
+          }
+        }, { threshold: [0, 0.35, 0.7] }).observe(heroEl);
+      }
+      // Start in "hero-in-view" state so the painting reads from the first frame
+      document.body.classList.add('hero-in-view');
+
+      // Section-driven painting transitions — each [data-monet] element declares
+      // which Monet it wants behind it. We use IntersectionObserver (NOT scroll
+      // events) so this works correctly with Lenis smooth-scroll, programmatic
+      // scrolls, anchor jumps, and native scrolling alike.
+      const sectionEls = Array.from(document.querySelectorAll('[data-monet]'));
+      if (heroEl && !heroEl.hasAttribute('data-monet')) {
+        heroEl.setAttribute('data-monet', '0');
+        sectionEls.unshift(heroEl);
+      }
+      const sectionRatios = new Map();
+      function pickActiveSection(){
+        let bestEl = null, bestRatio = 0;
+        for (const [el, ratio] of sectionRatios) {
+          if (ratio > bestRatio) { bestRatio = ratio; bestEl = el; }
+        }
+        if (bestEl && bestRatio > 0.02) {
+          const idx = parseInt(bestEl.getAttribute('data-monet'), 10) || 0;
+          if (seedTextures[idx]) requestPainting(idx);
+        }
+      }
+      // rootMargin shrinks the viewport's "active band" to the middle 40% — an
+      // element only counts as visible when it crosses into that band, so the
+      // painting changes when a chapter is centered, not as soon as it peeks in.
+      const sectionObserver = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          sectionRatios.set(e.target, e.intersectionRatio);
+        }
+        pickActiveSection();
+      }, {
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
+        rootMargin: '-30% 0px -30% 0px'
+      });
+      sectionEls.forEach(el => {
+        sectionRatios.set(el, 0);
+        sectionObserver.observe(el);
+      });
+
+      // expose for debug / external probes
+      window.__monetState = () => ({
+        indexA, indexB, seedMix, targetIndex,
+        loaded: seedTextures.map((t, i) => !!t),
+        fadeStartAt,
+        sectionEls: sectionEls.length,
+        ratios: Array.from(sectionRatios.entries()).map(([el, r]) => ({
+          tag: el.tagName + '.' + (el.className || '').split(' ')[0],
+          monet: el.getAttribute('data-monet'),
+          ratio: r.toFixed(2)
+        }))
+      });
+      window.__pickActiveSection = pickActiveSection;
+
+      let resizeTimer;
+      addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => { fitChars(); rebuildFBOs(); }, 100);
+      });
+    })();
+    </script>
 </body>
 </html>
