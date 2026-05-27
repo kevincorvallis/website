@@ -1249,11 +1249,16 @@
         function insertBlock(type, afterId) {
             var nb = makeBlock(type);
             if (!nb) return;
-            if (afterId == null) {
+            if (afterId === '') {
+                // Empty string = "top of canvas" sentinel (the first insert rail)
+                state.blocks.unshift(nb);
+            } else if (afterId == null) {
+                // null = "no anchor, append to end" (rail-button adds)
                 state.blocks.push(nb);
             } else {
                 var idx = state.blocks.findIndex(function(b) { return b.id === afterId; });
-                state.blocks.splice(idx + 1, 0, nb);
+                if (idx < 0) state.blocks.push(nb);
+                else state.blocks.splice(idx + 1, 0, nb);
             }
             selectedId = nb.id;
             render();
@@ -1473,8 +1478,9 @@
             var insertItem = e.target.closest('.insert-popover [data-insert]');
             if (insertItem) {
                 var rail2 = insertItem.closest('.insert-rail');
-                var afterId = rail2.getAttribute('data-after-id') || null;
-                insertBlock(insertItem.getAttribute('data-insert'), afterId);
+                // PRESERVE empty-string sentinel — `"" || null` collapses to null and breaks top inserts
+                var afterAttr = rail2.hasAttribute('data-after-id') ? rail2.getAttribute('data-after-id') : null;
+                insertBlock(insertItem.getAttribute('data-insert'), afterAttr);
                 rail2.classList.remove('active');
                 return;
             }
