@@ -135,13 +135,13 @@ function toApiArticle(row) {
         title_ko: row.title_ko || null,
         subtitle: row.description_en || null,
         subtitle_ko: row.description_ko || null,
-        template_key: row.template_key || null,
+        template_key: null,
         status: row.status,
         visibility: 'public',
         cover_image_url: row.cover_image_url || null,
         body_json: row.content_blocks || [],
         published_at: row.published_at,
-        updated_at: row.updated_at,
+        updated_at: row.created_at,
         created_at: row.created_at,
     };
 }
@@ -189,28 +189,37 @@ module.exports = async function handler(req, res) {
             if (id) {
                 if (!isValidId(id)) return res.status(400).json({ error: 'Valid id required' });
                 const r = await fetch(
-                    `${SUPABASE_URL}/rest/v1/articles?id=eq.${id}&author_id=eq.${profile.id}&select=id,slug,title_en,title_ko,description_en,description_ko,template_key,status,cover_image_url,content_blocks,published_at,updated_at,created_at`,
+                    `${SUPABASE_URL}/rest/v1/articles?id=eq.${id}&author_id=eq.${profile.id}&select=id,slug,title_en,title_ko,description_en,description_ko,status,cover_image_url,content_blocks,published_at,created_at`,
                     { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
                 );
-                if (!r.ok) return res.status(502).json({ error: 'Could not load article' });
+                if (!r.ok) {
+                    const txt = await r.text();
+                    console.error('article get failed:', r.status, txt);
+                    return res.status(502).json({ error: 'Could not load article' });
+                }
                 const rows = await r.json();
                 if (!rows.length) return res.status(404).json({ error: 'Not found' });
                 return res.status(200).json({ ok: true, profile: apiProfile, article: toApiArticle(rows[0]) });
             }
             const r = await fetch(
-                `${SUPABASE_URL}/rest/v1/articles?author_id=eq.${profile.id}&select=id,slug,title_en,title_ko,description_en,template_key,status,cover_image_url,published_at,updated_at&order=updated_at.desc`,
+                `${SUPABASE_URL}/rest/v1/articles?author_id=eq.${profile.id}&select=id,slug,title_en,title_ko,description_en,status,cover_image_url,published_at,created_at&order=created_at.desc`,
                 { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
             );
-            if (!r.ok) return res.status(502).json({ error: 'Could not load articles' });
+            if (!r.ok) {
+                const txt = await r.text();
+                console.error('articles list failed:', r.status, txt);
+                return res.status(502).json({ error: 'Could not load articles' });
+            }
             const rows = await r.json();
             return res.status(200).json({ ok: true, profile: apiProfile, articles: rows.map(toApiArticle) });
         }
 
         // ---- CREATE ----
         if (req.method === 'POST') {
-            const { title, template_key, body_json } = req.body || {};
+            const { title, body_json } = req.body || {};
             const t = (title && typeof title === 'string') ? title.trim().slice(0, 200) : '';
-            const tk = (template_key && typeof template_key === 'string' && ['field-notes','photo-essay','receipt','blank'].includes(template_key)) ? template_key : null;
+            // template_key is accepted in the body for forward-compat but not persisted
+            // (existing schema doesn't have this column; safe to drop)
 
             let validatedBlocks = [];
             if (body_json !== undefined) {
@@ -234,7 +243,6 @@ module.exports = async function handler(req, res) {
                 author_id: profile.id,
                 slug,
                 title_en: t,
-                template_key: tk,
                 status: 'draft',
                 content_blocks: validatedBlocks,
             };
@@ -271,9 +279,7 @@ module.exports = async function handler(req, res) {
                 if (u && isLocalUrl(u)) return res.status(400).json({ error: 'cover_image_url must be an uploaded URL' });
                 updates.cover_image_url = u;
             }
-            if ('template_key' in patch) {
-                updates.template_key = (patch.template_key && ['field-notes','photo-essay','receipt','blank'].includes(patch.template_key)) ? patch.template_key : null;
-            }
+            // template_key is intentionally ignored on update — column doesn't exist in the existing schema yet
             if ('body_json' in patch) {
                 const v = validateBlocks(patch.body_json);
                 if (!v.ok) return res.status(400).json({ error: v.error });
