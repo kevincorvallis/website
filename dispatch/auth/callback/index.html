@@ -17,66 +17,314 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
 
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #f0eee6; --text: #1f1e1d; --caption: #8a8880; --accent: #a0826d;
+            --bg: #f0eee6;
+            --bg-warm: #e9e3d4;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --accent-soft: #c4a882;
             --rule: rgba(31,30,29,0.1);
+            --rule-strong: rgba(31,30,29,0.18);
+            --warn: #b35a3d;
             --font: 'Newsreader', Georgia, serif;
             --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
         }
-        [data-theme="dark"] { --bg: #1f1e1d; --text: #f0eee6; --caption: #7a7a75; --accent: #c4a882; --rule: rgba(240,238,230,0.08); }
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --bg-warm: #2a2723;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --accent-soft: #a0826d;
+            --rule: rgba(240,238,230,0.08);
+            --rule-strong: rgba(240,238,230,0.14);
+        }
 
         html, body { height: 100%; }
         body {
             font-family: var(--font);
-            background: var(--bg); color: var(--text);
+            background: var(--bg);
+            color: var(--text);
             font-size: 18px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.6s ease, color 0.3s ease;
         }
-        .wordmark {
+        a { color: inherit; text-decoration: none; transition: opacity 0.2s ease; }
+        a:hover { opacity: 0.6; }
+
+        /* Atmosphere */
+        .backdrop {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+        }
+        .backdrop::before {
+            content: '';
+            position: absolute; top: -80px; left: 50%;
+            transform: translateX(-50%);
+            width: 900px; height: 600px;
+            background: radial-gradient(ellipse at top, rgba(160,130,109,0.18), transparent 65%);
+            opacity: 0; animation: fadeIn 1.8s 0.2s ease forwards;
+        }
+        [data-theme="dark"] .backdrop::before {
+            background: radial-gradient(ellipse at top, rgba(196,168,130,0.15), transparent 65%);
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Header */
+        header {
+            position: relative; z-index: 5;
+            padding: 22px 28px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .back-link {
+            font-size: 13px; opacity: 0.55;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .nav-wordmark {
             font-family: var(--font-display); font-style: italic; font-weight: 600;
-            font-size: 22px; margin-bottom: 56px;
+            font-size: 18px;
         }
-        .wordmark::after {
-            content: '✶'; margin-left: 6px; color: var(--accent);
-            font-style: normal; font-size: 12px; vertical-align: super;
+        .nav-wordmark::after {
+            content: '✶'; margin-left: 4px; color: var(--accent);
+            font-style: normal; font-size: 10px; vertical-align: super;
         }
+        .theme-pill {
+            width: 36px; height: 18px; border-radius: 100px;
+            background: var(--text); position: relative; cursor: pointer;
+        }
+        .theme-pill::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 14px; height: 14px; border-radius: 50%; background: var(--bg);
+            transition: transform 0.2s ease;
+        }
+        [data-theme="dark"] .theme-pill::after { transform: translateX(18px); }
+        .theme-pill input { display: none; }
 
-        .card { width: 100%; max-width: 420px; text-align: center; }
+        /* Main */
+        main {
+            flex: 1; z-index: 5; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px 24px 60px;
+        }
+        .card {
+            width: 100%;
+            max-width: 540px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(16px);
+            animation: rise 0.9s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        @keyframes rise { to { opacity: 1; transform: translateY(0); } }
 
-        h1 {
+        /* ===== LOADING STATE ===== */
+        .loading-h1 {
             font-family: var(--font-display); font-weight: 600; font-style: italic;
-            font-size: 32px; line-height: 1.1; margin-bottom: 14px;
+            font-size: 36px; line-height: 1.1;
+            margin-bottom: 14px;
         }
-        h1 em { color: var(--accent); font-style: italic; }
-        p { color: var(--caption); margin-bottom: 36px; }
-        p .accent { color: var(--text); }
-
-        .status-line {
-            font-size: 14px; font-style: italic; color: var(--caption);
-            min-height: 22px;
+        .loading-h1 em { color: var(--accent); font-style: italic; }
+        .loading-sub { color: var(--caption); font-size: 16px; }
+        .spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid var(--rule); border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.9s linear infinite;
+            vertical-align: middle; margin-right: 10px;
         }
-        .status-line.error { color: #b35a3d; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .field { margin: 18px 0 28px; position: relative; }
+        /* ===== CLAIM STATE ===== */
+        .eyebrow {
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.28em; text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 22px;
+            display: inline-block;
+        }
+        .eyebrow::before, .eyebrow::after {
+            content: ''; display: inline-block;
+            width: 20px; height: 1px;
+            background: currentColor;
+            vertical-align: middle;
+            margin: 0 12px;
+            opacity: 0.5;
+        }
+
+        h1.title {
+            font-family: var(--font-display);
+            font-weight: 600; font-style: italic;
+            font-size: 44px; line-height: 1.05;
+            letter-spacing: -0.015em;
+            margin-bottom: 14px;
+        }
+        h1.title em { color: var(--accent); font-style: italic; }
+
+        .subtitle {
+            color: var(--caption); font-size: 17px;
+            line-height: 1.5;
+            max-width: 420px;
+            margin: 0 auto 56px;
+        }
+
+        /* URL preview — the centerpiece */
+        .url-preview {
+            margin: 0 auto 12px;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0;
+            justify-content: center;
+            line-height: 1;
+            max-width: 100%;
+            flex-wrap: nowrap;
+        }
+        .url-prefix {
+            font-family: var(--font);
+            font-size: 26px;
+            color: var(--caption);
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+        .url-handle {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 56px;
+            color: var(--accent);
+            line-height: 1;
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+            transition: color 0.3s ease;
+            min-width: 1ch;
+        }
+        .url-handle.ghost {
+            color: var(--caption);
+            opacity: 0.35;
+        }
+        .url-handle .caret {
+            display: inline-block;
+            width: 2px;
+            height: 0.85em;
+            background: currentColor;
+            margin-left: 2px;
+            vertical-align: middle;
+            opacity: 0;
+            animation: blink 1.05s steps(2, jump-none) infinite;
+        }
+        .url-rule {
+            width: 60%; max-width: 320px;
+            height: 1px;
+            background: var(--rule);
+            margin: 0 auto 32px;
+        }
+        @keyframes blink { 50% { opacity: 1; } }
+
+        /* Hidden real input — visible on focus via the wrapper */
+        .field {
+            position: relative;
+            max-width: 360px;
+            margin: 0 auto 14px;
+        }
         .field input {
-            width: 100%; background: transparent; border: none;
+            width: 100%;
+            background: transparent;
+            border: none;
             border-bottom: 1px solid var(--rule);
-            padding: 12px 0; font-size: 22px; font-family: var(--font);
-            color: var(--text); outline: none; text-align: center;
-            transition: border-bottom-color 0.3s ease;
+            padding: 10px 0;
+            font-family: var(--font);
+            font-size: 18px;
+            color: var(--text);
+            outline: none;
+            text-align: center;
+            letter-spacing: 0.02em;
+            transition: border-color 0.3s ease;
         }
-        .field input::placeholder { color: var(--caption); font-style: italic; }
+        .field input::placeholder { color: var(--caption); font-style: italic; opacity: 0.5; }
         .field input:focus { border-bottom-color: var(--accent); }
-        .field-hint {
-            font-size: 13px; color: var(--caption); font-style: italic;
-            margin-top: 8px; text-align: center;
+        .field::after {
+            content: '';
+            position: absolute;
+            left: 50%; bottom: 0;
+            width: 0; height: 1px;
+            background: var(--accent);
+            transition: width 0.4s ease, left 0.4s ease;
+        }
+        .field:focus-within::after {
+            width: 100%; left: 0;
         }
 
+        /* Validation row */
+        .validate {
+            margin: 0 auto 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--caption);
+            min-height: 22px;
+            transition: color 0.3s ease;
+        }
+        .validate .dot {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--rule-strong);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            flex-shrink: 0;
+        }
+        .validate.ok { color: var(--accent); }
+        .validate.ok .dot { background: var(--accent); }
+        .validate.err { color: var(--warn); }
+        .validate.err .dot { background: var(--warn); }
+        .validate.checking .dot { animation: pulse 1s ease-in-out infinite; }
+        @keyframes pulse { 50% { opacity: 0.3; transform: scale(0.85); } }
+
+        /* Suggestion chips */
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto 36px;
+            max-width: 440px;
+            min-height: 0;
+        }
+        .suggestions:empty { display: none; }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 15px;
+            color: var(--accent);
+            border: 1px solid var(--rule-strong);
+            border-radius: 100px;
+            padding: 5px 14px;
+            cursor: pointer;
+            background: transparent;
+            transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.2s ease;
+        }
+        .chip::before {
+            content: '@';
+            opacity: 0.5;
+            margin-right: 2px;
+            font-style: italic;
+        }
+        .chip:hover {
+            border-color: var(--accent);
+            background: rgba(160,130,109,0.06);
+            transform: translateY(-1px);
+        }
+        [data-theme="dark"] .chip:hover { background: rgba(196,168,130,0.08); }
+
+        /* CTA */
         .btn {
             background: transparent; border: none; cursor: pointer;
             font-family: var(--font); font-size: 18px; font-weight: 600;
@@ -86,63 +334,191 @@
             transition: color 0.3s ease, border-bottom-color 0.3s ease, transform 0.2s ease;
         }
         .btn:hover { color: var(--accent); border-bottom-color: var(--accent); transform: translateY(-2px); }
-        .btn:disabled { opacity: 0.4; cursor: wait; transform: none; }
-        .btn .arrow { transition: transform 0.2s ease; }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; pointer-events: none; }
+        .btn .arrow { transition: transform 0.2s ease; display: inline-block; }
         .btn:hover .arrow { transform: translateX(4px); }
 
-        .spinner {
-            display: inline-block; width: 18px; height: 18px;
-            border: 2px solid var(--rule); border-top-color: var(--accent);
-            border-radius: 50%; animation: spin 0.9s linear infinite;
-            vertical-align: middle; margin-right: 10px;
+        .submit-row {
+            margin-bottom: 18px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Footnote + disclosure */
+        .footnote {
+            margin-top: 18px;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--caption);
+        }
+        .disclosure {
+            margin-top: 36px;
+            font-size: 13px;
+            color: var(--caption);
+        }
+        .disclosure summary {
+            cursor: pointer;
+            font-style: italic;
+            display: inline-block;
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 1px;
+            list-style: none;
+            transition: color 0.2s ease;
+        }
+        .disclosure summary::marker, .disclosure summary::-webkit-details-marker { display: none; }
+        .disclosure summary:hover { color: var(--text); }
+        .disclosure[open] summary { color: var(--text); border-bottom-color: var(--text); }
+        .disclosure .body {
+            margin-top: 18px;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: left;
+            color: var(--caption);
+            padding: 16px 18px;
+            border: 1px solid var(--rule);
+            border-radius: 6px;
+            background: rgba(160,130,109,0.04);
+            font-style: normal;
+        }
+        [data-theme="dark"] .disclosure .body { background: rgba(196,168,130,0.05); }
+        .disclosure .body p { margin-bottom: 0.8em; }
+        .disclosure .body p:last-child { margin-bottom: 0; }
+        .disclosure .body em { font-style: italic; color: var(--text); }
+
+        /* ===== ERROR STATE ===== */
+        .err-h1 {
+            font-family: var(--font-display); font-weight: 600; font-style: italic;
+            font-size: 36px; line-height: 1.1; margin-bottom: 14px;
+        }
+        .err-h1 em { color: var(--accent); font-style: italic; }
+        .err-msg { color: var(--caption); font-size: 16px; margin-bottom: 36px; }
+
+        footer {
+            position: relative; z-index: 5;
+            padding: 22px; text-align: center;
+            font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--caption); opacity: 0.55;
+        }
+
+        @media (max-width: 540px) {
+            .url-handle { font-size: 40px; }
+            .url-prefix { font-size: 20px; }
+            h1.title { font-size: 34px; }
+            .field { max-width: 100%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
     </style>
 </head>
 <body>
-    <div class="wordmark">Dispatch</div>
+    <div class="backdrop"></div>
 
-    <div class="card" id="card">
-        <div id="loadingState">
-            <h1>Signing you in<em>.</em></h1>
-            <p><span class="spinner"></span>One moment.</p>
-        </div>
+    <header>
+        <a href="/dispatch/" class="back-link">&larr; back</a>
+        <a href="/dispatch/" class="nav-wordmark">Dispatch</a>
+        <label class="theme-pill" for="theme-toggle"><input type="checkbox" id="theme-toggle"></label>
+    </header>
 
-        <div id="claimState" style="display:none;">
-            <h1>Pick a <em>handle.</em></h1>
-            <p>This is your URL: <span class="accent">klee.page/@<span id="previewHandle">you</span></span></p>
-            <form id="claimForm">
-                <div class="field">
-                    <input type="text" id="usernameInput" placeholder="yourname" autocomplete="username"
-                           autocorrect="off" autocapitalize="none" spellcheck="false"
-                           maxlength="20" required>
+    <main>
+        <div class="card" id="card">
+            <!-- LOADING STATE -->
+            <div id="loadingState">
+                <p class="eyebrow">One moment</p>
+                <h1 class="loading-h1">Signing you <em>in.</em></h1>
+                <p class="loading-sub"><span class="spinner"></span>Verifying your link…</p>
+            </div>
+
+            <!-- CLAIM HANDLE STATE -->
+            <div id="claimState" style="display:none;">
+                <p class="eyebrow">Welcome — Step 1 of 1</p>
+                <h1 class="title">Pick a <em>handle.</em></h1>
+                <p class="subtitle">This is where your letters live. People will share your handle as your URL — and it stays with you.</p>
+
+                <div class="url-preview">
+                    <span class="url-prefix">klee.page/@</span><span class="url-handle ghost" id="urlHandle">yourname<span class="caret"></span></span>
                 </div>
-                <button class="btn" id="claimBtn" type="submit">
-                    Claim &amp; start writing <span class="arrow">→</span>
-                </button>
-            </form>
-            <p class="status-line" id="claimStatus" role="status" aria-live="polite"></p>
-        </div>
+                <div class="url-rule"></div>
 
-        <div id="errorState" style="display:none;">
-            <h1>That link <em>didn't work.</em></h1>
-            <p id="errorMsg">It may have expired. Try requesting a new one.</p>
-            <a class="btn" href="/dispatch/sign-in/">Back to sign in <span class="arrow">→</span></a>
+                <form id="claimForm" novalidate>
+                    <div class="field">
+                        <input
+                            type="text"
+                            id="usernameInput"
+                            placeholder="type your handle"
+                            autocomplete="username"
+                            autocorrect="off"
+                            autocapitalize="none"
+                            spellcheck="false"
+                            maxlength="20"
+                            required
+                        >
+                    </div>
+                    <div class="validate" id="validate" role="status" aria-live="polite">
+                        <span class="dot"></span>
+                        <span class="msg">3–20 lowercase letters, numbers, or underscores.</span>
+                    </div>
+
+                    <div class="suggestions" id="suggestions" aria-label="Suggested handles"></div>
+
+                    <div class="submit-row">
+                        <button class="btn" id="claimBtn" type="submit" disabled>
+                            Claim &amp; start writing <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </form>
+
+                <p class="footnote">You can change your display name later. Your handle is permanent.</p>
+
+                <details class="disclosure">
+                    <summary>What's a handle?</summary>
+                    <div class="body">
+                        <p>Your handle is the URL where your dispatches live: <em>klee.page/@yourname</em>. It's how the people you write to find your letters, and the link you share when you publish.</p>
+                        <p>Pick something that feels like yours — a nickname, your first name, or a short phrase. <em>3 to 20 characters, lowercase letters, numbers, or underscores.</em></p>
+                        <p>You can't change it later, so don't overthink it — most people just use their first name.</p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ERROR STATE -->
+            <div id="errorState" style="display:none;">
+                <p class="eyebrow">Something went wrong</p>
+                <h1 class="err-h1">That link <em>didn't work.</em></h1>
+                <p class="err-msg" id="errorMsg">It may have expired. Try requesting a new one.</p>
+                <a class="btn" href="/dispatch/sign-in/">Back to sign in <span class="arrow">→</span></a>
+            </div>
         </div>
-    </div>
+    </main>
+
+    <footer>klee.page · Dispatch is open to friends</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/dispatch/js/dispatch-config.js"></script>
     <script src="/dispatch/js/dispatch-api.js"></script>
     <script>
-        var loading = document.getElementById('loadingState');
-        var claim   = document.getElementById('claimState');
-        var errorEl = document.getElementById('errorState');
-        var errorMsg = document.getElementById('errorMsg');
-        var claimStatus = document.getElementById('claimStatus');
-        var preview = document.getElementById('previewHandle');
-        var usernameInput = document.getElementById('usernameInput');
-        var claimBtn = document.getElementById('claimBtn');
+        // ===== Theme =====
+        (function () {
+            var toggle = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            toggle.checked = root.getAttribute('data-theme') === 'dark';
+            toggle.addEventListener('change', function () {
+                var theme = toggle.checked ? 'dark' : 'light';
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            });
+        })();
+
+        // ===== Elements =====
+        var loading      = document.getElementById('loadingState');
+        var claim        = document.getElementById('claimState');
+        var errorEl      = document.getElementById('errorState');
+        var errorMsg     = document.getElementById('errorMsg');
+        var urlHandle    = document.getElementById('urlHandle');
+        var usernameInput= document.getElementById('usernameInput');
+        var claimBtn     = document.getElementById('claimBtn');
+        var validate     = document.getElementById('validate');
+        var validateMsg  = validate.querySelector('.msg');
+        var suggestions  = document.getElementById('suggestions');
+
         var callbackParams = new URLSearchParams(window.location.search);
         var callbackInvite = callbackParams.get('invite');
         if (callbackInvite) {
@@ -155,21 +531,113 @@
             claim.style.display   = which === 'claim'   ? '' : 'none';
             errorEl.style.display = which === 'error'   ? '' : 'none';
         }
-
         function failWith(msg) {
             errorMsg.textContent = msg || 'It may have expired. Try requesting a new one.';
             show('error');
         }
 
+        // ===== Validation states =====
+        var HANDLE_RE = /^[a-z0-9_]{3,20}$/;
+        function setValidate(kind, message) {
+            validate.className = 'validate ' + (kind || '');
+            validateMsg.textContent = message;
+        }
+        function updateValidity() {
+            var raw = usernameInput.value || '';
+            var v = raw.toLowerCase().replace(/[^a-z0-9_]/g, '');
+            if (raw !== v) usernameInput.value = v;
+            urlHandle.classList.toggle('ghost', !v);
+            if (!v) {
+                urlHandle.textContent = 'yourname';
+                urlHandle.appendChild(makeCaret());
+                setValidate('', '3–20 lowercase letters, numbers, or underscores.');
+                claimBtn.disabled = true;
+                return;
+            }
+            urlHandle.textContent = v;
+            urlHandle.appendChild(makeCaret());
+            if (v.length < 3) {
+                setValidate('err', 'A bit longer — 3 characters minimum.');
+                claimBtn.disabled = true;
+                return;
+            }
+            if (!HANDLE_RE.test(v)) {
+                setValidate('err', 'Only lowercase letters, numbers, and underscores.');
+                claimBtn.disabled = true;
+                return;
+            }
+            setValidate('ok', 'Looks good. Click to claim it.');
+            claimBtn.disabled = false;
+        }
+        function makeCaret() {
+            var c = document.createElement('span');
+            c.className = 'caret';
+            return c;
+        }
+
+        usernameInput.addEventListener('input', updateValidity);
+
+        // ===== Suggestions, derived from current Supabase user =====
+        function sanitize(raw) {
+            return String(raw || '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+        }
+        function makeSuggestions(user) {
+            var candidates = [];
+            var meta = (user && user.user_metadata) || {};
+            var nameSource = meta.full_name || meta.name || meta.display_name || '';
+            var email = (user && user.email) || '';
+            var emailLocal = email.split('@')[0] || '';
+
+            // 1. emailLocal (e.g. "kevincorvallis")
+            if (emailLocal) candidates.push(sanitize(emailLocal));
+            // 2. first name (lowercased)
+            var firstName = (nameSource.split(' ')[0] || '').toLowerCase();
+            if (firstName) candidates.push(sanitize(firstName));
+            // 3. first + last initial (e.g. "kevinl")
+            var parts = nameSource.split(/\s+/).filter(Boolean);
+            if (parts.length >= 2) {
+                candidates.push(sanitize(parts[0] + parts[parts.length - 1].charAt(0)));
+            }
+            // 4. short nickname from first 3 chars
+            if (firstName && firstName.length > 3) candidates.push(sanitize(firstName.slice(0, 4)));
+
+            // Dedupe, keep valid lengths, trim to 3 suggestions
+            var seen = {};
+            var out = [];
+            for (var i = 0; i < candidates.length; i++) {
+                var c = candidates[i];
+                if (c && c.length >= 3 && c.length <= 20 && !seen[c]) {
+                    seen[c] = 1;
+                    out.push(c);
+                    if (out.length >= 3) break;
+                }
+            }
+            return out;
+        }
+        function renderSuggestions(items) {
+            suggestions.innerHTML = '';
+            items.forEach(function (handle) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'chip';
+                b.textContent = handle;
+                b.addEventListener('click', function () {
+                    usernameInput.value = handle;
+                    updateValidity();
+                    usernameInput.focus();
+                });
+                suggestions.appendChild(b);
+            });
+        }
+
+        // ===== Boot =====
         (async function () {
-            // Wait for Supabase library to load
             if (!window.supabase || !window.Dispatch) {
                 failWith('Supabase client failed to load.');
                 return;
             }
             window.Dispatch.init();
 
-            // Supabase parses ?code=... or #access_token=... automatically when detectSessionInUrl is true
             var session = null;
             for (var i = 0; i < 12 && !session; i++) {
                 session = await window.Dispatch.session();
@@ -181,13 +649,11 @@
                 return;
             }
 
-            // Clean tokens out of the URL
             try { history.replaceState({}, '', '/dispatch/auth/callback/'); } catch (_) {}
 
-            // Try to load profile — if API says "claim a handle", show the claim form
             try {
-                var result = await window.Dispatch.listArticles();
-                // We have a profile already → go where they intended
+                await window.Dispatch.listArticles();
+                // Already has a handle
                 var dest = sessionStorage.getItem('dispatch.post-auth') || '/dispatch/editor/';
                 sessionStorage.removeItem('dispatch.post-auth');
                 sessionStorage.removeItem('dispatch.invite-code');
@@ -196,48 +662,40 @@
                 return;
             } catch (err) {
                 if (err.status === 403) {
-                    // Needs to claim a handle
+                    // First sign-in: needs to claim a handle
                     show('claim');
+                    renderSuggestions(makeSuggestions(session.user));
+                    updateValidity();
                     usernameInput.focus();
                     return;
                 }
                 failWith(err.message || 'Could not load your account.');
-                return;
             }
         })();
 
-        // Live preview of handle (3–20 lowercase letters, numbers, underscores — matches profiles_handle_format)
-        usernameInput && usernameInput.addEventListener('input', function () {
-            var v = (usernameInput.value || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
-            preview.textContent = v || 'you';
-        });
-
-        // Submit handle
+        // ===== Submit =====
         var form = document.getElementById('claimForm');
-        form && form.addEventListener('submit', async function (e) {
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
             var v = (usernameInput.value || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
-            if (!v || v.length < 3) {
-                claimStatus.className = 'status-line error';
-                claimStatus.textContent = 'At least three characters.';
+            if (!HANDLE_RE.test(v)) {
+                setValidate('err', 'Handle needs to be 3–20 letters, numbers, or underscores.');
                 return;
             }
             claimBtn.disabled = true;
-            claimStatus.className = 'status-line';
-            claimStatus.textContent = 'Claiming…';
+            setValidate('checking', 'Claiming ' + v + '…');
             try {
                 var inviteCode = sessionStorage.getItem('dispatch.invite-code') || localStorage.getItem('dispatch.invite-code');
                 await window.Dispatch.claimUsername(v, inviteCode ? { invitation_code: inviteCode } : {});
                 sessionStorage.removeItem('dispatch.invite-code');
                 localStorage.removeItem('dispatch.invite-code');
-                claimStatus.textContent = 'Got it.';
+                setValidate('ok', 'Got it. Sending you to your editor…');
                 var dest = sessionStorage.getItem('dispatch.post-auth') || '/dispatch/editor/';
                 sessionStorage.removeItem('dispatch.post-auth');
-                setTimeout(function () { window.location.href = dest; }, 400);
+                setTimeout(function () { window.location.href = dest; }, 600);
             } catch (err) {
-                claimStatus.className = 'status-line error';
-                claimStatus.textContent = err.message || 'Could not claim that handle.';
                 claimBtn.disabled = false;
+                setValidate('err', err.message || 'Could not claim that handle.');
             }
         });
     </script>
