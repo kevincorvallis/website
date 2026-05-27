@@ -24,6 +24,17 @@ function isRateLimited(ip) {
     return entry.count > RATE_LIMIT;
 }
 
+// Trust Vercel's headers in preference order; x-forwarded-for can be spoofed by the client.
+function clientIp(req) {
+    const vcl = req.headers['x-vercel-forwarded-for'];
+    if (vcl) return String(vcl).split(',').pop().trim();
+    const real = req.headers['x-real-ip'];
+    if (real) return String(real).trim();
+    const xff = req.headers['x-forwarded-for'];
+    if (xff) return String(xff).split(',').pop().trim();
+    return req.socket && req.socket.remoteAddress || 'unknown';
+}
+
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
 }
@@ -86,8 +97,7 @@ module.exports = async function handler(req, res) {
         return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
-    if (isRateLimited(ip)) return res.status(429).json({ error: 'Too many requests' });
+    if (isRateLimited(clientIp(req))) return res.status(429).json({ error: 'Too many requests' });
 
     const { email, code } = req.body || {};
     if (!email || typeof email !== 'string' || !isValidEmail(email.trim())) {

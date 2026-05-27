@@ -433,12 +433,21 @@ module.exports = async function handler(req, res) {
         return res.status(500).send(notFoundPage());
     }
 
-    const u = (req.query.u || '').toString().toLowerCase();
-    const s = (req.query.s || '').toString().toLowerCase();
+    const uRaw = (req.query.u || '').toString();
+    const sRaw = (req.query.s || '').toString();
+    const u = uRaw.toLowerCase();
+    const s = sRaw.toLowerCase();
 
     if (!u || !/^[a-z0-9_]{3,20}$/.test(u)) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         return res.status(404).send(notFoundPage());
+    }
+
+    // Canonicalize: /@KEVINLEE → 301 /@kevinlee so handles only live at one URL
+    if (uRaw !== u || sRaw !== s) {
+        const canonical = '/@' + u + (s ? '/' + s : '');
+        res.setHeader('Location', canonical);
+        return res.status(301).end();
     }
 
     try {
@@ -480,10 +489,14 @@ module.exports = async function handler(req, res) {
 
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+            // og:image fallback: author's avatar, or the cover of their most recent published article
+            const profileOg = profile.avatar_url
+                || (articles[0] && articles[0].cover_image_url)
+                || null;
             return res.status(200).send(pageShell({
                 title: `${profile.display_name || profile.username} — Dispatch`,
                 description: profile.bio || `Dispatches by @${profile.username}.`,
-                image: null,
+                image: profileOg,
                 username: profile.username,
                 displayName: profile.display_name,
                 body,

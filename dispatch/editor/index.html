@@ -1133,6 +1133,9 @@
             } catch (e) { return null; }
         }
         function saveDraft() {
+            // Don't persist while the picker is showing (state.id is null until startWith fires).
+            // Otherwise stray keystrokes write localStorage.dispatch.draft.null.
+            if (!state.id) return;
             state.updatedAt = new Date().toISOString();
             try {
                 localStorage.setItem('dispatch.draft.' + state.id, JSON.stringify(state));
@@ -1922,7 +1925,8 @@
 
             if (id) {
                 var d = loadDraft(id);
-                if (d) {
+                // Guard against malformed/old-shape drafts — must have a real blocks array
+                if (d && Array.isArray(d.blocks)) {
                     state = Object.assign(state, d);
                     document.getElementById('titleInput').value = state.title || '';
                     render();

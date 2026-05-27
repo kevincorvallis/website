@@ -27,6 +27,15 @@ function isRateLimited(ip) {
     entry.count++;
     return entry.count > RATE_LIMIT;
 }
+function clientIp(req) {
+    const vcl = req.headers['x-vercel-forwarded-for'];
+    if (vcl) return String(vcl).split(',').pop().trim();
+    const real = req.headers['x-real-ip'];
+    if (real) return String(real).trim();
+    const xff = req.headers['x-forwarded-for'];
+    if (xff) return String(xff).split(',').pop().trim();
+    return req.socket && req.socket.remoteAddress || 'unknown';
+}
 
 async function verifyUser(token) {
     const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
@@ -63,12 +72,8 @@ module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     if (!SUPABASE_URL || !SUPABASE_KEY) return res.status(500).json({ error: 'Server configuration error' });
-    if (!CLOUD_NAME || !API_KEY || !API_SECRET) {
-        return res.status(500).json({ error: 'Image uploads are not configured yet.' });
-    }
 
-    const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
-    if (isRateLimited(ip)) return res.status(429).json({ error: 'Too many requests' });
+    if (isRateLimited(clientIp(req))) return res.status(429).json({ error: 'Too many requests' });
 
     const auth = req.headers.authorization || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
@@ -77,6 +82,9 @@ module.exports = async function handler(req, res) {
     if (!user || !user.id) return res.status(401).json({ error: 'Invalid session.' });
     const profile = await getProfile(user.id);
     if (!profile || !profile.handle) return res.status(403).json({ error: 'Claim a handle first.' });
+    if (!CLOUD_NAME || !API_KEY || !API_SECRET) {
+        return res.status(500).json({ error: 'Image uploads are not configured yet.' });
+    }
 
     const timestamp = Math.floor(Date.now() / 1000);
     const folder = `dispatch/${profile.handle}`;
