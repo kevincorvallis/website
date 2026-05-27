@@ -109,7 +109,7 @@
             background: var(--rule);
         }
         .tb-title-input {
-            width: 360px;
+            width: 480px;
             max-width: 100%;
             border: none;
             background: transparent;
@@ -117,11 +117,15 @@
             font-family: var(--font-display);
             font-style: italic;
             font-weight: 600;
-            font-size: 18px;
+            font-size: 22px;
+            letter-spacing: -0.01em;
             color: var(--text);
             outline: none;
+            padding: 4px 0;
+            transition: color 0.3s ease;
         }
-        .tb-title-input::placeholder { color: var(--caption); opacity: 0.6; }
+        .tb-title-input::placeholder { color: var(--caption); opacity: 0.55; }
+        .tb-title-input:focus { color: var(--accent); }
 
         .tb-right {
             display: flex;
@@ -281,16 +285,26 @@
 
         .block-wrap {
             position: relative;
-            padding: 12px 0;
-            margin: 4px 0;
+            padding: 14px 12px;
+            margin: 2px -12px;
             border-radius: 8px;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.25s ease, box-shadow 0.25s ease;
         }
-        .block-wrap:hover { background: rgba(160, 130, 109, 0.04); }
+        .block-wrap::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 14px; bottom: 14px;
+            width: 2px;
+            background: transparent;
+            border-radius: 2px;
+            transition: background-color 0.25s ease;
+        }
+        .block-wrap:hover { background: rgba(160, 130, 109, 0.035); }
         .block-wrap.selected {
-            background: rgba(160, 130, 109, 0.08);
-            outline: 1px dashed rgba(160, 130, 109, 0.4);
-            outline-offset: 4px;
+            background: rgba(160, 130, 109, 0.06);
+        }
+        .block-wrap.selected::before {
+            background: var(--accent);
         }
         .block-wrap.dragging { opacity: 0.4; }
         .block-wrap.drag-over::before {
@@ -305,10 +319,10 @@
 
         .block-handle {
             position: absolute;
-            left: -36px;
+            left: -32px;
             top: 50%;
             transform: translateY(-50%);
-            width: 24px;
+            width: 22px;
             height: 32px;
             display: flex;
             align-items: center;
@@ -316,33 +330,35 @@
             color: var(--caption);
             opacity: 0;
             cursor: grab;
-            transition: opacity 0.2s ease, color 0.2s ease;
+            transition: opacity 0.25s ease, color 0.25s ease;
             user-select: none;
         }
         .block-wrap:hover .block-handle,
-        .block-wrap.selected .block-handle { opacity: 0.6; }
+        .block-wrap.selected .block-handle { opacity: 0.5; }
         .block-handle:hover { color: var(--accent); opacity: 1 !important; }
         .block-handle:active { cursor: grabbing; }
-        .block-handle svg { width: 12px; height: 12px; }
+        .block-handle svg { width: 10px; height: 14px; }
 
         .block-actions {
             position: absolute;
-            right: -36px;
+            right: -32px;
             top: 50%;
             transform: translateY(-50%);
             display: none;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
         }
-        .block-wrap.selected .block-actions { display: flex; }
+        .block-wrap.selected .block-actions { display: flex; opacity: 1; }
         .block-actions button {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border: none;
             background: transparent;
             color: var(--caption);
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 13px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -592,19 +608,33 @@
         }
         .panel-empty {
             color: var(--caption);
-            font-style: italic;
             font-size: 14px;
+            line-height: 1.55;
             text-align: center;
-            margin-top: 40px;
+            margin-top: 60px;
+            padding: 0 8px;
         }
         .panel-empty::before {
             content: '✶';
             display: block;
             color: var(--accent);
-            font-size: 16px;
+            font-size: 18px;
             font-style: normal;
-            margin-bottom: 12px;
-            opacity: 0.6;
+            margin: 0 auto 18px;
+            opacity: 0.7;
+        }
+        .panel-empty .label {
+            display: block;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 19px;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .panel-empty .hint {
+            font-style: italic;
+            opacity: 0.85;
         }
         .panel h3 {
             font-family: var(--font-display);
@@ -924,7 +954,7 @@
         </main>
 
         <aside class="panel" id="panel">
-            <div class="panel-empty">Select a block to edit its settings.</div>
+            <div class="panel-empty"><span class="label">Nothing selected</span><span class="hint">Click any block in the canvas to tweak its settings.</span></div>
         </aside>
     </div>
 
@@ -1255,12 +1285,12 @@
         function renderPanel() {
             var panel = document.getElementById('panel');
             if (!selectedId) {
-                panel.innerHTML = '<div class="panel-empty">Select a block to edit its settings.</div>';
+                panel.innerHTML = '<div class="panel-empty"><span class="label">Nothing selected</span><span class="hint">Click any block in the canvas to tweak its settings.</span></div>';
                 return;
             }
             var b = state.blocks.find(function(x) { return x.id === selectedId; });
             if (!b) {
-                panel.innerHTML = '<div class="panel-empty">Select a block to edit its settings.</div>';
+                panel.innerHTML = '<div class="panel-empty"><span class="label">Nothing selected</span><span class="hint">Click any block in the canvas to tweak its settings.</span></div>';
                 return;
             }
             var def = BLOCK_DEFS[b.type];
