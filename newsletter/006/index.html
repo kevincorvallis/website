@@ -1720,7 +1720,13 @@
                     if (entry.isIntersecting) {
                         var p = v.play();
                         if (p && p.catch) p.catch(function() {});
-                    } else { v.pause(); }
+                    } else {
+                        v.pause();
+                        // If a "tap for sound" clip was unmuted, re-mute on exit so it
+                        // auto-previews (muted autoplay is allowed) when scrolled back in.
+                        var w = v.closest && v.closest('.vsound');
+                        if (w) { v.muted = true; w.classList.remove('unmuted'); }
+                    }
                 });
             }, { threshold: 0.25 });
             videos.forEach(function(v) { io.observe(v); });
