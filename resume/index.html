@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resume — Kevin Lee</title>
-    <meta name="description" content="Resume — Kevin Lee, Software Engineer">
+    <meta name="description" content="Resume — Kevin Lee, Software Engineering Manager, Applied AI/ML at Paramount.">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://klee.page/resume">
     <meta property="og:title" content="Resume — Kevin Lee">
-    <meta property="og:description" content="Software Engineer — Paramount, Microsoft, NASA JPL">
+    <meta property="og:description" content="Software Engineering Manager, Applied ML at Paramount · ex-Microsoft, NASA JPL, U.S. Army">
     <meta property="og:image" content="https://klee.page/images/kevi394-053.jpg">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Resume — Kevin Lee">
-    <meta name="twitter:description" content="Software Engineer — Paramount, Microsoft, NASA JPL">
+    <meta name="twitter:description" content="Software Engineering Manager, Applied ML at Paramount · ex-Microsoft, NASA JPL, U.S. Army">
     <meta name="twitter:image" content="https://klee.page/images/kevi394-053.jpg">
 
     <!-- Favicon -->
@@ -324,6 +324,87 @@
             opacity: 0.65;
         }
 
+        /* ——— Entry head (role left, date/location right) ——— */
+        .entry-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.5rem 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.35rem;
+        }
+
+        .entry-head h3 {
+            margin-bottom: 0;
+        }
+
+        .entry-date {
+            font-size: 13px;
+            font-weight: 400;
+            opacity: 0.5;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ——— Current role marker ——— */
+        .timeline .entry.current::before {
+            opacity: 0.9;
+            box-shadow: 0 0 0 3px color-mix(in oklch, var(--text) 14%, var(--bg));
+        }
+
+        /* ——— Quiet inline links in résumé prose ——— */
+        .resume-link {
+            color: inherit;
+            text-decoration: underline;
+            text-decoration-color: color-mix(in oklch, var(--text) 28%, var(--bg));
+            text-underline-offset: 2.5px;
+            transition: text-decoration-color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .resume-link:hover {
+            opacity: 1;
+            text-decoration-color: var(--text);
+        }
+
+        /* ——— Selected Work ——— */
+        .resume .sw-intro {
+            font-size: 15px;
+            opacity: 0.6;
+            margin-bottom: 1.25rem;
+        }
+
+        .selected-work {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .selected-work p {
+            font-size: 16px;
+            line-height: 1.7;
+            opacity: 0.8;
+            margin-bottom: 0;
+        }
+
+        .selected-work .see-all {
+            font-size: 14px;
+            opacity: 0.65;
+            margin-top: 0.25rem;
+        }
+
+        /* ——— Honors / interests ——— */
+        .resume .honors {
+            font-size: 14px;
+            opacity: 0.6;
+            margin-top: 0.5rem;
+        }
+
+        .resume .interests-list {
+            font-size: 15px;
+            opacity: 0.75;
+            line-height: 1.7;
+        }
+
         /* ——— Entrance Animations ——— */
         @media (prefers-reduced-motion: no-preference) {
             .page-title,
@@ -348,6 +429,8 @@
             .resume-section:nth-of-type(2) { animation-delay: 0.3s; }
             .resume-section:nth-of-type(3) { animation-delay: 0.4s; }
             .resume-section:nth-of-type(4) { animation-delay: 0.5s; }
+            .resume-section:nth-of-type(5) { animation-delay: 0.6s; }
+            .resume-section:nth-of-type(6) { animation-delay: 0.7s; }
 
             @keyframes fadeUp {
                 to { opacity: 1; transform: translateY(0); }
@@ -690,64 +773,95 @@
         <div class="resume">
             <h1 class="page-title" data-i18n="resume.heading">Resume</h1>
             <p class="contact">
-                <a href="mailto:kevin@pookieb.com">kevin@pookieb.com</a>
+                <a href="mailto:kevincorvallis@gmail.com">kevincorvallis@gmail.com</a>
                 <span class="sep" aria-hidden="true">&middot;</span>
                 <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">github.com/kevincorvallis</a>
             </p>
 
-            <p class="intro" data-i18n="resume.intro">I build at both ends of the scale — leading applied ML at Paramount, 40TB/day data pipelines at Microsoft, consumer apps shipped to the App Store. Before that I served in the Army, interned at NASA JPL, and mapped brain regions at the Broad Institute. On weekends I fly medical transport for Angel Flight West.</p>
+            <p class="intro" data-i18n-html="resume.intro">I build at the intersection of scale and intelligence. Today I lead the Applied ML team for Short Form at <a class="resume-link" href="https://www.paramount.com/" target="_blank" rel="noopener">Paramount</a>, architecting production AI pipelines — multimodal embeddings, semantic retrieval, classification — across one of the world's largest media catalogs. Before that I shipped <a class="resume-link" href="https://copilot.microsoft.com/" target="_blank" rel="noopener">Microsoft Copilot</a> to millions, mapped brain regions at the <a class="resume-link" href="https://www.broadinstitute.org/" target="_blank" rel="noopener">Broad Institute</a>, optimized the <a class="resume-link" href="https://www.jpl.nasa.gov/missions/mars-science-laboratory-curiosity-rover-msl/" target="_blank" rel="noopener">Curiosity rover</a> at NASA JPL, and served five years in the U.S. Army. On weekends I fly medical transport for <a class="resume-link" href="https://www.angelflightwest.org/" target="_blank" rel="noopener">Angel Flight West</a>.</p>
 
             <section class="resume-section">
                 <h2 data-i18n="resume.experienceHeading">Experience</h2>
                 <div class="timeline">
-                    <div class="entry">
-                        <h3 data-i18n="resume.paramountTitle">Paramount — Senior Software Engineer, Applied ML · Mar 2025–Present</h3>
-                        <p data-i18n="resume.paramountDesc">Leading a team of ~5 engineers on the Video Gisting & Short Form platform in the Applied Machine Learning group.</p>
+                    <div class="entry current">
+                        <div class="entry-head">
+                            <h3 data-i18n="resume.paramountTitle">Paramount — Software Engineering Manager, Applied AI/ML</h3>
+                            <span class="entry-date" data-i18n="resume.paramountMeta">Los Angeles · Mar 2026 – Present</span>
+                        </div>
+                        <p data-i18n-html="resume.paramountDesc">Lead the Applied ML team for Short Form, building end-to-end AI workflows for content classification, multimodal embedding, semantic retrieval, and personalization. Architected a Google Cloud pipeline that turns raw media into searchable intelligence — <a class="resume-link" href="https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings" target="_blank" rel="noopener">Gemini multimodal embeddings</a>, LLM taxonomy classification, output validation — powering a clip-classification platform (FastAPI · Cloud SQL · Pub/Sub · GKE) at ~2s p50 and ~$0.0003 per clip, replacing manual editorial review at catalog scale.</p>
                     </div>
                     <div class="entry">
-                        <h3 data-i18n="resume.msftTitle">Microsoft AI — Software Engineer · Aug 2022–Feb 2025</h3>
-                        <p data-i18n="resume.msftDesc">Built and shipped the Copilot settings experience in C++ across backend and frontend. Owned large-scale Azure data pipelines processing 40TB+ daily for Copilot, Edge, and Windows — cut end-to-end latency from 72 to 24 hours, accelerating experimentation across the org. Reduced annual cloud spend by $240K through infrastructure optimization.</p>
+                        <div class="entry-head">
+                            <h3 data-i18n="resume.msftTitle">Microsoft — Software Engineer</h3>
+                            <span class="entry-date" data-i18n="resume.msftMeta">Redmond · Aug 2022 – Mar 2026</span>
+                        </div>
+                        <p data-i18n-html="resume.msftDesc">Shipped the new <a class="resume-link" href="https://copilot.microsoft.com/" target="_blank" rel="noopener">Microsoft Copilot</a> settings experience end-to-end on Azure, serving millions of daily users. Designed and operated Cosmos data pipelines ingesting 40TB+/day across Copilot, Edge, and Windows (100M+ monthly users), cutting experimentation latency from 72 to 24 hours; migrating always-on VMs to event-driven Azure Functions trimmed $240K+/yr in compute at 99.9%+ uptime. Led a 12-person team to win the 2022 Microsoft Global Hackathon with an AI tool for early Alzheimer's detection.</p>
                     </div>
                     <div class="entry">
-                        <h3 data-i18n="resume.aclTitle">PookieB — Founder · 2024–Present</h3>
-                        <p data-i18n-html="resume.aclDesc">Founded a software company shipping 10 products across web, iOS, and AI/ML. Highlights: <a href="/projects/shredders">Shredders</a> (real-time powder tracker, 53 resorts, 90 API routes), <a href="/projects/spacec">SPACEc</a> (Stanford-published Python library for imaging analysis, PyPI + bioRxiv), and SmartSpender (3-stage AI financial pipeline, 13 AWS Lambdas). <a href="/projects">See all projects.</a></p>
+                        <div class="entry-head">
+                            <h3 data-i18n="resume.broadTitle">Broad Institute of MIT and Harvard — Researcher</h3>
+                            <span class="entry-date" data-i18n="resume.broadMeta">Boston · 2022</span>
+                        </div>
+                        <p data-i18n-html="resume.broadDesc">In <a class="resume-link" href="https://www.broadinstitute.org/bios/guoping-feng" target="_blank" rel="noopener">Dr. Guoping Feng</a>'s lab, classified spatial scRNA-seq (MERFISH) to subthalamic nuclei regions using machine learning on DAPI/poly-T scans from the Allen Brain Institute.</p>
                     </div>
                     <div class="entry">
-                        <h3 data-i18n="resume.broadTitle">Broad Institute of MIT and Harvard — Researcher · 2022</h3>
-                        <p data-i18n="resume.broadDesc">Classified spatial scRNA-seq data (MERFISH) to subthalamic nuclei regions using machine learning, in the laboratory of Dr. Guoping Feng.</p>
+                        <div class="entry-head">
+                            <h3 data-i18n="resume.armyTitle">U.S. Army — Soldier</h3>
+                            <span class="entry-date" data-i18n="resume.armyMeta">2017 – 2022</span>
+                        </div>
+                        <p data-i18n="resume.armyDesc">Five years of service. Led and trained squads of 8–12 through tactical field exercises, then ran logistics as Battalion S-4 for a 500+ person battalion. Full Army ROTC scholarship.</p>
                     </div>
                     <div class="entry">
-                        <h3 data-i18n="resume.nasaTitle">NASA Jet Propulsion Laboratory — Intern · 2019</h3>
-                        <p data-i18n="resume.nasaDesc">Improved Curiosity rover operational efficiency by 8–12% through mission-critical software development. Presented at the 2020 NASA conference.</p>
-                    </div>
-                    <div class="entry">
-                        <h3 data-i18n="resume.armyTitle">U.S. Army — 2017–2022</h3>
-                        <p data-i18n="resume.armyDesc">Five years of service. Trained at West Point, led small-unit operations, managed battalion logistics. Full ROTC scholarship to USC.</p>
+                        <div class="entry-head">
+                            <h3 data-i18n="resume.nasaTitle">NASA Jet Propulsion Laboratory — Software Engineering Intern</h3>
+                            <span class="entry-date" data-i18n="resume.nasaMeta">Pasadena · 2019</span>
+                        </div>
+                        <p data-i18n-html="resume.nasaDesc">Built scheduling-optimization models for <a class="resume-link" href="https://www.jpl.nasa.gov/missions/mars-science-laboratory-curiosity-rover-msl/" target="_blank" rel="noopener">Curiosity rover</a> operations, improving mission-planning efficiency 8–12% and cutting idle time between science activities. Presented the work at the 2020 NASA conference.</p>
                     </div>
                 </div>
             </section>
 
             <section class="resume-section">
+                <h2 data-i18n="resume.selectedWorkHeading">Selected Work</h2>
+                <p class="sw-intro" data-i18n="resume.selectedWorkIntro">Side projects shipped under my studio, PookieB — across web, iOS, and AI/ML.</p>
+                <div class="selected-work">
+                    <p data-i18n-html="resume.swShredders"><a class="resume-link" href="/projects/shredders"><strong>Shredders</strong></a> — real-time powder tracker, 53 resorts, 90 API routes, built on Next.js.</p>
+                    <p data-i18n-html="resume.swSpacec"><a class="resume-link" href="/projects/spacec"><strong>SPACEc</strong></a> — Stanford / Nolan-Lab Python workflow for multiplexed-imaging analysis, published in <a class="resume-link" href="https://www.nature.com/articles/s41467-025-65658-3" target="_blank" rel="noopener">Nature Communications</a>; on PyPI.</p>
+                    <p data-i18n-html="resume.swSmartSpender"><strong>SmartSpender</strong> — AI financial-decision engine, a 3-stage pipeline across 13 AWS Lambdas.</p>
+                    <p class="see-all" data-i18n-html="resume.swSeeAll"><a class="resume-link" href="/projects">See all projects →</a></p>
+                </div>
+            </section>
+
+            <section class="resume-section">
                 <h2 data-i18n="resume.educationHeading">Education</h2>
-                <p data-i18n-html="resume.uscDegree"><strong>University of Southern California</strong> — B.S. Computer Science, Viterbi School of Engineering · 2022</p>
+                <p data-i18n-html="resume.uscDegree"><a class="resume-link" href="https://viterbischool.usc.edu/" target="_blank" rel="noopener"><strong>University of Southern California</strong></a> — B.S. Computer Science, Viterbi School of Engineering · 2022</p>
+                <p class="honors" data-i18n="resume.uscHonors">Honors — Army ROTC &amp; Pathway Oregon full scholarships · Armed Forces Award · Dean's List</p>
             </section>
 
             <section class="resume-section">
                 <h2 data-i18n="resume.volunteerHeading">Volunteer</h2>
                 <div class="entry">
-                    <h3 data-i18n="resume.afwTitle">Angel Flight West — Pilot · 2024–Present</h3>
-                    <p data-i18n="resume.afwDesc">Volunteer pilot providing medical transport flights across the Pacific Northwest.</p>
+                    <div class="entry-head">
+                        <h3 data-i18n="resume.afwTitle">Angel Flight West — Pilot</h3>
+                        <span class="entry-date" data-i18n="resume.afwMeta">Seattle · 2024 – Present</span>
+                    </div>
+                    <p data-i18n-html="resume.afwDesc">Volunteer pilot flying medical transport across the Puget Sound for <a class="resume-link" href="https://www.angelflightwest.org/" target="_blank" rel="noopener">Angel Flight West</a>.</p>
                 </div>
             </section>
 
             <section class="resume-section">
                 <h2 data-i18n="resume.skillsHeading">Skills</h2>
                 <div class="skills">
-                    <p data-i18n-html="resume.skillsLanguages"><strong>Languages:</strong> Python, TypeScript, Swift, C++, Java</p>
-                    <p data-i18n-html="resume.skillsSystems"><strong>Systems:</strong> Azure, AWS (Lambda, DynamoDB, Step Functions, Bedrock), Supabase, Docker, Kubernetes</p>
-                    <p data-i18n-html="resume.skillsFrameworks"><strong>Frameworks:</strong> Next.js, React, SwiftUI, Flask, Node.js</p>
-                    <p data-i18n-html="resume.skillsAI"><strong>AI/ML:</strong> Claude, GPT-4, TensorFlow, PyTorch, ElevenLabs</p>
+                    <p data-i18n-html="resume.skillsLanguages"><strong>Languages:</strong> Python, C++, C#, TypeScript, Java, SCOPE</p>
+                    <p data-i18n-html="resume.skillsAI"><strong>AI / ML:</strong> Gemini, multimodal embeddings, LLM classification, PyTorch, TensorFlow</p>
+                    <p data-i18n-html="resume.skillsSystems"><strong>Cloud &amp; Infra:</strong> GCP (Vertex AI, GKE, Cloud SQL, Pub/Sub), Azure (Functions, Cosmos), AWS (Lambda, DynamoDB), Kubernetes, Docker</p>
+                    <p data-i18n-html="resume.skillsFrameworks"><strong>Frameworks:</strong> FastAPI, Next.js, React, SwiftUI, Node.js</p>
                 </div>
+            </section>
+
+            <section class="resume-section">
+                <h2 data-i18n="resume.interestsHeading">Interests</h2>
+                <p class="interests-list" data-i18n="resume.interestsList">Humanitarian aid · sustainable energy · surfing · flying · traveling</p>
             </section>
         </div>
 
@@ -808,10 +922,10 @@
 
             var SUGGESTIONS = [
                 [
-                    'Walk me through the video gisting pipeline',
+                    'Walk me through the clip-classification pipeline',
                     'Hardest scaling problem you\'ve solved?',
                     'Why Supabase over Firebase?',
-                    'What\'s RL-powered content personalization?',
+                    'How do you use Gemini embeddings in production?',
                     'What did JPL teach you about software?',
                     'How do you ship 10 side projects?',
                     'Paramount vs Microsoft — what\'s different?',
