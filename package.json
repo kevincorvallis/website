@@ -10,6 +10,7 @@
     "test:debug": "PWDEBUG=1 playwright test",
     "test:smoke": "playwright test tests/smoke tests/cli",
     "test:visual": "playwright test tests/visual",
+    "test:e2e": "node tests/e2e/publish-harness.js",
     "test:install": "playwright install chromium"
   },
   "dependencies": {
