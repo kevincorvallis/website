@@ -380,6 +380,20 @@
             .video-inset.portrait video { max-width: 440px; }
         }
 
+        /* ===== Inline "tap for sound" player (after Dispatch 003) ===== */
+        .vsound { position: relative; display: block; line-height: 0; }
+        .vsound video { cursor: pointer; }
+        .vsound-hint {
+            position: absolute; bottom: 0.7rem; left: 50%; transform: translateX(-50%);
+            z-index: 3; font-family: var(--font-display); font-style: italic; font-size: 13px;
+            letter-spacing: 0.06em; color: rgba(255,255,255,0.92); white-space: nowrap;
+            background: rgba(0,0,0,0.45); padding: 0.45rem 1.1rem; border-radius: 100px;
+            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+            pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
+        }
+        .vsound.show-hint .vsound-hint { opacity: 1; }
+        .vsound.unmuted .vsound-hint { opacity: 0; }
+
         /* ========== SIGN OFF / DIVIDER / SPACERS ========== */
         .sign-off { padding: 6rem 1.5rem 3rem; text-align: center; }
         .sign-off-name { font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 600; letter-spacing: -0.02em; }
@@ -899,17 +913,17 @@
 
         <div class="text-block reveal">
             <div data-l="en">
-                <p>This is a photo of Justin at a coffee shop with Kobe, and also, if you look closely, of me failing to not work on a Saturday. The laptop is open. The standup grid is up. Kobe, who did not consent to any of this, has filed his own complaint by leaning his entire body weight into Justin's leg.</p>
+                <p>This is me at a coffee shop with Kobe, failing &mdash; with real commitment &mdash; to not work on a Saturday. Laptop open, standup grid up, coffee going cold. Kobe did not consent to any of this and has filed his complaint by leaning his entire body weight into my leg until I acknowledge him.</p>
             </div>
             <div data-l="ko">
-                <p>이건 저스틴이 카페에서 코비랑 같이 있는 사진이고, 자세히 보면 토요일에 일을 안 하는 데 실패한 내 사진이기도 하다. 노트북은 열려 있고, 스탠드업 화면이 떠 있다. 아무 동의도 한 적 없는 코비는 자기 몸무게 전체를 저스틴 다리에 기대는 방식으로 항의를 접수했다.</p>
+                <p>이건 카페에서 코비랑 같이 있는 내 사진이다. 토요일에 일을 안 하려다 &mdash; 아주 성실하게 &mdash; 실패하는 중. 노트북은 열려 있고, 스탠드업 화면이 떠 있고, 커피는 식어간다. 아무 동의도 한 적 없는 코비는 자기 몸무게 전체를 내 다리에 기대며, 자길 좀 봐달라고 항의를 접수했다.</p>
             </div>
         </div>
         <div class="photo-inset reveal">
             <img src="/newsletter/006/images/cafe-kobe.jpg"
-                data-alt-en="Justin in sunglasses at an outdoor cafe table with a laptop open to a video-call grid, Kobe the dog on a blue leash leaning against him"
-                data-alt-ko="선글라스를 낀 저스틴이 야외 카페 테이블에서 화상회의 화면이 띄워진 노트북을 켜놓고 있고, 파란 목줄을 한 코비가 그에게 기대어 있다"
-                alt="Justin in sunglasses at an outdoor cafe table with a laptop open to a video-call grid, Kobe the dog on a blue leash leaning against him">
+                data-alt-en="Kevin at an outdoor cafe table with a laptop open to a video-call grid, Kobe the dog on a blue leash leaning against his leg"
+                data-alt-ko="케빈이 야외 카페 테이블에서 화상회의 화면이 띄워진 노트북을 켜놓고 있고, 파란 목줄을 한 코비가 다리에 기대어 있다"
+                alt="Kevin at an outdoor cafe table with a laptop open to a video-call grid, Kobe the dog on a blue leash leaning against his leg">
             <div class="photo-caption">
                 <span data-l="en">Saturday "coffee." note the laptop, the standup grid, and Kobe, who has filed a complaint</span>
                 <span data-l="ko">토요일 "커피." 노트북, 스탠드업 화면, 그리고 항의서를 접수한 코비를 보라</span>
@@ -935,12 +949,15 @@
             </div>
         </div>
         <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/ai-cat-poster.jpg"
-                data-aria-en="An AI-generated video of two cats standing upright and dancing on a bed"
-                data-aria-ko="두 마리 고양이가 침대 위에서 두 발로 서서 춤추는 AI 생성 영상"
-                aria-label="An AI-generated video of two cats standing upright and dancing on a bed">
-                <source src="/newsletter/006/images/ai-cat-dance.mp4" type="video/mp4">
-            </video>
+            <div class="vsound">
+                <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/ai-cat-poster.jpg"
+                    data-aria-en="An AI-generated video of two cats standing upright and dancing on a bed"
+                    data-aria-ko="두 마리 고양이가 침대 위에서 두 발로 서서 춤추는 AI 생성 영상"
+                    aria-label="An AI-generated video of two cats standing upright and dancing on a bed">
+                    <source src="/newsletter/006/images/ai-cat-dance.mp4" type="video/mp4">
+                </video>
+                <span class="vsound-hint"><span data-l="en">Tap for sound</span><span data-l="ko">탭하면 소리 켜짐</span></span>
+            </div>
             <div class="photo-caption">
                 <span data-l="en">two cats, fully committed, zero notes &mdash; courtesy @humantix, undefeated</span>
                 <span data-l="ko">고양이 두 마리, 완전 진심, 군말 없음 &mdash; @humantix 제공, 무패</span>
@@ -985,11 +1002,11 @@
         <div class="text-block reveal">
             <div data-l="en">
                 <p>It's a big deal. I keep telling myself it's a big deal. I also haven't had the energy to <em>feel</em> it, because the same month that handed me the title handed me a merger, a redefinition, and roughly nine hundred Slack threads.</p>
-                <p>This is a real photo of me, mid-weekday, at Ayeshna's, asleep face-down on an outdoor couch with my phone abandoned in the grass. Nobody posed me. That's just where the month found me.</p>
+                <p>This is a real photo of me yesterday &mdash; a Saturday, out cold at Ayeshna's after the Brazil&ndash;Morocco game, face-down on an outdoor couch with my phone abandoned in the grass. Nobody posed me. That's just where the month keeps leaving me.</p>
             </div>
             <div data-l="ko">
                 <p>큰일이다. 큰일이라고 계속 나 자신한테 말한다. 동시에 <em>느낄</em> 기력은 없었는데, 직함을 준 바로 그 달이 합병이랑 역할 재정의랑 슬랙 스레드 한 900개를 같이 안겨줬기 때문이다.</p>
-                <p>이건 평일 한낮에, 아예슈나네 집에서, 야외 소파에 엎드려 자고 있는 진짜 내 사진이다. 폰은 잔디밭에 버려져 있다. 아무도 포즈를 잡아주지 않았다. 그 달이 나를 발견한 자리가 그냥 거기였다.</p>
+                <p>이건 어제 &mdash; 토요일, 브라질 대 모로코 경기를 보고 아예슈나네 집에서 그대로 뻗어버린 진짜 내 사진이다. 야외 소파에 엎드린 채, 폰은 잔디밭에 버려져 있다. 아무도 포즈를 잡아주지 않았다. 요즘 이 달은 나를 자꾸 이런 자리에 두고 간다.</p>
             </div>
         </div>
         <div class="photo-inset reveal">
@@ -1015,20 +1032,23 @@
         <div class="text-block reveal">
             <div data-l="en">
                 <p>The best work day of the month barely felt like work: Justin and I did the Pride parade through Paramount, helping out the <em>Jackass</em> crew the studio was marching with. Yes. That Jackass. Picture it: blue sky, a float dripping rainbow fringe, Steve-O shirtless under a rainbow umbrella doing precisely what your brain just predicted, and the two of us handing out swag and completely losing the plot.</p>
-                <p>I've never seen Justin happier. The man was <em>thriving.</em> &ldquo;Vibing hella with the gays,&rdquo; in his exact words. He found his people for an afternoon and I'm not convinced he's come back yet.</p>
+                <p>I've never seen Justin happier. The man was <em>thriving</em> &mdash; he found his people for one glorious afternoon and I'm not convinced he's fully come back from it. Pretty sure part of him is still up on that float.</p>
             </div>
             <div data-l="ko">
                 <p>이번 달 최고의 회사 일정은 회사 일 같지도 않았다: 저스틴이랑 프라이드 퍼레이드에 갔다 &mdash; 파라마운트를 통해서, 스튜디오가 함께 행진한 <em>잭애스</em> 크루를 도우러. 그래, 그 잭애스. 그려보자: 파란 하늘, 무지개 술 장식이 줄줄 달린 플로트, 무지개 우산 아래 웃통 벗은 스티브오가 방금 네 머릿속이 예측한 바로 그 짓을 하고 있고, 우리 둘은 굿즈를 나눠주며 완전히 정신줄을 놓고 있다.</p>
-                <p>저스틴이 그렇게 행복한 건 처음 봤다. 그날 그 형은 <em>물 만난 물고기</em>였다. 본인 말 그대로, 게이들이랑 완전 신나게 바이브 타고 있었다. 한나절 동안 자기 사람들을 찾았고, 아직 돌아온 것 같진 않다.</p>
+                <p>저스틴이 그렇게 행복한 건 처음 봤다. 그날 그 형은 완전 <em>물 만난 물고기</em>였다 &mdash; 한나절 동안 제대로 자기 사람들을 만났고, 아직 거기서 다 돌아온 것 같지 않다. 영혼의 절반은 아직 그 플로트 위에 있는 듯.</p>
             </div>
         </div>
         <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/pride-poster.jpg"
-                data-aria-en="Pride parade under a blue sky: the Jackass crew on a float with rainbow fringe, Steve-O shirtless holding a rainbow umbrella"
-                data-aria-ko="파란 하늘 아래 프라이드 퍼레이드: 무지개 술 장식을 단 플로트 위 잭애스 크루, 무지개 우산을 든 웃통 벗은 스티브오"
-                aria-label="Pride parade under a blue sky: the Jackass crew on a float with rainbow fringe, Steve-O shirtless holding a rainbow umbrella">
-                <source src="/newsletter/006/images/pride-steveo.mp4" type="video/mp4">
-            </video>
+            <div class="vsound">
+                <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/pride-poster.jpg"
+                    data-aria-en="Pride parade under a blue sky: the Jackass crew on a float with rainbow fringe, Steve-O shirtless holding a rainbow umbrella"
+                    data-aria-ko="파란 하늘 아래 프라이드 퍼레이드: 무지개 술 장식을 단 플로트 위 잭애스 크루, 무지개 우산을 든 웃통 벗은 스티브오"
+                    aria-label="Pride parade under a blue sky: the Jackass crew on a float with rainbow fringe, Steve-O shirtless holding a rainbow umbrella">
+                    <source src="/newsletter/006/images/pride-steveo.mp4" type="video/mp4">
+                </video>
+                <span class="vsound-hint"><span data-l="en">Tap for sound</span><span data-l="ko">탭하면 소리 켜짐</span></span>
+            </div>
             <div class="photo-caption">
                 <span data-l="en">Steve-O, a rainbow umbrella, and a studio sponsorship &mdash; the afternoon contained multitudes</span>
                 <span data-l="ko">스티브오, 무지개 우산, 그리고 스튜디오 협찬 &mdash; 그 오후는 참 많은 걸 품고 있었다</span>
@@ -1054,12 +1074,15 @@
             </div>
         </div>
         <div class="video-inset portrait reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/kobe-weird.jpg"
-                data-aria-en="Kobe the dog draped head-down off the edge of the bed, looking at the camera with a guilty expression"
-                data-aria-ko="침대 가장자리에 머리를 거꾸로 늘어뜨린 채 죄지은 표정으로 카메라를 보는 코비"
-                aria-label="Kobe the dog draped head-down off the edge of the bed, looking at the camera with a guilty expression">
-                <source src="/newsletter/006/images/kobe-weird.mp4" type="video/mp4">
-            </video>
+            <div class="vsound">
+                <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/kobe-weird.jpg"
+                    data-aria-en="Kobe the dog draped head-down off the edge of the bed, looking at the camera with a guilty expression"
+                    data-aria-ko="침대 가장자리에 머리를 거꾸로 늘어뜨린 채 죄지은 표정으로 카메라를 보는 코비"
+                    aria-label="Kobe the dog draped head-down off the edge of the bed, looking at the camera with a guilty expression">
+                    <source src="/newsletter/006/images/kobe-weird.mp4" type="video/mp4">
+                </video>
+                <span class="vsound-hint"><span data-l="en">Tap for sound</span><span data-l="ko">탭하면 소리 켜짐</span></span>
+            </div>
             <div class="photo-caption">
                 <span data-l="en">"Kobe. why." &mdash; no notes, no remorse, no spine, apparently</span>
                 <span data-l="ko">"코비. 왜." &mdash; 할 말 없음, 반성 없음, 보아하니 척추도 없음</span>
@@ -1074,12 +1097,15 @@
             </div>
         </div>
         <div class="video-inset reveal">
-            <video class="lazy-video" muted loop playsinline preload="metadata"
-                data-aria-en="A tuxedo cat leaping between two wall-mounted shelves while Kevin watches from below"
-                data-aria-ko="케빈이 아래에서 지켜보는 가운데 벽에 달린 두 선반 사이를 뛰어 건너는 턱시도 고양이"
-                aria-label="A tuxedo cat leaping between two wall-mounted shelves while Kevin watches from below">
-                <source src="/newsletter/006/images/cat-jump.mp4" type="video/mp4">
-            </video>
+            <div class="vsound">
+                <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/cat-jump-poster.jpg"
+                    data-aria-en="A tuxedo cat leaping between two wall-mounted shelves while Kevin watches from below"
+                    data-aria-ko="케빈이 아래에서 지켜보는 가운데 벽에 달린 두 선반 사이를 뛰어 건너는 턱시도 고양이"
+                    aria-label="A tuxedo cat leaping between two wall-mounted shelves while Kevin watches from below">
+                    <source src="/newsletter/006/images/cat-jump.mp4" type="video/mp4">
+                </video>
+                <span class="vsound-hint"><span data-l="en">Tap for sound</span><span data-l="ko">탭하면 소리 켜짐</span></span>
+            </div>
             <div class="photo-caption">
                 <span data-l="en">unbothered, airborne, gold-medal form &mdash; more on relays later</span>
                 <span data-l="ko">동요 없음, 공중에 떠 있음, 금메달 폼 &mdash; 계주 얘긴 이따 더</span>
@@ -1087,10 +1113,12 @@
         </div>
         <div class="text-block reveal">
             <div data-l="en">
-                <p>And the people: dinner with Dakota and Maddie at the loud little place we like, the kind of night where the food is fine and the point is everything else. And Lauren, who announced she'd gone surfing by texting exactly one photo &mdash; herself in a wetsuit, double peace signs, no caption. Which is the correct and only way to announce you went surfing.</p>
+                <p>And the people. Dinner with Dakota and Maddie at <a href="https://www.theinfatuation.com/los-angeles/reviews/quarter-sheets-pizza" target="_blank" rel="noopener">Quarter Sheets</a> in Echo Park, where the pizza is great and the princess cake is &mdash; and I need you to take this seriously &mdash; the single best thing I have eaten in this city.</p>
+                <p>And Lauren. Ayeshna told us to meet at Staircase; Lauren took one look, deemed Staircase beneath her, and rerouted us to County Line next door, where the waves were a very sincere 6&ndash;7 feet. The Lauren protocol: maximum hype on the sand, wetsuit on, full send energy &mdash; right until the exact second she has to paddle out, when the fear of <a href="https://eos.surf/encyclopedia/pearl-pearling" target="_blank" rel="noopener">penciling</a> arrives and she remembers she's mortal. Still a great day. Mostly hers.</p>
             </div>
             <div data-l="ko">
-                <p>그리고 사람들: 우리가 좋아하는 시끄러운 작은 식당에서 다코타, 매디랑 저녁. 음식은 그냥 괜찮고 핵심은 그 외의 전부인, 그런 밤. 그리고 로런은 서핑 다녀온 걸 사진 딱 한 장으로 알렸다 &mdash; 웻수트 차림에 양손 브이, 캡션 없음. 서핑 다녀왔다고 알리는 정확하고 유일한 방식이다.</p>
+                <p>그리고 사람들. 에코파크의 <a href="https://www.theinfatuation.com/los-angeles/reviews/quarter-sheets-pizza" target="_blank" rel="noopener">Quarter Sheets</a>에서 다코타, 매디랑 저녁. 피자도 훌륭하지만, 거기 프린세스 케이크는 &mdash; 진지하게 들어달라 &mdash; 이 도시에서 내가 먹어본 것 중 단연 최고다.</p>
+                <p>그리고 로런. 아예슈나가 스테어케이스에서 만나자고 했는데, 로런이 딱 보더니 스테어케이스는 성에 안 찬다며 바로 옆 카운티 라인으로 데려갔다. 파도는 아주 진지하게 6&ndash;7피트. 로런 공식은 이렇다: 모래사장에선 텐션 최고조, 웻수트 장착, 완전 출격 모드 &mdash; 그러다 막상 패들 아웃 해야 하는 바로 그 순간, <a href="https://eos.surf/encyclopedia/pearl-pearling" target="_blank" rel="noopener">페널링(penciling)</a>의 공포가 찾아오고 자긴 인간이라는 걸 떠올린다. 그래도 좋은 하루였다. 주로 로런이.</p>
             </div>
         </div>
         <div class="photo-inset reveal">
@@ -1099,8 +1127,8 @@
                 data-alt-ko="어둑하고 붐비는 식당 테이블에서 웃고 있는 다코타와 매디, 앞에는 접시와 폰"
                 alt="Dakota and Maddie smiling at a table in a dim, busy restaurant, plates and phones in front of them">
             <div class="photo-caption">
-                <span data-l="en">Dakota &amp; Maddie &mdash; the food was fine; that was never the point</span>
-                <span data-l="ko">다코타 &amp; 매디 &mdash; 음식은 괜찮았다; 애초에 그게 핵심이 아니었다</span>
+                <span data-l="en">Dakota &amp; Maddie at Quarter Sheets &mdash; the princess cake was, in fact, the entire point</span>
+                <span data-l="ko">Quarter Sheets에서 다코타 &amp; 매디 &mdash; 사실 프린세스 케이크가 핵심의 전부였다</span>
             </div>
         </div>
         <div class="photo-inset reveal">
@@ -1109,8 +1137,8 @@
                 data-alt-ko="흐린 하늘 아래 해안 절벽에서 웻수트를 입고 양손 브이를 하는 로런, 뒤로는 바다"
                 alt="Lauren in a wetsuit throwing double peace signs on a coastal bluff under an overcast sky, the ocean behind her">
             <div class="photo-caption">
-                <span data-l="en">Lauren's full surf report, transcribed in its entirety</span>
-                <span data-l="ko">로런의 서핑 리포트 전문, 빠짐없이 옮김</span>
+                <span data-l="en">County Line, 6&ndash;7 ft &mdash; all hype on land, pure existential dread on the paddle out</span>
+                <span data-l="ko">카운티 라인, 6&ndash;7피트 &mdash; 뭍에선 텐션 만렙, 패들 아웃에선 실존적 공포</span>
             </div>
         </div>
     </div>
@@ -1696,6 +1724,29 @@
                 });
             }, { threshold: 0.25 });
             videos.forEach(function(v) { io.observe(v); });
+        })();
+
+        // ==================== INLINE TAP-FOR-SOUND (after 003) ====================
+        // Clips auto-preview muted (browsers block autoplay WITH sound); a "Tap for
+        // sound" pill invites one tap to unmute. Tap again to mute.
+        (function () {
+            var wraps = document.querySelectorAll('.vsound');
+            if (!wraps.length) return;
+            Array.prototype.forEach.call(wraps, function (wrap) {
+                var v = wrap.querySelector('video');
+                if (!v) return;
+                v.addEventListener('playing', function () { if (v.muted) wrap.classList.add('show-hint'); });
+                v.addEventListener('click', function () {
+                    if (v.muted) {
+                        v.muted = false;
+                        var p = v.play(); if (p && p.catch) p.catch(function () {});
+                        wrap.classList.add('unmuted');
+                    } else {
+                        v.muted = true;
+                        wrap.classList.remove('unmuted');
+                    }
+                });
+            });
         })();
 
         // ==================== SCOREBOARD COUNT-UP ====================
