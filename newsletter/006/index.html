@@ -46,8 +46,17 @@
             // Password gating removed — hide the (now-unused) password UI before
             // paint. The welcome interstitial still plays once via unlock().
             document.documentElement.setAttribute('data-prebypass', '1');
+
+            // Pre-paint: if the welcome interstitial was already seen this session,
+            // suppress its cover so content shows instantly. Otherwise the cover stays
+            // up from first paint so the article never flashes through before the intro.
+            var introPath = window.location.pathname.replace(/\/$/, '') || '/';
+            if (sessionStorage.getItem('dispatch-auth-' + introPath) === '1') {
+                document.documentElement.setAttribute('data-seen', '1');
+            }
         })();
     </script>
+    <noscript><style>.komorebi { display: none !important; }</style></noscript>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -457,12 +466,15 @@
         .reveal-scale { opacity: 0; transform: scale(0.97); }
 
         /* ========== WELCOME INTERSTITIAL ========== */
+        /* Covers from first paint so the article never "leaks" before the intro
+           mounts; html[data-seen] (set pre-paint) hides it for return visitors. */
         .komorebi {
             position: fixed; inset: 0; z-index: 150; background: var(--bg);
             display: flex; align-items: center; justify-content: center;
-            text-align: center; padding: 2rem; opacity: 0; visibility: hidden;
-            pointer-events: none; transition: background-color 0.3s ease;
+            text-align: center; padding: 2rem; opacity: 1; visibility: visible;
+            pointer-events: auto; transition: background-color 0.3s ease;
         }
+        html[data-seen="1"] .komorebi { display: none; }
         .komorebi.active { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 1s ease, visibility 0s; }
         .komorebi.exiting { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 1.2s ease, visibility 1.2s ease; }
         .komorebi-content { max-width: 480px; position: relative; }
