@@ -14,6 +14,21 @@
 //
 // Optional env overrides: E2E_EMAIL, E2E_PASSWORD, E2E_HANDLE.
 
+// Optionally load SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY from a dotenv file
+// (e.g. the one `vercel env pull` writes) so no fragile shell `set -a` sourcing is
+// needed. Only fills vars that aren't already set; never logs values.
+if (process.env.DOTENV) {
+    try {
+        const txt = require('fs').readFileSync(process.env.DOTENV, 'utf8');
+        for (const line of txt.split('\n')) {
+            const m = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*)$/);
+            if (!m) continue;
+            let v = m[2].trim().replace(/^["']/, '').replace(/["']$/, '');
+            if (process.env[m[1]] === undefined) process.env[m[1]] = v;
+        }
+    } catch (e) { /* ignore — fall back to real env */ }
+}
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SR = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
