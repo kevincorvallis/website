@@ -517,6 +517,49 @@
             50% { opacity: 0.7; transform: rotate(-12deg) scale(1.1); }
         }
 
+        /* ===== Interactive WebGL2 splash playground — Ice / Warmth ===== */
+        .komorebi-fx {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none; opacity: 0;
+            transition: opacity 1.4s ease; touch-action: none;
+        }
+        .komorebi.fx-ready .komorebi-fx { opacity: 1; }
+        /* dragging carves the field — don't let it select the text */
+        .komorebi.fx-ready { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        /* keep the word + controls above the canvas */
+        .komorebi-content { z-index: 2; }
+        /* the dappled-light ambience is redundant once the playground is live */
+        .komorebi.fx-ready .komorebi-leaves,
+        .komorebi.fx-ready .komorebi-sun,
+        .komorebi.fx-ready .komorebi-spots { opacity: 0 !important; }
+
+        .komorebi-play {
+            display: flex; flex-direction: column; align-items: center; gap: 0.7rem;
+            margin-top: 2rem; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,0.61,0.36,1);
+        }
+        .komorebi-modes {
+            display: inline-flex; padding: 3px;
+            border: 1px solid var(--rule); border-radius: 100px;
+            background: rgba(160,130,109,0.07);
+            -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+        }
+        .kfx-mode {
+            -webkit-appearance: none; appearance: none; border: none; background: none; cursor: pointer;
+            font-family: var(--font); font-size: 12px; letter-spacing: 0.06em;
+            color: var(--caption); padding: 6px 16px; border-radius: 100px;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        .kfx-mode:hover { color: var(--text); }
+        .kfx-mode.active { color: var(--bg); background: var(--text); }
+        .kfx-hint {
+            font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--caption); opacity: 0.7;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .komorebi-fx, .komorebi-play { display: none !important; }
+        }
+
         /* shared REC pulse used by deal-wire + featured video */
         @keyframes recPulse {
             0%, 100% { opacity: 0.55; transform: scale(1); }
@@ -680,6 +723,7 @@
 
     <!-- ==================== WELCOME INTERSTITIAL — 우리 / uri ==================== -->
     <div class="komorebi" id="komorebi">
+        <canvas class="komorebi-fx" id="komorebiFx" aria-hidden="true"></canvas>
         <svg class="komorebi-leaves" id="komorebiLeaves" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
             <defs><filter id="leafBlur"><feGaussianBlur stdDeviation="3"/></filter></defs>
             <g fill="rgba(160,130,109,0.12)" filter="url(#leafBlur)">
@@ -713,6 +757,19 @@
                 <span data-l="en">A letter for friends and family.</span>
                 <span data-l="ko">친구와 가족에게 보내는 편지.</span>
             </p>
+            <div class="komorebi-play" id="komorebiPlay">
+                <div class="komorebi-modes" role="group" aria-label="Playground mode">
+                    <button type="button" class="kfx-mode" data-mode="ice" aria-pressed="false">
+                        <span data-l="en">Ice</span><span data-l="ko">얼음</span>
+                    </button>
+                    <button type="button" class="kfx-mode active" data-mode="warmth" aria-pressed="true">
+                        <span data-l="en">Warmth</span><span data-l="ko">온기</span>
+                    </button>
+                </div>
+                <span class="kfx-hint">
+                    <span data-l="en">drag to play</span><span data-l="ko">드래그해서 만져보기</span>
+                </span>
+            </div>
             <button class="komorebi-dismiss" id="komorebiDismiss">
                 <span data-l="en">Continue &rarr;</span>
                 <span data-l="ko">계속 &rarr;</span>
@@ -1344,6 +1401,233 @@
                 return;
             }
             unlock();
+        })();
+    </script>
+    <script>
+        // ============ INTERACTIVE WEBGL2 SPLASH — Ice / Warmth playground ============
+        // A fragment-shader field behind the 우리 word. Drag (mouse/touch) to carve
+        // glowing blade-trails on ice, or stir warm dye that diffuses and rises.
+        // Self-contained: bails gracefully (static dappled-light splash stays) for
+        // returning visitors, reduced-motion, or no-WebGL2.
+        (function () {
+            var komorebi = document.getElementById('komorebi');
+            var canvas = document.getElementById('komorebiFx');
+            var play = document.getElementById('komorebiPlay');
+            if (!komorebi || !canvas) return;
+
+            // Only run while the interstitial is actually on screen. The gate IIFE runs
+            // first and, for returning visitors, sets the splash to display:none — so we
+            // check the rendered splash, not the session flag (which it sets for everyone).
+            if (window.getComputedStyle(komorebi).display === 'none') return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            var gl = canvas.getContext('webgl2', { antialias: false, alpha: false });
+            if (!gl) return;
+
+            var DPR = Math.min(window.devicePixelRatio || 1, 2);
+            var SIM_MAX = 320; // simulation long-edge cap (mobile perf)
+
+            function compile(type, src) {
+                var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+                if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn('fx shader:', gl.getShaderInfoLog(s)); return null; }
+                return s;
+            }
+            function program(vs, fs) {
+                var v = compile(gl.VERTEX_SHADER, vs), f = compile(gl.FRAGMENT_SHADER, fs);
+                if (!v || !f) return null;
+                var p = gl.createProgram(); gl.attachShader(p, v); gl.attachShader(p, f); gl.linkProgram(p);
+                if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.warn('fx link:', gl.getProgramInfoLog(p)); return null; }
+                return p;
+            }
+
+            var VERT = '#version 300 es\nprecision highp float;\nconst vec2 V[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.));\nout vec2 uv;\nvoid main(){vec2 p=V[gl_VertexID];uv=p*0.5+0.5;gl_Position=vec4(p,0.,1.);}';
+
+            var UPDATE = '#version 300 es\nprecision highp float;\n' +
+              'in vec2 uv; out vec4 o;\n' +
+              'uniform sampler2D u_prev; uniform vec2 u_texel; uniform vec2 u_a; uniform vec2 u_b;\n' +
+              'uniform float u_down; uniform int u_mode; uniform float u_aspect; uniform float u_radius; uniform float u_strength;\n' +
+              'uniform vec2 u_auto; uniform float u_autoOn;\n' +
+              'void main(){\n' +
+              '  vec4 s=texture(u_prev,uv);\n' +
+              '  vec4 n=texture(u_prev,uv+vec2(u_texel.x,0.))+texture(u_prev,uv-vec2(u_texel.x,0.))+texture(u_prev,uv+vec2(0.,u_texel.y))+texture(u_prev,uv-vec2(0.,u_texel.y));\n' +
+              '  vec4 blur=s*0.4+n*0.15;\n' +
+              '  float warm=mix(s.r,blur.r,0.6);\n' +
+              '  warm=mix(warm,texture(u_prev,uv-vec2(0.,u_texel.y*1.5)).r,0.06);\n' +   // dye rises
+              '  warm*=0.976;\n' +
+              '  float ice=mix(s.g,blur.g,0.12);\n' +
+              '  ice*=0.95;\n' +                                                         // scratches slowly refreeze
+              '  vec2 pa=(uv-u_a); vec2 ba=(u_b-u_a); pa.x*=u_aspect; ba.x*=u_aspect;\n' +
+              '  float h=clamp(dot(pa,ba)/max(dot(ba,ba),1e-5),0.,1.);\n' +
+              '  float d=length(pa-ba*h);\n' +
+              '  float brush=smoothstep(u_radius,0.,d)*u_down*u_strength;\n' +
+              '  float da=length((uv-u_auto)*vec2(u_aspect,1.));\n' +
+              '  float ab=smoothstep(u_radius*1.4,0.,da)*u_autoOn*u_strength*0.25;\n' +
+              '  if(u_mode==0){ ice+=brush+ab; } else { warm+=(brush+ab)*0.92; }\n' +
+              '  o=vec4(clamp(warm,0.,1.), clamp(ice,0.,1.), 0., 1.);\n' +
+              '}';
+
+            var DISPLAY = '#version 300 es\nprecision highp float;\n' +
+              'in vec2 uv; out vec4 o;\n' +
+              'uniform sampler2D u_field; uniform int u_mode; uniform float u_dark; uniform vec3 u_accent;\n' +
+              'void main(){\n' +
+              '  vec4 f=texture(u_field,uv); float warm=f.r, ice=f.g; vec3 col;\n' +
+              '  if(u_mode==0){\n' +
+              '    vec3 top=mix(vec3(0.82,0.87,0.92),vec3(0.09,0.12,0.15),u_dark);\n' +
+              '    vec3 bot=mix(vec3(0.90,0.93,0.96),vec3(0.05,0.07,0.09),u_dark);\n' +
+              '    col=mix(bot,top,uv.y);\n' +
+              '    vec3 glow=mix(vec3(0.26,0.60,0.95),vec3(1.0),smoothstep(0.35,1.0,ice));\n' +
+              '    col+=glow*pow(ice,1.25)*1.8;\n' +
+              '  } else {\n' +
+              '    vec3 top=mix(vec3(0.945,0.93,0.90),vec3(0.13,0.115,0.10),u_dark);\n' +
+              '    vec3 bot=mix(vec3(0.90,0.875,0.83),vec3(0.085,0.075,0.065),u_dark);\n' +
+              '    col=mix(bot,top,uv.y);\n' +
+              '    vec3 dye=mix(u_accent,vec3(1.0,0.86,0.55),smoothstep(0.5,1.0,warm));\n' +
+              '    col+=dye*pow(warm,1.2)*1.4;\n' +
+              '  }\n' +
+              '  o=vec4(col,1.0);\n' +
+              '}';
+
+            var updP = program(VERT, UPDATE), dispP = program(VERT, DISPLAY);
+            if (!updP || !dispP) return;
+
+            var U = {
+                prev: gl.getUniformLocation(updP, 'u_prev'), texel: gl.getUniformLocation(updP, 'u_texel'),
+                a: gl.getUniformLocation(updP, 'u_a'), b: gl.getUniformLocation(updP, 'u_b'),
+                down: gl.getUniformLocation(updP, 'u_down'), mode: gl.getUniformLocation(updP, 'u_mode'),
+                aspect: gl.getUniformLocation(updP, 'u_aspect'), radius: gl.getUniformLocation(updP, 'u_radius'),
+                strength: gl.getUniformLocation(updP, 'u_strength'), auto: gl.getUniformLocation(updP, 'u_auto'),
+                autoOn: gl.getUniformLocation(updP, 'u_autoOn')
+            };
+            var D = {
+                field: gl.getUniformLocation(dispP, 'u_field'), mode: gl.getUniformLocation(dispP, 'u_mode'),
+                dark: gl.getUniformLocation(dispP, 'u_dark'), accent: gl.getUniformLocation(dispP, 'u_accent')
+            };
+
+            var vao = gl.createVertexArray(); // attribute-less fullscreen triangle
+            var simW, simH, texs = [], fbos = [];
+            function makeTarget() {
+                var t = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, t);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, simW, simH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                var fb = gl.createFramebuffer();
+                gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+                return { t: t, f: fb };
+            }
+            function allocSim() {
+                texs.forEach(function (t) { gl.deleteTexture(t); });
+                fbos.forEach(function (f) { gl.deleteFramebuffer(f); });
+                texs = []; fbos = [];
+                for (var i = 0; i < 2; i++) { var m = makeTarget(); texs.push(m.t); fbos.push(m.f); }
+                for (var j = 0; j < 2; j++) {
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, fbos[j]); gl.viewport(0, 0, simW, simH);
+                    gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+                }
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            }
+
+            var aspect = 1;
+            function resize() {
+                var r = komorebi.getBoundingClientRect();
+                var w = Math.max(1, r.width), h = Math.max(1, r.height);
+                aspect = w / h;
+                canvas.width = Math.round(w * DPR); canvas.height = Math.round(h * DPR);
+                var scale = Math.min(SIM_MAX / Math.max(w, h), 1);
+                simW = Math.max(2, Math.round(w * scale)); simH = Math.max(2, Math.round(h * scale));
+                allocSim();
+            }
+            resize();
+            if ('ResizeObserver' in window) { new ResizeObserver(function () { resize(); }).observe(komorebi); }
+            else { window.addEventListener('resize', resize); }
+
+            var ptr = { x: 0.5, y: 0.5, px: 0.5, py: 0.5, down: 0 };
+            var frame = 0, lastInteract = -999;
+            function setPos(e) {
+                var r = komorebi.getBoundingClientRect();
+                ptr.px = ptr.x; ptr.py = ptr.y;
+                ptr.x = (e.clientX - r.left) / r.width;
+                ptr.y = 1.0 - (e.clientY - r.top) / r.height;
+            }
+            komorebi.addEventListener('pointerdown', function (e) {
+                if (e.target.closest && e.target.closest('button')) return; // don't draw on the controls
+                setPos(e); ptr.px = ptr.x; ptr.py = ptr.y; ptr.down = 1; lastInteract = frame;
+            });
+            komorebi.addEventListener('pointermove', function (e) { setPos(e); if (ptr.down) lastInteract = frame; });
+            window.addEventListener('pointerup', function () { ptr.down = 0; });
+            komorebi.addEventListener('pointerleave', function () { ptr.down = 0; });
+
+            var mode = 1; // 0 = ice, 1 = warmth (default warmth — matches the warm palette)
+            var modeBtns = play ? play.querySelectorAll('.kfx-mode') : [];
+            Array.prototype.forEach.call(modeBtns, function (btn) {
+                btn.addEventListener('click', function () {
+                    mode = btn.getAttribute('data-mode') === 'warmth' ? 1 : 0;
+                    Array.prototype.forEach.call(modeBtns, function (b) {
+                        var on = b === btn; b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                    });
+                    lastInteract = frame;
+                });
+            });
+
+            function accent() {
+                return document.documentElement.getAttribute('data-theme') === 'dark'
+                    ? [0.769, 0.659, 0.510] : [0.627, 0.510, 0.427];
+            }
+
+            var src = 0, running = true, raf = 0;
+            function step() {
+                if (!running) return;
+                frame++;
+                var idle = (frame - lastInteract) > 90;
+                var t = frame * 0.01;
+                var autoX = 0.5 + 0.28 * Math.sin(t * 0.9);
+                var autoY = 0.5 + 0.22 * Math.cos(t * 1.3);
+                var dst = 1 - src;
+
+                gl.useProgram(updP); gl.bindVertexArray(vao);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, fbos[dst]); gl.viewport(0, 0, simW, simH);
+                gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texs[src]);
+                gl.uniform1i(U.prev, 0);
+                gl.uniform2f(U.texel, 1 / simW, 1 / simH);
+                gl.uniform2f(U.a, ptr.px, ptr.py);
+                gl.uniform2f(U.b, ptr.x, ptr.y);
+                gl.uniform1f(U.down, ptr.down);
+                gl.uniform1i(U.mode, mode);
+                gl.uniform1f(U.aspect, aspect);
+                gl.uniform1f(U.radius, mode === 0 ? 0.030 : 0.060);
+                gl.uniform1f(U.strength, mode === 0 ? 0.55 : 0.40);
+                gl.uniform2f(U.auto, autoX, autoY);
+                gl.uniform1f(U.autoOn, idle ? 1.0 : 0.0);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                gl.viewport(0, 0, canvas.width, canvas.height);
+                gl.useProgram(dispP); gl.bindVertexArray(vao);
+                gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texs[dst]);
+                gl.uniform1i(D.field, 0);
+                gl.uniform1i(D.mode, mode);
+                gl.uniform1f(D.dark, document.documentElement.getAttribute('data-theme') === 'dark' ? 1.0 : 0.0);
+                var ac = accent(); gl.uniform3f(D.accent, ac[0], ac[1], ac[2]);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+                ptr.px = ptr.x; ptr.py = ptr.y; // held-stationary pointer keeps a dot
+                src = dst;
+                raf = requestAnimationFrame(step);
+            }
+
+            komorebi.classList.add('fx-ready');          // fade the canvas in (backdrop)
+            raf = requestAnimationFrame(step);
+            setTimeout(function () {                       // reveal controls with the entrance
+                if (play) { play.style.opacity = '1'; play.style.transform = 'translateY(0)'; }
+            }, 3900);
+
+            function stop() { running = false; if (raf) cancelAnimationFrame(raf); }
+            var dismiss = document.getElementById('komorebiDismiss');
+            if (dismiss) dismiss.addEventListener('click', function () { setTimeout(stop, 1300); });
+            canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); stop(); });
         })();
     </script>
     <script>
