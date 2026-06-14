@@ -2798,6 +2798,7 @@
 
     <!-- Scripts -->
     <script src="/js/theme.js"></script>
+    <script src="/js/subscribe.js"></script>
     <script>
         // ==================== KOMOREBI GATE ====================
         (function() {
@@ -3025,75 +3026,6 @@
             videos.forEach(function(v) { io.observe(v); });
         })();
 
-        // ==================== SUBSCRIBE ====================
-        (function() {
-            var form = document.getElementById('subscribeForm');
-            var emailInput = document.getElementById('subscribeEmail');
-            var btn = document.getElementById('subscribeBtn');
-            var section = document.getElementById('subscribe');
-
-            if (localStorage.getItem('dispatch-subscribed')) {
-                section.classList.add('submitted');
-                return;
-            }
-
-            // Retry a previously-failed signup (e.g. Supabase was briefly down) so a
-            // transient outage doesn't silently drop a subscriber.
-            var pendingEmail = localStorage.getItem('dispatch-pending');
-            if (pendingEmail) {
-                fetch('/api/subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: pendingEmail })
-                })
-                .then(function(res) {
-                    if (!res.ok) throw new Error('retry failed: ' + res.status);
-                    localStorage.removeItem('dispatch-pending');
-                    localStorage.setItem('dispatch-subscribed', pendingEmail);
-                })
-                .catch(function() {});
-            }
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var email = emailInput.value.trim();
-                if (!email) return;
-
-                btn.disabled = true;
-                btn.style.opacity = '0.4';
-
-                fetch('/api/subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
-                })
-                .then(function(res) {
-                    if (!res.ok) {
-                        var err = new Error('subscribe failed: ' + res.status);
-                        err.status = res.status;
-                        throw err;
-                    }
-                    return res.json();
-                })
-                .then(function() {
-                    localStorage.removeItem('dispatch-pending');
-                    localStorage.setItem('dispatch-subscribed', email);
-                    section.classList.remove('error');
-                    section.classList.add('submitted');
-                })
-                .catch(function(err) {
-                    // Don't fake success. Show an error so the visitor can retry, and
-                    // for transient failures (Supabase down / offline) queue the email
-                    // so we retry automatically on their next visit.
-                    btn.disabled = false;
-                    btn.style.opacity = '';
-                    section.classList.add('error');
-                    if (!err || !err.status || err.status >= 500) {
-                        localStorage.setItem('dispatch-pending', email);
-                    }
-                });
-            });
-        })();
 
         // ==================== COMMENTS ====================
         (function() {

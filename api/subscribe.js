@@ -87,12 +87,12 @@ module.exports = async function handler(req, res) {
             return res.status(200).json({ ok: true });
         }
 
-        // Log the full row so a failed signup (e.g. Supabase down) is recoverable
-        // from the function logs — the email is the part we can't afford to lose.
-        console.error('SUBSCRIBE_FAILED', response.status, JSON.stringify(row));
+        // Log the email so a failed signup (e.g. Supabase down) is recoverable from
+        // the function logs. Email only — don't spill IP/UA into logging infra.
+        console.error('SUBSCRIBE_FAILED', response.status, row.email);
         return res.status(502).json({ error: 'Failed to subscribe' });
     } catch (err) {
-        console.error('SUBSCRIBE_FAILED', 'exception', JSON.stringify(row), err && err.message);
+        console.error('SUBSCRIBE_FAILED', 'exception', row.email, err && err.message);
         return res.status(500).json({ error: 'Internal server error' });
     }
 };

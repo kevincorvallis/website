@@ -411,6 +411,9 @@
         .subscribe-success { font-size: 17px; font-weight: 600; color: var(--accent); display: none; margin-bottom: 1rem; transition: color 0.3s ease; }
         .subscribe.submitted .subscribe-form { display: none; }
         .subscribe.submitted .subscribe-success { display: block; }
+        .subscribe-error { font-size: 15px; color: #c0392b; display: none; margin-bottom: 1rem; }
+        [data-theme="dark"] .subscribe-error { color: #e8857a; }
+        .subscribe.error .subscribe-error { display: block; }
         .subscribe-note { font-size: 13px; color: var(--caption); opacity: 0.6; transition: color 0.3s ease; }
         @media (max-width: 768px) { .subscribe-form { flex-direction: column; } .subscribe-btn { padding: 14px 24px; } }
 
@@ -1201,6 +1204,10 @@
             <span data-l="en">You're in. See you next week.</span>
             <span data-l="ko">등록 완료. 다음 주에 봐요.</span>
         </p>
+        <p class="subscribe-error" id="subscribeError">
+            <span data-l="en">Hmm, that didn't go through. Mind trying again?</span>
+            <span data-l="ko">앗, 등록이 안 됐어요. 다시 시도해줄래요?</span>
+        </p>
         <p class="subscribe-note">
             <span data-l="en">Just between us &mdash; no third parties, ever.</span>
             <span data-l="ko">우리끼리만 &mdash; 절대 외부 공유 없음.</span>
@@ -1257,6 +1264,7 @@
 
     <!-- Scripts -->
     <script src="/js/theme.js"></script>
+    <script src="/js/subscribe.js"></script>
     <script>
         // ==================== WELCOME INTERSTITIAL ====================
         (function() {
@@ -1421,29 +1429,6 @@
                 });
             }, { threshold: 0.5 });
             io.observe(card);
-        })();
-
-        // ==================== SUBSCRIBE ====================
-        (function() {
-            var form = document.getElementById('subscribeForm');
-            var emailInput = document.getElementById('subscribeEmail');
-            var btn = document.getElementById('subscribeBtn');
-            var section = document.getElementById('subscribe');
-            if (localStorage.getItem('dispatch-subscribed')) { section.classList.add('submitted'); return; }
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var email = emailInput.value.trim();
-                if (!email) return;
-                btn.disabled = true; btn.style.opacity = '0.4';
-                fetch('/api/subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
-                })
-                .then(function(res) { return res.json(); })
-                .then(function() { localStorage.setItem('dispatch-subscribed', email); section.classList.add('submitted'); })
-                .catch(function() { localStorage.setItem('dispatch-subscribed', email); section.classList.add('submitted'); });
-            });
         })();
 
         // ==================== COMMENTS ====================
