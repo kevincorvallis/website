@@ -833,6 +833,15 @@
         .subscribe.submitted .subscribe-form { display: none; }
         .subscribe.submitted .subscribe-success { display: block; }
 
+        .subscribe-error {
+            font-size: 15px;
+            color: #c0392b;
+            display: none;
+            margin-bottom: 1rem;
+        }
+        [data-theme="dark"] .subscribe-error { color: #e8857a; }
+        .subscribe.error .subscribe-error { display: block; }
+
         .subscribe-note {
             font-size: 13px;
             color: var(--caption);
@@ -1916,6 +1925,10 @@
             <span data-l="en">You're in. See you next week.</span>
             <span data-l="ko">등록됨. 다음 주에 보자.</span>
         </p>
+        <p class="subscribe-error" id="subscribeError">
+            <span data-l="en">Hmm, that didn't go through. Mind trying again?</span>
+            <span data-l="ko">앗, 등록이 안 됐어요. 다시 시도해줄래요?</span>
+        </p>
         <p class="subscribe-note">
             <span data-l="en">Just between us — no third parties, ever.</span>
             <span data-l="ko">우리끼리만. 어디 넘기거나 그런 거 절대 없음.</span>
@@ -2095,6 +2108,23 @@
                 return;
             }
 
+            // Retry a previously-failed signup (e.g. Supabase was briefly down) so a
+            // transient outage doesn't silently drop a subscriber.
+            var pendingEmail = localStorage.getItem('dispatch-pending');
+            if (pendingEmail) {
+                fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: pendingEmail })
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error('retry failed: ' + res.status);
+                    localStorage.removeItem('dispatch-pending');
+                    localStorage.setItem('dispatch-subscribed', pendingEmail);
+                })
+                .catch(function() {});
+            }
+
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var email = emailInput.value.trim();
@@ -2108,14 +2138,30 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email })
                 })
-                .then(function(res) { return res.json(); })
+                .then(function(res) {
+                    if (!res.ok) {
+                        var err = new Error('subscribe failed: ' + res.status);
+                        err.status = res.status;
+                        throw err;
+                    }
+                    return res.json();
+                })
                 .then(function() {
+                    localStorage.removeItem('dispatch-pending');
                     localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.remove('error');
                     section.classList.add('submitted');
                 })
-                .catch(function() {
-                    localStorage.setItem('dispatch-subscribed', email);
-                    section.classList.add('submitted');
+                .catch(function(err) {
+                    // Don't fake success. Show an error so the visitor can retry, and
+                    // for transient failures (Supabase down / offline) queue the email
+                    // so we retry automatically on their next visit.
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                    section.classList.add('error');
+                    if (!err || !err.status || err.status >= 500) {
+                        localStorage.setItem('dispatch-pending', email);
+                    }
                 });
             });
         })();

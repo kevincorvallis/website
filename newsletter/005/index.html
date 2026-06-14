@@ -43,19 +43,9 @@
             document.documentElement.setAttribute('data-lang', lang);
             document.documentElement.setAttribute('lang', lang);
 
-            // Pre-paint URL-key bypass: hide password UI so it never flashes.
-            // The yohaku welcome interstitial still plays after unlock().
-            // tsundoku/積ん読/積読 also accepted — grace-period alias for the
-            // old Coquelicots edition that previously occupied this slot.
-            var urlKey = params.get('key');
-            if (urlKey) {
-                var raw = urlKey.trim();
-                var lower = raw.toLowerCase();
-                if (lower === 'yohaku' || lower === 'komorebi' || lower === 'tsundoku'
-                    || raw === '余白' || raw === '積ん読' || raw === '積読') {
-                    document.documentElement.setAttribute('data-prebypass', '1');
-                }
-            }
+            // Password gating removed — hide the (now-unused) password UI before
+            // paint. The welcome interstitial still plays once via unlock().
+            document.documentElement.setAttribute('data-prebypass', '1');
         })();
     </script>
 
@@ -1247,6 +1237,15 @@
         .subscribe.submitted .subscribe-form { display: none; }
         .subscribe.submitted .subscribe-success { display: block; }
 
+        .subscribe-error {
+            font-size: 15px;
+            color: #c0392b;
+            display: none;
+            margin-bottom: 1rem;
+        }
+        [data-theme="dark"] .subscribe-error { color: #e8857a; }
+        .subscribe.error .subscribe-error { display: block; }
+
         .subscribe-note {
             font-size: 13px;
             color: var(--caption);
@@ -2098,32 +2097,6 @@
                 <span data-l="en">This letter is for friends and family.</span>
                 <span data-l="ko">친구와 가족에게만 보내는 편지예요.</span>
             </p>
-            <form id="gateForm" style="display: flex; flex-direction: column; align-items: center;">
-                <input
-                    type="text"
-                    class="gate-input"
-                    id="gateInput"
-                    data-ph-en="this week's word"
-                    data-ph-ko="이번 주의 단어"
-                    aria-describedby="gateAside"
-                    autocomplete="off"
-                    autocorrect="off"
-                    autocapitalize="none"
-                    spellcheck="false"
-                    inputmode="text"
-                    enterkeyhint="go"
-                    autofocus
-                >
-                <button type="submit" class="gate-btn" id="gateBtn">&rarr;</button>
-            </form>
-            <p class="gate-hint" id="gateHint">
-                <span data-l="en">Hmm, that's not it.</span>
-                <span data-l="ko">음, 아닌데?</span>
-            </p>
-            <p class="gate-aside" id="gateAside">
-                <span data-l="en">Japanese noun &mdash; romaji or kanji</span>
-                <span data-l="ko">일본어 명사 &mdash; 로마자 또는 한자</span>
-            </p>
         </div>
     </div>
 
@@ -2737,6 +2710,10 @@
             <span data-l="en">You're in. See you next week.</span>
             <span data-l="ko">등록 완료. 다음 주에 봐요.</span>
         </p>
+        <p class="subscribe-error" id="subscribeError">
+            <span data-l="en">Hmm, that didn't go through. Mind trying again?</span>
+            <span data-l="ko">앗, 등록이 안 됐어요. 다시 시도해줄래요?</span>
+        </p>
         <p class="subscribe-note">
             <span data-l="en">Just between us &mdash; no third parties, ever.</span>
             <span data-l="ko">우리끼리만 &mdash; 절대 외부 공유 없음.</span>
@@ -2825,10 +2802,8 @@
         // ==================== KOMOREBI GATE ====================
         (function() {
             var gate = document.getElementById('gate');
-            var input = document.getElementById('gateInput');
-            var hint = document.getElementById('gateHint');
             var komorebi = document.getElementById('komorebi');
-            if (!gate || !input) return;
+            if (!gate) return;
 
             var path = window.location.pathname.replace(/\/$/, '') || '/';
             var issueKey = 'dispatch-auth-' + path;
@@ -2905,78 +2880,16 @@
                 document.body.classList.add('gate-open');
             }
 
-            function showGate() {
-                document.body.style.overflow = 'hidden';
-                var form = document.getElementById('gateForm');
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var val = input.value.trim();
-                    if (!val) return;
-                    input.disabled = true;
-                    document.getElementById('gateBtn').disabled = true;
-                    checkPassword(val, function(ok) {
-                        input.disabled = false;
-                        document.getElementById('gateBtn').disabled = false;
-                        if (ok) {
-                            unlock();
-                        } else {
-                            input.value = '';
-                            input.classList.remove('shake');
-                            void input.offsetWidth;
-                            input.classList.add('shake');
-                            if (hint) hint.classList.add('visible');
-                        }
-                    });
-                });
-            }
-
-            function checkPassword(val, callback) {
-                // 005's word of the week is the password.
-                // tsundoku/積ん読/積読 are accepted as a grace-period alias for the
-                // old Coquelicots edition that previously occupied this slot.
-                // Falls through to /api/gate which still honors DISPATCH_PASS (komorebi) as a master.
-                var raw = val.trim();
-                var lower = raw.toLowerCase();
-                if (lower === 'yohaku' || lower === 'komorebi' || lower === 'tsundoku'
-                    || raw === '余白' || raw === '積ん読' || raw === '積読') {
-                    callback(true);
-                    return;
-                }
-                fetch('/api/gate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: val }),
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) { callback(data.ok === true); })
-                .catch(function() { callback(false); });
-            }
-
             if (sessionStorage.getItem(issueKey) === '1') {
+                // Returning visitor this session — reveal without replaying the intro.
                 gate.classList.add('unlocked');
                 document.body.classList.add('gate-open');
                 if (komorebi) komorebi.style.display = 'none';
                 return;
             }
 
-            var params = new URLSearchParams(window.location.search);
-            var urlKey = params.get('key');
-            if (urlKey) {
-                params.delete('key');
-                var clean = window.location.pathname + (params.toString() ? '?' + params : '');
-                window.history.replaceState({}, '', clean);
-
-                checkPassword(urlKey, function(ok) {
-                    if (ok) {
-                        unlock();
-                    } else {
-                        showGate();
-                    }
-                });
-                return;
-            }
-
-            showGate();
+            // No password required — play the welcome interstitial once, then reveal.
+            unlock();
         })();
     </script>
     <script>
@@ -3124,6 +3037,23 @@
                 return;
             }
 
+            // Retry a previously-failed signup (e.g. Supabase was briefly down) so a
+            // transient outage doesn't silently drop a subscriber.
+            var pendingEmail = localStorage.getItem('dispatch-pending');
+            if (pendingEmail) {
+                fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: pendingEmail })
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error('retry failed: ' + res.status);
+                    localStorage.removeItem('dispatch-pending');
+                    localStorage.setItem('dispatch-subscribed', pendingEmail);
+                })
+                .catch(function() {});
+            }
+
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var email = emailInput.value.trim();
@@ -3137,14 +3067,30 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email })
                 })
-                .then(function(res) { return res.json(); })
+                .then(function(res) {
+                    if (!res.ok) {
+                        var err = new Error('subscribe failed: ' + res.status);
+                        err.status = res.status;
+                        throw err;
+                    }
+                    return res.json();
+                })
                 .then(function() {
+                    localStorage.removeItem('dispatch-pending');
                     localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.remove('error');
                     section.classList.add('submitted');
                 })
-                .catch(function() {
-                    localStorage.setItem('dispatch-subscribed', email);
-                    section.classList.add('submitted');
+                .catch(function(err) {
+                    // Don't fake success. Show an error so the visitor can retry, and
+                    // for transient failures (Supabase down / offline) queue the email
+                    // so we retry automatically on their next visit.
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                    section.classList.add('error');
+                    if (!err || !err.status || err.status >= 500) {
+                        localStorage.setItem('dispatch-pending', email);
+                    }
                 });
             });
         })();

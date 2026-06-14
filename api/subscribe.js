@@ -87,10 +87,12 @@ module.exports = async function handler(req, res) {
             return res.status(200).json({ ok: true });
         }
 
-        console.error('Supabase subscribe error:', response.status, err);
+        // Log the full row so a failed signup (e.g. Supabase down) is recoverable
+        // from the function logs — the email is the part we can't afford to lose.
+        console.error('SUBSCRIBE_FAILED', response.status, JSON.stringify(row));
         return res.status(502).json({ error: 'Failed to subscribe' });
     } catch (err) {
-        console.error('Subscribe error:', err);
+        console.error('SUBSCRIBE_FAILED', 'exception', JSON.stringify(row), err && err.message);
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
