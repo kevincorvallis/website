@@ -23,7 +23,12 @@ if (process.env.DOTENV) {
         for (const line of txt.split('\n')) {
             const m = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*)$/);
             if (!m) continue;
-            let v = m[2].trim().replace(/^["']/, '').replace(/["']$/, '');
+            let v = m[2].trim();
+            if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+                v = v.slice(1, -1);
+            }
+            // Vercel CLI writes a trailing escaped newline on values; strip escapes/ws.
+            v = v.replace(/\\r/g, '').replace(/\\n/g, '').replace(/[\r\n]+$/, '').trim();
             if (process.env[m[1]] === undefined) process.env[m[1]] = v;
         }
     } catch (e) { /* ignore — fall back to real env */ }
@@ -78,11 +83,16 @@ function sr(method, path, body) {
         console.log(`reused existing auth user ${EMAIL} (password reset)`);
     }
 
-    // 2) Ensure a profiles row with the handle (mirrors api/auth/claim-username.js).
+    // 2) Ensure a profiles row WITH a handle. Note: a DB trigger may auto-create a
+    //    handle-less profile row on user signup — in that case set the handle.
     const existing = await sr('GET', `rest/v1/profiles?id=eq.${userId}&select=id,handle`);
     const rows = existing.ok ? await existing.json() : [];
-    if (rows.length) {
+    if (rows.length && rows[0].handle) {
         console.log(`profile already exists: @${rows[0].handle}`);
+    } else if (rows.length) {
+        const upd = await sr('PATCH', `rest/v1/profiles?id=eq.${userId}`, { handle: HANDLE, display_name: 'E2E Bot' });
+        if (!upd.ok) { console.error(`ERROR setting handle: ${upd.status} ${(await upd.text()).slice(0, 200)}`); process.exit(1); }
+        console.log(`set handle @${HANDLE} on existing (handle-less) profile`);
     } else {
         const ins = await sr('POST', 'rest/v1/profiles', { id: userId, handle: HANDLE, display_name: 'E2E Bot' });
         if (!ins.ok) { console.error(`ERROR inserting profile: ${ins.status} ${(await ins.text()).slice(0, 200)}`); process.exit(1); }
