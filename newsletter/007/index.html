@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="canonical" href="https://klee.page/newsletter/007/">
+    <title>Dispatch 007: Coquelicots — Kevin Lee</title>
+    <meta name="description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
+    <meta name="author" content="Kevin Lee">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://klee.page/newsletter/007/">
+    <meta property="og:title" content="Dispatch 007: Coquelicots — Kevin Lee">
+    <meta property="og:description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
+    <meta property="og:image" content="https://klee.page/newsletter/007/images/coquelicots.jpg">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ko_KR">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dispatch 007: Coquelicots — Kevin Lee">
+    <meta name="twitter:description" content="A letter on weight, work, role models, and a cat doing kung fu. After Monet, 1873.">
+    <meta name="twitter:image" content="https://klee.page/newsletter/007/images/coquelicots.jpg">
+
+    <!-- Smart App Banner -->
+    <meta name="apple-itunes-app" content="app-id=6761163892">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <!-- Detect theme + language + URL-key bypass before first paint -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+
+            var params = new URLSearchParams(window.location.search);
+            var urlLang = params.get('lang');
+            var storedLang = localStorage.getItem('dispatch-lang');
+            var navLang = (navigator.language || '').slice(0, 2);
+            var lang = (urlLang === 'ko' || urlLang === 'en') ? urlLang
+                     : (storedLang === 'ko' || storedLang === 'en') ? storedLang
+                     : navLang === 'ko' ? 'ko'
+                     : 'en';
+            document.documentElement.setAttribute('data-lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+
+            // Password gating removed — hide the (now-unused) password UI before
+            // paint. The welcome interstitial still plays once via unlock().
+            document.documentElement.setAttribute('data-prebypass', '1');
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+        }
+
+        [data-lang="ko"] {
+            --font: 'Noto Serif KR', 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
+        }
+
+        /* Language toggle */
+        [data-lang="en"] [data-l="ko"],
+        [data-lang="ko"] [data-l="en"] {
+            display: none !important;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection {
+            background: rgba(0, 100, 255, 0.26);
+            color: inherit;
+        }
+
+        a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+        /* When ?key= bypass is present, hide ONLY the password input + ambient gate
+           light. The tsundoku welcome interstitial still plays. */
+        [data-prebypass="1"] .gate,
+        [data-prebypass="1"] .gate-light {
+            display: none !important;
+        }
+
+        /* ========== PASSWORD GATE ========== */
+        .gate {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            transition: opacity 0.6s ease, visibility 0.6s ease, background-color 0.3s ease;
+        }
+
+        .gate.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .gate-content {
+            max-width: 320px;
+        }
+
+        .gate-title {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.75rem;
+        }
+
+        .gate-subtitle {
+            font-size: 16px;
+            color: var(--caption);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .gate-input {
+            width: 100%;
+            max-width: 240px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--accent);
+            border-radius: 0;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 18px;
+            padding: 12px 0;
+            text-align: center;
+            outline: none;
+            letter-spacing: 0.12em;
+            transition: border-color 0.4s ease, color 0.3s ease;
+        }
+
+        .gate-input::placeholder {
+            color: var(--caption);
+            opacity: 0.5;
+            letter-spacing: 0;
+            font-size: 15px;
+            font-style: italic;
+        }
+
+        .gate-input:focus {
+            border-color: var(--text);
+        }
+
+        .gate-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-family: var(--font);
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            padding: 8px 24px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-btn:hover {
+            opacity: 1;
+        }
+
+        .gate-input.shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .gate-hint {
+            font-size: 13px;
+            color: var(--caption);
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .gate-hint.visible {
+            opacity: 1;
+        }
+
+        /* ========== GATE — Monet revamp (007) ========== */
+        /* The gate is transparent so the live hero flow-field shows through.
+           A frosted-glass card holds the form; a soft cream veil sits between. */
+        .gate {
+            background: transparent;
+            overflow: hidden;
+        }
+        .gate::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse 55% 80% at center, rgba(240,238,230,0.05) 0%, rgba(240,238,230,0.30) 55%, rgba(240,238,230,0.55) 100%);
+            pointer-events: none;
+        }
+        [data-theme="dark"] .gate::after {
+            background:
+                radial-gradient(ellipse 55% 80% at center, rgba(31,30,29,0.10) 0%, rgba(31,30,29,0.45) 55%, rgba(31,30,29,0.70) 100%);
+        }
+
+        /* Hold the hero text dark until the gate opens — let the reveal land */
+        .hero-content {
+            opacity: 0;
+            transition: opacity 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) 0.4s;
+        }
+        .gate.unlocked ~ section.hero .hero-content,
+        body.gate-open .hero-content {
+            opacity: 1;
+        }
+        /* When the gate is up, soften the hero overlay so the painting reads */
+        .hero-overlay {
+            transition: background 0.6s ease, opacity 0.6s ease;
+        }
+        body:not(.gate-open) .hero-overlay { opacity: 0.35; }
+
+        /* Frosted-glass card holding the form */
+        .gate-content {
+            position: relative;
+            background: rgba(240, 238, 230, 0.42);
+            backdrop-filter: blur(14px) saturate(1.08);
+            -webkit-backdrop-filter: blur(14px) saturate(1.08);
+            padding: 2.4rem 2.4rem 2rem;
+            border-radius: 2px;
+            box-shadow: 0 18px 70px -30px rgba(31, 30, 29, 0.45);
+            max-width: 360px;
+            width: calc(100% - 2.5rem);
+            border-top: 1px solid rgba(255,255,255,0.45);
+            border-bottom: 1px solid rgba(31, 30, 29, 0.06);
+        }
+        [data-theme="dark"] .gate-content {
+            background: rgba(31, 30, 29, 0.55);
+            border-top: 1px solid rgba(240, 238, 230, 0.10);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.20);
+            box-shadow: 0 18px 70px -28px rgba(0, 0, 0, 0.7);
+        }
+
+        .gate-meta {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            opacity: 0.85;
+        }
+        .gate-title {
+            font-style: italic;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .gate-subtitle { font-style: italic; }
+        .gate-input {
+            background: rgba(240, 238, 230, 0.55);
+            border-radius: 2px;
+            padding: 12px 14px;
+        }
+        [data-theme="dark"] .gate-input {
+            background: rgba(31, 30, 29, 0.45);
+        }
+        .gate-aside {
+            margin-top: 1.5rem;
+            font-family: var(--font-display);
+            font-style: italic;
+            color: var(--caption);
+            font-size: 13px;
+            opacity: 0.75;
+            letter-spacing: 0.03em;
+        }
+
+        /* ========== MINI PLAYER — pinned bottom-left, song of the week ========== */
+        .mini-player {
+            position: fixed;
+            bottom: max(1rem, env(safe-area-inset-bottom, 0));
+            left: 1rem;
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0.7rem 0.4rem 0.4rem;
+            background: var(--bg);
+            border: 1px solid var(--rule);
+            border-radius: 100px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06);
+            font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: var(--text);
+            max-width: calc(100vw - 2rem);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        background-color 0.3s ease,
+                        border-color 0.3s ease;
+        }
+        [data-theme="dark"] .mini-player {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 12px 32px rgba(0,0,0,0.4);
+        }
+        .mini-player.visible { opacity: 1; transform: translateY(0); }
+        .mini-player[hidden] { display: none; }
+        .mini-player-btn {
+            position: relative;
+            width: 38px; height: 38px;
+            border-radius: 100%;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            flex: 0 0 auto;
+            transition: transform 0.18s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        background-color 0.3s ease, color 0.3s ease;
+            padding: 0; overflow: visible;
+        }
+        .mini-player-btn:hover  { transform: scale(1.05); }
+        .mini-player-btn:active { transform: scale(0.92); }
+        .mini-player-ring {
+            position: absolute; inset: -3px;
+            width: calc(100% + 6px); height: calc(100% + 6px);
+            transform: rotate(-90deg);
+            pointer-events: none; fill: none;
+        }
+        .ring-track    { stroke: var(--rule); stroke-width: 1.5; transition: stroke 0.3s ease; }
+        .ring-progress {
+            stroke: var(--accent); stroke-width: 2; stroke-linecap: round;
+            stroke-dasharray: 100.531; stroke-dashoffset: 100.531;
+            transition: stroke-dashoffset 0.18s linear, stroke 0.3s ease;
+        }
+        .mini-player-icon {
+            position: relative; width: 14px; height: 14px;
+            fill: currentColor; display: block; overflow: visible;
+        }
+        .mini-player-icon path {
+            transition: opacity 0.22s cubic-bezier(0.22, 0.61, 0.36, 1),
+                        transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: 12px 12px;
+            transform-box: fill-box;
+        }
+        .mini-player-icon .icon-play  { opacity: 1; transform: scale(1) rotate(0deg); }
+        .mini-player-icon .icon-pause { opacity: 0; transform: scale(0.6) rotate(-90deg); }
+        .mini-player-btn[data-state="playing"] .icon-play  { opacity: 0; transform: scale(0.6) rotate(90deg); }
+        .mini-player-btn[data-state="playing"] .icon-pause { opacity: 1; transform: scale(1) rotate(0deg); }
+        @keyframes ring-buffer { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .mini-player-btn[data-state="buffering"] .ring-track { animation: ring-buffer 1s ease-in-out infinite; }
+        .mini-player-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; line-height: 1.2; }
+        .mini-player-title {
+            font-family: var(--font-display); font-style: italic;
+            font-size: 13px; font-weight: 600; letter-spacing: 0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            color: var(--text); max-width: 220px;
+        }
+        .mini-player-artist {
+            font-size: 10px; color: var(--caption);
+            letter-spacing: 0.06em; text-transform: uppercase;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            transition: color 0.3s ease;
+            max-width: 220px;
+        }
+        .mini-player-close {
+            background: none; border: none; color: var(--caption);
+            font-size: 18px; line-height: 1; cursor: pointer;
+            padding: 0 4px; opacity: 0.6;
+            transition: opacity 0.2s ease, color 0.3s ease;
+            flex: 0 0 auto;
+        }
+        .mini-player-close:hover { opacity: 1; }
+        @keyframes nudge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(160,130,109,0); }
+            50%      { box-shadow: 0 0 0 8px rgba(160,130,109,0.15); }
+        }
+        @keyframes nudge-dark {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(196,168,130,0); }
+            50%      { box-shadow: 0 0 0 8px rgba(196,168,130,0.2); }
+        }
+        .mini-player.needs-tap .mini-player-btn { animation: nudge 1.8s ease-in-out infinite; }
+        [data-theme="dark"] .mini-player.needs-tap .mini-player-btn { animation-name: nudge-dark; }
+        @media print { .mini-player { display: none !important; } }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--accent);
+            z-index: 60;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== NAVIGATION ========== */
+        .back-link {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 50;
+            font-size: 15px;
+            font-weight: 400;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, color 0.3s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.75;
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 1.15rem;
+            right: 1.25rem;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .lang-pill {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 56px;
+            height: 24px;
+            background: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.5s ease;
+        }
+
+        .lang-pill:hover { opacity: 0.75; }
+
+        .lang-pill-label {
+            flex: 1;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            line-height: 22px;
+            color: var(--bg);
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        .lang-pill-dot {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        [data-lang="ko"] .lang-pill-dot { transform: translateX(32px); }
+        [data-lang="en"] .lang-pill-ko { opacity: 0.4; }
+        [data-lang="ko"] .lang-pill-en { opacity: 0.4; }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-wrap input { display: none; }
+
+        .toggle-wrap label {
+            position: relative;
+            display: block;
+            width: 44px;
+            height: 24px;
+            background: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.5s ease;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0s, background-color 0.5s ease;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            overflow: hidden;
+        }
+
+        /* Monet flow-field — fixed background across the entire article (007) */
+        .hero-smoke, .hero-chars {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .hero-smoke { z-index: -3; }
+        .hero-chars { z-index: -2; pointer-events: none; }
+        .hero-fallback {
+            position: fixed; inset: 0; z-index: -4;
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 0.6s ease;
+            transform: scale(1);
+            will-change: transform;
+        }
+        .hero-fallback.show { opacity: 1; }
+
+        /* The journey: the painting IS the medium. The veil is a very soft tint,
+           not a wash; legibility lives in per-text-block scrims (.chapter .text-block). */
+        .article-veil {
+            position: fixed; inset: 0; z-index: -1;
+            background: rgba(240, 238, 230, 0.0);  /* effectively transparent; kept for theme transition only */
+            pointer-events: none;
+            opacity: 1;
+            transition: background-color 0.5s ease;
+        }
+        [data-theme="dark"] .article-veil {
+            background: rgba(31, 30, 29, 0.0);
+        }
+
+        /* ==================== JOURNEY CHAPTERS ==================== */
+        /* Each .chapter is a room: full-viewport tall, content centered, painting in full bloom behind. */
+        .chapter {
+            position: relative;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12vh 0;
+            gap: 2.5rem;
+        }
+        .chapter > * { width: 100%; }
+
+        /* Museum placard — sticks to the top of the viewport while you're in this chapter,
+           hands off when the next chapter's mark sticks past it. */
+        .chapter-mark {
+            position: sticky;
+            top: 1.5rem;
+            z-index: 5;
+            text-align: center;
+            margin: 0;
+            font-family: var(--font-display);
+            color: var(--accent);
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            font-size: 12px;
+            opacity: 0.9;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+        .chapter-mark .numeral {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            margin-right: 0.9rem;
+        }
+        .chapter-mark .painting-title {
+            font-style: italic;
+            letter-spacing: 0.12em;
+            text-transform: none;
+        }
+        [data-theme="dark"] .chapter-mark { mix-blend-mode: screen; opacity: 0.85; }
+
+        /* The text-block sits on the painting; a soft radial halo provides reading legibility */
+        .chapter .text-block {
+            position: relative;
+            z-index: 1;
+        }
+        .chapter .text-block::before {
+            content: '';
+            position: absolute;
+            inset: -2rem -1.5rem;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, rgba(240,238,230,0.78) 0%, rgba(240,238,230,0.62) 50%, rgba(240,238,230,0.0) 100%);
+            border-radius: 6px;
+            pointer-events: none;
+            transition: background 0.4s ease;
+        }
+        [data-theme="dark"] .chapter .text-block::before {
+            background: radial-gradient(ellipse at center, rgba(31,30,29,0.78) 0%, rgba(31,30,29,0.62) 50%, rgba(31,30,29,0.0) 100%);
+        }
+
+        /* Photos within a chapter: soft white frame ("polaroid-ish"), gentle shadow,
+           barely-there tilt so they feel pinned to the painting */
+        .chapter .photo-inset img {
+            box-shadow: 0 18px 60px -22px rgba(31, 30, 29, 0.45),
+                        0 4px 12px -4px rgba(31, 30, 29, 0.15);
+            transform: rotate(-0.6deg);
+            transition: transform 0.5s ease;
+            background: #fff;
+            padding: 6px;
+        }
+        [data-theme="dark"] .chapter .photo-inset img {
+            background: #2a2826;
+            box-shadow: 0 18px 60px -22px rgba(0, 0, 0, 0.6);
+        }
+        .chapter .photo-inset:nth-of-type(even) img { transform: rotate(0.6deg); }
+
+        /* Body must be transparent so the canvases show through */
+        body { background: transparent; }
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: -5;
+            background: var(--bg);
+            transition: background-color 0.3s ease;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(
+                to top,
+                rgba(240, 238, 230, 0.95) 0%,
+                rgba(240, 238, 230, 0.5) 35%,
+                rgba(240, 238, 230, 0.05) 100%
+            );
+            transition: background 0.3s ease;
+        }
+
+        [data-theme="dark"] .hero-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(31, 30, 29, 0.95) 0%,
+                rgba(31, 30, 29, 0.4) 35%,
+                rgba(31, 30, 29, 0.05) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding-bottom: 3rem;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 10vw, 5.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            margin-bottom: 1rem;
+            opacity: 0;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+        }
+
+        .scroll-hint span {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to bottom, var(--caption), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ========== ISSUE HEADER ========== */
+        .issue-intro {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 1.5rem;
+        }
+
+        .issue-number {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .issue-date {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .issue-opener {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 440px;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== TEXT BLOCKS ========== */
+        .text-block {
+            padding: 2rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .text-block p {
+            font-size: 20px;
+            line-height: 1.7;
+            margin-bottom: 1.25rem;
+        }
+
+        .text-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .text-block em { font-style: italic; }
+        .text-block strong { font-weight: 600; }
+
+        .photo-inset {
+            padding: 1rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .photo-inset img,
+        .photo-inset .gif-wrap img {
+            width: 100%;
+            border-radius: 3px;
+            display: block;
+        }
+
+        .photo-caption {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .photo-caption .caption-location {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .photo-inset .photo-caption {
+            margin-top: 0.75rem;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SIGN OFF ========== */
+        .sign-off {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .sign-off-name {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* ========== DIVIDER ========== */
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 0 auto;
+            opacity: 0.5;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== SPACERS ========== */
+        .spacer { height: 4rem; }
+        .spacer-sm { height: 2rem; }
+        .spacer-lg { height: 8rem; }
+
+        /* ========== FOOTER ========== */
+        .story-footer {
+            padding: 4rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .story-footer p {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .story-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SUBSCRIBE ========== */
+        .subscribe {
+            padding: 5rem 1.5rem 3rem;
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .subscribe-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-desc {
+            font-size: 16px;
+            color: var(--caption);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .subscribe-input::placeholder { color: var(--caption); }
+        .subscribe-input:focus { border-color: var(--accent); }
+
+        .subscribe-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .subscribe-btn:hover { opacity: 0.7; }
+
+        .subscribe-success {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent);
+            display: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe.submitted .subscribe-form { display: none; }
+        .subscribe.submitted .subscribe-success { display: block; }
+
+        .subscribe-error {
+            font-size: 15px;
+            color: #c0392b;
+            display: none;
+            margin-bottom: 1rem;
+        }
+        [data-theme="dark"] .subscribe-error { color: #e8857a; }
+        .subscribe.error .subscribe-error { display: block; }
+
+        .subscribe-note {
+            font-size: 13px;
+            color: var(--caption);
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .subscribe-form { flex-direction: column; }
+            .subscribe-btn { padding: 14px 24px; }
+        }
+
+        /* ========== COMMENTS ========== */
+        .comments {
+            padding: 3rem 1.5rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .comments-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .comments-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .comments-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .comments-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 2.5rem;
+        }
+
+        .comments-input {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .comments-input::placeholder { color: var(--caption); }
+        .comments-input:focus { border-color: var(--accent); }
+
+        .comments-textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .comments-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            align-self: flex-end;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .comments-btn:hover { opacity: 0.7; }
+
+        .comments-list { list-style: none; }
+
+        .comment-item {
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-item:first-child {
+            border-top: 1px solid var(--rule);
+        }
+
+        .comment-meta {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .comment-name { font-size: 15px; font-weight: 600; }
+
+        .comment-time {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .comment-body {
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .comments-empty {
+            font-size: 16px;
+            color: var(--caption);
+            text-align: center;
+            padding: 2rem 0;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .comments-btn { align-self: stretch; padding: 14px 24px; }
+        }
+
+        /* ========== REVEAL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal-fade { opacity: 0; }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.97);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .back-link { font-size: 14px; }
+            .text-block p { font-size: 18px; }
+        }
+
+        @media (min-width: 768px) {
+            .photo-inset { padding: 2rem 3rem; max-width: 700px; }
+            .text-block { padding: 2.5rem 3rem; }
+        }
+
+        /* ========== KOMOREBI INTERSTITIAL ========== */
+        .komorebi {
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 1s ease, visibility 0s;
+        }
+
+        .komorebi.exiting {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+
+        .komorebi-content {
+            max-width: 480px;
+            position: relative;
+        }
+
+        .komorebi-kanji {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(3.5rem, 14vw, 7rem);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            opacity: 0;
+            transform: translateY(20px) scale(0.96);
+            line-height: 1.2;
+        }
+
+        .komorebi-romaji {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--accent);
+            margin-top: 0.75rem;
+            letter-spacing: 0.04em;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-noun {
+            font-family: var(--font);
+            font-size: 12px;
+            font-style: italic;
+            color: var(--caption);
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-meaning {
+            font-family: var(--font);
+            font-size: 17px;
+            color: var(--caption);
+            line-height: 1.8;
+            margin-top: 2.5rem;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 2rem auto;
+            opacity: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi-tagline {
+            font-size: 14px;
+            color: var(--caption);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-dismiss {
+            background: none;
+            border: none;
+            font-family: var(--font);
+            font-size: 15px;
+            color: var(--accent);
+            cursor: pointer;
+            margin-top: 2.5rem;
+            padding: 10px 28px;
+            letter-spacing: 0.03em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, color 0.3s ease, transform 0.8s cubic-bezier(0.22,0.61,0.36,1);
+        }
+
+        .komorebi-dismiss:hover {
+            opacity: 0.7 !important;
+        }
+
+        /* Dappled light system */
+        .komorebi-light {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            mix-blend-mode: plus-lighter;
+            transition: opacity 2.5s ease;
+        }
+
+        .gate-light {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 199;
+            opacity: 0.02;
+            mix-blend-mode: plus-lighter;
+            background: radial-gradient(ellipse at 50% 30%, rgba(160,130,109,0.3) 0%, transparent 60%);
+            transition: opacity 2s ease;
+        }
+
+        .gate-light.awakening {
+            opacity: 0.15;
+        }
+
+        .komorebi-leaves {
+            position: absolute;
+            inset: -20%;
+            pointer-events: none;
+            opacity: 0;
+            filter: blur(8px);
+            animation: leafSway 12s ease-in-out infinite;
+        }
+
+        @keyframes leafSway {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(1%, -0.5%) rotate(0.3deg); }
+            66% { transform: translate(-0.5%, 0.5%) rotate(-0.2deg); }
+        }
+
+        .komorebi-sun {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            background: radial-gradient(
+                ellipse at 50% -10%,
+                rgba(160,130,109,0.25) 0%,
+                rgba(160,130,109,0.08) 30%,
+                transparent 65%
+            );
+            transition: opacity 3s ease;
+        }
+
+        .komorebi-spots {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .komorebi-spot {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(200,175,140,0.15);
+            filter: blur(20px);
+            animation: spotPulse 8s ease-in-out infinite;
+        }
+
+        .komorebi-spot:nth-child(1) { width: 120px; height: 80px; top: 8%; left: 15%; animation-delay: 0s; transform: rotate(-15deg); }
+        .komorebi-spot:nth-child(2) { width: 90px; height: 60px; top: 25%; right: 20%; animation-delay: 2.5s; transform: rotate(10deg); }
+        .komorebi-spot:nth-child(3) { width: 140px; height: 90px; bottom: 30%; left: 25%; animation-delay: 1.2s; transform: rotate(-8deg); }
+        .komorebi-spot:nth-child(4) { width: 70px; height: 50px; bottom: 15%; right: 30%; animation-delay: 4s; transform: rotate(20deg); }
+        .komorebi-spot:nth-child(5) { width: 100px; height: 70px; top: 50%; left: 55%; animation-delay: 3s; transform: rotate(-5deg); }
+
+        @keyframes spotPulse {
+            0%, 100% { opacity: 0.3; transform: rotate(-15deg) scale(0.9); }
+            50% { opacity: 0.7; transform: rotate(-12deg) scale(1.1); }
+        }
+
+        /* ========== REDUCED MOTION ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-fade, .reveal-scale {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .scroll-line { animation: none; }
+            .gate-input.shake { animation: none; }
+            .komorebi-spot, .komorebi-leaves { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== PASSWORD GATE ==================== -->
+    <div class="gate" id="gate">
+        <div class="gate-content">
+            <p class="gate-meta">No. 007 &middot; Coquelicots</p>
+            <h1 class="gate-title">Dispatch</h1>
+            <p class="gate-subtitle">
+                <span data-l="en">This letter is for friends and family.</span>
+                <span data-l="ko">가족이랑 친구들한테만 보내는 거예요.</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Ambient gate light -->
+    <div class="gate-light" id="gateLight"></div>
+
+    <!-- ==================== KOMOREBI INTERSTITIAL ==================== -->
+    <div class="komorebi" id="komorebi">
+        <svg class="komorebi-leaves" id="komorebiLeaves" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <filter id="leafBlur"><feGaussianBlur stdDeviation="3"/></filter>
+            </defs>
+            <g fill="rgba(160,130,109,0.12)" filter="url(#leafBlur)">
+                <ellipse cx="120" cy="100" rx="45" ry="22" transform="rotate(-30 120 100)"/>
+                <ellipse cx="350" cy="80" rx="35" ry="18" transform="rotate(15 350 80)"/>
+                <ellipse cx="600" cy="150" rx="50" ry="25" transform="rotate(-20 600 150)"/>
+                <ellipse cx="200" cy="300" rx="40" ry="20" transform="rotate(25 200 300)"/>
+                <ellipse cx="500" cy="350" rx="55" ry="28" transform="rotate(-10 500 350)"/>
+                <ellipse cx="700" cy="400" rx="38" ry="19" transform="rotate(30 700 400)"/>
+                <ellipse cx="150" cy="550" rx="48" ry="24" transform="rotate(-15 150 550)"/>
+                <ellipse cx="400" cy="600" rx="42" ry="21" transform="rotate(20 400 600)"/>
+                <ellipse cx="650" cy="650" rx="35" ry="17" transform="rotate(-25 650 650)"/>
+                <ellipse cx="300" cy="750" rx="52" ry="26" transform="rotate(10 300 750)"/>
+            </g>
+        </svg>
+        <div class="komorebi-sun" id="komorebiSun"></div>
+        <div class="komorebi-spots" id="komorebiSpots">
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+        </div>
+        <div class="komorebi-content">
+            <p class="komorebi-kanji" id="komorebiKanji">積ん読</p>
+            <p class="komorebi-romaji" id="komorebiRomaji">tsundoku</p>
+            <p class="komorebi-noun" id="komorebiNoun">noun &middot; Japanese</p>
+            <p class="komorebi-meaning" id="komorebiMeaning">
+                <span data-l="en">The practice of buying books and letting them pile up unread on a shelf &mdash; a named architectural failure of intention.</span>
+                <span data-l="ko">책을 사놓고 읽지 않은 채 책장에 쌓아두는 일 &mdash; 의도가 무너지는 방식에 따로 이름을 붙여둔 단어.</span>
+            </p>
+            <div class="komorebi-divider" id="komorebiDivider"></div>
+            <p class="komorebi-tagline" id="komorebiTagline">
+                <span data-l="en">A letter for friends and family.</span>
+                <span data-l="ko">가까운 사람들한테 보내는 편지.</span>
+            </p>
+            <button class="komorebi-dismiss" id="komorebiDismiss">
+                <span data-l="en">Continue &rarr;</span>
+                <span data-l="ko">계속 &rarr;</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <a href="/newsletter" class="back-link">&larr; Dispatch</a>
+    <div class="top-controls">
+        <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
+            <span class="lang-pill-label lang-pill-en">EN</span>
+            <span class="lang-pill-label lang-pill-ko">한</span>
+            <span class="lang-pill-dot"></span>
+        </div>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </div>
+
+    <!-- ==================== MONET BACKGROUND (fixed, page-wide) ==================== -->
+    <div class="hero-fallback" id="heroFallback" style="background-image: url('/newsletter/007/images/coquelicots.jpg');"></div>
+    <canvas class="hero-smoke" id="heroSmoke"></canvas>
+    <canvas class="hero-chars" id="heroChars"></canvas>
+    <div class="article-veil" id="articleVeil"></div>
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero" id="heroSection">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-label">
+                <span data-l="en">Dispatch 007 &middot; A Journey Through Monet</span>
+                <span data-l="ko">디스패치 007호 &middot; 모네의 그림을 따라</span>
+            </div>
+            <h1 class="hero-title" style="font-style: italic;">Coquelicots</h1>
+            <p class="hero-description">
+                <span data-l="en">after Monet, 1873 &mdash; letters drift through pigment</span>
+                <span data-l="ko">모네의 들판, 1873 &mdash; 글자가 안료 사이를 떠다닌다</span>
+            </p>
+        </div>
+        <div class="scroll-hint">
+            <span data-l="en">Scroll</span>
+            <span data-l="ko">스크롤</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ==================== ISSUE 007 — Coquelicots ==================== -->
+
+    <div class="issue-intro reveal">
+        <p class="issue-number">No. 007</p>
+        <h2 class="issue-date">
+            <span data-l="en">Coquelicots</span>
+            <span data-l="ko">개양귀비</span>
+        </h2>
+        <p class="issue-opener">
+            <span data-l="en">May 21, 2026</span>
+            <span data-l="ko">2026년 5월 21일</span>
+        </p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— The Letter ——— -->
+
+    <!-- ============================================================
+         CHAPTER I — Coquelicots (the body, the field, sunset paddling)
+         ============================================================ -->
+    <div class="chapter" data-monet="0">
+        <p class="chapter-mark"><span class="numeral">I</span><span class="painting-title">Coquelicots</span></p>
+        <div class="text-block reveal">
+            <div data-l="en">
+                <p>I weighed myself last week. 192. I've been around 170 my whole adult life. I knew I'd put on a few since the move, but not that &mdash; and the number sat with me for a minute before I put on a shirt. The plan is to get back. Not all the way. Just enough that the next time I paddle out, my belly doesn't catch me off guard.</p>
+            </div>
+            <div data-l="ko">
+                <p>지난주에 몸무게를 쟀다. 192. 어른이 된 이후로 줄곧 170 언저리였다. 이사 와서 몇 파운드 붙었을 거라곤 짐작했지만, 192일 줄은 몰랐다 &mdash; 셔츠를 입기 전, 잠시 그 숫자를 들여다봤다. 다시 돌아갈 계획이다. 끝까지는 아니고. 다음에 패들보드를 타고 나갈 때, 배가 나를 놀라게 하지 않을 정도까지만.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         CHAPTER II — Tulip Fields at Sassenheim (work, the structure)
+         ============================================================ -->
+    <div class="chapter" data-monet="1">
+        <p class="chapter-mark"><span class="numeral">II</span><span class="painting-title">Tulip Fields at Sassenheim</span></p>
+        <div class="text-block reveal">
+            <div data-l="en">
+                <p>Work is a lot right now. I manage six people. We might add three more this quarter, which would put the team at nine. I used to think this was what I wanted &mdash; the responsibility, the room to make calls. Now that I have it I'm learning that wanting it and doing it are two different conversations.</p>
+                <p>I went to the Burbank office today &mdash; the Nickelodeon one. Stood in the lobby for a minute before going up. Some weeks I do better than others at keeping the burnout at arm's length. This was one of the harder ones.</p>
+            </div>
+            <div data-l="ko">
+                <p>요즘 회사 일이 많다. 6명을 매니징하고 있고, 이번 분기 안에 3명 정도 더 합류할 것 같다. 그러면 팀이 9명이 된다. 예전엔 이게 내가 원하는 거라고 생각했다 &mdash; 책임이라든가, 결정할 수 있는 여지 같은 거. 막상 가져보니, 원하는 것과 해내는 건 별개의 대화라는 걸 배우고 있다.</p>
+                <p>오늘은 버뱅크 사무실에 있었다 &mdash; 니켈로디언 쪽. 로비에서 잠깐 서 있다가 올라갔다. 번아웃을 어떻게든 손이 닿지 않는 거리에 두려고 하는데, 어떤 주는 잘되고 어떤 주는 잘 안 된다. 이번 주는 후자였다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         CHAPTER III — Spring in Giverny (beginning again)
+         ============================================================ -->
+    <div class="chapter" data-monet="3">
+        <p class="chapter-mark"><span class="numeral">III</span><span class="painting-title">Spring in Giverny</span></p>
+        <div class="text-block reveal">
+            <div data-l="en">
+                <p>In between, I'm taking Japanese lessons. Hiragana, slowly. I don't really know what I'll do with it yet. It's just nice to be a beginner at something again &mdash; to sit with a teacher and not be the one anyone expects to have the answers.</p>
+                <p>Hunter is driving up from San Diego this weekend. We've known each other since high school; he's been in the Marine Corps for a few years now. There's a kind of friendship where you don't have to be impressive &mdash; you just have to show up. I'm grateful for the ones that have lasted long enough to become that.</p>
+            </div>
+            <div data-l="ko">
+                <p>그 사이사이에 일본어 수업을 받고 있다. 히라가나, 천천히. 이걸로 뭘 하게 될지는 아직 모르겠다. 그냥 다시 초보가 되는 게 좋다 &mdash; 선생님 앞에 앉아서, 답을 알고 있어야 하는 사람이 아닌 상태로.</p>
+                <p>이번 주말엔 헌터가 샌디에이고에서 차를 몰고 올라온다. 고등학교 때부터 친구고, 몇 년째 해병대에 있다. 어떤 우정은 잘 보이려고 애쓰지 않아도 되는 종류다 &mdash; 그냥 나타나기만 하면 된다. 그런 우정이 오래 살아남아 줘서 고맙다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         CHAPTER IV — Parc Monceau (overgrown garden / feed)
+         ============================================================ -->
+    <div class="chapter" data-monet="2">
+        <p class="chapter-mark"><span class="numeral">IV</span><span class="painting-title">Parc Monceau</span></p>
+        <div class="photo-inset reveal">
+            <img src="/newsletter/007/images/newprofilepic.jpg"
+                data-alt-en="Kevin's new profile photo"
+                data-alt-ko="케빈의 새 프로필 사진"
+                alt="Kevin's new profile photo">
+            <div class="photo-caption">
+                <span data-l="en">the new headshot &mdash; 엄마 said I look serious</span>
+                <span data-l="ko">새 프로필 사진 &mdash; 엄마는 내가 너무 심각해 보인다고 했다</span>
+            </div>
+        </div>
+        <div class="text-block reveal">
+            <div data-l="en">
+                <p>I posted a new headshot this week. I don't usually take photos of myself. <strong>엄마</strong> texted to ask why I looked so serious; everyone else was quiet, which is roughly how the internet works.</p>
+                <p>The next morning I opened my phone to an AI-generated video of a cat doing kung fu. It made me laugh, and then it made me a little sad &mdash; that we built a world where five seconds of compute can turn a housecat into a martial artist, and the same five seconds can't fix any of the things that actually hurt.</p>
+            </div>
+            <div data-l="ko">
+                <p>이번 주에 새 프로필 사진을 올렸다. 평소 내 사진은 잘 안 찍는다. <strong>엄마</strong>가 왜 그렇게 심각해 보이냐고 문자를 보냈고, 다른 사람들은 조용했다. 인터넷이 대체로 그렇다.</p>
+                <p>다음 날 아침 폰을 켰는데, 고양이가 쿵후를 하는 AI 영상이 떠 있었다. 웃겼고, 곧 좀 슬펐다 &mdash; 5초의 연산으로 집고양이를 무술가로 만들 수 있는 세상은 만들어 놓고, 그 5초로 실제로 아픈 것들은 하나도 못 고친다는 게.</p>
+            </div>
+        </div>
+        <div style="max-width: 620px; margin: 2rem auto 0; padding: 0 1.5rem;" class="reveal">
+            <video id="catKungfuVideo" muted loop playsinline preload="none"
+                data-aria-en="AI-generated video of a cat performing kung fu"
+                data-aria-ko="쿵후를 하는 고양이 AI 생성 영상"
+                style="width: 100%; border-radius: 3px; display: block;">
+                <source src="/newsletter/007/images/catkungfu.mp4" type="video/mp4">
+            </video>
+            <div class="photo-caption" style="margin-top: 0.75rem; color: var(--caption);">
+                <span data-l="en">five seconds of processing, one new master of the martial arts</span>
+                <span data-l="ko">5초의 연산, 한 명의 새로운 무술의 대가</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         CHAPTER V — Poppy Field at Argenteuil (Dakota + Berly + Debussy)
+         ============================================================ -->
+    <div class="chapter" data-monet="4">
+        <p class="chapter-mark"><span class="numeral">V</span><span class="painting-title">Poppy Field at Argenteuil</span></p>
+        <div class="text-block reveal">
+            <div data-l="en">
+                <p>I had dinner with Dakota tonight. We were talking about the way things are right now &mdash; people losing their jobs, the strange suddenness of it &mdash; and somewhere between the entrées he asked, "Who's your role model?" I didn't have a name. I tried for a minute and came up with nothing.</p>
+                <p>What I told him instead was something Berly said to me once: <em>comparison is the thief of joy.</em> I think about it more than I let on. I see what other people my age have built &mdash; the wealth, the headlines, the velocity &mdash; and there's a version of me that gets very small. But the truth is I'm okay. I have breath in my lungs and food on my plate and people I love sitting across the table. That's the part that matters, even if it doesn't sound like much.</p>
+                <p>I've been playing <em>La fille aux cheveux de lin</em> on loop while I work. It's a Debussy prelude, two and a half minutes long, written in 1910 when half of Europe was trying to be Wagner. Debussy just wrote a small piece about a girl. He didn't try to be impressive. He just was. That's closer to a role model than anything I could name.</p>
+            </div>
+            <div data-l="ko">
+                <p>오늘 저녁엔 다코타와 밥을 먹었다. 요즘 세상 돌아가는 얘기를 했다 &mdash; 일자리를 잃는 사람들, 그 묘하게 빠른 속도. 식사 중간쯤 그가 물었다. "네 롤모델은 누구야?" 떠오르는 이름이 없었다. 한참 생각해봤지만 빈칸이었다.</p>
+                <p>대신 얼마 전 버리가 해준 말을 꺼냈다. <em>비교는 기쁨을 앗아간다.</em> 입 밖에 잘 안 내지만, 자주 생각한다. 또래들이 쌓아 올린 걸 보면 나의 어떤 버전이 작아진다. 하지만 사실 나는 괜찮다. 폐로 들이마시는 숨이 있고, 접시 위에 음식이 있고, 식탁 건너편에 사랑하는 사람들이 있다. 그게 중요한 부분이다. 별 거 아닌 것처럼 들려도.</p>
+                <p>요즘은 일하는 동안 <em>La fille aux cheveux de lin</em>을 반복 재생한다. 드뷔시가 1910년에 쓴 2분 30초짜리 전주곡이다. 유럽의 절반이 바그너처럼 쓰려 애쓸 때, 드뷔시는 그냥 소녀에 관한 짧은 곡을 썼다. 굳이 인상 깊으려 하지 않았다. 그냥 그 자체로 있었다. 내가 떠올릴 수 있는 그 어떤 롤모델보다도 그쪽이 가깝다.</p>
+            </div>
+        </div>
+        <!-- Debussy embed, in-chapter — the song is part of this room, not a separate feature -->
+        <div style="max-width: 560px; margin: 1rem auto 0; padding: 0 1.5rem;" class="reveal">
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 3px;">
+                <iframe
+                    src="https://www.youtube.com/embed/OfXD6ceEPT4?rel=0&modestbranding=1"
+                    data-title-en="La fille aux cheveux de lin — Debussy"
+                    data-title-ko="아마빛 머리의 소녀 — 드뷔시"
+                    title="La fille aux cheveux de lin — Debussy"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                ></iframe>
+            </div>
+            <p class="photo-caption" style="margin-top: 0.6rem; color: var(--caption); text-align: center; font-style: italic;">
+                <span data-l="en">Claude Debussy &middot; <em>Préludes, Book I</em> &middot; 1910</span>
+                <span data-l="ko">클로드 드뷔시 &middot; <em>전주곡집 1권</em> &middot; 1910</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         CHAPTER VI — Coquelicots, revisited (May ends; tsundoku; books)
+         ============================================================ -->
+    <div class="chapter" data-monet="0">
+        <p class="chapter-mark"><span class="numeral">VI</span><span class="painting-title">Coquelicots, revisited</span></p>
+        <div class="text-block reveal">
+            <div data-l="en">
+                <p>May is almost over. I'll be twenty-eight in three months. There's a stack of books on my nightstand I haven't read &mdash; things I bought thinking I'd get to. There's a Japanese word for it: <span style="font-family: 'Noto Serif JP', serif;">積ん読</span>, <em>tsundoku.</em> The pile of books you meant to read.</p>
+                <p>Most of my life is shaped like that right now. Intention outrunning execution. The 170 I want to be. The Japanese I want to know. The chapters of this letter I keep meaning to send sooner. I'm trying to be gentler with the gap than I used to be.</p>
+                <p>If you've read something lately that actually changed how you saw a Tuesday afternoon, send it my way. My goodreads is <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank" rel="noopener noreferrer">here</a>. I'm not asking for productivity-bro lists. I want the ones that did something for you, even if you can't name what.</p>
+            </div>
+            <div data-l="ko">
+                <p>5월이 거의 끝나간다. 석 달 뒤면 스물여덟이다. 침대 옆에 안 읽은 책이 쌓여 있다 &mdash; 언젠가 읽겠지 하고 사놓은 것들. 일본어에 그걸 가리키는 단어가 있다. <span style="font-family: 'Noto Serif JP', serif;">積ん読</span>, <em>tsundoku.</em> 읽으려고 사놓고 쌓아둔 책들.</p>
+                <p>요즘 내 삶이 대체로 그 모양이다. 의도가 실행을 앞서 달리는. 되고 싶은 170. 알고 싶은 일본어. 더 일찍 보내야지 하면서 미루는 이 편지의 챕터들. 그 간극에 좀 더 너그러워지려 노력 중이다.</p>
+                <p>최근 화요일 오후를 바라보는 시선을 진짜로 바꿔놓은 책이 있다면 보내달라. 내 goodreads는 <a href="https://www.goodreads.com/user/show/28581272-kevin-lee" target="_blank" rel="noopener noreferrer">여기</a>. 자기계발 책 목록 말고. 너에게 뭔가 일어나게 한 책. 그게 뭔지 말로 못 해도.</p>
+            </div>
+        </div>
+        <div class="photo-inset reveal">
+            <img src="/newsletter/007/images/dogonmyshoulders.jpg"
+                data-alt-en="A dog using Kevin's shoulders as a landing pad"
+                data-alt-ko="케빈의 어깨를 착륙장으로 쓴 개"
+                alt="A dog using Kevin's shoulders as a landing pad">
+            <div class="photo-caption">
+                <span data-l="en">my cousin's friend's dog, unannounced &mdash; he looked at me like he had something to say, and then he didn't say it</span>
+                <span data-l="ko">사촌 친구의 개, 통보 없이 어깨로 &mdash; 뭔가 할 말이 있는 표정으로 나를 보더니, 결국 아무 말도 하지 않았다</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Word of the Week and Song of the Week have been folded into the prose
+         of Chapters V (Debussy) and VI (tsundoku) so they read as part of the letter,
+         not as separate features. The standalone section blocks are intentionally
+         removed in this issue. -->
+
+    <!-- ——— Sign Off — quiet, just the name ——— -->
+    <div class="sign-off reveal">
+        <p class="sign-off-name" style="margin-top: 0;">&mdash; Kevin</p>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Subscribe ——— -->
+    <div class="subscribe reveal" id="subscribe">
+        <p class="subscribe-label">
+            <span data-l="en">Stay in the Loop</span>
+            <span data-l="ko">소식 받기</span>
+        </p>
+        <h2 class="subscribe-title">
+            <span data-l="en">Want this weekly?</span>
+            <span data-l="ko">매주 받고 싶다면?</span>
+        </h2>
+        <p class="subscribe-desc">
+            <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
+            <span data-l="ko">이메일 남겨주면 매주 보내줄게. 스팸 같은 거 없고 그냥 내 근황.</span>
+        </p>
+        <form class="subscribe-form" id="subscribeForm">
+            <input type="email" class="subscribe-input" id="subscribeEmail"
+                data-ph-en="your@email.com" data-ph-ko="your@email.com"
+                required autocomplete="email">
+            <button type="submit" class="subscribe-btn" id="subscribeBtn">
+                <span data-l="en">Subscribe</span>
+                <span data-l="ko">구독</span>
+            </button>
+        </form>
+        <p class="subscribe-success" id="subscribeSuccess">
+            <span data-l="en">You're in. See you next week.</span>
+            <span data-l="ko">등록됨. 다음 주에 보자.</span>
+        </p>
+        <p class="subscribe-error" id="subscribeError">
+            <span data-l="en">Hmm, that didn't go through. Mind trying again?</span>
+            <span data-l="ko">앗, 등록이 안 됐어요. 다시 시도해줄래요?</span>
+        </p>
+        <p class="subscribe-note">
+            <span data-l="en">Just between us — no third parties, ever.</span>
+            <span data-l="ko">우리끼리만. 어디 넘기거나 그런 거 절대 없음.</span>
+        </p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ==================== COMMENTS ==================== -->
+    <div class="comments reveal" id="comments">
+        <div class="comments-header">
+            <p class="comments-label">
+                <span data-l="en">Discussion</span>
+                <span data-l="ko">댓글</span>
+            </p>
+            <h2 class="comments-title">
+                <span data-l="en">Leave a note</span>
+                <span data-l="ko">한마디 남기기</span>
+            </h2>
+        </div>
+        <form class="comments-form" id="commentsForm">
+            <input type="text" class="comments-input" id="commentName" data-ph-en="Your name" data-ph-ko="이름" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" data-ph-en="Write a comment..." data-ph-ko="댓글 작성..." maxlength="2000" required></textarea>
+            <button type="submit" class="comments-btn" id="commentBtn">
+                <span data-l="en">Post</span>
+                <span data-l="ko">게시</span>
+            </button>
+        </form>
+        <div class="comments-list" id="commentsList"></div>
+        <p class="comments-empty" id="commentsEmpty" style="display:none;">
+            <span data-l="en">No comments yet. Be the first.</span>
+            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨 주세요.</span>
+        </p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="story-footer">
+        <p>
+            <span data-l="en">Dispatch No. 007 &middot; Coquelicots &middot;</span>
+            <span data-l="ko">Dispatch 007호 &middot; 개양귀비 &middot;</span>
+            <a href="/">klee.page</a>
+        </p>
+    </footer>
+
+    <!-- ==================== SONG OF THE WEEK — audio + mini player ==================== -->
+    <audio id="songOfTheWeek" src="/newsletter/007/images/la-fille-aux-cheveux-de-lin.mp3" preload="metadata" loop></audio>
+    <div class="mini-player" id="miniPlayer" hidden aria-label="Song of the week mini player">
+        <button class="mini-player-btn" id="miniPlayerBtn" type="button" aria-label="Play or pause song of the week" data-state="paused">
+            <svg class="mini-player-ring" viewBox="0 0 36 36" aria-hidden="true">
+                <circle class="ring-track"    cx="18" cy="18" r="16"></circle>
+                <circle class="ring-progress" cx="18" cy="18" r="16" id="miniPlayerRing"></circle>
+            </svg>
+            <svg class="mini-player-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="icon-play"  d="M7 5 L7 19 L19 12 Z"></path>
+                <path class="icon-pause" d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z"></path>
+            </svg>
+        </button>
+        <div class="mini-player-meta">
+            <div class="mini-player-title"><span data-l="en">La fille aux cheveux de lin</span><span data-l="ko">아마빛 머리의 소녀</span></div>
+            <div class="mini-player-artist"><span data-l="en">Debussy &middot; 1910</span><span data-l="ko">드뷔시 &middot; 1910</span></div>
+        </div>
+        <button class="mini-player-close" id="miniPlayerClose" type="button" aria-label="Close mini player">&times;</button>
+    </div>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- Scripts -->
+    <script src="/js/theme.js"></script>
+    <script>
+        // ==================== KOMOREBI GATE ====================
+        (function() {
+            var gate = document.getElementById('gate');
+            var komorebi = document.getElementById('komorebi');
+            if (!gate) return;
+
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            var issueKey = 'dispatch-auth-' + path;
+
+            function animateKomorebi(callback) {
+                var gateLight = document.getElementById('gateLight');
+                gateLight.classList.add('awakening');
+
+                komorebi.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
+                setTimeout(function() {
+                    gate.classList.add('unlocked');
+                    gateLight.style.display = 'none';
+
+                    var leaves = document.getElementById('komorebiLeaves');
+                    var sun = document.getElementById('komorebiSun');
+                    var spots = document.getElementById('komorebiSpots');
+                    var kanji = document.getElementById('komorebiKanji');
+                    var romaji = document.getElementById('komorebiRomaji');
+                    var noun = document.getElementById('komorebiNoun');
+                    var meaning = document.getElementById('komorebiMeaning');
+                    var divider = document.getElementById('komorebiDivider');
+                    var tagline = document.getElementById('komorebiTagline');
+
+                    var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+
+                    function animate(el, d, dur) {
+                        dur = dur || 1;
+                        setTimeout(function() {
+                            el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0) scale(1)';
+                        }, d);
+                    }
+
+                    setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
+                    setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
+                    setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
+
+                    animate(kanji, 800, 1.4);
+                    animate(romaji, 1800, 1);
+                    animate(noun, 2200, 0.8);
+                    animate(meaning, 2800, 1.1);
+                    setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
+                    animate(tagline, 3800, 0.9);
+
+                    var dismiss = document.getElementById('komorebiDismiss');
+                    setTimeout(function() {
+                        dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
+                        dismiss.style.opacity = '0.5';
+                        dismiss.style.transform = 'translateY(0)';
+                    }, 4200);
+
+                    dismiss.addEventListener('click', function() {
+                        komorebi.classList.add('exiting');
+                        document.body.style.overflow = '';
+                        document.body.classList.add('gate-open');
+                        setTimeout(callback, 1200);
+                    });
+                }, 800);
+            }
+
+            function unlock() {
+                sessionStorage.setItem(issueKey, '1');
+                animateKomorebi(function() {
+                    komorebi.style.display = 'none';
+                });
+            }
+
+            function unlockQuiet() {
+                sessionStorage.setItem(issueKey, '1');
+                gate.classList.add('unlocked');
+                document.body.classList.add('gate-open');
+            }
+
+            if (sessionStorage.getItem(issueKey) === '1') {
+                // Returning visitor this session — reveal without replaying the intro.
+                gate.classList.add('unlocked');
+                document.body.classList.add('gate-open');
+                if (komorebi) komorebi.style.display = 'none';
+                return;
+            }
+
+            // No password required — play the welcome interstitial once, then reveal.
+            unlock();
+        })();
+    </script>
+    <script>
+        // ==================== DISPATCH I18N ====================
+        (function() {
+            function getLang() {
+                return document.documentElement.getAttribute('data-lang') || 'en';
+            }
+
+            function applyI18n() {
+                var lang = getLang();
+                document.querySelectorAll('[data-ph-en]').forEach(function(el) {
+                    el.placeholder = el.getAttribute('data-ph-' + lang) || el.getAttribute('data-ph-en');
+                });
+                document.querySelectorAll('[data-alt-en]').forEach(function(el) {
+                    el.alt = el.getAttribute('data-alt-' + lang) || el.getAttribute('data-alt-en');
+                });
+                document.querySelectorAll('[data-aria-en]').forEach(function(el) {
+                    el.setAttribute('aria-label',
+                        el.getAttribute('data-aria-' + lang) || el.getAttribute('data-aria-en'));
+                });
+                document.querySelectorAll('[data-title-en]').forEach(function(el) {
+                    el.title = el.getAttribute('data-title-' + lang) || el.getAttribute('data-title-en');
+                });
+                if (typeof window.dispatchCommentsRefresh === 'function') {
+                    window.dispatchCommentsRefresh();
+                }
+            }
+
+            window.dispatchApplyI18n = applyI18n;
+            applyI18n();
+        })();
+
+        // ==================== LANGUAGE TOGGLE ====================
+        (function() {
+            var pill = document.getElementById('langPill');
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+
+            function toggle() {
+                current = current === 'en' ? 'ko' : 'en';
+                document.documentElement.setAttribute('data-lang', current);
+                document.documentElement.setAttribute('lang', current);
+                localStorage.setItem('dispatch-lang', current);
+                window.dispatchApplyI18n();
+            }
+
+            pill.addEventListener('click', toggle);
+            pill.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+            });
+        })();
+
+        // ==================== LAZY VIDEO (cat kung fu) ====================
+        (function() {
+            var video = document.getElementById('catKungfuVideo');
+            if (!video) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (!('IntersectionObserver' in window)) return;
+
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        var p = video.play();
+                        if (p && p.catch) p.catch(function() {});
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, { threshold: 0.2 });
+            io.observe(video);
+        })();
+
+        // ==================== SUBSCRIBE ====================
+        (function() {
+            var form = document.getElementById('subscribeForm');
+            var emailInput = document.getElementById('subscribeEmail');
+            var btn = document.getElementById('subscribeBtn');
+            var section = document.getElementById('subscribe');
+
+            if (localStorage.getItem('dispatch-subscribed')) {
+                section.classList.add('submitted');
+                return;
+            }
+
+            // Retry a previously-failed signup (e.g. Supabase was briefly down) so a
+            // transient outage doesn't silently drop a subscriber.
+            var pendingEmail = localStorage.getItem('dispatch-pending');
+            if (pendingEmail) {
+                fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: pendingEmail })
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error('retry failed: ' + res.status);
+                    localStorage.removeItem('dispatch-pending');
+                    localStorage.setItem('dispatch-subscribed', pendingEmail);
+                })
+                .catch(function() {});
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = emailInput.value.trim();
+                if (!email) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(function(res) {
+                    if (!res.ok) {
+                        var err = new Error('subscribe failed: ' + res.status);
+                        err.status = res.status;
+                        throw err;
+                    }
+                    return res.json();
+                })
+                .then(function() {
+                    localStorage.removeItem('dispatch-pending');
+                    localStorage.setItem('dispatch-subscribed', email);
+                    section.classList.remove('error');
+                    section.classList.add('submitted');
+                })
+                .catch(function(err) {
+                    // Don't fake success. Show an error so the visitor can retry, and
+                    // for transient failures (Supabase down / offline) queue the email
+                    // so we retry automatically on their next visit.
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                    section.classList.add('error');
+                    if (!err || !err.status || err.status >= 500) {
+                        localStorage.setItem('dispatch-pending', email);
+                    }
+                });
+            });
+        })();
+
+        // ==================== COMMENTS ====================
+        (function() {
+            var form = document.getElementById('commentsForm');
+            var nameInput = document.getElementById('commentName');
+            var textInput = document.getElementById('commentText');
+            var btn = document.getElementById('commentBtn');
+            var list = document.getElementById('commentsList');
+            var empty = document.getElementById('commentsEmpty');
+            var issue = '007';
+            var cachedComments = [];
+
+            function escapeHtml(str) {
+                var div = document.createElement('div');
+                div.appendChild(document.createTextNode(str));
+                return div.innerHTML;
+            }
+
+            function timeAgo(dateStr) {
+                var lang = document.documentElement.getAttribute('data-lang') || 'en';
+                var seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+                if (seconds < 60) return lang === 'ko' ? '방금' : 'just now';
+                var intervals = lang === 'ko'
+                    ? [[31536000, '년'], [2592000, '개월'], [86400, '일'], [3600, '시간'], [60, '분']]
+                    : [[31536000, 'y'], [2592000, 'mo'], [86400, 'd'], [3600, 'h'], [60, 'm']];
+                for (var i = 0; i < intervals.length; i++) {
+                    var count = Math.floor(seconds / intervals[i][0]);
+                    if (count >= 1) {
+                        return lang === 'ko'
+                            ? count + intervals[i][1] + ' 전'
+                            : count + intervals[i][1] + ' ago';
+                    }
+                }
+                return lang === 'ko' ? '방금' : 'just now';
+            }
+
+            function renderComment(c) {
+                var div = document.createElement('div');
+                div.className = 'comment-item';
+                div.innerHTML = '<div class="comment-meta">'
+                    + '<span class="comment-name">' + escapeHtml(c.name) + '</span>'
+                    + '<span class="comment-time">' + timeAgo(c.created_at) + '</span>'
+                    + '</div>'
+                    + '<p class="comment-body">' + escapeHtml(c.comment) + '</p>';
+                return div;
+            }
+
+            function renderComments(comments) {
+                cachedComments = comments || [];
+                list.innerHTML = '';
+                if (!cachedComments.length) {
+                    empty.style.display = '';
+                    return;
+                }
+                empty.style.display = 'none';
+                cachedComments.forEach(function(c) {
+                    list.appendChild(renderComment(c));
+                });
+            }
+
+            window.dispatchCommentsRefresh = function() {
+                if (cachedComments.length) renderComments(cachedComments);
+            };
+
+            function loadComments() {
+                fetch('/api/comments?issue=' + issue)
+                    .then(function(r) { return r.json(); })
+                    .then(function(comments) {
+                        renderComments(comments);
+                    })
+                    .catch(function() {});
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = nameInput.value.trim();
+                var comment = textInput.value.trim();
+                if (!name || !comment) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issue: issue, name: name, comment: comment })
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error();
+                    localStorage.setItem('dispatch-comment-name', name);
+                    textInput.value = '';
+                    loadComments();
+                })
+                .catch(function() {})
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                });
+            });
+
+            var savedName = localStorage.getItem('dispatch-comment-name');
+            if (savedName) nameInput.value = savedName;
+
+            loadComments();
+        })();
+
+        // ==================== MINI PLAYER (song of the week, autoplay) ====================
+        (function() {
+            var audio    = document.getElementById('songOfTheWeek');
+            var player   = document.getElementById('miniPlayer');
+            var btn      = document.getElementById('miniPlayerBtn');
+            var ring     = document.getElementById('miniPlayerRing');
+            var closeBtn = document.getElementById('miniPlayerClose');
+            if (!audio || !player || !btn || !ring) return;
+
+            var RING_C = 2 * Math.PI * 16;
+            ring.style.strokeDasharray  = RING_C;
+            ring.style.strokeDashoffset = RING_C;
+
+            var triedAutoplay = false;
+            var dismissed = false;
+            var rafId = null;
+
+            function showPlayer() {
+                if (dismissed) return;
+                player.hidden = false;
+                requestAnimationFrame(function() { player.classList.add('visible'); });
+            }
+            function setState(s) {
+                btn.setAttribute('data-state', s);
+                if (s === 'playing') player.classList.remove('needs-tap');
+            }
+            function updateRing() {
+                if (!audio.duration || !isFinite(audio.duration)) {
+                    rafId = requestAnimationFrame(updateRing);
+                    return;
+                }
+                var pct = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
+                ring.style.strokeDashoffset = RING_C * (1 - pct);
+                if (!audio.paused) rafId = requestAnimationFrame(updateRing);
+            }
+            function startRingLoop() {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(updateRing);
+            }
+            function stopRingLoop() {
+                if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+                updateRing();
+            }
+
+            audio.addEventListener('play',     function() { setState('playing'); startRingLoop(); });
+            audio.addEventListener('playing',  function() { setState('playing'); startRingLoop(); });
+            audio.addEventListener('pause',    function() { setState('paused');  stopRingLoop();  });
+            audio.addEventListener('ended',    function() { setState('paused');  stopRingLoop();  });
+            audio.addEventListener('waiting',  function() { setState('buffering'); });
+            audio.addEventListener('seeking',  function() { setState('buffering'); });
+            audio.addEventListener('loadedmetadata', updateRing);
+
+            btn.addEventListener('click', function() {
+                if (audio.paused) {
+                    var p = audio.play();
+                    if (p && p.catch) p.catch(function() {});
+                } else {
+                    audio.pause();
+                }
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (player.hidden) return;
+                if (e.key === 'k' || (e.key === ' ' && document.activeElement === btn)) {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+            closeBtn.addEventListener('click', function() {
+                audio.pause();
+                dismissed = true;
+                player.classList.remove('visible');
+                setTimeout(function() { player.hidden = true; }, 450);
+            });
+
+            function tryAutoplay() {
+                if (triedAutoplay) return;
+                triedAutoplay = true;
+                showPlayer();
+                audio.volume = 0.5; // gentle piano — keep it quiet
+                var p = audio.play();
+                if (p && p.catch) {
+                    p.catch(function() { player.classList.add('needs-tap'); });
+                }
+            }
+
+            var dismiss = document.getElementById('komorebiDismiss');
+            if (dismiss) dismiss.addEventListener('click', tryAutoplay);
+            var gateForm = document.getElementById('gateForm');
+            if (gateForm) gateForm.addEventListener('submit', tryAutoplay);
+
+            // Returning visitor — gate already passed, surface the player with needs-tap
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            var alreadyAuthed = sessionStorage.getItem('dispatch-auth-' + path) === '1';
+            if (alreadyAuthed) {
+                setTimeout(function() {
+                    showPlayer();
+                    player.classList.add('needs-tap');
+                }, 1200);
+            }
+        })();
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js" integrity="sha384-O55L/6rhHr9CFvrxqv5luxOCcmVaBmETbZbJDP+Do8T0pztTACsFBD/IXCNkj7DV" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener('load', function() { initDispatch(); });
+        setTimeout(function() {
+            if (typeof gsap !== 'undefined' && !window._dispatchInit) initDispatch();
+        }, 4000);
+
+        function initDispatch() {
+            if (window._dispatchInit) return;
+            window._dispatchInit = true;
+
+            // Smooth scroll
+            var lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            // Progress bar
+            gsap.to('#progressBar', {
+                width: '100%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: 0.3,
+                }
+            });
+
+            // Hero animations
+            var heroTl = gsap.timeline({ delay: 0.3 });
+            heroTl
+                .to('.hero-label', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+                .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
+                .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+                .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+
+            // Hero Ken Burns (fallback painting behind canvas)
+            gsap.to('#heroFallback', {
+                scale: 1.06,
+                transformOrigin: 'center center',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Hero title parallax
+            gsap.to('.hero-title', {
+                yPercent: -20,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Fade scroll hint
+            gsap.to('.scroll-hint', {
+                opacity: 0,
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: '15% top',
+                    end: '30% top',
+                    scrub: true,
+                }
+            });
+
+            // Reveals
+            gsap.utils.toArray('.reveal').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, y: 0, duration: 0.9, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-fade').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, duration: 1, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-scale').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+        }
+    </script>
+
+    <!-- ==================== HERO — Monet flow-field ==================== -->
+    <script>
+    (function(){
+      "use strict";
+      const smoke = document.getElementById('heroSmoke');
+      const chars = document.getElementById('heroChars');
+      const fallback = document.getElementById('heroFallback');
+      if (!smoke || !chars) return;
+
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const gl = smoke.getContext('webgl2', { antialias:false, premultipliedAlpha:false, alpha:false });
+      if (reduced || !gl) {
+        // graceful fallback: show the painting still
+        if (fallback) fallback.classList.add('show');
+        smoke.style.display = 'none'; chars.style.display = 'none';
+        return;
+      }
+
+      const DPR = Math.min(devicePixelRatio || 1, 2);
+      const IS_NARROW = innerWidth < 700;
+      const SIM_SCALE = IS_NARROW ? 0.45 : 0.55;
+
+      // ---- interactive state: cursor (UV coords, GL convention y-up) + scatter target px coords
+      let cursorUV = [0.5, 0.5];
+      let cursorPower = 0;
+      let cursorPX = -9999, cursorPY = -9999;
+      function setCursor(clientX, clientY){
+        cursorPX = clientX;
+        cursorPY = clientY;
+        cursorUV[0] = clientX / innerWidth;
+        cursorUV[1] = 1 - clientY / innerHeight;   // GL y-up
+        cursorPower = 1.0;
+      }
+      addEventListener('mousemove', (e) => setCursor(e.clientX, e.clientY), { passive: true });
+      addEventListener('touchmove', (e) => {
+        if (e.touches.length) setCursor(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+      addEventListener('mouseleave', () => { cursorPX = -9999; cursorPY = -9999; });
+      const halfFloatExt = gl.getExtension('EXT_color_buffer_float');
+      const FBO_INTERNAL = halfFloatExt ? gl.RGBA16F : gl.RGBA;
+      const FBO_TYPE    = halfFloatExt ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE;
+      const t0 = performance.now();
+
+      function fitSmoke(){
+        smoke.width  = Math.max(1, Math.floor(smoke.clientWidth  * DPR));
+        smoke.height = Math.max(1, Math.floor(smoke.clientHeight * DPR));
+      }
+      fitSmoke();
+
+      function compile(t, src){
+        const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+        return s;
+      }
+      function program(vs, fs){
+        const p = gl.createProgram();
+        gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
+        gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+        gl.linkProgram(p);
+        return p;
+      }
+
+      const VS = `#version 300 es
+in vec2 a_pos; out vec2 v_uv;
+void main(){ v_uv = a_pos*0.5+0.5; gl_Position = vec4(a_pos,0.,1.); }`;
+
+      const FS_ADVECT = `#version 300 es
+precision highp float;
+in vec2 v_uv;
+uniform sampler2D u_prev;
+uniform sampler2D u_seedA;
+uniform sampler2D u_seedB;
+uniform float u_seedMix;
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_cursor;       // UV coords, [0..1], origin top-left flipped to bottom-left
+uniform float u_cursorPower; // 0..1 decaying after movement
+out vec4 outColor;
+vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+vec2 mod289(vec2 x){return x-floor(x*(1./289.))*289.;}
+vec3 permute(vec3 x){return mod289(((x*34.)+1.)*x);}
+float snoise(vec2 v){
+  const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);
+  vec2 i=floor(v+dot(v,C.yy));
+  vec2 x0=v-i+dot(i,C.xx);
+  vec2 i1=(x0.x>x0.y)?vec2(1.,0.):vec2(0.,1.);
+  vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1;
+  i=mod289(i);
+  vec3 p=permute(permute(i.y+vec3(0.,i1.y,1.))+i.x+vec3(0.,i1.x,1.));
+  vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.);
+  m=m*m; m=m*m;
+  vec3 x=2.*fract(p*C.www)-1.;
+  vec3 h=abs(x)-0.5;
+  vec3 ox=floor(x+0.5);
+  vec3 a0=x-ox;
+  m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);
+  vec3 g; g.x=a0.x*x0.x+h.x*x0.y;
+  g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+  return 130.*dot(m,g);
+}
+vec2 curl(vec2 p){
+  float e=0.018;
+  return vec2(snoise(p+vec2(0,e))-snoise(p-vec2(0,e)),
+              -(snoise(p+vec2(e,0))-snoise(p-vec2(e,0))))/(2.*e);
+}
+void main(){
+  vec2 uv = v_uv;
+  vec2 p  = uv*2.-1.;
+  p.x *= u_resolution.x/u_resolution.y;
+  vec2 vel = curl(p*0.75 + vec2(0., u_time*0.045));
+  vel    += 0.40*curl(p*2.0 + vec2(-u_time*0.030, u_time*0.024));
+  // cursor swirl — local vortex around mouse/touch
+  vec2 cd = uv - u_cursor;
+  cd.x *= u_resolution.x / u_resolution.y;
+  vec2 swirl = vec2(-cd.y, cd.x) * exp(-dot(cd,cd) * 35.0) * 3.0;
+  vel += swirl * u_cursorPower;
+  float dt = 0.0024;
+  vec2 prevUV = uv - vel*dt;
+  vec3 prev     = texture(u_prev, prevUV).rgb;
+  vec3 paintA   = texture(u_seedA, uv).rgb;
+  vec3 paintB   = texture(u_seedB, uv).rgb;
+  vec3 painting = mix(paintA, paintB, smoothstep(0.0, 1.0, u_seedMix));
+  // push painting harder so transitions read; the drift in prev still provides motion
+  vec3 col = prev*0.52 + painting*0.48;
+  outColor = vec4(col, 1.0);
+}`;
+      const FS_PRESENT = `#version 300 es
+precision highp float;
+in vec2 v_uv;
+uniform sampler2D u_src;
+out vec4 outColor;
+void main(){
+  vec3 c = texture(u_src, v_uv).rgb;
+  c = pow(max(c, 0.0), vec3(0.95));
+  float L = dot(c, vec3(0.299, 0.587, 0.114));
+  c = mix(vec3(L), c, 1.25);
+  vec2 q = v_uv - 0.5;
+  c *= smoothstep(1.25, 0.25, dot(q,q)*1.25);
+  outColor = vec4(c, 1.0);
+}`;
+      const FS_BLIT = `#version 300 es
+precision highp float;
+in vec2 v_uv; uniform sampler2D u_seedA; out vec4 outColor;
+void main(){ outColor = vec4(texture(u_seedA, v_uv).rgb, 1.0); }`;
+
+      const progAdvect  = program(VS, FS_ADVECT);
+      const progPresent = program(VS, FS_PRESENT);
+      const progBlit    = program(VS, FS_BLIT);
+
+      const quad = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+      function bindQuad(prog){
+        const loc = gl.getAttribLocation(prog, 'a_pos');
+        gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      }
+      function makeFBO(w, h){
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, FBO_INTERNAL, w, h, 0, gl.RGBA, FBO_TYPE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        const fbo = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+        return { fbo, tex, w, h };
+      }
+
+      // Multiple Monet seed textures, cycling slowly with crossfade.
+      // Order is chosen so adjacent paintings differ in palette (no two greens in a row).
+      const PAINTING_SRCS = [
+        '/newsletter/007/images/coquelicots.jpg',       // red poppies, sage
+        '/newsletter/007/images/monet-tulips.jpg',      // cool blues, pink/red tulip stripes
+        '/newsletter/007/images/monet-parc.jpg',        // green park, pink florals, warm light
+        '/newsletter/007/images/monet-spring.jpg',      // pastel pinks, soft greens
+        '/newsletter/007/images/monet-poppies.jpg'      // lavender + cool blue, peachy clouds
+      ];
+      const HOLD_S = 12.0;   // (unused now — kept for back-compat with older builds)
+      const FADE_S = 2.2;    // seconds of crossfade between paintings
+      const palW = 320, palH = 240;
+
+      let seedTextures = [];          // GPU textures, one per painting
+      let palettes = [];              // CPU palette caches, one per painting
+      let painImgs = [];              // <img> elements (kept for GC)
+      let A, B;
+      let indexA = 0, indexB = 0;     // both start at painting 0 → seedMix=0 shows painting 0
+      let seedMix = 0;                // 0 → 1 during the crossfade
+      let loadedCount = 0;
+
+      function uploadTexture(img){
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        return tex;
+      }
+      function cachePalette(img){
+        const pal = document.createElement('canvas');
+        pal.width = palW; pal.height = palH;
+        const pctx = pal.getContext('2d');
+        pctx.drawImage(img, 0, 0, palW, palH);
+        return pctx.getImageData(0, 0, palW, palH).data;
+      }
+
+      // Load each painting; once the FIRST one is in, start the loop. Others
+      // join the rotation as they arrive (they're at index >= 1 by definition).
+      PAINTING_SRCS.forEach((src, i) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = src;
+        img.onload = () => {
+          seedTextures[i] = uploadTexture(img);
+          palettes[i] = cachePalette(img);
+          painImgs[i] = img;
+          loadedCount++;
+          if (i === 0) {           // first painting ready → start
+            rebuildFBOs();
+            startLoops();
+          }
+        };
+        img.onerror = () => {
+          if (i === 0 && fallback) fallback.classList.add('show');
+        };
+      });
+
+      function rebuildFBOs(){
+        if (!seedTextures[0]) return;
+        fitSmoke();
+        const w = Math.max(2, Math.floor(smoke.width * SIM_SCALE));
+        const h = Math.max(2, Math.floor(smoke.height * SIM_SCALE));
+        A = makeFBO(w, h); B = makeFBO(w, h);
+        gl.useProgram(progBlit);
+        bindQuad(progBlit);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, seedTextures[0]);
+        gl.uniform1i(gl.getUniformLocation(progBlit, 'u_seedA'), 0);
+        for (const f of [A, B]){
+          gl.bindFramebuffer(gl.FRAMEBUFFER, f.fbo);
+          gl.viewport(0, 0, f.w, f.h);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
+      }
+
+      // Scroll-driven painting transition: each section declares data-monet="N";
+      // an observer picks the section currently most-visible and we lerp seedMix
+      // toward that section's painting over FADE_S seconds.
+      let targetIndex = 0;       // painting we're heading toward
+      let fadeStartAt = null;    // performance.now()/1000 when current fade started
+
+      function visiblePainting(){
+        // When seedMix==0 we show indexA; when ==1 we show indexB; in between, the blend.
+        return seedMix >= 1 ? indexB : (seedMix <= 0 ? indexA : null);
+      }
+
+      function requestPainting(idx){
+        if (idx === targetIndex && fadeStartAt !== null) return;   // already heading there
+        const vp = visiblePainting();
+        if (idx === vp && fadeStartAt === null) return;            // already shown, no fade running
+        // snapshot whatever is currently visible into indexA so the next fade starts cleanly
+        if (fadeStartAt !== null) {
+          if (seedMix >= 0.5) indexA = indexB;
+          // else keep indexA as-is — closer to A than B
+        }
+        indexB = idx;
+        seedMix = 0;
+        fadeStartAt = performance.now() / 1000;
+        targetIndex = idx;
+      }
+
+      function tickCycle(){
+        if (fadeStartAt == null) return;                  // settled
+        const elapsed = performance.now()/1000 - fadeStartAt;
+        if (elapsed >= FADE_S) {
+          indexA = indexB;
+          seedMix = 0;
+          fadeStartAt = null;
+        } else {
+          seedMix = elapsed / FADE_S;
+        }
+      }
+
+      function sampleColor(u, v){
+        // Use index A's palette (the dominant one — accurate during HOLD, slightly off mid-FADE)
+        const palData = palettes[indexA] || palettes[0];
+        if (!palData) return [200, 200, 200];
+        const x = Math.min(palW-1, Math.max(0, (u*palW)|0));
+        const y = Math.min(palH-1, Math.max(0, (v*palH)|0));
+        const i = (y*palW + x)*4;
+        return [palData[i], palData[i+1], palData[i+2]];
+      }
+
+      // ---- chars layer ----
+      const cctx = chars.getContext('2d', { alpha: true });
+      const POOL = ('a a b c d e f g h i j k l m n o o p q r s t t u v w x y z '
+                  + '. . . , , ; \' / — '
+                  + '木 漏 れ 日 風 空 光 雲 雨 想 夢 静 '
+                  + 'ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅇ ㅎ '
+                  + 'A I L K M S').split(/\s+/).filter(Boolean);
+      function fitChars(){
+        const w = chars.clientWidth, h = chars.clientHeight;
+        chars.width  = Math.max(1, Math.floor(w * DPR));
+        chars.height = Math.max(1, Math.floor(h * DPR));
+        cctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        cctx.textBaseline = 'middle';
+        cctx.textAlign = 'center';
+      }
+      fitChars();
+
+      const SIZE_PX = [16, 22, 30];
+      const FONTS = ['"Newsreader", Georgia, serif', '"Noto Serif JP", serif', '"Noto Serif KR", serif'];
+      function fontKey(ch){
+        const cp = ch.codePointAt(0);
+        if (cp >= 0x3000 && cp <= 0x9FFF) return 1;
+        if ((cp >= 0x1100 && cp <= 0x11FF) || (cp >= 0x3130 && cp <= 0x318F)) return 2;
+        return 0;
+      }
+      const PARTICLE_TARGET = IS_NARROW ? 380 : 700;
+      const particles = [];
+      function spawn(p, fresh){
+        const w = chars.clientWidth, h = chars.clientHeight;
+        p.x = Math.random() * w;
+        p.y = Math.random() * h;
+        p.vx = 0; p.vy = 0;
+        p.ch = POOL[(Math.random()*POOL.length)|0];
+        p.sizeClass = (Math.random() < 0.6) ? 0 : (Math.random() < 0.75 ? 1 : 2);
+        p.weight = Math.random() < 0.15 ? 600 : 400;
+        p.life = fresh ? 0 : Math.random() * 220;
+        p.maxLife = 240 + Math.random() * 380;
+        p.fontKey = fontKey(p.ch);
+      }
+      for (let i=0; i<PARTICLE_TARGET; i++){ const p = {}; spawn(p, false); particles.push(p); }
+
+      function flow(x, y, t){
+        const ax = 0.0036, ay = 0.0030, bx = 0.0078, by = 0.0066;
+        const u = Math.sin(y*ay + t*0.26)
+                + 0.55*Math.sin(y*by + x*ax*1.8 + t*0.46)
+                + 0.28*Math.cos(x*ax*0.6 - t*0.36);
+        const v = Math.cos(x*ax + t*0.24)
+                + 0.55*Math.cos(x*bx + y*ay*1.8 + t*0.42)
+                + 0.28*Math.sin(y*ay*0.6 - t*0.46);
+        return [u*0.8, v*0.8];
+      }
+      const SPEED = 48, VEL_SMOOTH = 0.90;
+      const BUCKETS = [];
+      for (let f=0; f<FONTS.length; f++)
+        for (let w of [400, 600])
+          for (let s=0; s<SIZE_PX.length; s++)
+            BUCKETS.push({ font: `italic ${w} ${SIZE_PX[s]}px ${FONTS[f]}`, list: [] });
+      function bucketIndex(p){
+        const w = p.weight === 600 ? 1 : 0;
+        return ((p.fontKey*2 + w)*SIZE_PX.length + p.sizeClass);
+      }
+
+      let running = false;
+      let lastT = performance.now();
+      function smokeFrame(){
+        if (!running) return;
+        tickCycle();
+        const t = (performance.now() - t0)/1000;
+        const seedA = seedTextures[indexA] || seedTextures[0];
+        const seedB = seedTextures[indexB] || seedTextures[indexA] || seedTextures[0];
+        gl.useProgram(progAdvect);
+        bindQuad(progAdvect);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, B.fbo);
+        gl.viewport(0,0,B.w,B.h);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, A.tex);
+        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_prev'),  0);
+        gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, seedA);
+        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_seedA'), 1);
+        gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, seedB);
+        gl.uniform1i(gl.getUniformLocation(progAdvect,'u_seedB'), 2);
+        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_seedMix'), seedMix);
+        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_time'), t);
+        gl.uniform2f(gl.getUniformLocation(progAdvect,'u_resolution'), B.w, B.h);
+        gl.uniform2f(gl.getUniformLocation(progAdvect,'u_cursor'), cursorUV[0], cursorUV[1]);
+        gl.uniform1f(gl.getUniformLocation(progAdvect,'u_cursorPower'), cursorPower);
+        cursorPower *= 0.94;   // exponential decay each frame
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        gl.useProgram(progPresent);
+        bindQuad(progPresent);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, smoke.width, smoke.height);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, B.tex);
+        gl.uniform1i(gl.getUniformLocation(progPresent,'u_src'), 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        const tmp = A; A = B; B = tmp;
+        requestAnimationFrame(smokeFrame);
+      }
+
+      function charsFrame(now){
+        if (!running) return;
+        const t = (now - t0) / 1000;
+        let dt = (now - lastT) / 1000;
+        if (dt > 0.05) dt = 0.05;
+        lastT = now;
+        const w = chars.clientWidth, h = chars.clientHeight;
+        cctx.clearRect(0, 0, w, h);
+        for (const b of BUCKETS) b.list.length = 0;
+        const CURSOR_R = 160;
+        const CURSOR_R2 = CURSOR_R * CURSOR_R;
+        for (const p of particles){
+          const f = flow(p.x, p.y, t);
+          p.vx = p.vx * VEL_SMOOTH + f[0] * (1 - VEL_SMOOTH);
+          p.vy = p.vy * VEL_SMOOTH + f[1] * (1 - VEL_SMOOTH);
+          // cursor scatter — push letters out of a ~160px radius around the cursor
+          if (cursorPX > -1000) {
+            const dx = p.x - cursorPX, dy = p.y - cursorPY;
+            const d2 = dx*dx + dy*dy;
+            if (d2 < CURSOR_R2 && d2 > 4) {
+              const d = Math.sqrt(d2);
+              const force = (CURSOR_R - d) / CURSOR_R;  // 0..1
+              const kick = force * force * 6.5;          // sharper falloff
+              p.x += (dx/d) * kick;
+              p.y += (dy/d) * kick;
+              // also impart a small persistent velocity nudge
+              p.vx += (dx/d) * force * 0.18;
+              p.vy += (dy/d) * force * 0.18;
+            }
+          }
+          p.x += p.vx * SPEED * dt;
+          p.y += p.vy * SPEED * dt;
+          if (p.x < -30) p.x = w + 30;
+          if (p.x > w + 30) p.x = -30;
+          if (p.y < -30) p.y = h + 30;
+          if (p.y > h + 30) p.y = -30;
+          p.life += dt * 60;
+          if (p.life > p.maxLife){ spawn(p, true); continue; }
+          const fadeIn  = Math.min(1, p.life / 40);
+          const fadeOut = Math.min(1, (p.maxLife - p.life) / 40);
+          const vFade = p.y < h * 0.55 ? 1.0
+                      : 1.0 - Math.min(1, (p.y - h*0.55) / (h*0.35));
+          p.alpha = fadeIn * fadeOut * vFade;
+          if (p.alpha < 0.04) continue;
+          const c = sampleColor(p.x / w, p.y / h);
+          p.r = Math.max(0, c[0]-30)|0;
+          p.g = Math.max(0, c[1]-30)|0;
+          p.b = Math.max(0, c[2]-30)|0;
+          BUCKETS[bucketIndex(p)].list.push(p);
+        }
+        for (const b of BUCKETS){
+          if (b.list.length === 0) continue;
+          cctx.font = b.font;
+          for (const p of b.list){
+            cctx.globalAlpha = p.alpha * 0.85;
+            cctx.fillStyle = `rgb(${p.r},${p.g},${p.b})`;
+            cctx.fillText(p.ch, p.x, p.y);
+          }
+        }
+        cctx.globalAlpha = 1;
+        requestAnimationFrame(charsFrame);
+      }
+
+      function startLoops(){
+        if (running) return;
+        running = true;
+        lastT = performance.now();
+        requestAnimationFrame(smokeFrame);
+        requestAnimationFrame(charsFrame);
+      }
+      function stopLoops(){ running = false; }
+
+      // Page-visibility pause (the canvases are now full-viewport fixed, so they
+      // are always "intersecting"; only stop when the tab is backgrounded).
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stopLoops();
+        else if (palettes[0]) startLoops();
+      });
+
+      // Hero-in-view: toggle body class so the cream article-veil lifts on the hero
+      const heroEl = document.getElementById('heroSection');
+      if (heroEl) {
+        new IntersectionObserver((entries) => {
+          for (const e of entries) {
+            document.body.classList.toggle('hero-in-view', e.intersectionRatio > 0.35);
+          }
+        }, { threshold: [0, 0.35, 0.7] }).observe(heroEl);
+      }
+      // Start in "hero-in-view" state so the painting reads from the first frame
+      document.body.classList.add('hero-in-view');
+
+      // Section-driven painting transitions — each [data-monet] element declares
+      // which Monet it wants behind it. We use IntersectionObserver (NOT scroll
+      // events) so this works correctly with Lenis smooth-scroll, programmatic
+      // scrolls, anchor jumps, and native scrolling alike.
+      const sectionEls = Array.from(document.querySelectorAll('[data-monet]'));
+      if (heroEl && !heroEl.hasAttribute('data-monet')) {
+        heroEl.setAttribute('data-monet', '0');
+        sectionEls.unshift(heroEl);
+      }
+      const sectionRatios = new Map();
+      function pickActiveSection(){
+        let bestEl = null, bestRatio = 0;
+        for (const [el, ratio] of sectionRatios) {
+          if (ratio > bestRatio) { bestRatio = ratio; bestEl = el; }
+        }
+        if (bestEl && bestRatio > 0.02) {
+          const idx = parseInt(bestEl.getAttribute('data-monet'), 10) || 0;
+          if (seedTextures[idx]) requestPainting(idx);
+        }
+      }
+      // rootMargin shrinks the viewport's "active band" to the middle 40% — an
+      // element only counts as visible when it crosses into that band, so the
+      // painting changes when a chapter is centered, not as soon as it peeks in.
+      const sectionObserver = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          sectionRatios.set(e.target, e.intersectionRatio);
+        }
+        pickActiveSection();
+      }, {
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
+        rootMargin: '-30% 0px -30% 0px'
+      });
+      sectionEls.forEach(el => {
+        sectionRatios.set(el, 0);
+        sectionObserver.observe(el);
+      });
+
+      // expose for debug / external probes
+      window.__monetState = () => ({
+        indexA, indexB, seedMix, targetIndex,
+        loaded: seedTextures.map((t, i) => !!t),
+        fadeStartAt,
+        sectionEls: sectionEls.length,
+        ratios: Array.from(sectionRatios.entries()).map(([el, r]) => ({
+          tag: el.tagName + '.' + (el.className || '').split(' ')[0],
+          monet: el.getAttribute('data-monet'),
+          ratio: r.toFixed(2)
+        }))
+      });
+      window.__pickActiveSection = pickActiveSection;
+
+      let resizeTimer;
+      addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => { fitChars(); rebuildFBOs(); }, 100);
+      });
+    })();
+    </script>
+</body>
+</html>

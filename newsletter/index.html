@@ -353,6 +353,11 @@
             transition: color 0.3s ease, border-color 0.3s ease;
         }
 
+        /* Draft issue — restored but not ready; non-clickable, dimmed */
+        .issue-link.is-draft { opacity: 0.5; cursor: default; }
+        .issue-link.is-draft:hover { opacity: 0.5; }
+        .issue-badge.draft { color: var(--caption); border-color: var(--rule); }
+
         /* ========== FOOTER ========== */
         footer {
             max-width: 620px;
@@ -430,6 +435,32 @@
         -->
 
         <ul class="issue-list">
+            <li>
+                <div class="issue-link is-draft" aria-disabled="true">
+                    <img src="/newsletter/007/images/coquelicots.jpg" alt="" class="issue-cover" loading="lazy">
+                    <div class="issue-content">
+                        <div class="issue-meta">
+                            <span class="issue-num">007</span>
+                            <span class="issue-date">
+                                <span data-l="en">Coming soon</span>
+                                <span data-l="ko">곧 공개</span>
+                            </span>
+                            <span class="issue-badge draft">
+                                <span data-l="en">Not ready yet</span>
+                                <span data-l="ko">준비 중</span>
+                            </span>
+                        </div>
+                        <div class="issue-title">
+                            <span data-l="en">Coquelicots</span>
+                            <span data-l="ko">개양귀비</span>
+                        </div>
+                        <p class="issue-desc">
+                            <span data-l="en">A WebGL Monet flow-field you can stir with your cursor &mdash; letters drifting through pigment, paintings dissolving as you scroll. Still polishing. After Monet, 1873.</span>
+                            <span data-l="ko">커서로 휘저을 수 있는 WebGL 모네 유체 배경 &mdash; 안료 사이를 떠다니는 글자, 스크롤에 따라 번지는 그림들. 아직 다듬는 중. 모네의 들판을 따라, 1873.</span>
+                        </p>
+                    </div>
+                </div>
+            </li>
             <li>
                 <a href="/newsletter/006/" class="issue-link">
                     <img src="/newsletter/006/images/korea-relay-poster.jpg" alt="" class="issue-cover" loading="lazy">
