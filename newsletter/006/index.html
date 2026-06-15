@@ -735,6 +735,52 @@
         .vlb-close:hover { color: #fff; }
         @media (prefers-reduced-motion: reduce) { .vid-lightbox { transition: none; } }
 
+        /* ===== Song of the week — refined bottom-left mini player ===== */
+        .mini-player {
+            position: fixed; bottom: max(1.1rem, env(safe-area-inset-bottom, 0)); left: 1.1rem; z-index: 90;
+            display: flex; align-items: center; gap: 0.7rem;
+            padding: 0.4rem 0.9rem 0.4rem 0.4rem;
+            background: var(--bg);
+            background: color-mix(in srgb, var(--bg) 74%, transparent);
+            -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+            border: 1px solid var(--rule); border-radius: 100px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 6px 16px -6px rgba(0,0,0,0.18), 0 20px 50px -24px rgba(0,0,0,0.30);
+            max-width: calc(100vw - 2.2rem);
+            opacity: 0; transform: translateY(12px) scale(0.98);
+            transition: opacity 0.5s cubic-bezier(0.22,0.61,0.36,1), transform 0.5s cubic-bezier(0.22,0.61,0.36,1), background-color 0.3s ease, border-color 0.3s ease;
+        }
+        [data-theme="dark"] .mini-player { box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 6px 16px -6px rgba(0,0,0,0.6), 0 20px 50px -24px rgba(0,0,0,0.7); }
+        .mini-player.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .mini-player[hidden] { display: none; }
+        .mini-player-btn {
+            position: relative; width: 42px; height: 42px; flex: 0 0 auto;
+            border-radius: 50%; background: var(--text); color: var(--bg); border: none;
+            display: grid; place-items: center; cursor: pointer; padding: 0; overflow: visible;
+            transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background-color 0.3s ease, color 0.3s ease;
+        }
+        .mini-player-btn:hover { transform: scale(1.06); }
+        .mini-player-btn:active { transform: scale(0.93); }
+        .mini-player-ring { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); transform: rotate(-90deg); pointer-events: none; fill: none; }
+        .ring-track { stroke: var(--rule); stroke-width: 1.5; transition: stroke 0.3s ease; }
+        .ring-progress { stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 100.531; stroke-dashoffset: 100.531; transition: stroke-dashoffset 0.15s linear, stroke 0.3s ease; }
+        .mini-player-icon { position: relative; width: 15px; height: 15px; fill: currentColor; display: block; overflow: visible; }
+        .mini-player-icon path { transition: opacity 0.22s ease, transform 0.32s cubic-bezier(0.34,1.56,0.64,1); transform-origin: 12px 12px; transform-box: fill-box; }
+        .mini-player-icon .icon-play { opacity: 1; transform: scale(1); }
+        .mini-player-icon .icon-pause { opacity: 0; transform: scale(0.6); }
+        .mini-player-btn[data-state="playing"] .icon-play { opacity: 0; transform: scale(0.6); }
+        .mini-player-btn[data-state="playing"] .icon-pause { opacity: 1; transform: scale(1); }
+        @keyframes mp-buffer { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .mini-player-btn[data-state="buffering"] .ring-track { animation: mp-buffer 1s ease-in-out infinite; }
+        .mini-player-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; line-height: 1.25; }
+        .mini-player-title { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 15px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; transition: color 0.3s ease; }
+        .mini-player-artist { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; transition: color 0.3s ease; }
+        .mini-player-close { background: none; border: none; color: var(--caption); font-size: 17px; line-height: 1; cursor: pointer; padding: 0 2px 0 4px; opacity: 0.55; align-self: flex-start; transition: opacity 0.2s ease, color 0.3s ease; flex: 0 0 auto; }
+        .mini-player-close:hover { opacity: 1; }
+        @keyframes mp-nudge { 0%,100% { box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 6px 16px -6px rgba(0,0,0,0.18), 0 20px 50px -24px rgba(0,0,0,0.30), 0 0 0 0 rgba(160,130,109,0); } 50% { box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 6px 16px -6px rgba(0,0,0,0.18), 0 20px 50px -24px rgba(0,0,0,0.30), 0 0 0 7px rgba(160,130,109,0.16); } }
+        .mini-player.needs-tap { animation: mp-nudge 1.9s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .mini-player.needs-tap { animation: none; } }
+        @media print { .mini-player { display: none !important; } }
+
         .relay { max-width: 620px; margin: 1.5rem auto 0.5rem; padding: 0 1.5rem; text-align: center; }
         .relay-rink { width: 100%; max-width: 460px; margin: 0 auto; display: block; overflow: visible; }
         .relay-rink .rink-edge { fill: none; stroke: var(--rule); stroke-width: 1.5; }
@@ -1378,6 +1424,30 @@
         </p>
     </footer>
 
+    <!-- ==================== SONG OF THE WEEK — bottom-left mini player ==================== -->
+    <audio id="songOfTheWeek" src="/newsletter/006/images/so-easy-olivia-dean.mp3" preload="metadata" loop></audio>
+    <div class="mini-player" id="miniPlayer" hidden aria-label="Song of the week mini player">
+        <button class="mini-player-btn" id="miniPlayerBtn" type="button" aria-label="Play or pause the song of the week" data-state="paused">
+            <svg class="mini-player-ring" viewBox="0 0 36 36" aria-hidden="true">
+                <circle class="ring-track" cx="18" cy="18" r="16"></circle>
+                <circle class="ring-progress" cx="18" cy="18" r="16" id="miniPlayerRing"></circle>
+            </svg>
+            <svg class="mini-player-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="icon-play" d="M7 5 L7 19 L19 12 Z"></path>
+                <path class="icon-pause" d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z"></path>
+            </svg>
+        </button>
+        <div class="mini-player-meta">
+            <div class="mini-player-title">So Easy (To Fall In Love)</div>
+            <div class="mini-player-artist">
+                <span data-l="en">Olivia Dean &middot; piano cover</span>
+                <span data-l="ko">올리비아 딘 &middot; 피아노 커버</span>
+            </div>
+        </div>
+        <button class="mini-player-close" id="miniPlayerClose" type="button"
+            data-aria-en="Close mini player" data-aria-ko="미니 플레이어 닫기" aria-label="Close mini player">&times;</button>
+    </div>
+
     <!-- Click-to-watch lightbox: "penciling" -->
     <div class="vid-lightbox" id="pencilingLightbox" role="dialog" aria-modal="true" aria-label="Penciling, demonstrated" hidden>
         <button class="vlb-close" type="button" aria-label="Close video">&times;</button>
@@ -1839,6 +1909,69 @@
                 box.addEventListener('click', function (e) { if (e.target === box) close(box); });
                 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box.classList.contains('open')) close(box); });
             });
+        })();
+
+        // ==================== SONG OF THE WEEK (bottom-left mini player) ====================
+        (function () {
+            var audio = document.getElementById('songOfTheWeek');
+            var player = document.getElementById('miniPlayer');
+            var miniBtn = document.getElementById('miniPlayerBtn');
+            var ring = document.getElementById('miniPlayerRing');
+            var closeBtn = document.getElementById('miniPlayerClose');
+            if (!audio || !player) return;
+
+            var RING_C = 2 * Math.PI * 16;
+            if (ring) { ring.style.strokeDasharray = RING_C; ring.style.strokeDashoffset = RING_C; }
+            var triedAutoplay = false, dismissed = false, rafId = null;
+
+            function setState(s) { if (miniBtn) miniBtn.setAttribute('data-state', s); if (s === 'playing') player.classList.remove('needs-tap'); }
+            function showPlayer() { if (dismissed) return; player.hidden = false; requestAnimationFrame(function () { player.classList.add('visible'); }); }
+            function updateRing() {
+                if (!audio.duration || !isFinite(audio.duration)) { rafId = requestAnimationFrame(updateRing); return; }
+                var pct = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
+                if (ring) ring.style.strokeDashoffset = RING_C * (1 - pct);
+                if (!audio.paused) rafId = requestAnimationFrame(updateRing);
+            }
+            function startRingLoop() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(updateRing); }
+            function stopRingLoop() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } updateRing(); }
+
+            audio.addEventListener('play', function () { setState('playing'); startRingLoop(); });
+            audio.addEventListener('playing', function () { setState('playing'); startRingLoop(); });
+            audio.addEventListener('pause', function () { setState('paused'); stopRingLoop(); });
+            audio.addEventListener('ended', function () { setState('paused'); stopRingLoop(); });
+            audio.addEventListener('waiting', function () { setState('buffering'); });
+
+            function toggle() {
+                showPlayer();
+                if (audio.paused) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
+                else { audio.pause(); }
+            }
+            if (miniBtn) miniBtn.addEventListener('click', toggle);
+            document.addEventListener('keydown', function (e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (player.hidden) return;
+                if (e.key === 'k' || (e.key === ' ' && document.activeElement === miniBtn)) { e.preventDefault(); toggle(); }
+            });
+            if (closeBtn) closeBtn.addEventListener('click', function () {
+                audio.pause(); dismissed = true; player.classList.remove('visible');
+                setTimeout(function () { player.hidden = true; }, 450);
+            });
+
+            function tryAutoplay() {
+                if (triedAutoplay) return; triedAutoplay = true;
+                showPlayer();
+                audio.volume = 0.35; // gentle — sit under the reading, don't compete
+                var p = audio.play();
+                if (p && p.catch) p.catch(function () { player.classList.add('needs-tap'); });
+            }
+            var dismiss = document.getElementById('komorebiDismiss');
+            if (dismiss) dismiss.addEventListener('click', tryAutoplay);
+
+            // Returning visitor (interstitial skipped) — surface the player with a soft nudge.
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            if (sessionStorage.getItem('dispatch-auth-' + path) === '1') {
+                setTimeout(function () { showPlayer(); player.classList.add('needs-tap'); }, 1200);
+            }
         })();
 
         // ==================== SCOREBOARD COUNT-UP ====================
