@@ -277,7 +277,11 @@ footer .made { font-style: italic; }
 footer a { color: var(--text); opacity: 0.8; }
 
 /* Profile list (when no slug) */
-.profile-hero { padding: 40px 0 24px; }
+.profile-hero { padding: 48px 0 28px; border-bottom: 1px solid var(--rule); }
+.profile-avatar {
+    width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+    display: block; margin-bottom: 18px; background: var(--rule);
+}
 .profile-hero h1 {
     font-family: var(--font-display); font-style: italic; font-weight: 600;
     font-size: 38px; line-height: 1.1;
@@ -324,7 +328,8 @@ footer a { color: var(--text); opacity: 0.8; }
 
 .empty-state {
     text-align: center; padding: 80px 20px;
-    color: var(--caption); font-style: italic;
+    color: var(--caption);
+    font-family: var(--font-display); font-style: italic; font-size: 26px;
 }
 
 @media (max-width: 600px) {
@@ -480,10 +485,11 @@ module.exports = async function handler(req, res) {
                             </div>
                         </a>
                     </li>`).join('')}</ul>`
-                : `<div class="empty-state">${escapeHtml(profile.display_name || profile.username)} hasn\'t published yet.</div>`;
+                : `<div class="empty-state">${escapeHtml(profile.display_name || profile.username)} hasn\'t sent a letter yet.</div>`;
 
             const body = `<main>
                 <section class="profile-hero">
+                    ${safeUrl(profile.avatar_url) ? `<img class="profile-avatar" src="${escapeHtml(safeUrl(profile.avatar_url))}" alt="${escapeHtml(profile.display_name || profile.username)}">` : ''}
                     <div class="profile-handle">@${escapeHtml(profile.username)}</div>
                     <h1>${escapeHtml(profile.display_name || profile.username)}</h1>
                     ${profile.bio ? `<p class="profile-bio">${escapeHtml(profile.bio)}</p>` : ''}
