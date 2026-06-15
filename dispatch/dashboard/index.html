@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your desk — Dispatch</title>
+    <meta name="description" content="Your Dispatch drafts and sent letters.">
+    <meta name="robots" content="noindex">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✶</text></svg>">
+
+    <script>
+        (function () {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --font: 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+        }
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            transition: background-color 0.6s ease, color 0.3s ease;
+        }
+        a { color: inherit; text-decoration: none; transition: opacity 0.2s ease; }
+        a:hover { opacity: 0.6; }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+        }
+
+        /* ---- header ---- */
+        header {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-link { font-size: 14px; opacity: 0.55; }
+        .header-right { display: flex; align-items: center; gap: 18px; }
+        .nav-wordmark {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .nav-wordmark::after {
+            content: '✶';
+            margin-left: 4px;
+            color: var(--accent);
+            font-style: normal;
+            font-size: 10px;
+            vertical-align: super;
+        }
+        .theme-pill {
+            width: 36px; height: 18px; border-radius: 100px;
+            background: var(--text); position: relative; cursor: pointer;
+            display: inline-block; transition: background-color 0.3s ease;
+        }
+        .theme-pill::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: var(--bg); transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+        [data-theme="dark"] .theme-pill::after { transform: translateX(18px); }
+        .theme-pill input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+        .theme-pill input:focus-visible + .theme-pill,
+        .theme-pill:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+        /* ---- main ---- */
+        main {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 64px 24px 120px;
+        }
+        .desk-head { margin-bottom: 3.5rem; }
+        .desk-title {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 600;
+            font-size: 38px;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+        }
+        .desk-sub {
+            font-size: 16px;
+            color: var(--caption);
+            margin-top: 0.5rem;
+        }
+        .new-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            font-style: italic;
+            font-family: var(--font-display);
+            font-size: 22px;
+            color: var(--accent);
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 1px;
+        }
+        .new-link:hover { opacity: 1; color: var(--text); }
+        .new-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+        .section { margin-top: 3rem; }
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ---- ledger rows ---- */
+        .ledger { list-style: none; }
+        .row {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            padding: 1.1rem 0;
+            border-bottom: 1px solid var(--rule);
+        }
+        .row-main { flex: 1; min-width: 0; }
+        .row-title {
+            font-size: 21px;
+            display: inline;
+        }
+        a.row-title { cursor: pointer; }
+        .row-title:hover { color: var(--accent); opacity: 1; }
+        .row-title:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+        .row-meta {
+            font-size: 14px;
+            color: var(--caption);
+            margin-top: 0.15rem;
+        }
+        .row-actions {
+            display: flex;
+            gap: 1rem;
+            flex-shrink: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .row:hover .row-actions,
+        .row:focus-within .row-actions { opacity: 1; }
+        @media (hover: none) { .row-actions { opacity: 1; } }
+        .act {
+            background: none; border: none; padding: 0; cursor: pointer;
+            font-family: var(--font); font-size: 14px; color: var(--accent);
+            transition: opacity 0.2s ease;
+        }
+        .act:hover { opacity: 0.6; }
+        .act:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; opacity: 1; }
+        .act.danger { color: var(--caption); }
+        .act.danger[data-armed="1"] { color: #c0392b; font-style: italic; }
+        [data-theme="dark"] .act.danger[data-armed="1"] { color: #e8857a; }
+        .row.removing { opacity: 0; transform: translateY(-4px); transition: opacity 0.4s ease, transform 0.4s ease; }
+
+        /* ---- empty / states ---- */
+        .empty {
+            text-align: center;
+            padding: 4rem 0;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 26px;
+            color: var(--caption);
+        }
+        .empty .new-link { font-size: 20px; display: block; margin-top: 1rem; }
+        .state-msg { color: var(--caption); padding: 3rem 0; text-align: center; font-style: italic; }
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .desk-title { font-size: 30px; }
+            main { padding-top: 40px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/dispatch/" class="back-link">&larr; Dispatch</a>
+        <div class="header-right">
+            <span class="nav-wordmark" aria-hidden="true">Dispatch</span>
+            <label class="theme-pill" for="theme-toggle"><input type="checkbox" id="theme-toggle" aria-label="Dark mode"></label>
+        </div>
+    </header>
+
+    <main>
+        <div id="liveStatus" aria-live="polite" class="sr-only"></div>
+
+        <p class="state-msg" id="loadingState" role="status">Opening your desk…</p>
+        <p class="state-msg hidden" id="errorState" role="alert">Couldn't load your desk. <a href="/dispatch/dashboard/" style="color:var(--accent);border-bottom:1px solid currentColor;">Try again</a>.</p>
+
+        <div id="desk" class="hidden">
+            <div class="desk-head">
+                <h1 class="desk-title" id="deskTitle">Your desk</h1>
+                <p class="desk-sub" id="deskSub"></p>
+                <a href="/dispatch/editor/" class="new-link" id="newLink">Start a letter</a>
+            </div>
+
+            <div class="empty hidden" id="emptyState" role="status">
+                Your desk is clear.
+                <a href="/dispatch/editor/" class="new-link">Start a letter</a>
+            </div>
+
+            <section class="section hidden" id="draftsSection" aria-labelledby="draftsHd">
+                <h2 class="section-label" id="draftsHd">Drafts</h2>
+                <ul class="ledger" id="draftsList"></ul>
+            </section>
+
+            <section class="section hidden" id="sentSection" aria-labelledby="sentHd">
+                <h2 class="section-label" id="sentHd">Sent</h2>
+                <ul class="ledger" id="sentList"></ul>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/dispatch/js/dispatch-config.js"></script>
+    <script src="/dispatch/js/dispatch-api.js"></script>
+    <script>
+        // ---- theme toggle ----
+        (function () {
+            var toggle = document.getElementById('theme-toggle');
+            if (!toggle) return;
+            toggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
+            toggle.addEventListener('change', function () {
+                var theme = toggle.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            });
+        })();
+
+        // ---- helpers ----
+        var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        function fmtDate(iso) {
+            if (!iso) return '';
+            var d = new Date(iso);
+            if (isNaN(d)) return '';
+            var now = new Date();
+            var s = MONTHS[d.getMonth()] + ' ' + d.getDate();
+            if (d.getFullYear() !== now.getFullYear()) s += ', ' + d.getFullYear();
+            return s;
+        }
+        function ts(iso) { var t = Date.parse(iso); return isNaN(t) ? 0 : t; }
+        function el(tag, cls, text) {
+            var n = document.createElement(tag);
+            if (cls) n.className = cls;
+            if (text != null) n.textContent = text;
+            return n;
+        }
+        function show(id) { document.getElementById(id).classList.remove('hidden'); }
+        function hide(id) { document.getElementById(id).classList.add('hidden'); }
+        function announce(msg) { document.getElementById('liveStatus').textContent = msg; }
+
+        var HANDLE = null;
+
+        function makeRow(article) {
+            var li = el('li', 'row');
+            li.setAttribute('data-id', article.id);
+            li.setAttribute('data-status', article.status);
+
+            var isSent = article.status === 'published' || article.status === 'sent';
+            var slug = article.slug || '';
+            var titleText = article.title || 'Untitled';
+            // Sent letters need a slug to be viewable; without one they're not navigable.
+            var navigable = isSent ? !!slug : true;
+            var dest = isSent
+                ? '/@' + encodeURIComponent(HANDLE) + '/' + encodeURIComponent(slug)
+                : '/dispatch/editor/?cloud=' + encodeURIComponent(article.id);
+
+            var main = el('div', 'row-main');
+            var title = navigable ? el('a', 'row-title', titleText) : el('span', 'row-title', titleText);
+            if (navigable) title.href = dest;
+            var meta = el('div', 'row-meta',
+                isSent ? fmtDate(article.published_at) : 'Started ' + fmtDate(article.created_at));
+            main.appendChild(title);
+            main.appendChild(meta);
+
+            var actions = el('div', 'row-actions');
+            if (!isSent) {
+                var edit = el('a', 'act', 'Edit'); edit.href = dest;
+                edit.setAttribute('aria-label', 'Edit ' + titleText);
+                actions.appendChild(edit);
+            } else if (navigable) {
+                var view = el('a', 'act', 'View'); view.href = dest;
+                view.setAttribute('aria-label', 'View ' + titleText);
+                actions.appendChild(view);
+            }
+
+            var del = el('button', 'act danger', 'Delete');
+            del.type = 'button';
+            del.setAttribute('aria-label', 'Delete ' + titleText);
+            var armTimer = null;
+            del.addEventListener('click', function () {
+                if (del.getAttribute('data-armed') !== '1') {
+                    del.setAttribute('data-armed', '1');
+                    del.textContent = 'Confirm?';
+                    del.setAttribute('aria-label', 'Delete ' + titleText + ' — press again to confirm');
+                    announce('Press delete again to confirm deleting ' + titleText);
+                    armTimer = setTimeout(function () {
+                        if (del.disabled) return;
+                        del.removeAttribute('data-armed');
+                        del.textContent = 'Delete';
+                        del.setAttribute('aria-label', 'Delete ' + titleText);
+                        armTimer = null;
+                    }, 4000);
+                    return;
+                }
+                clearTimeout(armTimer); armTimer = null;
+                del.removeAttribute('data-armed');
+                del.disabled = true;
+                del.textContent = 'Deleting…';
+                announce('Deleting ' + titleText);
+                window.Dispatch.deleteArticle(article.id)
+                    .then(function () {
+                        announce('Deleted ' + titleText);
+                        var next = li.nextElementSibling && li.nextElementSibling.querySelector('.row-title, .act');
+                        li.classList.add('removing');
+                        setTimeout(function () {
+                            li.remove();
+                            reflectEmptiness();
+                            if (next && next.focus) next.focus();
+                        }, 400);
+                    })
+                    .catch(function () {
+                        del.disabled = false;
+                        del.textContent = 'Delete';
+                        del.setAttribute('aria-label', 'Delete ' + titleText);
+                        announce('Could not delete ' + titleText + '. Try again.');
+                    });
+            });
+            actions.appendChild(del);
+
+            li.appendChild(main);
+            li.appendChild(actions);
+            return li;
+        }
+
+        function reflectEmptiness() {
+            var drafts = document.getElementById('draftsList').children.length;
+            var sent = document.getElementById('sentList').children.length;
+            var empty = drafts + sent === 0;
+            document.getElementById('draftsSection').classList.toggle('hidden', drafts === 0);
+            document.getElementById('sentSection').classList.toggle('hidden', sent === 0);
+            document.getElementById('emptyState').classList.toggle('hidden', !empty);
+            // Avoid two competing CTAs: hide the head "Start a letter" when the empty state shows.
+            document.getElementById('newLink').classList.toggle('hidden', empty);
+        }
+
+        function render(profile, articles) {
+            HANDLE = profile.handle || profile.username;
+            if (!HANDLE) { hide('loadingState'); show('errorState'); return; }
+            document.getElementById('deskTitle').textContent = (profile.display_name || '@' + HANDLE);
+            document.getElementById('deskSub').textContent = 'klee.page/@' + HANDLE;
+
+            // Unknown/legacy statuses bucket into drafts so they stay visible + editable.
+            var sent = articles.filter(function (a) { return a.status === 'published' || a.status === 'sent'; });
+            var drafts = articles.filter(function (a) { return a.status !== 'published' && a.status !== 'sent'; });
+            drafts.sort(function (a, b) { return ts(b.created_at) - ts(a.created_at); });
+            sent.sort(function (a, b) { return ts(b.published_at || b.created_at) - ts(a.published_at || a.created_at); });
+
+            var dl = document.getElementById('draftsList');
+            var sl = document.getElementById('sentList');
+            drafts.forEach(function (a) { dl.appendChild(makeRow(a)); });
+            sent.forEach(function (a) { sl.appendChild(makeRow(a)); });
+
+            hide('loadingState');
+            show('desk');
+            reflectEmptiness();
+        }
+
+        // ---- boot / auth gate ----
+        (async function boot() {
+            if (!window.Dispatch) { hide('loadingState'); show('errorState'); return; }
+            try {
+                window.Dispatch.init();
+                var session = await window.Dispatch.session();
+                if (!session) {
+                    sessionStorage.setItem('dispatch.post-auth', '/dispatch/dashboard/');
+                    window.location.href = '/dispatch/sign-in/';
+                    return;
+                }
+                var data = await window.Dispatch.listArticles();
+                if (!data || !data.profile) {
+                    // 200 but no profile shape → treat as a load error, not a claim redirect.
+                    hide('loadingState'); show('errorState');
+                    return;
+                }
+                render(data.profile, data.articles || []);
+            } catch (e) {
+                if (e && e.status === 403) {
+                    // Signed in but hasn't claimed a handle yet → go claim one.
+                    sessionStorage.setItem('dispatch.post-auth', '/dispatch/dashboard/');
+                    window.location.href = '/dispatch/auth/callback/';
+                    return;
+                }
+                hide('loadingState');
+                show('errorState');
+            }
+        })();
+    </script>
+</body>
+</html>
