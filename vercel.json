@@ -1,6 +1,10 @@
 {
   "buildCommand": null,
   "outputDirectory": ".",
+  "redirects": [
+    { "source": "/@:user/", "destination": "/@:user", "permanent": true },
+    { "source": "/@:user/:slug/", "destination": "/@:user/:slug", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/@:user/:slug", "destination": "/api/render?u=:user&s=:slug" },
     { "source": "/@:user", "destination": "/api/render?u=:user" }
