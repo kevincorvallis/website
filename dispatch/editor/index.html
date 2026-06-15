@@ -1941,6 +1941,8 @@
                 var p = window.Dispatch.getProfile();
                 var hp = p.handle || p.username;
                 el.innerHTML = '@<a href="/@' + hp + '" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor;">' + hp + '</a>';
+                var bk = document.querySelector('.tb-back');
+                if (bk) bk.href = '/dispatch/dashboard/';
             } else {
                 el.innerHTML = '<a href="/dispatch/sign-in/" style="color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor;">Sign in to publish</a>';
             }
