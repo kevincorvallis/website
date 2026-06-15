@@ -693,7 +693,12 @@
         [data-theme="dark"] .featured-video video { box-shadow: 0 24px 70px -30px rgba(0,0,0,0.8); }
         .featured-video .fv-cap { margin-top: 0.75rem; text-align: center; font-family: var(--font-display); font-style: italic; color: var(--caption); font-size: 14px; }
         /* explicit "press to play (with sound)" overlay on the featured video */
-        .fv-stage { position: relative; line-height: 0; border-radius: 6px; overflow: hidden; }
+        .fv-stage { position: relative; line-height: 0; border-radius: 6px; overflow: hidden; box-shadow: 0 18px 60px -22px rgba(31,30,29,0.45), 0 4px 12px -4px rgba(31,30,29,0.15); }
+        [data-theme="dark"] .fv-stage { box-shadow: 0 18px 60px -22px rgba(0,0,0,0.6); }
+        .fv-stage video { width: 100%; height: auto; display: block; }
+        .video-inset .fv-stage { margin: 0 auto; }
+        .video-inset.portrait .fv-stage { max-width: 380px; }
+        @media (min-width: 768px) { .video-inset.portrait .fv-stage { max-width: 440px; } }
         .fv-play {
             position: absolute; inset: 0; width: 100%; height: 100%; border: none; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem;
@@ -958,11 +963,11 @@
     <div class="chapter">
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Hey. Before anything else: a few paragraphs down there's a photo of me passed out face-down, 2pm on a Saturday, on a daybed that isn't even mine. Just sit with that one for a second.</p>
+                <p>Hey. Before anything else: just below this there's a photo of me passed out face-down, 2pm on a Saturday, on a daybed that isn't even mine. Just sit with it for a second.</p>
                 <p>It looks worse than it is &mdash; honestly it might be the high point of my month &mdash; but it lands better if we rewind a few weeks first. So, rewinding.</p>
             </div>
             <div data-l="ko">
-                <p>안녕. 시작하기 전에: 몇 단락 아래에 내가 토요일 오후 두 시에, 그것도 내 것도 아닌 데이베드에 얼굴을 박고 뻗어 있는 사진이 나온다. 일단 그 장면 한번 음미해 보길.</p>
+                <p>안녕. 시작하기 전에: 바로 아래에 내가 토요일 오후 두 시에, 그것도 내 것도 아닌 데이베드에 얼굴을 박고 뻗어 있는 사진이 나온다. 일단 그 장면 한번 음미해 보길.</p>
                 <p>보이는 것만큼 심각하진 않다 &mdash; 솔직히 이번 달 최고의 순간일지도 &mdash; 그래도 몇 주 되감고 보면 더 와닿을 거다. 자, 되감기.</p>
             </div>
         </div>
@@ -1059,14 +1064,17 @@
             </div>
         </div>
         <div class="video-inset portrait reveal">
-            <div class="vsound">
-                <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/ai-cat-poster.jpg"
+            <div class="fv-stage">
+                <video controls playsinline preload="metadata" poster="/newsletter/006/images/ai-cat-poster.jpg"
                     data-aria-en="An AI-generated video of two cats standing upright and dancing on a bed"
                     data-aria-ko="두 마리 고양이가 침대 위에서 두 발로 서서 춤추는 AI 생성 영상"
                     aria-label="An AI-generated video of two cats standing upright and dancing on a bed">
                     <source src="/newsletter/006/images/ai-cat-dance.mp4" type="video/mp4">
                 </video>
-                <span class="vsound-hint"><span data-l="en">Tap for sound</span><span data-l="ko">탭하면 소리 켜짐</span></span>
+                <button class="fv-play" type="button" aria-label="Play with sound">
+                    <span class="fv-play-disc" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+                    <span class="fv-play-label"><span data-l="en">Play with sound</span><span data-l="ko">소리와 함께 재생</span></span>
+                </button>
             </div>
             <div class="photo-caption">
                 <span data-l="en">two cats, fully committed, zero notes &mdash; courtesy @humantix, undefeated</span>
@@ -1132,14 +1140,17 @@
             </div>
         </div>
         <div class="video-inset portrait reveal">
-            <div class="vsound">
-                <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/pride-poster.jpg"
+            <div class="fv-stage">
+                <video controls playsinline preload="metadata" poster="/newsletter/006/images/pride-poster.jpg"
                     data-aria-en="Pride parade under a blue sky: the Jackass crew on a float with rainbow fringe, Steve-O shirtless holding a rainbow umbrella"
                     data-aria-ko="파란 하늘 아래 프라이드 퍼레이드: 무지개 술 장식을 단 플로트 위 잭애스 크루, 무지개 우산을 든 웃통 벗은 스티브오"
                     aria-label="Pride parade under a blue sky: the Jackass crew on a float with rainbow fringe, Steve-O shirtless holding a rainbow umbrella">
                     <source src="/newsletter/006/images/pride-steveo.mp4" type="video/mp4">
                 </video>
-                <span class="vsound-hint"><span data-l="en">Tap for sound</span><span data-l="ko">탭하면 소리 켜짐</span></span>
+                <button class="fv-play" type="button" aria-label="Play with sound">
+                    <span class="fv-play-disc" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+                    <span class="fv-play-label"><span data-l="en">Play with sound</span><span data-l="ko">소리와 함께 재생</span></span>
+                </button>
             </div>
             <div class="photo-caption">
                 <span data-l="en">Steve-O, a rainbow umbrella, and a studio sponsorship &mdash; the afternoon contained multitudes</span>
@@ -1161,14 +1172,17 @@
             </div>
         </div>
         <div class="video-inset portrait reveal">
-            <div class="vsound">
-                <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/kobe-weird.jpg"
+            <div class="fv-stage">
+                <video controls playsinline preload="metadata" poster="/newsletter/006/images/kobe-weird.jpg"
                     data-aria-en="Kobe the dog draped head-down off the edge of the bed, looking at the camera with a guilty expression"
                     data-aria-ko="침대 가장자리에 머리를 거꾸로 늘어뜨린 채 죄지은 표정으로 카메라를 보는 코비"
                     aria-label="Kobe the dog draped head-down off the edge of the bed, looking at the camera with a guilty expression">
                     <source src="/newsletter/006/images/kobe-weird.mp4" type="video/mp4">
                 </video>
-                <span class="vsound-hint"><span data-l="en">Tap for sound</span><span data-l="ko">탭하면 소리 켜짐</span></span>
+                <button class="fv-play" type="button" aria-label="Play with sound">
+                    <span class="fv-play-disc" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+                    <span class="fv-play-label"><span data-l="en">Play with sound</span><span data-l="ko">소리와 함께 재생</span></span>
+                </button>
             </div>
             <div class="photo-caption">
                 <span data-l="en">"Kobe. why." &mdash; he has no answer. he has never had an answer.</span>
@@ -1176,14 +1190,17 @@
             </div>
         </div>
         <div class="video-inset reveal">
-            <div class="vsound">
-                <video class="lazy-video" muted loop playsinline preload="metadata" poster="/newsletter/006/images/cat-jump-poster.jpg"
+            <div class="fv-stage">
+                <video controls playsinline preload="metadata" poster="/newsletter/006/images/cat-jump-poster.jpg"
                     data-aria-en="A tuxedo cat leaping between two wall-mounted shelves while Kevin watches from below"
                     data-aria-ko="케빈이 아래에서 지켜보는 가운데 벽에 달린 두 선반 사이를 뛰어 건너는 턱시도 고양이"
                     aria-label="A tuxedo cat leaping between two wall-mounted shelves while Kevin watches from below">
                     <source src="/newsletter/006/images/cat-jump.mp4" type="video/mp4">
                 </video>
-                <span class="vsound-hint"><span data-l="en">Tap for sound</span><span data-l="ko">탭하면 소리 켜짐</span></span>
+                <button class="fv-play" type="button" aria-label="Play with sound">
+                    <span class="fv-play-disc" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+                    <span class="fv-play-label"><span data-l="en">Play with sound</span><span data-l="ko">소리와 함께 재생</span></span>
+                </button>
             </div>
             <div class="photo-caption">
                 <span data-l="en">unbothered, airborne, gold-medal form &mdash; more on relays later</span>
@@ -1955,6 +1972,22 @@
             if (closeBtn) closeBtn.addEventListener('click', function () {
                 audio.pause(); dismissed = true; player.classList.remove('visible');
                 setTimeout(function () { player.hidden = true; }, 450);
+            });
+
+            // Duck the song while a video plays with sound; resume it once nothing's playing.
+            var duckedByVideo = false;
+            var soundVids = document.querySelectorAll('.fv-stage video');
+            function anyVideoPlaying() { return Array.prototype.some.call(soundVids, function (v) { return !v.paused && !v.ended; }); }
+            function maybeResume() {
+                if (duckedByVideo && !anyVideoPlaying() && !dismissed) {
+                    duckedByVideo = false;
+                    var p = audio.play(); if (p && p.catch) p.catch(function () {});
+                }
+            }
+            Array.prototype.forEach.call(soundVids, function (v) {
+                v.addEventListener('play', function () { if (!audio.paused) { audio.pause(); duckedByVideo = true; } });
+                v.addEventListener('pause', maybeResume);
+                v.addEventListener('ended', maybeResume);
             });
 
             function tryAutoplay() {
