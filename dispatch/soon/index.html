@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatch — Coming soon</title>
+    <meta name="description" content="A quiet place to write letters to the few people you actually want to read them. Coming soon.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://klee.page/dispatch/soon/">
+    <meta property="og:title" content="Dispatch — Coming soon">
+    <meta property="og:description" content="A quiet place to write letters to the few people you actually want to read them. Coming soon.">
+    <meta property="og:image" content="https://klee.page/images/kevi394-053.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dispatch — Coming soon">
+    <meta name="twitter:image" content="https://klee.page/images/kevi394-053.jpg">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✶</text></svg>">
+
+    <script>
+        (function () {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #f0eee6; --text: #1f1e1d; --caption: #8a8880; --accent: #a0826d;
+            --rule: rgba(31,30,29,0.1);
+            --font: 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+        }
+        [data-theme="dark"] {
+            --bg: #1f1e1d; --text: #f0eee6; --caption: #7a7a75; --accent: #c4a882;
+            --rule: rgba(240,238,230,0.08);
+        }
+        html, body { min-height: 100%; }
+        body {
+            font-family: var(--font); background: var(--bg); color: var(--text);
+            font-size: 20px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+            display: flex; flex-direction: column; min-height: 100vh;
+            transition: background-color 0.6s ease, color 0.3s ease;
+        }
+        a { color: inherit; text-decoration: none; transition: opacity 0.2s ease; }
+        a:hover { opacity: 0.6; }
+
+        .backdrop { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .backdrop::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 820px; height: 600px;
+            background: radial-gradient(ellipse at top, rgba(160,130,109,0.16), transparent 62%);
+            opacity: 0; animation: fadeIn 1.8s 0.2s ease forwards;
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        header {
+            position: relative; z-index: 5;
+            max-width: 600px; margin: 0 auto; width: 100%;
+            padding: 22px 28px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .back-link { font-size: 14px; opacity: 0.55; }
+        .header-right { display: flex; align-items: center; gap: 18px; }
+        .nav-wordmark { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 18px; }
+        .nav-wordmark::after { content: '✶'; margin-left: 4px; color: var(--accent); font-style: normal; font-size: 10px; vertical-align: super; }
+        .theme-pill { width: 36px; height: 18px; border-radius: 100px; background: var(--text); position: relative; cursor: pointer; display: inline-block; transition: background-color 0.3s ease; }
+        .theme-pill::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); transition: transform 0.2s ease, background-color 0.3s ease; }
+        [data-theme="dark"] .theme-pill::after { transform: translateX(18px); }
+        .theme-pill input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+
+        main {
+            position: relative; z-index: 1;
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            max-width: 600px; margin: 0 auto; width: 100%;
+            padding: 40px 28px 80px;
+        }
+        .eyebrow {
+            font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 1.25rem;
+        }
+        .hero-title {
+            font-family: var(--font-display); font-style: italic; font-weight: 600;
+            font-size: clamp(40px, 8vw, 58px); line-height: 1.06; letter-spacing: -0.015em;
+            margin-bottom: 1.5rem;
+        }
+        .lede {
+            font-size: 19px; color: var(--text); line-height: 1.6; max-width: 30em;
+            margin-bottom: 2.5rem;
+        }
+        .lede .muted { color: var(--caption); }
+
+        /* notify capture (reuses /js/subscribe.js) */
+        .subscribe { max-width: 440px; }
+        .subscribe-form { display: flex; gap: 8px; margin-bottom: 0.9rem; }
+        .subscribe-input {
+            flex: 1; background: none; border: 1px solid var(--rule); border-radius: 8px;
+            color: var(--text); font-family: var(--font); font-size: 16px; padding: 12px 16px;
+            outline: none; transition: border-color 0.2s ease, color 0.3s ease;
+        }
+        .subscribe-input::placeholder { color: var(--caption); }
+        .subscribe-input:focus { border-color: var(--accent); }
+        .subscribe-btn {
+            background: var(--text); color: var(--bg); border: none; border-radius: 8px;
+            font-family: var(--font); font-size: 15px; padding: 12px 22px; cursor: pointer;
+            transition: opacity 0.2s ease, background-color 0.3s ease;
+        }
+        .subscribe-btn:hover { opacity: 0.8; }
+        .subscribe-success { font-size: 17px; font-weight: 600; color: var(--accent); display: none; margin-bottom: 0.6rem; }
+        .subscribe-error { font-size: 15px; color: #c0392b; display: none; margin-bottom: 0.6rem; }
+        [data-theme="dark"] .subscribe-error { color: #e8857a; }
+        .subscribe.submitted .subscribe-form { display: none; }
+        .subscribe.submitted .subscribe-success { display: block; }
+        .subscribe.error .subscribe-error { display: block; }
+        .subscribe-note { font-size: 13px; color: var(--caption); opacity: 0.7; }
+
+        footer {
+            position: relative; z-index: 1;
+            max-width: 600px; margin: 0 auto; width: 100%;
+            padding: 24px 28px; font-size: 13px; color: var(--caption);
+        }
+        footer .made { font-style: italic; }
+
+        @media (max-width: 600px) {
+            body { font-size: 18px; }
+            .subscribe-form { flex-direction: column; }
+        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+    </style>
+</head>
+<body>
+    <div class="backdrop" aria-hidden="true"></div>
+
+    <header>
+        <a href="/newsletter/" class="back-link">&larr; Dispatch</a>
+        <div class="header-right">
+            <span class="nav-wordmark" aria-hidden="true">Dispatch</span>
+            <label class="theme-pill" for="theme-toggle"><input type="checkbox" id="theme-toggle" aria-label="Dark mode"></label>
+        </div>
+    </header>
+
+    <main>
+        <p class="eyebrow">Coming soon</p>
+        <h1 class="hero-title">A quiet place to write to the few who matter.</h1>
+        <p class="lede">Dispatch is becoming a small tool for letters like the ones you've been reading &mdash; yours to write, at your own little address on the web. <span class="muted">No feeds, no metrics, no algorithm. Just a page and a URL.</span></p>
+
+        <div class="subscribe" id="subscribe">
+            <form class="subscribe-form" id="subscribeForm">
+                <input type="email" class="subscribe-input" id="subscribeEmail" placeholder="your@email.com" required autocomplete="email" aria-label="Email address">
+                <button type="submit" class="subscribe-btn" id="subscribeBtn">Notify me</button>
+            </form>
+            <p class="subscribe-success" id="subscribeSuccess">You're on the list. I'll write when it opens.</p>
+            <p class="subscribe-error" id="subscribeError">Hmm, that didn't go through. Mind trying again?</p>
+            <p class="subscribe-note">One note when Dispatch opens &mdash; nothing else.</p>
+        </div>
+    </main>
+
+    <footer>
+        <span class="made">Dispatch</span> &middot; by <a href="/" style="border-bottom:1px solid var(--rule);">Kevin Lee</a>
+    </footer>
+
+    <script src="/js/subscribe.js"></script>
+    <script>
+        (function () {
+            var t = document.getElementById('theme-toggle');
+            if (!t) return;
+            t.checked = document.documentElement.getAttribute('data-theme') === 'dark';
+            t.addEventListener('change', function () {
+                var v = t.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', v);
+                localStorage.setItem('theme', v);
+            });
+        })();
+    </script>
+</body>
+</html>
