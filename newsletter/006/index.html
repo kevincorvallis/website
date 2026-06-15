@@ -692,6 +692,26 @@
         .featured-video video { width: 100%; display: block; border-radius: 6px; background: #000; box-shadow: 0 24px 70px -30px rgba(31,30,29,0.5); }
         [data-theme="dark"] .featured-video video { box-shadow: 0 24px 70px -30px rgba(0,0,0,0.8); }
         .featured-video .fv-cap { margin-top: 0.75rem; text-align: center; font-family: var(--font-display); font-style: italic; color: var(--caption); font-size: 14px; }
+        /* explicit "press to play (with sound)" overlay on the featured video */
+        .fv-stage { position: relative; line-height: 0; border-radius: 6px; overflow: hidden; }
+        .fv-play {
+            position: absolute; inset: 0; width: 100%; height: 100%; border: none; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem;
+            background: rgba(0,0,0,0.30); color: #fff;
+            transition: opacity 0.35s ease, background-color 0.2s ease;
+        }
+        .fv-play:hover { background: rgba(0,0,0,0.4); }
+        .fv-play-disc {
+            width: 78px; height: 78px; border-radius: 50%;
+            background: rgba(255,255,255,0.14); border: 2px solid rgba(255,255,255,0.92);
+            display: grid; place-items: center;
+            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+            transition: transform 0.2s cubic-bezier(0.22,0.61,0.36,1), background-color 0.2s ease;
+        }
+        .fv-play:hover .fv-play-disc { transform: scale(1.07); background: rgba(255,255,255,0.24); }
+        .fv-play-disc svg { width: 30px; height: 30px; fill: #fff; margin-left: 5px; }
+        .fv-play-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; text-shadow: 0 1px 8px rgba(0,0,0,0.55); }
+        .fv-stage.playing .fv-play { opacity: 0; pointer-events: none; }
 
         .relay { max-width: 620px; margin: 1.5rem auto 0.5rem; padding: 0 1.5rem; text-align: center; }
         .relay-rink { width: 100%; max-width: 460px; margin: 0 auto; display: block; overflow: visible; }
@@ -1201,12 +1221,18 @@
 
         <div class="featured-video reveal">
             <p class="fv-flag"><span class="dot" aria-hidden="true"></span><span data-l="en">Watch with sound &middot; Milano-Cortina 2026</span><span data-l="ko">소리 켜고 &middot; 밀라노-코르티나 2026</span></p>
-            <video controls playsinline preload="metadata" poster="/newsletter/006/images/korea-relay-poster.jpg"
-                data-aria-en="Final laps of the women's 3000m short-track relay final at the 2026 Olympics, Korea winning gold and celebrating with the flag"
-                data-aria-ko="2026 올림픽 여자 3000m 쇼트트랙 계주 결승 마지막 바퀴, 금메달을 따고 태극기를 들고 환호하는 한국"
-                aria-label="Final laps of the women's 3000m short-track relay final at the 2026 Olympics, Korea winning gold and celebrating with the flag">
-                <source src="/newsletter/006/images/korea-relay.mp4" type="video/mp4">
-            </video>
+            <div class="fv-stage">
+                <video controls playsinline preload="metadata" poster="/newsletter/006/images/korea-relay-poster.jpg"
+                    data-aria-en="Final laps of the women's 3000m short-track relay final at the 2026 Olympics, Korea winning gold and celebrating with the flag"
+                    data-aria-ko="2026 올림픽 여자 3000m 쇼트트랙 계주 결승 마지막 바퀴, 금메달을 따고 태극기를 들고 환호하는 한국"
+                    aria-label="Final laps of the women's 3000m short-track relay final at the 2026 Olympics, Korea winning gold and celebrating with the flag">
+                    <source src="/newsletter/006/images/korea-relay.mp4" type="video/mp4">
+                </video>
+                <button class="fv-play" type="button" aria-label="Play the relay with sound">
+                    <span class="fv-play-disc" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+                    <span class="fv-play-label"><span data-l="en">Play with sound</span><span data-l="ko">소리와 함께 재생</span></span>
+                </button>
+            </div>
             <p class="fv-cap"><span data-l="en">the final laps. I have watched this more times than I'll admit in writing.</span><span data-l="ko">마지막 바퀴. 글로는 인정 못 할 만큼 여러 번 돌려봤다.</span></p>
         </div>
 
@@ -1727,6 +1753,24 @@
                         wrap.classList.remove('unmuted');
                     }
                 });
+            });
+        })();
+
+        // ==================== FEATURED VIDEO — explicit play-with-sound ====================
+        (function () {
+            var stages = document.querySelectorAll('.fv-stage');
+            if (!stages.length) return;
+            Array.prototype.forEach.call(stages, function (stage) {
+                var v = stage.querySelector('video');
+                var btn = stage.querySelector('.fv-play');
+                if (!v || !btn) return;
+                btn.addEventListener('click', function () {
+                    v.muted = false;                 // the click is a user gesture → sound is allowed
+                    var p = v.play();
+                    if (p && p.catch) p.catch(function () { v.muted = true; v.play().catch(function () {}); });
+                    stage.classList.add('playing');
+                });
+                v.addEventListener('play', function () { stage.classList.add('playing'); });
             });
         })();
 
