@@ -184,6 +184,13 @@
     "footer": "Kevin &amp; Berylが愛を込めて — <a href=\"/\">klee.page</a>"
   },
   "merfish": {
+    "navLabel": "セクションへ移動",
+    "chapterBridge": "チャプター",
+    "exploreTitle": "MERFISH 脳エクスプローラー",
+    "exploreHint": "動かして撹拌 · ドラッグで移動 · スクロールで読む",
+    "explore": "探索",
+    "exploreClose": "閉じる",
+    "scrollCue": "スクロール",
     "pageTitle": "MERFISH — Kevin Lee",
     "metaDescription": "ケーススタディ：Vizgen MERSCOPEマウス脳データを、細胞タイプがマップされアトラス登録された地図に変換する空間トランスクリプトミクス・パイプライン — RNA分子ひとつずつ。",
     "skipLink": "本文へスキップ",

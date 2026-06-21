@@ -52,8 +52,11 @@
             --accent-bright: #93c01f;         /* viridis chartreuse (rare highlight) */
             --accent-deep: #46327e;           /* viridis violet (depth) */
             --hero-bg: #0b0c0a;
+            --glass: color-mix(in srgb, var(--bg) 86%, transparent);
+            --glass-edge: color-mix(in srgb, var(--accent) 18%, var(--rule));
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
             --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
             color-scheme: light dark;
         }
 
@@ -73,12 +76,24 @@
 
         body {
             font-family: var(--font);
-            background: var(--bg);
+            background: var(--hero-bg);
             color: var(--text);
             font-size: 20px;
             line-height: 1.6;
             transition: color 0.3s ease, background-color 0.3s ease;
             overflow-x: hidden;
+        }
+        body.mf-scrolled { background: var(--bg); }
+        body.mf-past-hero {
+            background: var(--bg);
+        }
+        body.mf-past-hero #mf-stage,
+        body.mf-past-hero #mf-trail-canvas,
+        body.mf-past-hero .mf-cursor-ring,
+        body.mf-past-hero .mf-scroll-cue {
+            display: none !important;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         ::selection { background: rgba(43, 179, 155, 0.30); color: inherit; }
@@ -92,23 +107,414 @@
             border-radius: 2px;
         }
 
+        /* ——— Fixed immersive stage (brain canvas, always on) ——— */
+        #mf-stage {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(ellipse 85% 60% at 58% 38%, rgba(31,158,137,0.24), rgba(31,158,137,0.05) 52%, transparent 72%), var(--hero-bg);
+            overflow: hidden;
+            transition: opacity 0.55s var(--ease-out), filter 0.55s var(--ease-out);
+            will-change: opacity, filter;
+        }
+        #mf-stage-inner {
+            position: absolute;
+            inset: 0;
+            transform-origin: 50% 42%;
+            will-change: transform;
+        }
+        .mf-vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background:
+                radial-gradient(ellipse 92% 78% at 50% 44%, transparent 42%, rgba(11,12,10,0.55) 100%),
+                radial-gradient(ellipse 120% 90% at 50% 100%, rgba(11,12,10,0.72), transparent 58%);
+            opacity: calc(0.72 + var(--scroll-p, 0) * 0.18);
+            transition: opacity 0.4s ease;
+        }
+        .mf-grain {
+            position: absolute;
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0.045;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            animation: grainShift 8s steps(6) infinite;
+            mix-blend-mode: overlay;
+        }
+        @keyframes grainShift {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-2%, -3%); }
+            40% { transform: translate(3%, 1%); }
+            60% { transform: translate(-1%, 4%); }
+            80% { transform: translate(2%, -2%); }
+        }
+        #mf-stage::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(170,220,50,0.10), transparent 38%);
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+            opacity: var(--mglow, 0);
+        }
+        #mf-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        #mf-trail-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        #mf-canvas.mf-grabbing { cursor: grabbing; }
+        .mf-cursor-ring {
+            position: fixed;
+            width: 120px;
+            height: 120px;
+            margin: -60px 0 0 -60px;
+            border-radius: 50%;
+            border: 1px solid rgba(170,220,50,0.35);
+            box-shadow: 0 0 40px rgba(31,158,137,0.25), inset 0 0 24px rgba(31,158,137,0.12);
+            pointer-events: none;
+            z-index: 4;
+            opacity: 0;
+            transition: opacity 0.35s ease, width 0.18s var(--ease-out), height 0.18s var(--ease-out), margin 0.18s var(--ease-out);
+            mix-blend-mode: screen;
+        }
+        .mf-cursor-ring.on { opacity: 1; }
+        .mf-cursor-ring.stirring {
+            width: 148px;
+            height: 148px;
+            margin: -74px 0 0 -74px;
+            border-color: rgba(170,220,50,0.55);
+        }
+        .mf-scroll-cue {
+            position: fixed;
+            bottom: max(18px, env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+            transition: opacity 0.55s ease, transform 0.55s var(--ease-out);
+        }
+        body.mf-scrolled .mf-scroll-cue { opacity: 0; transform: translateX(-50%) translateY(12px); }
+        .mf-scroll-cue-line {
+            display: block;
+            width: 1px;
+            height: 42px;
+            background: linear-gradient(to bottom, rgba(244,242,234,0.05), rgba(170,220,50,0.65), rgba(244,242,234,0.05));
+            position: relative;
+            overflow: hidden;
+        }
+        .mf-scroll-cue-line::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: -100%;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to bottom, transparent, rgba(244,242,234,0.95), transparent);
+            animation: cuePulse 2.1s var(--ease-out) infinite;
+        }
+        @keyframes cuePulse {
+            0% { top: -60%; opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { top: 120%; opacity: 0; }
+        }
+        .mf-scroll-cue-text {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(244,242,234,0.52);
+        }
+        .mf-scroll-hint {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(244,242,234,0.38);
+            text-align: center;
+            max-width: 28ch;
+            line-height: 1.5;
+        }
+
+        /* ——— Top cinematic progress ——— */
+        .mf-progress-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 11;
+            background: rgba(244,242,234,0.06);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.45s ease;
+        }
+        body.mf-scrolled .mf-progress-top { opacity: 1; }
+        .mf-progress-top-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-deep), var(--accent), var(--accent-bright));
+            box-shadow: 0 0 12px rgba(31,158,137,0.45);
+            transition: width 0.08s linear;
+        }
+
+        /* ——— Section progress rail ——— */
+        .mf-progress {
+            position: fixed;
+            left: max(14px, env(safe-area-inset-left));
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+            opacity: 0;
+            transition: opacity 0.45s ease;
+        }
+        body.mf-scrolled .mf-progress { opacity: 1; }
+        .mf-progress-track {
+            width: 2px;
+            height: min(52vh, 420px);
+            background: var(--rule);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        .mf-progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to bottom, var(--accent-deep), var(--accent), var(--accent-bright));
+            border-radius: 2px;
+            transition: height 0.12s linear;
+        }
+        .mf-progress-dots {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .mf-progress-dots li { list-style: none; position: relative; }
+        .mf-progress-dots button {
+            display: block;
+            width: 8px;
+            height: 8px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background: var(--rule);
+            cursor: pointer;
+            transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.25s var(--ease-out);
+        }
+        .mf-progress-dots button:hover,
+        .mf-progress-dots button:focus-visible {
+            background: color-mix(in srgb, var(--accent) 70%, var(--rule));
+            transform: scale(1.2);
+        }
+        .mf-progress-dots li.active button {
+            background: var(--accent);
+            box-shadow: 0 0 10px rgba(31,158,137,0.45);
+            transform: scale(1.35);
+        }
+        .mf-progress-dots li.done button { background: color-mix(in srgb, var(--accent) 55%, var(--rule)); }
+        .mf-progress-dots li::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%) translateX(-4px);
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            color: var(--text);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s var(--ease-out);
+        }
+        .mf-progress-dots li:hover::after,
+        .mf-progress-dots li:focus-within::after {
+            opacity: 0.72;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        /* ——— Scroll layer (Apple-style chapters over the brain) ——— */
+        .mf-scroll {
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .mf-hero-wrap {
+            height: 185vh;
+            position: relative;
+            pointer-events: none;
+        }
+        .mf-chapter-hero {
+            position: sticky;
+            top: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+        .mf-chapter-gap {
+            height: clamp(6vh, 10vw, 14vh);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mf-chapter-bridge {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: color-mix(in srgb, var(--accent) 55%, transparent);
+            opacity: calc(0.35 + var(--scroll-p, 0) * 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            pointer-events: none;
+        }
+        .mf-chapter-bridge::before,
+        .mf-chapter-bridge::after {
+            content: '';
+            width: clamp(24px, 8vw, 48px);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.45;
+        }
+        .mf-panel {
+            --panel-r: 14px;
+            position: relative;
+            max-width: 820px;
+            margin: 0 auto 11vh;
+            padding: clamp(2rem, 4.5vw, 2.85rem) clamp(1.35rem, 4vw, 2.15rem);
+            padding-left: clamp(1.65rem, 5vw, 2.45rem);
+            background:
+                linear-gradient(to bottom, var(--accent-deep), var(--accent) 48%, var(--accent-bright)) left/3px 100% no-repeat,
+                linear-gradient(135deg,
+                    color-mix(in srgb, var(--bg) 98%, var(--accent) 2%) 0%,
+                    var(--bg) 38%,
+                    color-mix(in srgb, var(--bg) 96%, var(--accent-deep) 4%) 100%);
+            border: 1px solid var(--rule);
+            border-left: none;
+            border-radius: 0 var(--panel-r) var(--panel-r) 0;
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.05) inset,
+                0 28px 72px rgba(0, 0, 0, 0.10);
+            pointer-events: auto;
+            isolation: isolate;
+        }
+        .mf-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: clamp(1.25rem, 6vw, 2.5rem);
+            right: clamp(1.25rem, 6vw, 2.5rem);
+            height: 1px;
+            border-radius: 1px;
+            background: linear-gradient(90deg, var(--accent-deep) 0%, var(--accent) 38%, var(--accent-bright) 62%, transparent 100%);
+            opacity: 0.55;
+        }
+        .mf-panel::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 0 var(--panel-r) var(--panel-r) 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse 80% 50% at 100% 0%, rgba(31,158,137,0.06), transparent 55%);
+        }
+        [data-theme="dark"] .mf-panel {
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.03) inset,
+                0 28px 72px rgba(0, 0, 0, 0.42);
+        }
+        .mf-panel.first { margin-top: 2vh; }
+        .mf-chapter-hero .mf-hero-inner {
+            max-width: 820px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px clamp(28px, 6vw, 64px);
+            pointer-events: none;
+        }
+        .mf-chapter-hero .mf-hero-actions {
+            pointer-events: auto;
+        }
+
         /* ——— Header ——— */
         header {
-            max-width: 820px;
-            margin: 0 auto;
-            padding: 15px 20px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            max-width: none;
+            margin: 0;
+            padding: max(14px, env(safe-area-inset-top)) 20px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
-            z-index: 5;
+            background: linear-gradient(to bottom, rgba(11,12,10,0.72), rgba(11,12,10,0));
+            transition: background 0.35s ease, color 0.3s ease;
+            pointer-events: auto;
+        }
+        body.mf-scrolled header {
+            background: color-mix(in srgb, var(--bg) 92%, transparent);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--rule);
+        }
+        body.mf-scrolled header .back-link { opacity: 0.65; color: var(--text); }
+        header .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        header .lang-btn {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            letter-spacing: 0.02em;
         }
         .back-link {
             font-family: var(--mono);
             font-size: 12.5px;
             letter-spacing: 0.02em;
             text-decoration: none;
-            opacity: 0.5;
+            color: rgba(244,242,234,0.72);
+            opacity: 1;
             transition: opacity 0.2s ease, color 0.3s ease;
         }
         .back-link:hover { opacity: 0.85; }
@@ -138,45 +544,16 @@
         }
         .skip-link:focus { top: 0; }
 
-        /* ——— Hero (full-bleed dark, particle reconstruction) ——— */
-        .mf-hero {
-            position: relative;
-            width: 100vw;
-            left: 50%;
-            transform: translateX(-50%);
-            min-height: clamp(440px, 80vh, 760px);
-            background: radial-gradient(ellipse 85% 60% at 58% 38%, rgba(31,158,137,0.24), rgba(31,158,137,0.05) 52%, transparent 72%), var(--hero-bg);
-            overflow: hidden;
+        /* ——— Hero typography (over immersive stage) ——— */
+        .mf-hero-actions {
+            position: absolute;
+            right: max(20px, calc(50% - 410px + 20px));
+            bottom: clamp(72px, 12vw, 120px);
+            z-index: 3;
             display: flex;
-            align-items: flex-end;
-            margin-top: 0.5rem;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        #mf-canvas {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            cursor: crosshair;
-        }
-        /* legibility scrim under the headline */
-        .mf-hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(11,12,10,0.92) 0%, rgba(11,12,10,0.55) 26%, rgba(11,12,10,0.0) 56%);
-            pointer-events: none;
-        }
-        .mf-hero-inner {
-            position: relative;
-            z-index: 2;
-            max-width: 820px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0 20px clamp(28px, 5vw, 56px);
-            pointer-events: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
         }
         .mf-eyebrow {
             font-family: var(--mono);
@@ -199,36 +576,43 @@
         .mf-hero h1 {
             font-size: clamp(44px, 9vw, 104px);
             font-weight: 600;
-            line-height: 0.98;
-            letter-spacing: -0.02em;
+            line-height: 0.96;
+            letter-spacing: -0.028em;
             color: #f4f2ea;
-            margin-bottom: 1.1rem;
-            max-width: 14ch;
+            margin-bottom: 1.15rem;
+            max-width: 13ch;
+            text-shadow: 0 2px 32px rgba(0, 0, 0, 0.78);
+        }
+        .mf-hero h1 .mf-title-line {
+            display: block;
+            overflow: hidden;
         }
         .mf-hero h1 em {
             font-style: italic;
             font-weight: 500;
-            color: var(--accent);
+            background: linear-gradient(118deg, var(--accent) 0%, var(--accent-bright) 52%, #e8f5a8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            filter: drop-shadow(0 2px 18px rgba(31,158,137,0.35));
         }
         .mf-hero-sub {
             font-size: clamp(17px, 2.3vw, 21px);
-            line-height: 1.5;
-            color: rgba(244,242,234,0.82);
-            max-width: 52ch;
+            line-height: 1.52;
+            color: rgba(244,242,234,0.88);
+            max-width: 48ch;
+            text-shadow: 0 1px 22px rgba(0, 0, 0, 0.88);
+            font-weight: 400;
         }
         .mf-replay {
-            position: absolute;
-            right: max(20px, calc(50% - 410px + 20px));
-            bottom: clamp(28px, 5vw, 56px);
-            z-index: 3;
-            pointer-events: auto;
             font-family: var(--mono);
             font-size: 11px;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: rgba(244,242,234,0.55);
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.16);
+            color: rgba(244,242,234,0.72);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.22);
             border-radius: 999px;
             padding: 7px 14px;
             cursor: pointer;
@@ -236,11 +620,9 @@
         }
         .mf-replay:hover { color: var(--accent-bright); border-color: var(--accent-bright); background: rgba(255,255,255,0.10); }
 
-        /* ——— Metadata bar (sample-sheet readout) ——— */
+        /* ——— Metadata bar ——— */
         .mf-meta {
-            max-width: 820px;
-            margin: 0 auto;
-            padding: 1.1rem 20px 0;
+            padding: 0 clamp(1.25rem, 4vw, 2rem);
         }
         .mf-meta-inner {
             display: flex;
@@ -261,35 +643,39 @@
 
         /* ——— Main column ——— */
         main {
-            max-width: 820px;
-            margin: 0 auto;
-            padding: 0 20px;
+            padding: 0;
         }
 
-        .mf-section { padding: 2.8rem 0 0; }
-        .mf-section.first { padding-top: 2.6rem; }
+        .mf-section { padding: 0; }
+        .mf-section.first { padding-top: 0; }
 
         .mf-kicker {
             font-family: var(--mono);
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 500;
-            letter-spacing: 0.16em;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
             color: var(--accent);
-            margin-bottom: 0.85rem;
+            margin-bottom: 1rem;
             display: flex;
             align-items: baseline;
-            gap: 0.7em;
+            gap: 0.75em;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
         }
-        .mf-kicker .idx { opacity: 0.5; }
+        .mf-kicker .idx {
+            opacity: 0.42;
+            font-variant-numeric: tabular-nums;
+            min-width: 4.5em;
+        }
 
         h2 {
-            font-size: clamp(26px, 4vw, 33px);
+            font-size: clamp(26px, 4vw, 34px);
             font-weight: 600;
-            line-height: 1.12;
-            letter-spacing: -0.015em;
-            margin-bottom: 1.1rem;
-            max-width: 22ch;
+            line-height: 1.1;
+            letter-spacing: -0.018em;
+            margin-bottom: 1.15rem;
+            max-width: 26ch;
         }
         h3 {
             font-size: 19px;
@@ -299,7 +685,18 @@
         }
         p { margin-bottom: 1rem; }
         p:last-child { margin-bottom: 0; }
-        .lede { font-size: 21px; line-height: 1.55; }
+        .lede {
+            font-size: 21px;
+            line-height: 1.55;
+        }
+        .lede::first-letter {
+            float: left;
+            font-size: 3.45em;
+            line-height: 0.82;
+            font-weight: 600;
+            margin: 0.06em 0.14em 0 0;
+            color: var(--accent-deep);
+        }
         .muted { opacity: 0.62; }
         strong { font-weight: 600; }
         code, .mono { font-family: var(--mono); }
@@ -481,12 +878,7 @@
 
         .mf-meta-item a { color: inherit; text-decoration: none; opacity: 0.85; }
         .mf-meta-item a:hover { opacity: 1; text-decoration: underline; }
-        .mf-meta-badge {
-            display: inline-block;
-            vertical-align: middle;
-            height: 16px;
-            margin-left: 0.15rem;
-        }
+        .mf-meta-item a b { color: var(--accent); font-weight: 600; opacity: 1; }
 
         /* ——— Tags + links ——— */
         .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 1.6rem 0 0; }
@@ -498,7 +890,7 @@
         .project-links a { text-decoration: none; color: var(--accent); }
         .project-links a:hover { text-decoration: underline; opacity: 1; }
 
-        footer { max-width: 820px; margin: 0 auto; padding: 3.5rem 20px 2.5rem; }
+        footer { max-width: 820px; margin: 0 auto 4rem; padding: 0 20px 2.5rem; pointer-events: auto; }
         footer p { font-family: var(--mono); font-size: 12.5px; opacity: 0.5; }
 
         /* ——— Responsive ——— */
@@ -509,22 +901,73 @@
             .mf-stats.cols-2 { grid-template-columns: 1fr; }
             .plate-pair { grid-template-columns: 1fr; }
             .mf-bits { gap: 4px; }
-            .mf-replay { right: 16px; top: 16px; bottom: auto; }
+            .mf-hero-actions { right: 16px; top: max(56px, calc(env(safe-area-inset-top) + 46px)); bottom: auto; }
+            .mf-scroll-hint { display: none; }
             .mf-hero h1 { max-width: 100%; }
+            .mf-meta-inner { font-size: 11.5px; padding: 0.65rem 0.85rem; gap: 0.45rem 0.75rem; }
+            .mf-meta-sep { display: none; }
+            .mf-meta-item { white-space: normal; }
+            .mf-hero-wrap { height: 125vh; }
+            .mf-progress { display: none; }
+            .mf-grain { opacity: 0.028; animation: none; }
+            .mf-panel { margin-bottom: 9vh; --panel-r: 16px; }
+            .mf-chapter-bridge { display: none; }
+            .mf-chapter-gap { height: 3vh; }
+        }
+        @media (max-width: 980px) {
+            .mf-progress-dots { display: none; }
         }
         /* ——— Scroll reveal (armed by JS via html.anim; visible by default if JS/IO fails) ——— */
         @media (prefers-reduced-motion: no-preference) {
-            html.anim .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+            html.anim .reveal { opacity: 0; transform: translateY(24px) scale(0.988); transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
             html.anim .reveal.in { opacity: 1; transform: none; }
-            .mf-hero-inner > * { opacity: 0; transform: translateY(14px); animation: heroUp 0.7s ease forwards; }
-            .mf-eyebrow { animation-delay: 0.15s; }
-            .mf-hero h1 { animation-delay: 0.28s; }
-            .mf-hero-sub { animation-delay: 0.42s; }
+            html.anim .mf-panel {
+                opacity: 0;
+                transform: translateY(48px) scale(0.985);
+                transition: opacity 0.85s var(--ease-out), transform 0.85s var(--ease-out);
+            }
+            html.anim .mf-panel.in { opacity: 1; transform: none; }
+            html.anim .mf-panel.in .mf-kicker,
+            html.anim .mf-panel.in > h2,
+            html.anim .mf-panel.in > p:first-of-type,
+            html.anim .mf-panel.in > .lede {
+                animation: panelChildIn 0.75s var(--ease-out) backwards;
+            }
+            html.anim .mf-panel.in .mf-kicker { animation-delay: 0.06s; }
+            html.anim .mf-panel.in > h2 { animation-delay: 0.14s; }
+            html.anim .mf-panel.in > p:first-of-type,
+            html.anim .mf-panel.in > .lede { animation-delay: 0.22s; }
+            html.anim .mf-panel.in .reveal,
+            html.anim .mf-panel.in .mf-stats,
+            html.anim .mf-panel.in figure.plate,
+            html.anim .mf-panel.in .mf-decoder,
+            html.anim .mf-panel.in .mf-pipe-v,
+            html.anim .mf-panel.in .mf-table-wrap,
+            html.anim .mf-panel.in .mf-scope,
+            html.anim .mf-panel.in .plate-pair {
+                animation: panelChildIn 0.8s var(--ease-out) backwards;
+                animation-delay: 0.32s;
+            }
+            @keyframes panelChildIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: none; }
+            }
+            .mf-chapter-hero .mf-hero-inner > * { opacity: 0; transform: translateY(18px); animation: heroUp 0.85s var(--ease-out) forwards; }
+            .mf-eyebrow { animation-delay: 0.12s; }
+            .mf-hero h1 { animation-delay: 0.26s; }
+            .mf-hero-sub { animation-delay: 0.44s; }
             @keyframes heroUp { to { opacity: 1; transform: none; } }
+        }
+        @media (pointer: coarse) {
+            .mf-cursor-ring { display: none; }
+            #mf-trail-canvas { display: none; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
             html { scroll-behavior: auto; }
+            .mf-grain { display: none; }
+            .mf-hero-wrap { height: auto; }
+            .mf-chapter-hero { position: relative; height: auto; min-height: 100vh; }
         }
 
         .sr-only {
@@ -535,29 +978,56 @@
 </head>
 <body>
 
+    <div class="mf-progress-top" aria-hidden="true"><div class="mf-progress-top-fill" id="mf-progress-top-fill"></div></div>
+    <div class="sr-only" aria-live="polite" id="mf-chapter-announcer"></div>
+
     <a href="#main" class="skip-link" data-i18n="merfish.skipLink">Skip to content</a>
 
     <header>
         <a href="/projects" class="back-link" data-i18n="merfish.backLink">← PROJECTS</a>
-        <div class="toggle-wrap">
-            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
-            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
+        <div class="header-controls">
+            <div class="toggle-wrap">
+                <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+                <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
+            </div>
         </div>
     </header>
 
-    <!-- ——— HERO: transcripts reconstruct the real coronal section ——— -->
-    <section class="mf-hero" aria-label="A coronal mouse-brain section reconstructed from individual RNA transcript positions">
-        <canvas id="mf-canvas"></canvas>
-        <button class="mf-replay" id="mf-replay" type="button" data-i18n="merfish.replay">⟳ Replay</button>
-        <div class="mf-hero-inner">
-            <div class="mf-eyebrow" data-i18n="merfish.heroEyebrow">MERFISH · Mouse-Brain Atlas</div>
-            <h1 data-i18n-html="merfish.heroTitle">Anatomy from <em>RNA alone.</em></h1>
-            <p class="mf-hero-sub" data-i18n="merfish.heroSub">Read the RNA inside an intact mouse brain — one molecule at a time — then rebuild the brain from where those molecules sit.</p>
+    <div id="mf-stage" aria-hidden="true">
+        <div id="mf-stage-inner">
+            <canvas id="mf-canvas"></canvas>
         </div>
-    </section>
+        <div class="mf-vignette" aria-hidden="true"></div>
+        <div class="mf-grain" aria-hidden="true"></div>
+    </div>
+    <canvas id="mf-trail-canvas" aria-hidden="true"></canvas>
+    <div class="mf-cursor-ring" id="mf-cursor-ring" aria-hidden="true"></div>
+    <div class="mf-scroll-cue" id="mf-scroll-cue">
+        <span class="mf-scroll-cue-line"></span>
+        <span class="mf-scroll-cue-text" data-i18n="merfish.scrollCue">Scroll</span>
+        <span class="mf-scroll-hint" data-i18n="merfish.exploreHint">move to stir · drag to pan · scroll for story</span>
+    </div>
+    <nav class="mf-progress" id="mf-progress" aria-label="Sections" data-i18n-aria-label="merfish.navLabel">
+        <div class="mf-progress-track"><div class="mf-progress-fill" id="mf-progress-fill"></div></div>
+        <ol class="mf-progress-dots" id="mf-progress-dots"></ol>
+    </nav>
+
+    <div class="mf-scroll">
+        <div class="mf-hero-wrap" id="mf-hero-wrap">
+        <section class="mf-chapter-hero mf-hero" aria-label="A coronal mouse-brain section reconstructed from individual RNA transcript positions">
+            <div class="mf-hero-actions">
+                <button class="mf-replay" id="mf-replay" type="button" data-i18n="merfish.replay">⟳ Replay</button>
+            </div>
+            <div class="mf-hero-inner" id="mf-hero-inner">
+                <div class="mf-eyebrow" data-i18n="merfish.heroEyebrow">MERFISH · Mouse-Brain Atlas</div>
+                <h1 data-i18n-html="merfish.heroTitle"><span class="mf-title-line">Anatomy from</span> <em>RNA alone.</em></h1>
+                <p class="mf-hero-sub" data-i18n="merfish.heroSub">Read the RNA inside an intact mouse brain — one molecule at a time — then rebuild the brain from where those molecules sit.</p>
+            </div>
+        </section>
+        </div>
 
     <!-- ——— Sample-sheet metadata bar ——— -->
-    <div class="mf-meta">
+    <div class="mf-meta mf-panel" data-chapter="meta">
         <div class="mf-meta-inner">
             <span class="mf-meta-item">MOUSE BRAIN · CORONAL</span>
             <span class="mf-meta-sep">/</span>
@@ -569,20 +1039,22 @@
             <span class="mf-meta-sep">/</span>
             <span class="mf-meta-item"><b>scanpy</b> · squidpy · STalign</span>
             <span class="mf-meta-sep">/</span>
-            <span class="mf-meta-item"><a href="https://github.com/kevincorvallis/MERFISH/actions/workflows/test.yml" target="_blank" rel="noopener"><img class="mf-meta-badge" src="https://github.com/kevincorvallis/MERFISH/actions/workflows/test.yml/badge.svg" alt="CI status" width="88" height="16"></a></span>
+            <span class="mf-meta-item"><a href="https://github.com/kevincorvallis/MERFISH/actions/workflows/test.yml" target="_blank" rel="noopener"><b>CI</b> →</a></span>
         </div>
     </div>
 
     <main id="main">
 
         <!-- ——— Intro ——— -->
-        <section class="mf-section first">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel first" data-chapter="intro">
             <p class="lede" data-i18n-html="merfish.lede">MERFISH (<em>multiplexed error-robust fluorescence in&nbsp;situ hybridization</em>) images individual RNA molecules right where they sit in tissue. Hundreds of genes per cell, positions kept — so the anatomy comes from the molecules themselves.</p>
             <p class="muted" data-i18n="merfish.introNote">Portfolio repo, not a production pipeline: notebooks and pytest walk a Vizgen coronal cohort through QC, clustering, cell-type mapping, and CCF registration. Synthetic fixtures run offline in CI; live tests hit public downloads when you have network.</p>
         </section>
 
         <!-- ——— Method: barcode decoder ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="method">
             <div class="mf-kicker"><span class="idx">METHOD</span> <span data-i18n="merfish.methodKicker">Reading a gene as a barcode</span></div>
             <h2 data-i18n="merfish.methodTitle">Every gene gets an error-correcting binary code.</h2>
             <p data-i18n-html="merfish.methodP1">MERFISH reads each gene as a binary <strong>codeword</strong> spread across many imaging rounds — the on/off pattern names the gene. The code self-corrects (<strong>16-bit, Hamming-distance-4</strong>), so one misread round can't change the answer. That's the "ER" in MERFISH.</p>
@@ -602,10 +1074,9 @@
             </div>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Pipeline ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="pipeline">
             <div class="mf-kicker"><span class="idx">PIPELINE</span> <span data-i18n="merfish.pipelineKicker">Raw imagery to per-cell labels</span></div>
             <h2 data-i18n-html="merfish.pipelineTitle">Six stages, one <code>AnnData</code> object.</h2>
             <p data-i18n="merfish.pipelineP">Segmentation comes first — it decides what counts as a cell — then QC, clustering, mapping, and atlas registration hand off through the same object.</p>
@@ -619,10 +1090,9 @@
             </ol>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— QC ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="validation">
             <div class="mf-kicker"><span class="idx">VALIDATION</span> <span data-i18n="merfish.validationKicker">Check the counts first</span></div>
             <h2 data-i18n="merfish.validationTitle">QC before clustering.</h2>
             <p data-i18n-html="merfish.validationP">MERFISH counts should match bulk RNAseq and reproduce across replicates in the <code>MsBrain_VS38</code> aging cohort — rendered with seaborn from cohort data.</p>
@@ -637,10 +1107,9 @@
             </figure>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Cell types in space ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="celltypes">
             <div class="mf-kicker"><span class="idx">CELL TYPES</span> <span data-i18n="merfish.celltypesKicker">Mapping with a confidence score</span></div>
             <h2 data-i18n="merfish.celltypesTitle">Cell types with a confidence score.</h2>
             <p data-i18n-html="merfish.celltypesP">I reimplemented the Allen <code>cell_type_mapper</code> approach on Moffitt 2018 hypothalamus hold-out data: marker-gene matching plus a bootstrap confidence that beats the old cosine heuristic (label only, no score). Fine subtype accuracy within correct classes: <span class="accent-num">0.82</span>.</p>
@@ -664,10 +1133,9 @@
             </div>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Segmentation ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="segmentation">
             <div class="mf-kicker"><span class="idx">SEGMENTATION</span> <span data-i18n="merfish.segmentationKicker">The decision that sits upstream</span></div>
             <h2 data-i18n="merfish.segmentationTitle">Segmentation sits upstream.</h2>
             <p data-i18n-html="merfish.segmentationP">Draw the cell boundary wrong and everything downstream shifts. On shared ground truth, transcript-aware assignment hits <span class="accent-num">0.76</span> accuracy (Voronoi <span class="accent-num">0.70</span>, nucleus-only <span class="accent-num">0.17</span>); downstream Leiden ARI reaches <span class="accent-num">1.00</span> vs <span class="accent-num">0.96</span> baseline. Three methods benchmarked end-to-end (Baysor / proseg / segger-style).</p>
@@ -677,10 +1145,9 @@
             </figure>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Atlas registration ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="registration">
             <div class="mf-kicker"><span class="idx">REGISTRATION</span> <span data-i18n="merfish.registrationKicker">The hardest part of a new scan</span></div>
             <h2 data-i18n="merfish.registrationTitle">Register the section to CCFv3.</h2>
             <p data-i18n-html="merfish.registrationP">Each cell needs a brain-region label — anchor the AP plane, warp with <strong>STalign</strong>, lift labels from the Allen atlas. The registration core adds per-cell confidence and a QC score that separates good fits from deliberately bad ones (<span class="accent-num">0.14→0.96</span> on synthetic misalignment). High-confidence calls hit ~98–99% at every ontology depth on that synthetic geometry; <span class="accent-num">670</span> leaf regions roll up the ontology tree.</p>
@@ -700,10 +1167,9 @@
             </figure>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Real data ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="proof">
             <div class="mf-kicker"><span class="idx">PROOF</span> <span data-i18n="merfish.proofKicker">Tested on real data</span></div>
             <h2 data-i18n="merfish.proofTitle">Live test on Moffitt 2018.</h2>
             <p data-i18n-html="merfish.proofP"><a href="https://www.science.org/doi/10.1126/science.aau5324" target="_blank" rel="noopener">Moffitt et al.</a> hypothalamic MERFISH — <span class="accent-num">73,626</span> cells, 160 genes. Unsupervised Leiden (27 clusters) vs 16 published classes: ARI <span class="accent-num">0.28</span> (random ≈ 0), concordant UMAP, real coronal anatomy.</p>
@@ -713,10 +1179,9 @@
             </figure>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Context ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="context">
             <div class="mf-kicker"><span class="idx">CONTEXT</span> <span data-i18n="merfish.contextKicker">Where MERFISH sits in the field</span></div>
             <h2 data-i18n="merfish.contextTitle">Imaging vs sequencing.</h2>
             <p data-i18n="merfish.contextP">MERFISH is one of three imaging platforms that read single molecules in place. Imaging trades panel size for subcellular precision; sequencing trades precision for whole-transcriptome reach.</p>
@@ -750,10 +1215,9 @@
             <p class="muted" data-i18n="merfish.contextNote">The field is standardizing on SpatialData, segmentation is the active research front, and panels keep growing toward whole-transcriptome imaging.</p>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Honest scope ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="scope">
             <div class="mf-kicker"><span class="idx">SCOPE</span> <span data-i18n="merfish.scopeKicker">What's implemented vs what's wired-in</span></div>
             <h2 data-i18n="merfish.scopeTitle">Repo status.</h2>
             <p data-i18n="merfish.scopeP">Light core in CI; heavy atlases and engines plug in behind the same interface.</p>
@@ -765,19 +1229,17 @@
             <p class="muted" style="margin-top:1.2rem;" data-i18n-html="merfish.scopeCaveat">Honest caveat (also in the repo): the calibration and QC numbers use a synthetic registration error on <em>real</em> atlas geometry — so they test the math, not an engine's end-to-end accuracy. The STalign result is a real fit.</p>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Notes ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="notes">
             <div class="mf-kicker"><span class="idx">NOTES</span> <span data-i18n="merfish.notesKicker">Engineering</span></div>
             <h2 data-i18n="merfish.notesTitle">A few choices.</h2>
             <p data-i18n-html="merfish.notesP">Cell-type and region calls both ship calibrated confidence — same pattern, two stages. Every stage has a no-download synthetic path so pytest runs in CI without atlas downloads; real engines slot in behind the same function signatures. STalign upstream still pins <code>numpy==1.23</code>; I install it <code>--no-deps</code> beside NumPy 2.4 in one venv rather than maintaining a separate STalign-only environment.</p>
         </section>
 
-        <hr class="rule">
-
         <!-- ——— Tags + links ——— -->
-        <section class="mf-section">
+        <div class="mf-chapter-gap" aria-hidden="true"><span class="mf-chapter-bridge" data-i18n="merfish.chapterBridge">Chapter</span></div>
+        <section class="mf-section mf-panel" data-chapter="links">
             <div class="tags">
                 <span class="tag">Python 3.12</span>
                 <span class="tag">scanpy</span>
@@ -805,6 +1267,7 @@
     <footer>
         <p data-i18n-html="merfish.footer">© <span id="copyrightYear"></span> Kevin Lee · built with scanpy, STalign &amp; the Allen CCFv3</p>
     </footer>
+    </div><!-- .mf-scroll -->
 
     <!-- Analytics -->
     <script defer src="/_vercel/insights/script.js"></script>
@@ -813,32 +1276,149 @@
     <script src="/js/i18n.js"></script>
     <script src="/js/theme.js"></script>
 
-    <!-- ——— Hero particle reconstruction ——— -->
+    <!-- ——— Immersive brain stage (default explore + scroll story) ——— -->
     <script>
     (function () {
         var canvas = document.getElementById('mf-canvas');
-        if (!canvas) return;
+        var stage = document.getElementById('mf-stage');
+        var stageInner = document.getElementById('mf-stage-inner');
+        var ring = document.getElementById('mf-cursor-ring');
+        var trailCanvas = document.getElementById('mf-trail-canvas');
+        var heroWrap = document.getElementById('mf-hero-wrap');
+        var heroInner = document.getElementById('mf-hero-inner');
+        var progressFill = document.getElementById('mf-progress-fill');
+        var progressTopFill = document.getElementById('mf-progress-top-fill');
+        var progressDots = document.getElementById('mf-progress-dots');
+        var chapterAnnouncer = document.getElementById('mf-chapter-announcer');
+        if (!canvas || !stage) return;
         var ctx = canvas.getContext('2d');
+        var trailCtx = trailCanvas ? trailCanvas.getContext('2d') : null;
         var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var coarse = window.matchMedia('(pointer: coarse)').matches;
         var img = new Image();
         var particles = [], W = 0, H = 0, dpr = 1, raf = null, t0 = 0, settled = false, doneTimer = null, fellBack = false;
+        var view = { cx: 0, cy: 0, scale: 1, tx: 0, ty: 0 };
+        var brain = { ox: 0, oy: 0, dw: 0, dh: 0 };
+        var ptr = { down: false, lastX: 0, lastY: 0, ids: {} };
+        var pinch = { active: false, dist: 0, cx: 0, cy: 0 };
+        var mouse = { x: 0.5, y: 0.5, active: false, lastMove: 0, vx: 0, vy: 0, px: 0, py: 0 };
+        var scrollP = 0;
+        var scrollCam = { zoom: 1, driftX: 0, driftY: 0 };
+        var trail = [];
+        var chapters = [];
+        var activeChapter = -1;
+        var scrollTicking = false;
+        var immersiveActive = true;
+        var pastHero = false;
+        var TRAIL_MAX = coarse || reduce ? 0 : 22;
 
         function resize() {
             dpr = Math.min(window.devicePixelRatio || 1, 2);
-            var r = canvas.getBoundingClientRect();
-            W = r.width; H = r.height;
+            W = window.innerWidth;
+            H = window.innerHeight;
             canvas.width = Math.max(1, Math.round(W * dpr));
             canvas.height = Math.max(1, Math.round(H * dpr));
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            if (trailCanvas && trailCtx) {
+                trailCanvas.width = Math.max(1, Math.round(W * dpr));
+                trailCanvas.height = Math.max(1, Math.round(H * dpr));
+                trailCanvas.style.width = W + 'px';
+                trailCanvas.style.height = H + 'px';
+                trailCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+        }
+
+        function resetView() {
+            view.cx = W / 2; view.cy = H / 2; view.scale = 1; view.tx = 0; view.ty = 0;
+        }
+
+        function screenToWorld(sx, sy) {
+            return {
+                x: (sx - W / 2) / view.scale + view.cx + view.tx * 0.001,
+                y: (sy - H / 2) / view.scale + view.cy + view.ty * 0.001
+            };
+        }
+
+        function zoomAt(sx, sy, factor) {
+            var before = screenToWorld(sx, sy);
+            view.scale = Math.min(8, Math.max(0.45, view.scale * factor));
+            var after = screenToWorld(sx, sy);
+            view.cx += before.x - after.x;
+            view.cy += before.y - after.y;
+        }
+
+        function nudgeAt(wx, wy, strength) {
+            var r = 96 / view.scale;
+            var r2 = r * r;
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                var dx = p.tx - wx, dy = p.ty - wy;
+                var d2 = dx * dx + dy * dy;
+                if (d2 > r2 || d2 < 0.25) continue;
+                var d = Math.sqrt(d2);
+                var falloff = 1 - d / r;
+                var f = falloff * falloff * strength;
+                p.vx = (p.vx || 0) + (dx / d) * f;
+                p.vy = (p.vy || 0) + (dy / d) * f;
+            }
+        }
+
+        function pushTrail(x, y) {
+            if (!TRAIL_MAX || !trailCtx) return;
+            trail.push({ x: x, y: y, life: 1 });
+            if (trail.length > TRAIL_MAX) trail.shift();
+        }
+
+        function drawTrail() {
+            if (!trailCtx || !trail.length) return;
+            trailCtx.clearRect(0, 0, W, H);
+            var fade = 1 - scrollP * 0.55;
+            if (trail.length > 1) {
+                trailCtx.lineCap = 'round';
+                trailCtx.lineJoin = 'round';
+                for (var i = 1; i < trail.length; i++) {
+                    var a = trail[i - 1], b = trail[i];
+                    var alpha = Math.min(a.life, b.life) * 0.42 * fade;
+                    if (alpha < 0.02) continue;
+                    trailCtx.beginPath();
+                    trailCtx.strokeStyle = 'rgba(31,158,137,' + alpha.toFixed(3) + ')';
+                    trailCtx.lineWidth = 0.8 + b.life * 2.4;
+                    trailCtx.moveTo(a.x, a.y);
+                    var mx = (a.x + b.x) * 0.5 + (b.y - a.y) * 0.08;
+                    var my = (a.y + b.y) * 0.5 + (a.x - b.x) * 0.08;
+                    trailCtx.quadraticCurveTo(mx, my, b.x, b.y);
+                    trailCtx.stroke();
+                }
+            }
+            for (var j = 0; j < trail.length; j++) {
+                var t = trail[j];
+                t.life *= 0.88;
+                var a2 = t.life * 0.62 * fade;
+                var r = 1.2 + (1 - t.life) * 2.8;
+                trailCtx.beginPath();
+                trailCtx.fillStyle = 'rgba(147,192,31,' + a2.toFixed(3) + ')';
+                trailCtx.arc(t.x, t.y, r, 0, Math.PI * 2);
+                trailCtx.fill();
+            }
+            while (trail.length && trail[0].life < 0.04) trail.shift();
+        }
+
+        function applyView() {
+            ctx.translate(W / 2, H / 2);
+            ctx.scale(view.scale, view.scale);
+            ctx.translate(-view.cx - view.tx * 0.001, -view.cy - view.ty * 0.001);
         }
 
         function build() {
             if (!img.width) return;
             var off = document.createElement('canvas');
-            var scale = Math.min(W / img.width, H / img.height) * 0.94;
+            var scale = Math.min(W / img.width, H / img.height) * 0.98;
             var dw = Math.max(1, Math.round(img.width * scale));
             var dh = Math.max(1, Math.round(img.height * scale));
             var ox = (W - dw) / 2, oy = (H - dh) / 2;
+            brain.ox = ox; brain.oy = oy; brain.dw = dw; brain.dh = dh;
             off.width = dw; off.height = dh;
             var octx = off.getContext('2d', { willReadFrequently: true });
             octx.drawImage(img, 0, 0, dw, dh);
@@ -847,8 +1427,8 @@
             catch (e) { return; }
 
             var area = W * H;
-            var N = Math.min(13000, Math.max(1800, Math.round(area / 95)));
-            if (W < 560) N = Math.min(N, 3200);
+            var N = Math.min(18000, Math.max(2200, Math.round(area / 68)));
+            if (W < 560) N = Math.min(N, 4200);
             particles = [];
             var tries = 0, max = N * 60;
             while (particles.length < N && tries < max) {
@@ -862,65 +1442,145 @@
                     var ang = Math.random() * Math.PI * 2;
                     var rad = (0.4 + Math.random() * 0.8) * Math.max(W, H);
                     var br = 1.32;
-                    var R = Math.min(255, Math.round(rr * br));
-                    var G = Math.min(255, Math.round(gg * br));
-                    var B = Math.min(255, Math.round(bb * br));
                     particles.push({
                         tx: ox + px, ty: oy + py,
                         sx: W / 2 + Math.cos(ang) * rad, sy: H / 2 + Math.sin(ang) * rad,
-                        x: 0, y: 0,
-                        col: 'rgb(' + R + ',' + G + ',' + B + ')',
+                        x: 0, y: 0, ox: 0, oy: 0, vx: 0, vy: 0,
+                        col: 'rgb(' + Math.min(255, Math.round(rr * br)) + ',' + Math.min(255, Math.round(gg * br)) + ',' + Math.min(255, Math.round(bb * br)) + ')',
                         sz: lum > 165 ? 2.5 : (lum > 90 ? 1.9 : 1.5),
                         d: Math.random() * 0.34,
                         ph: Math.random() * Math.PI * 2
                     });
                 }
             }
+            resetView();
         }
 
         function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
 
-        function drawStatic() {
-            ctx.clearRect(0, 0, W, H);
-            ctx.globalCompositeOperation = 'lighter';
+        function decayOffsets() {
             for (var i = 0; i < particles.length; i++) {
                 var p = particles[i];
-                ctx.fillStyle = p.col;
-                ctx.fillRect(p.tx, p.ty, p.sz, p.sz);
+                p.vx = (p.vx || 0) * 0.88;
+                p.vy = (p.vy || 0) * 0.88;
+                p.ox = (p.ox || 0) * 0.90 + p.vx;
+                p.oy = (p.oy || 0) * 0.90 + p.vy;
             }
-            ctx.globalCompositeOperation = 'source-over';
         }
 
-        function frame(ts) {
-            if (fellBack) return;
-            if (!t0) t0 = ts;
-            var elapsed = (ts - t0) / 1000;
-            var DUR = 1.7;
-            ctx.clearRect(0, 0, W, H);
+        function drawParticles(elapsed, animate) {
+            ctx.save();
+            applyView();
             ctx.globalCompositeOperation = 'lighter';
-            var allDone = true;
             for (var i = 0; i < particles.length; i++) {
                 var p = particles[i];
-                var local = (elapsed - p.d) / DUR;
-                if (local < 0) { allDone = false; continue; }
-                if (local > 1) local = 1; else allDone = false;
-                var e = easeOutCubic(local);
-                var x = p.sx + (p.tx - p.sx) * e;
-                var y = p.sy + (p.ty - p.sy) * e;
-                if (local >= 1) {
-                    var sh = Math.sin(elapsed * 1.3 + p.ph) * 0.5;
-                    x = p.tx + sh; y = p.ty + Math.cos(elapsed * 1.1 + p.ph) * 0.5;
+                var x = p.tx + (p.ox || 0), y = p.ty + (p.oy || 0);
+                var alpha = 1;
+                if (animate) {
+                    var local = (elapsed - p.d) / 1.7;
+                    if (local < 0) continue;
+                    if (local > 1) local = 1;
+                    var e = easeOutCubic(local);
+                    x = p.sx + (p.tx - p.sx) * e + (p.ox || 0);
+                    y = p.sy + (p.ty - p.sy) * e + (p.oy || 0);
+                    if (local >= 1) {
+                        var sh = Math.sin(elapsed * 1.3 + p.ph) * 0.5;
+                        x = p.tx + sh + (p.ox || 0);
+                        y = p.ty + Math.cos(elapsed * 1.1 + p.ph) * 0.5 + (p.oy || 0);
+                    }
+                    alpha = local < 0.25 ? local / 0.25 : 1;
                 }
-                ctx.globalAlpha = local < 0.25 ? local / 0.25 : 1;
+                ctx.globalAlpha = alpha * (1 - scrollP * 0.35);
                 ctx.fillStyle = p.col;
                 ctx.fillRect(x, y, p.sz, p.sz);
             }
             ctx.globalAlpha = 1;
             ctx.globalCompositeOperation = 'source-over';
+            ctx.restore();
+        }
+
+        function drawStatic() {
+            ctx.clearRect(0, 0, W, H);
+            decayOffsets();
+            drawParticles(999, false);
+        }
+
+        function updateParallax() {
+            if (ptr.down) return;
+            var damp = 1 - scrollP * 0.72;
+            var targetTx = (mouse.x - 0.5) * 52 * damp + scrollCam.driftX;
+            var targetTy = (mouse.y - 0.5) * 36 * damp + scrollCam.driftY;
+            view.tx += (targetTx - view.tx) * 0.055;
+            view.ty += (targetTy - view.ty) * 0.055;
+        }
+
+        function stirFromMouse() {
+            if (!settled || scrollP > 0.88) return;
+            var sx = mouse.x * W, sy = mouse.y * H;
+            var w = screenToWorld(sx, sy);
+            var speed = Math.min(2.2, Math.hypot(mouse.vx, mouse.vy) * 0.016);
+            var base = mouse.active ? 0.38 + speed * 0.42 : 0.06;
+            nudgeAt(w.x, w.y, base);
+            if (mouse.active && speed > 0.12) {
+                nudgeAt(w.x - mouse.vx * 0.014, w.y - mouse.vy * 0.014, base * 0.5);
+                nudgeAt(w.x - mouse.vx * 0.028, w.y - mouse.vy * 0.028, base * 0.22);
+            }
+        }
+
+        function clearImmersiveFx() {
+            stage.style.opacity = '';
+            stage.style.filter = '';
+            stage.style.setProperty('--scroll-p', '0');
+            stage.style.setProperty('--mglow', '0');
+            if (stageInner) stageInner.style.transform = '';
+            if (ring) ring.classList.remove('on', 'stirring');
+            if (trailCtx) trailCtx.clearRect(0, 0, W, H);
+            trail = [];
+            mouse.active = false;
+        }
+
+        function disableImmersive() {
+            if (!immersiveActive) return;
+            immersiveActive = false;
+            if (raf) { cancelAnimationFrame(raf); raf = null; }
+            clearImmersiveFx();
+        }
+
+        function enableImmersive() {
+            if (immersiveActive) return;
+            immersiveActive = true;
+            if (!reduce && particles.length && !fellBack) {
+                if (settled) startLoop();
+                else start();
+            } else if (particles.length) {
+                drawStatic();
+            }
+        }
+
+        function frame(ts) {
+            if (fellBack || !immersiveActive) return;
+            if (!t0) t0 = ts;
+            var elapsed = (ts - t0) / 1000;
+            var DUR = 1.7;
+            ctx.clearRect(0, 0, W, H);
+            updateParallax();
+            stirFromMouse();
+            decayOffsets();
+            var allDone = true;
+            for (var i = 0; i < particles.length; i++) {
+                if ((elapsed - particles[i].d) / DUR < 1) allDone = false;
+            }
+            drawParticles(elapsed, !settled || elapsed < DUR + 0.5);
+            drawTrail();
             if (allDone && elapsed > DUR + 0.5) {
                 settled = true;
-                if (doneTimer) { clearTimeout(doneTimer); doneTimer = null; } // animation finished cleanly; cancel the safety net
+                if (doneTimer) { clearTimeout(doneTimer); doneTimer = null; }
             }
+            raf = requestAnimationFrame(frame);
+        }
+
+        function startLoop() {
+            if (raf) cancelAnimationFrame(raf);
             raf = requestAnimationFrame(frame);
         }
 
@@ -929,11 +1589,9 @@
             resize();
             build();
             if (!particles.length) return;
-            if (reduce) { drawStatic(); return; }
+            if (reduce) { drawStatic(); settled = true; return; }
             t0 = 0; settled = false; fellBack = false;
-            raf = requestAnimationFrame(frame);
-            // safety net: if rAF is throttled (backgrounded/idle tab) and the fly-in never completes,
-            // paint the settled brain anyway so the hero is never empty
+            startLoop();
             if (doneTimer) clearTimeout(doneTimer);
             doneTimer = setTimeout(function () {
                 if (settled) return;
@@ -941,9 +1599,262 @@
                 if (raf) cancelAnimationFrame(raf);
                 raf = null;
                 drawStatic();
+                settled = true;
                 doneTimer = null;
             }, 2800);
         }
+
+        function canvasPos(e) {
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function isOverPanel(target) {
+            return target && target.closest && (target.closest('.mf-panel') || target.closest('header') || target.closest('a') || target.closest('button') || target.closest('input'));
+        }
+
+        function onPointerDown(e) {
+            if (!settled || isOverPanel(e.target)) return;
+            ptr.ids[e.pointerId] = { x: e.clientX, y: e.clientY };
+            canvas.setPointerCapture(e.pointerId);
+            var keys = Object.keys(ptr.ids);
+            if (keys.length === 1) {
+                ptr.down = true;
+                var p = canvasPos(e);
+                ptr.lastX = p.x; ptr.lastY = p.y;
+            } else if (keys.length === 2) {
+                ptr.down = false;
+                var a = ptr.ids[keys[0]], b = ptr.ids[keys[1]];
+                pinch.active = true;
+                pinch.dist = Math.hypot(b.x - a.x, b.y - a.y);
+                pinch.cx = (a.x + b.x) / 2; pinch.cy = (a.y + b.y) / 2;
+            }
+            canvas.classList.add('mf-grabbing');
+        }
+
+        function onPointerMove(e) {
+            if (!immersiveActive) return;
+            var nx = e.clientX / W, ny = e.clientY / H;
+            var rawVx = (nx - mouse.x) * W;
+            var rawVy = (ny - mouse.y) * H;
+            mouse.vx = mouse.vx * 0.62 + rawVx * 0.38;
+            mouse.vy = mouse.vy * 0.62 + rawVy * 0.38;
+            mouse.x = nx;
+            mouse.y = ny;
+            mouse.active = true;
+            mouse.lastMove = performance.now();
+            pushTrail(e.clientX, e.clientY);
+            stage.style.setProperty('--mx', (mouse.x * 100).toFixed(1) + '%');
+            stage.style.setProperty('--my', (mouse.y * 100).toFixed(1) + '%');
+            stage.style.setProperty('--mglow', scrollP < 0.78 ? '1' : String(0.35 - scrollP * 0.2));
+            if (ring) {
+                ring.style.left = e.clientX + 'px';
+                ring.style.top = e.clientY + 'px';
+                ring.classList.add('on');
+                var stirring = Math.hypot(mouse.vx, mouse.vy) > 2.5;
+                ring.classList.toggle('stirring', stirring);
+            }
+            if (!ptr.ids.hasOwnProperty(e.pointerId)) return;
+            ptr.ids[e.pointerId] = { x: e.clientX, y: e.clientY };
+            var keys = Object.keys(ptr.ids);
+            if (keys.length >= 2 && pinch.active) {
+                var a = ptr.ids[keys[0]], b = ptr.ids[keys[1]];
+                var dist = Math.hypot(b.x - a.x, b.y - a.y);
+                if (pinch.dist > 0) zoomAt(pinch.cx, pinch.cy, dist / pinch.dist);
+                pinch.dist = dist;
+                return;
+            }
+            if (!ptr.down) return;
+            var p = canvasPos(e);
+            var dx = p.x - ptr.lastX, dy = p.y - ptr.lastY;
+            view.cx -= dx / view.scale;
+            view.cy -= dy / view.scale;
+            nudgeAt(screenToWorld(p.x, p.y).x, screenToWorld(p.x, p.y).y, 2.8);
+            ptr.lastX = p.x; ptr.lastY = p.y;
+        }
+
+        function onPointerUp(e) {
+            delete ptr.ids[e.pointerId];
+            if (canvas.hasPointerCapture && canvas.hasPointerCapture(e.pointerId)) {
+                try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+            }
+            var keys = Object.keys(ptr.ids);
+            if (keys.length < 2) pinch.active = false;
+            if (!keys.length) {
+                ptr.down = false;
+                canvas.classList.remove('mf-grabbing');
+            } else if (keys.length === 1) {
+                var pt = ptr.ids[keys[0]];
+                ptr.down = true;
+                ptr.lastX = pt.x; ptr.lastY = pt.y;
+            }
+        }
+
+        function onWheel(e) {
+            if (!settled || !e.altKey) return;
+            if (isOverPanel(e.target)) return;
+            e.preventDefault();
+            var p = canvasPos(e);
+            zoomAt(p.x, p.y, Math.exp(-e.deltaY * 0.0012));
+        }
+
+        canvas.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove, { passive: true });
+        canvas.addEventListener('pointerup', onPointerUp);
+        canvas.addEventListener('pointercancel', onPointerUp);
+        window.addEventListener('wheel', onWheel, { passive: false });
+
+        window.addEventListener('pointerleave', function () {
+            mouse.active = false;
+            if (ring) { ring.classList.remove('on', 'stirring'); }
+            stage.style.setProperty('--mglow', '0');
+        });
+
+        function labelFromSection(el) {
+            if (el.classList.contains('mf-meta')) {
+                return ({ ko: '샘플 시트', ja: 'サンプルシート', fr: "Feuille d'échantillon" })[document.documentElement.lang] || 'Sample sheet';
+            }
+            var k = el.querySelector('.mf-kicker span[data-i18n], .mf-kicker span:last-child');
+            if (k && k.textContent.trim()) return k.textContent.trim();
+            var h = el.querySelector('h2');
+            if (h && h.textContent.trim()) return h.textContent.trim().replace(/\.$/, '');
+            return el.getAttribute('data-chapter') || '';
+        }
+
+        function syncNavTips() {
+            if (!progressDots) return;
+            Array.prototype.forEach.call(progressDots.children, function (li, idx) {
+                var btn = li.querySelector('button');
+                var el = chapters[idx];
+                if (!btn || !el) return;
+                var label = labelFromSection(el);
+                btn.setAttribute('aria-label', label);
+                li.setAttribute('data-tip', label);
+            });
+        }
+
+        function buildProgress() {
+            if (!progressDots) return;
+            chapters = Array.prototype.slice.call(document.querySelectorAll('[data-chapter]'));
+            progressDots.innerHTML = '';
+            chapters.forEach(function (el) {
+                var li = document.createElement('li');
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.setAttribute('aria-label', labelFromSection(el));
+                btn.addEventListener('click', function () {
+                    var top = el.getBoundingClientRect().top + window.scrollY - Math.max(72, window.innerHeight * 0.12);
+                    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+                });
+                li.setAttribute('data-tip', btn.getAttribute('aria-label') || '');
+                li.appendChild(btn);
+                progressDots.appendChild(li);
+            });
+        }
+
+        function announceChapter(idx) {
+            if (!chapterAnnouncer || idx === activeChapter || idx < 0) return;
+            activeChapter = idx;
+            var btn = progressDots && progressDots.children[idx] && progressDots.children[idx].querySelector('button');
+            var label = btn && btn.getAttribute('aria-label');
+            if (label) chapterAnnouncer.textContent = label;
+        }
+
+        function updateProgress() {
+            if (!progressFill || !chapters.length) return;
+            var docH = document.documentElement.scrollHeight - window.innerHeight;
+            var y = window.scrollY || document.documentElement.scrollTop;
+            var pct = docH > 0 ? Math.min(1, y / docH) : 0;
+            progressFill.style.height = (pct * 100).toFixed(2) + '%';
+            if (progressTopFill) progressTopFill.style.width = (pct * 100).toFixed(2) + '%';
+            var vh = window.innerHeight;
+            var activeIdx = 0;
+            for (var i = 0; i < chapters.length; i++) {
+                var r = chapters[i].getBoundingClientRect();
+                if (r.top < vh * 0.55) activeIdx = i;
+            }
+            var dots = progressDots ? progressDots.children : [];
+            for (var j = 0; j < dots.length; j++) {
+                dots[j].classList.toggle('active', j === activeIdx);
+                dots[j].classList.toggle('done', j < activeIdx);
+            }
+            announceChapter(activeIdx);
+        }
+
+        function applyScrollFx() {
+            var y = window.scrollY || document.documentElement.scrollTop;
+            var heroH = window.innerHeight || 600;
+            var pinLen = heroWrap ? heroWrap.offsetHeight - heroH : heroH * 0.55;
+            var pinP = pinLen > 0 ? Math.min(1, y / pinLen) : Math.min(1, y / (heroH * 0.55));
+            var nowPastHero = pinLen > 0 ? y >= pinLen - 2 : y >= heroH * 0.92;
+
+            document.body.classList.toggle('mf-scrolled', y > heroH * 0.32);
+            document.body.classList.toggle('mf-past-hero', nowPastHero);
+
+            if (nowPastHero !== pastHero) {
+                pastHero = nowPastHero;
+                if (pastHero) disableImmersive();
+                else enableImmersive();
+            }
+
+            if (pastHero) {
+                scrollP = 1;
+                if (heroInner) {
+                    heroInner.style.opacity = '0';
+                    heroInner.style.transform = '';
+                    heroInner.style.filter = 'none';
+                }
+                updateProgress();
+                return;
+            }
+
+            scrollP = Math.min(1, y / (heroH * 1.55));
+            var stageOpacity = 1 - scrollP * 0.68;
+            var stageBlur = scrollP * 4.2;
+            var stageScale = 1 + scrollP * 0.09;
+            var camZoom = 1 - scrollP * 0.14;
+            scrollCam.driftX = scrollP * -14;
+            scrollCam.driftY = scrollP * 22;
+            stage.style.opacity = String(stageOpacity);
+            stage.style.filter = stageBlur > 0.08
+                ? 'blur(' + stageBlur.toFixed(1) + 'px) brightness(' + (1 - scrollP * 0.14).toFixed(2) + ')'
+                : 'none';
+            stage.style.setProperty('--scroll-p', scrollP.toFixed(3));
+            if (stageInner) {
+                stageInner.style.transform =
+                    'scale(' + (stageScale * camZoom).toFixed(4) + ') ' +
+                    'translateY(' + (scrollP * 22 + pinP * 8).toFixed(1) + 'px) ' +
+                    'translateX(' + (scrollP * -10).toFixed(1) + 'px)';
+            }
+            if (heroInner) {
+                var heroFade = Math.max(0, 1 - pinP * 1.45);
+                var heroLift = pinP * -52;
+                var heroScale = 1 - pinP * 0.055;
+                var heroBlur = pinP * 2.8;
+                heroInner.style.opacity = String(heroFade);
+                heroInner.style.transform = 'translateY(' + heroLift.toFixed(1) + 'px) scale(' + heroScale.toFixed(3) + ')';
+                heroInner.style.filter = heroBlur > 0.2 ? 'blur(' + heroBlur.toFixed(1) + 'px)' : 'none';
+            }
+            updateProgress();
+        }
+
+        function onScroll() {
+            if (scrollTicking) return;
+            scrollTicking = true;
+            requestAnimationFrame(function () {
+                applyScrollFx();
+                scrollTicking = false;
+            });
+        }
+        buildProgress();
+        window.addEventListener('load', function () { buildProgress(); syncNavTips(); });
+        window.setTimeout(syncNavTips, 900);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        applyScrollFx();
+        document.addEventListener('click', function (e) {
+            if (e.target.closest && e.target.closest('.lang-menu button')) {
+                window.setTimeout(function () { buildProgress(); syncNavTips(); }, 250);
+            }
+        });
 
         img.onload = start;
         img.src = '/projects/images/merfish-hero.png';
@@ -953,14 +1864,22 @@
             clearTimeout(rt);
             rt = setTimeout(function () {
                 if (!img.width) return;
-                if (reduce) { resize(); build(); drawStatic(); }
-                else { start(); }
+                resize();
+                build();
+                onScroll();
+                applyScrollFx();
+                if (reduce || settled || fellBack) drawStatic();
+                else start();
             }, 200);
         });
 
-        var replay = document.getElementById('mf-replay');
-        if (replay) replay.addEventListener('click', function () { if (img.width) start(); });
-        canvas.addEventListener('click', function () { if (img.width && !reduce) start(); });
+        var replayBtn = document.getElementById('mf-replay');
+        if (replayBtn) {
+            replayBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (img.width) start();
+            });
+        }
     })();
     </script>
 
@@ -1053,14 +1972,14 @@
     <script>
     (function () {
         var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var els = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
-        if (reduce || !els.length) return; // visible by default — no arming
-        document.documentElement.classList.add('anim'); // arm the hidden-then-reveal state
+        var els = Array.prototype.slice.call(document.querySelectorAll('.reveal, .mf-panel'));
+        if (reduce || !els.length) return;
+        document.documentElement.classList.add('anim');
         function reveal() {
             var vh = window.innerHeight || document.documentElement.clientHeight;
             for (var i = els.length - 1; i >= 0; i--) {
                 var r = els[i].getBoundingClientRect();
-                if (r.top < vh * 0.92 && r.bottom > -40) { els[i].classList.add('in'); els.splice(i, 1); }
+                if (r.top < vh * 0.88 && r.bottom > -40) { els[i].classList.add('in'); els.splice(i, 1); }
             }
             if (!els.length) { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); }
         }

@@ -184,6 +184,13 @@
     "footer": "Fait avec amour par Kevin &amp; Beryl — <a href=\"/\">klee.page</a>"
   },
   "merfish": {
+    "navLabel": "Aller à la section",
+    "chapterBridge": "Chapitre",
+    "exploreTitle": "Explorateur de cerveau MERFISH",
+    "exploreHint": "bougez pour remuer · glissez pour déplacer · défilez pour lire",
+    "explore": "Explorer",
+    "exploreClose": "Fermer",
+    "scrollCue": "Défiler",
     "pageTitle": "MERFISH — Kevin Lee",
     "metaDescription": "Étude de cas : un pipeline de transcriptomique spatiale qui transforme les données MERSCOPE Vizgen de cerveau de souris en cartes annotées par type cellulaire et enregistrées dans l'atlas — une molécule d'ARN à la fois.",
     "skipLink": "Aller au contenu",
