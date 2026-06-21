@@ -790,13 +790,29 @@
         .refs-block li:last-child { border-bottom: 1px solid var(--rule); }
         .refs-block li strong { display: block; color: var(--text); font-weight: 600; font-size: 17px; margin-bottom: 0.25rem; }
         .refs-block li em { font-style: italic; color: var(--text); opacity: 0.85; }
-        .photo-duo {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
-            max-width: 620px; margin: 0 auto; padding: 0 1.5rem;
+        .refs-block .ref-pdf {
+            display: inline-flex; align-items: center; gap: 0.35em;
+            margin-top: 0.5rem; font-family: var(--mono); font-size: 11px;
+            letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+            color: var(--accent); border: 1px solid var(--accent); border-radius: 100px;
+            padding: 0.3em 0.85em; transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
         }
-        .photo-duo img { width: 100%; border-radius: 3px; display: block; border: 1px solid var(--rule); }
-        .photo-duo .photo-caption { grid-column: 1 / -1; margin-top: 0.25rem; color: var(--caption); font-size: 14px; }
-        @media (max-width: 520px) { .photo-duo { grid-template-columns: 1fr; } }
+        .refs-block .ref-pdf:hover { background: var(--accent); color: var(--bg); opacity: 1; }
+        .refs-block .ref-pdf svg { width: 12px; height: 12px; fill: currentColor; }
+
+        /* Claude screenshots — stacked, framed light cards so the email text stays legible in both themes */
+        .photo-duo {
+            display: flex; flex-direction: column; gap: 1rem;
+            max-width: 560px; margin: 0 auto; padding: 0 1.5rem;
+        }
+        .photo-duo a { display: block; line-height: 0; border-radius: 8px; overflow: hidden; }
+        .photo-duo img {
+            width: 100%; display: block; border-radius: 8px;
+            background: #fff; padding: 6px;
+            box-shadow: 0 10px 40px -18px rgba(31,30,29,0.45); border: 1px solid var(--rule);
+        }
+        [data-theme="dark"] .photo-duo img { box-shadow: 0 10px 40px -18px rgba(0,0,0,0.7); }
+        .photo-duo .photo-caption { margin-top: 0.25rem; color: var(--caption); font-size: 14px; text-align: center; }
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
@@ -921,8 +937,8 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="hero-label">
-                <span data-l="en">Dispatch 006 &middot; June 2026</span>
-                <span data-l="ko">디스패치 006 &middot; 2026년 6월</span>
+                <span data-l="en">Dispatch 006 &middot; June 14, 2026</span>
+                <span data-l="ko">디스패치 006 &middot; 2026년 6월 14일</span>
             </div>
             <h1 class="hero-title" style="font-style: italic;">
                 <span data-l="en">Us</span>
@@ -939,19 +955,6 @@
             <div class="scroll-line"></div>
         </div>
     </section>
-
-    <!-- ==================== ISSUE 006 — Us ==================== -->
-    <div class="issue-intro reveal">
-        <p class="issue-number">No. 006</p>
-        <h2 class="issue-date">
-            <span data-l="en">Us</span>
-            <span data-l="ko">우리</span>
-        </h2>
-        <p class="issue-opener">
-            <span data-l="en">June 14, 2026 &middot; there's a photo of me passed out near the top &mdash; it makes sense by the end, I promise</span>
-            <span data-l="ko">2026년 6월 14일 &middot; 위쪽에 내가 뻗어 있는 사진이 나온다 &mdash; 끝까지 보면 다 이해됨, 약속</span>
-        </p>
-    </div>
 
     <div class="divider reveal-fade"></div>
 
@@ -1062,17 +1065,21 @@
             </div>
         </div>
         <div class="photo-duo reveal">
-            <img src="/newsletter/006/images/claude-power-user.png"
-                data-alt-en="Email from the Claude Code team congratulating Kevin as a top Claude Code power user and offering a gift"
-                data-alt-ko="케빈을 탑 Claude Code 파워 유저로 축하하고 선물을 제안하는 Claude Code 팀 이메일"
-                alt="Email from the Claude Code team congratulating Kevin as a top Claude Code power user and offering a gift">
-            <img src="/newsletter/006/images/claude-gift.png"
-                data-alt-en="Shipping notification from Anthropic saying something special is on its way, fulfilled via Brilliant"
-                data-alt-ko="Brilliant 경유로 특별한 무언가가 배송 중이라는 Anthropic 발송 알림"
-                alt="Shipping notification from Anthropic saying something special is on its way, fulfilled via Brilliant">
+            <a href="/newsletter/006/images/claude-power-user.png" target="_blank" rel="noopener" aria-label="Open full-size: Claude Code power user email">
+                <img src="/newsletter/006/images/claude-power-user.png" loading="lazy"
+                    data-alt-en="Email from the Claude Code team congratulating Kevin as a top Claude Code power user and offering a gift"
+                    data-alt-ko="케빈을 탑 Claude Code 파워 유저로 축하하고 선물을 제안하는 Claude Code 팀 이메일"
+                    alt="Email from the Claude Code team congratulating Kevin as a top Claude Code power user and offering a gift">
+            </a>
+            <a href="/newsletter/006/images/claude-gift.png" target="_blank" rel="noopener" aria-label="Open full-size: Anthropic shipping notification">
+                <img src="/newsletter/006/images/claude-gift.png" loading="lazy"
+                    data-alt-en="Shipping notification from Anthropic saying something special is on its way, fulfilled via Brilliant"
+                    data-alt-ko="Brilliant 경유로 특별한 무언가가 배송 중이라는 Anthropic 발송 알림"
+                    alt="Shipping notification from Anthropic saying something special is on its way, fulfilled via Brilliant">
+            </a>
             <div class="photo-caption">
-                <span data-l="en">top user, mystery box. the job is mostly vibes now.</span>
-                <span data-l="ko">탑 유저, 미스터리 박스. 일은 이제 대부분 바이브다.</span>
+                <span data-l="en">top user, mystery box. the job is mostly vibes now. (tap to read)</span>
+                <span data-l="ko">탑 유저, 미스터리 박스. 일은 이제 대부분 바이브다. (탭하면 크게)</span>
             </div>
         </div>
         <div class="video-inset portrait reveal">
@@ -1302,32 +1309,38 @@
         <ul>
             <li>
                 <span data-l="en">
-                    <strong><a href="https://www.oreilly.com/library/view/software-engineering-at/9781492082791/" target="_blank" rel="noopener">Software Engineering at Google</a></strong>
+                    <strong>Software Engineering at Google</strong>
                     <em>Winters, Manshreck &amp; Wright</em> &mdash; "Programming integrated over time." Hyrum's Law: given enough users, your innocent change breaks something. Clever is a compliment in a hackathon, an accusation in prod.
+                    <br><a class="ref-pdf" href="/newsletter/006/docs/software-engineering-at-google.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5z"/></svg>PDF</a>
                 </span>
                 <span data-l="ko">
-                    <strong><a href="https://www.oreilly.com/library/view/software-engineering-at/9781492082791/" target="_blank" rel="noopener">Software Engineering at Google</a></strong>
+                    <strong>Software Engineering at Google</strong>
                     <em>Winters, Manshreck &amp; Wright</em> &mdash; "시간에 걸친 프로그래밍." Hyrum's Law: 사용자가 충분하면 순진한 변경도 뭔가를 부순다. clever는 해커톤에선 칭찬, 프로덕션에선 고발.
+                    <br><a class="ref-pdf" href="/newsletter/006/docs/software-engineering-at-google.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5z"/></svg>PDF</a>
                 </span>
             </li>
             <li>
                 <span data-l="en">
-                    <strong><a href="https://dora.dev/dora-report-2025/" target="_blank" rel="noopener">State of AI-assisted Software Development (2025)</a></strong>
+                    <strong>State of AI-assisted Software Development (2025)</strong>
                     <em>DORA / Google Cloud</em> &mdash; AI is an amplifier, not a shortcut. 90% adoption, 30% trust issues. Throughput up, instability up. Systems problem, not tools problem.
+                    <br><a class="ref-pdf" href="/newsletter/006/docs/dora-2025-state-of-ai-assisted-software-development.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5z"/></svg>PDF</a>
                 </span>
                 <span data-l="ko">
-                    <strong><a href="https://dora.dev/dora-report-2025/" target="_blank" rel="noopener">State of AI-assisted Software Development (2025)</a></strong>
+                    <strong>State of AI-assisted Software Development (2025)</strong>
                     <em>DORA / Google Cloud</em> &mdash; AI는 증폭기지 지름길이 아니다. 90% 도입, 30% 신뢰 문제. 처리량↑, 불안정성↑. 도구 문제가 아니라 시스템 문제.
+                    <br><a class="ref-pdf" href="/newsletter/006/docs/dora-2025-state-of-ai-assisted-software-development.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5z"/></svg>PDF</a>
                 </span>
             </li>
             <li>
                 <span data-l="en">
-                    <strong><a href="https://dora.dev/ai-capabilities-model/" target="_blank" rel="noopener">DORA AI Capabilities Model (2025)</a></strong>
+                    <strong>DORA AI Capabilities Model (2025)</strong>
                     <em>DORA / Google Cloud</em> &mdash; Seven things that actually matter: clear AI policy, healthy data, AI-accessible docs, version control, small batches, user-centric focus, quality platforms. The boring stuff wins.
+                    <br><a class="ref-pdf" href="/newsletter/006/docs/dora-2025-ai-capabilities-model.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5z"/></svg>PDF</a>
                 </span>
                 <span data-l="ko">
-                    <strong><a href="https://dora.dev/ai-capabilities-model/" target="_blank" rel="noopener">DORA AI Capabilities Model (2025)</a></strong>
+                    <strong>DORA AI Capabilities Model (2025)</strong>
                     <em>DORA / Google Cloud</em> &mdash; 진짜 중요한 일곱 가지: 명확한 AI 정책, 건강한 데이터, AI가 읽을 수 있는 문서, 버전 관리, 작은 배치, 사용자 중심, 좋은 플랫폼. 지루한 게 이긴다.
+                    <br><a class="ref-pdf" href="/newsletter/006/docs/dora-2025-ai-capabilities-model.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5z"/></svg>PDF</a>
                 </span>
             </li>
         </ul>
