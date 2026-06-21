@@ -65,6 +65,7 @@
             --caption: #8a8880;
             --accent: #a0826d;
             --rule: rgba(31, 30, 29, 0.1);
+            --leader: rgba(31, 30, 29, 0.3);
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
             --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
             color-scheme: light dark;
@@ -76,6 +77,7 @@
             --caption: #7a7a75;
             --accent: #c4a882;
             --rule: rgba(240, 238, 230, 0.08);
+            --leader: rgba(240, 238, 230, 0.22);
         }
 
         [data-lang="ko"] {
@@ -91,6 +93,11 @@
         html {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
         }
 
         body {
@@ -238,125 +245,311 @@
 
         .page-title {
             font-family: var(--font-display);
-            font-size: 34px;
+            font-size: 40px;
             font-weight: 700;
-            line-height: 1.15;
+            line-height: 1.05;
+            letter-spacing: -0.01em;
             margin-top: 2rem;
-            margin-bottom: 0.25rem;
         }
 
         .page-subtitle {
-            opacity: 0.5;
-            font-size: 18px;
-            margin-bottom: 3rem;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 400;
+            font-size: 19px;
+            opacity: 0.6;
+            margin-top: 0.2rem;
+            margin-bottom: 2.25rem;
         }
 
-        /* ========== ISSUE LIST ========== */
-        .issue-list {
-            list-style: none;
-        }
-
-        .issue-list li {
-            border-bottom: 1px solid var(--rule);
-            transition: border-color 0.3s ease;
-        }
-
-        .issue-list li:last-child {
-            border-bottom: none;
-        }
-
-        .issue-link {
+        /* ========== FRONTISPIECE (the Interlude — undated, set apart) ========== */
+        .frontispiece {
             display: flex;
-            gap: 1.25rem;
+            gap: 1.35rem;
             align-items: flex-start;
             text-decoration: none;
-            padding: 1.75rem 0;
-            transition: opacity 0.2s ease;
+            padding: 1.6rem 0 1.8rem;
+            border-top: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule);
+            transition: opacity 0.2s ease, border-color 0.3s ease;
         }
+        .frontispiece:hover { opacity: 0.62; }
 
-        .issue-link:hover {
-            opacity: 0.6;
-        }
-
-        .issue-cover {
-            flex-shrink: 0;
-            width: 120px;
-            height: 90px;
-            border-radius: 8px;
-            object-fit: cover;
-            background: var(--rule);
-        }
-
-        @media (max-width: 768px) {
-            .issue-cover {
-                width: 90px;
-                height: 68px;
-                border-radius: 6px;
-            }
-        }
-
-        .issue-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .issue-meta {
-            display: flex;
-            align-items: baseline;
-            gap: 1rem;
-            margin-bottom: 0.35rem;
-        }
-
-        .issue-num {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
+        .frontispiece-glyph {
+            font-family: var(--font-display);
+            font-weight: 400;
+            font-size: 46px;
+            line-height: 1;
             color: var(--accent);
             flex-shrink: 0;
+            padding-top: 0.35rem;
             transition: color 0.3s ease;
         }
 
-        .issue-date {
-            font-size: 14px;
-            color: var(--caption);
+        .frontispiece-body { flex: 1; min-width: 0; }
+
+        .frontispiece-eyebrow {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.45rem;
             transition: color 0.3s ease;
         }
 
-        .issue-title {
+        .frontispiece-title {
             font-family: var(--font-display);
-            font-size: 22px;
-            font-weight: 700;
-            line-height: 1.3;
+            font-style: italic;
+            font-weight: 600;
+            font-size: 27px;
+            line-height: 1.15;
+            margin-bottom: 0.45rem;
         }
 
-        .issue-desc {
+        .frontispiece-desc {
             font-size: 16px;
             color: var(--caption);
             line-height: 1.5;
-            margin-top: 0.35rem;
+            margin-bottom: 0.7rem;
             transition: color 0.3s ease;
         }
 
-        .issue-badge {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
+        .frontispiece-more {
+            font-size: 14px;
             color: var(--accent);
-            border: 1px solid var(--accent);
-            border-radius: 3px;
-            padding: 2px 6px;
-            margin-left: 0.5rem;
-            vertical-align: middle;
-            transition: color 0.3s ease, border-color 0.3s ease;
+            letter-spacing: 0.02em;
+            transition: color 0.3s ease;
         }
 
-        /* Draft issue — restored but not ready; non-clickable, dimmed */
-        .issue-link.is-draft { opacity: 0.5; cursor: default; }
-        .issue-link.is-draft:hover { opacity: 0.5; }
-        .issue-badge.draft { color: var(--caption); border-color: var(--rule); }
+        /* ========== JUMP NAV (sticky) ========== */
+        .almanac-nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: var(--bg);
+            border-bottom: 1px solid var(--rule);
+            margin-top: 2.25rem;
+            padding: 0.7rem 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .jump-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .jump-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--caption);
+            flex-shrink: 0;
+            transition: color 0.3s ease;
+        }
+
+        .jump-months {
+            display: flex;
+            align-items: baseline;
+            gap: 0.2rem 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .jump-link {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--text);
+            opacity: 0.45;
+            padding-bottom: 2px;
+            border-bottom: 1.5px solid transparent;
+            transition: opacity 0.2s ease, color 0.3s ease, border-color 0.2s ease;
+        }
+        .jump-link:hover { opacity: 0.9; }
+        .jump-link.is-active {
+            opacity: 1;
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .jump-select {
+            display: none;
+            font-family: var(--font);
+            font-size: 15px;
+            color: var(--text);
+            background: transparent;
+            border: 1px solid var(--rule);
+            border-radius: 6px;
+            padding: 0.55rem 0.7rem;
+            width: 100%;
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+        .jump-select:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* ========== YEAR BAND ========== */
+        .year-band {
+            display: flex;
+            align-items: baseline;
+            gap: 0.85rem;
+            margin: 2.5rem 0 0.25rem;
+        }
+        .year-num {
+            font-family: var(--font-display);
+            font-size: 30px;
+            font-weight: 300;
+            line-height: 1;
+            letter-spacing: 0.01em;
+        }
+        .year-count {
+            font-size: 13px;
+            color: var(--caption);
+            letter-spacing: 0.03em;
+            transition: color 0.3s ease;
+        }
+        .year-rule {
+            flex: 1;
+            height: 1px;
+            background: var(--rule);
+            align-self: center;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== MONTH GROUPS ========== */
+        .month { scroll-margin-top: 56px; }
+
+        .month-rubric {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+            margin: 1.6rem 0 0.35rem;
+        }
+        .month-name {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+        .month-count {
+            font-size: 12px;
+            color: var(--caption);
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s ease;
+        }
+        .month-rubric-rule {
+            flex: 1;
+            height: 1px;
+            background: var(--rule);
+            align-self: center;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== ENTRIES (folio lines) ========== */
+        .entry {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            column-gap: 0.6rem;
+            row-gap: 0.15rem;
+            text-decoration: none;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid var(--rule);
+            transition: opacity 0.2s ease, border-color 0.3s ease;
+        }
+        .month .entry:last-child { border-bottom: none; }
+        .entry:hover { opacity: 0.6; }
+        .entry:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+            border-radius: 2px;
+        }
+
+        .entry-num {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s ease;
+        }
+        .entry-title {
+            font-size: 19px;
+            font-weight: 600;
+            line-height: 1.25;
+            flex-shrink: 0;
+        }
+        .entry-tag {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            flex-shrink: 0;
+            transition: color 0.3s ease;
+        }
+        .entry-leader {
+            flex: 1 1 2rem;
+            min-width: 1.5rem;
+            align-self: flex-end;
+            height: 0;
+            border-bottom: 2px dotted var(--leader);
+            transform: translateY(-0.34em);
+        }
+        .entry-date {
+            font-size: 13px;
+            color: var(--caption);
+            letter-spacing: 0.03em;
+            flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s ease;
+        }
+        .entry-desc {
+            flex-basis: 100%;
+            margin-left: 3rem;
+            font-size: 15px;
+            color: var(--caption);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: color 0.3s ease;
+        }
+
+        /* Enclosed photo — pinned in the right margin on hover/focus (wide desktop only) */
+        .entry-cover { display: none; }
+        @media (min-width: 1100px) and (pointer: fine) {
+            .entry-cover {
+                display: block;
+                position: absolute;
+                top: 0.75rem;
+                right: -172px;
+                width: 148px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 4px;
+                opacity: 0;
+                transform: translateY(5px);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+                pointer-events: none;
+                transition: opacity 0.32s ease, transform 0.32s ease;
+            }
+            .entry:hover .entry-cover,
+            .entry:focus-visible .entry-cover {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* ========== FOOTER ========== */
         footer {
@@ -372,28 +565,40 @@
 
         /* ========== ENTRANCE ANIMATIONS ========== */
         @media (prefers-reduced-motion: no-preference) {
-            .issue-list li {
+            .reveal {
                 opacity: 0;
-                transform: translateY(12px);
+                transform: translateY(10px);
                 animation: fadeUp 0.5s ease forwards;
             }
-            .issue-list li:nth-child(1) { animation-delay: 0.1s; }
-            .issue-list li:nth-child(2) { animation-delay: 0.2s; }
-            .issue-list li:nth-child(3) { animation-delay: 0.3s; }
-            .issue-list li:nth-child(4) { animation-delay: 0.4s; }
-            .issue-list li:nth-child(5) { animation-delay: 0.5s; }
             @keyframes fadeUp {
                 to { opacity: 1; transform: translateY(0); }
             }
         }
 
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
             body { font-size: 18px; }
             .back-link { font-size: 14px; }
-            .page-title { font-size: 28px; }
-            .page-subtitle { font-size: 16px; }
-            .issue-title { font-size: 20px; }
-            .issue-desc { font-size: 15px; }
+            .page-title { font-size: 32px; }
+            .page-subtitle { font-size: 17px; }
+            .frontispiece-glyph { font-size: 40px; }
+            .frontispiece-title { font-size: 23px; }
+            .year-num { font-size: 26px; }
+            .entry-title { font-size: 18px; }
+        }
+
+        /* Mobile: the jump row becomes a native dropdown; folio lines stack */
+        @media (max-width: 640px) {
+            .jump-row { display: none; }
+            .jump-select { display: block; }
+
+            .entry-leader { display: none; }
+            .entry { column-gap: 0.7rem; }
+            .entry-num { order: 1; }
+            .entry-date { order: 2; }
+            .entry-tag { order: 3; }
+            .entry-title { order: 4; flex-basis: 100%; margin-top: 0.05rem; }
+            .entry-desc { order: 5; margin-left: 0; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -451,17 +656,214 @@
     <main>
         <h1 class="page-title">Dispatch</h1>
         <p class="page-subtitle">
-            <span data-l="en">A weekly letter for friends and family.</span>
-            <span data-l="ko">가까운 사람들한테 매주 쓰는 근황 편지.</span>
+            <span data-l="en">A weekly letter, by the month.</span>
+            <span data-l="ko">매주 쓰는 편지, 달별로.</span>
         </p>
 
         <!--
+            STRUCTURE — a correspondence almanac, grouped by month within year.
             To add a new issue:
             1. Create newsletter/NNN/ with index.html + images/
-            2. Add a new <li> at the TOP of this list
+            2. Add an <a class="entry"> at the TOP of the right month <section>.
+               If it opens a new month, add a <div class="month-rubric"> + a new
+               <section class="month" id="m-YYYY-MM"> and a matching entry in the
+               MONTHS array in the script at the bottom (powers the mobile dropdown).
+               A new year needs its own <div class="year-band">.
+            3. Bump the year-count and the month-count (N).
+            The Interlude below is undated, so it lives apart, above the almanac.
         -->
 
-        <ul class="issue-list">
+        <!-- FRONTISPIECE — the Interlude has no number or date; it sits apart -->
+        <a href="/newsletter/on-love/" class="frontispiece reveal" style="animation-delay:0.05s">
+            <div class="frontispiece-glyph" aria-hidden="true">ἀγάπη</div>
+            <div class="frontispiece-body">
+                <p class="frontispiece-eyebrow">
+                    <span data-l="en">Interlude</span>
+                    <span data-l="ko">막간</span>
+                </p>
+                <h2 class="frontispiece-title">
+                    <span data-l="en">Clean Pain</span>
+                    <span data-l="ko">깨끗한 고통</span>
+                </h2>
+                <p class="frontispiece-desc">
+                    <span data-l="en">After finishing Beef Season 2, a 27-year-old&rsquo;s honest two cents on agape, his first breakup, and the difference between the pain you stay for and the pain you leave.</span>
+                    <span data-l="ko">비프 시즌 2를 다 보고 나서, 스물일곱의 솔직한 두 푼어치 생각 &mdash; 아가페, 첫 이별, 그리고 견뎌야 할 고통과 떠나야 할 고통의 차이에 관하여.</span>
+                </p>
+                <span class="frontispiece-more">
+                    <span data-l="en">Read the interlude &rarr;</span>
+                    <span data-l="ko">막간 읽기 &rarr;</span>
+                </span>
+            </div>
+        </a>
+
+        <!-- JUMP NAV — desktop anchor row, mobile <select>. ids are the source of truth -->
+        <nav class="almanac-nav" aria-label="Jump to month">
+            <div class="jump-row">
+                <span class="jump-label">
+                    <span data-l="en">Jump to</span>
+                    <span data-l="ko">바로가기</span>
+                </span>
+                <span class="jump-months">
+                    <a class="jump-link" href="#m-2026-06" data-month="m-2026-06"><span data-l="en">Jun</span><span data-l="ko">6월</span></a>
+                    <a class="jump-link" href="#m-2026-05" data-month="m-2026-05"><span data-l="en">May</span><span data-l="ko">5월</span></a>
+                    <a class="jump-link" href="#m-2026-04" data-month="m-2026-04"><span data-l="en">Apr</span><span data-l="ko">4월</span></a>
+                    <a class="jump-link" href="#m-2026-03" data-month="m-2026-03"><span data-l="en">Mar</span><span data-l="ko">3월</span></a>
+                </span>
+            </div>
+            <select class="jump-select" aria-label="Jump to month"></select>
+        </nav>
+
+        <!-- ===== 2026 ===== -->
+        <div class="year-band reveal" style="animation-delay:0.12s">
+            <span class="year-num">2026</span>
+            <span class="year-count">
+                <span data-l="en">7 letters</span>
+                <span data-l="ko">편지 7통</span>
+            </span>
+            <span class="year-rule" aria-hidden="true"></span>
+        </div>
+
+        <section class="month reveal" id="m-2026-06" style="animation-delay:0.18s" aria-label="June 2026">
+            <div class="month-rubric">
+                <span class="month-name"><span data-l="en">June</span><span data-l="ko">6월</span></span>
+                <span class="month-count">(2)</span>
+                <span class="month-rubric-rule" aria-hidden="true"></span>
+            </div>
+
+            <a href="/newsletter/007/" class="entry">
+                <span class="entry-num">№007</span>
+                <span class="entry-title"><span data-l="en">Leave</span><span data-l="ko">휴가</span></span>
+                <span class="entry-tag"><span data-l="en">Latest</span><span data-l="ko">최신</span></span>
+                <span class="entry-leader" aria-hidden="true"></span>
+                <span class="entry-date"><span data-l="en">Jun 20</span><span data-l="ko">6월 20일</span></span>
+                <p class="entry-desc">
+                    <span data-l="en">First PTO from Paramount. Dad, Justin, and me at Korea&ndash;Mexico in Guadalajara &mdash; Estadio Akron, split jerseys, whole octopus, one very good group chat.</span>
+                    <span data-l="ko">파라마운트 첫 PTO. 과달라하라에서 아빠, 저스틴, 나 &mdash; 에스타디오 아크론, 갈라진 유니폼, 통문어, 아주 좋은 단톡방.</span>
+                </p>
+                <img class="entry-cover" src="/newsletter/007/images/family-selfie.jpg" alt="" loading="lazy" aria-hidden="true">
+            </a>
+
+            <a href="/newsletter/006/" class="entry">
+                <span class="entry-num">№006</span>
+                <span class="entry-title"><span data-l="en">Us</span><span data-l="ko">우리</span></span>
+                <span class="entry-leader" aria-hidden="true"></span>
+                <span class="entry-date"><span data-l="en">Jun 14</span><span data-l="ko">6월 14일</span></span>
+                <p class="entry-desc">
+                    <span data-l="en">A $111-billion merger, a manager title I'm too tired to celebrate, Pride with Justin and the Jackass crew, the World Cup, and a Korean short-track relay I can't stop crying over. On us &mdash; the people and the country that held the line.</span>
+                    <span data-l="ko">1,110억 달러짜리 합병, 축하할 기운도 없는 매니저 승진, 저스틴과 함께한 프라이드와 잭애스 크루, 월드컵, 그리고 자꾸 울게 만드는 한국 쇼트트랙 계주. 우리 &mdash; 끝내 자리를 지킨 사람들과 나라에 대하여.</span>
+                </p>
+                <img class="entry-cover" src="/newsletter/006/images/korea-relay-poster.jpg" alt="" loading="lazy" aria-hidden="true">
+            </a>
+        </section>
+
+        <section class="month reveal" id="m-2026-05" style="animation-delay:0.24s" aria-label="May 2026">
+            <div class="month-rubric">
+                <span class="month-name"><span data-l="en">May</span><span data-l="ko">5월</span></span>
+                <span class="month-count">(2)</span>
+                <span class="month-rubric-rule" aria-hidden="true"></span>
+            </div>
+
+            <a href="/newsletter/005/" class="entry">
+                <span class="entry-num">№005</span>
+                <span class="entry-title"><span data-l="en">Margin</span><span data-l="ko">여백</span></span>
+                <span class="entry-leader" aria-hidden="true"></span>
+                <span class="entry-date"><span data-l="en">May 25</span><span data-l="ko">5월 25일</span></span>
+                <p class="entry-desc">
+                    <span data-l="en">A long weekend &mdash; a Friday screening on the Paramount lot, a Sunday that started in a church courtyard and ended on a sandy ridge above Big Bear, and a Monday that refused to put on real pants.</span>
+                    <span data-l="ko">긴 주말 &mdash; 금요일 파라마운트 부지의 시사회, 교회 안마당에서 시작해 빅베어 위 능선에서 끝난 일요일, 그리고 진짜 바지를 거부한 월요일.</span>
+                </p>
+                <img class="entry-cover" src="/newsletter/005/images/camp-setup.jpg" alt="" loading="lazy" aria-hidden="true">
+            </a>
+
+            <a href="/newsletter/004/" class="entry">
+                <span class="entry-num">№004</span>
+                <span class="entry-title"><span data-l="en">Open House</span><span data-l="ko">손님맞이</span></span>
+                <span class="entry-leader" aria-hidden="true"></span>
+                <span class="entry-date"><span data-l="en">May 17</span><span data-l="ko">5월 17일</span></span>
+                <p class="entry-desc">
+                    <span data-l="en">Cousins Eunice &amp; Lance flew in from the east coast, Brawley and his Bows drove down from Salt Lake, cousin Matthew got his USC psych degree, and Kobe robbed the counter on the Ring cam. Itemized as a receipt.</span>
+                    <span data-l="ko">동부에서 온 사촌 유니스 &amp; 랜스, 솔트레이크에서 보우즈 신고 내려온 브롤리, USC 심리학 학위 받은 사촌 매튜, 그리고 링 카메라에 잡힌 카운터 털이범 코비. 영수증 형식.</span>
+                </p>
+                <img class="entry-cover" src="/newsletter/004/images/matthew-graduation.jpeg" alt="" loading="lazy" aria-hidden="true">
+            </a>
+        </section>
+
+        <section class="month reveal" id="m-2026-04" style="animation-delay:0.30s" aria-label="April 2026">
+            <div class="month-rubric">
+                <span class="month-name"><span data-l="en">April</span><span data-l="ko">4월</span></span>
+                <span class="month-count">(1)</span>
+                <span class="month-rubric-rule" aria-hidden="true"></span>
+            </div>
+
+            <a href="/newsletter/003/" class="entry">
+                <span class="entry-num">№003</span>
+                <span class="entry-title"><span data-l="en">Field of Daisies</span><span data-l="ko">데이지 들판</span></span>
+                <span class="entry-leader" aria-hidden="true"></span>
+                <span class="entry-date"><span data-l="en">Apr 27</span><span data-l="ko">4월 27일</span></span>
+                <p class="entry-desc">
+                    <span data-l="en">Youbin's H1B, Kobe back from Germany, first 1:1s as a manager, and Justin Bieber crashing Coachella. Flip your phone.</span>
+                    <span data-l="ko">유빈이의 H1B, 독일에서 돌아온 Kobe, 매니저로서 첫 1:1, 그리고 코첼라에 등장한 저스틴 비버. 폰을 옆으로 돌려.</span>
+                </p>
+                <img class="entry-cover" src="/newsletter/003/images/bieber-poster.jpg" alt="" loading="lazy" aria-hidden="true">
+            </a>
+        </section>
+
+        <section class="month reveal" id="m-2026-03" style="animation-delay:0.36s" aria-label="March 2026">
+            <div class="month-rubric">
+                <span class="month-name"><span data-l="en">March</span><span data-l="ko">3월</span></span>
+                <span class="month-count">(2)</span>
+                <span class="month-rubric-rule" aria-hidden="true"></span>
+            </div>
+
+            <a href="/newsletter/002/" class="entry">
+                <span class="entry-num">№002</span>
+                <span class="entry-title"><span data-l="en">Spring on the Mountain</span><span data-l="ko">산 위의 봄</span></span>
+                <span class="entry-leader" aria-hidden="true"></span>
+                <span class="entry-date"><span data-l="en">Mar 21</span><span data-l="ko">3월 21일</span></span>
+                <p class="entry-desc">
+                    <span data-l="en">Closing out ski season at Mammoth, producing at Paramount, free furniture from London, and Dylan's first visit.</span>
+                    <span data-l="ko">매머드에서 시즌 마무리, 파라마운트에서 프로듀싱, 런던 사람한테 공짜 가구, Dylan 첫 방문.</span>
+                </p>
+                <img class="entry-cover" src="/newsletter/002/images/mammoth-sunset.jpeg" alt="" loading="lazy" aria-hidden="true">
+            </a>
+
+            <a href="/newsletter/001/" class="entry">
+                <span class="entry-num">№001</span>
+                <span class="entry-title"><span data-l="en">Week One in LA</span><span data-l="ko">LA 첫째 주</span></span>
+                <span class="entry-leader" aria-hidden="true"></span>
+                <span class="entry-date"><span data-l="en">Mar 8</span><span data-l="ko">3월 8일</span></span>
+                <p class="entry-desc">
+                    <span data-l="en">First week at Paramount, apartment hunting in Hollywood, and film photos from the drive down.</span>
+                    <span data-l="ko">파라마운트 첫 주, 할리우드 집 구하기, 오레곤에서 내려오면서 찍은 필름 사진들.</span>
+                </p>
+                <img class="entry-cover" src="/newsletter/001/images/paramountlot.jpg" alt="" loading="lazy" aria-hidden="true">
+            </a>
+        </section>
+            <li>
+                <a href="/newsletter/on-love/" class="issue-link">
+                    <div class="issue-cover" style="display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 26px; color: var(--accent);" aria-hidden="true">ἀγάπη</div>
+                    <div class="issue-content">
+                        <div class="issue-meta">
+                            <span class="issue-num">
+                                <span data-l="en">Interlude</span>
+                                <span data-l="ko">막간</span>
+                            </span>
+                            <span class="issue-badge">
+                                <span data-l="en">Interlude</span>
+                                <span data-l="ko">막간</span>
+                            </span>
+                        </div>
+                        <div class="issue-title">
+                            <span data-l="en">Clean Pain</span>
+                            <span data-l="ko">깨끗한 고통</span>
+                        </div>
+                        <p class="issue-desc">
+                            <span data-l="en">After finishing Beef Season 2, a 27-year-old&rsquo;s honest two cents on agape, his first breakup, and the difference between the pain you stay for and the pain you leave.</span>
+                            <span data-l="ko">비프 시즌 2를 다 보고 나서, 스물일곱의 솔직한 두 푼어치 생각 &mdash; 아가페, 첫 이별, 그리고 견뎌야 할 고통과 떠나야 할 고통의 차이에 관하여.</span>
+                        </p>
+                    </div>
+                </a>
+            </li>
             <li>
                 <a href="/newsletter/007/" class="issue-link">
                     <img src="/newsletter/007/images/family-selfie.jpg" alt="" class="issue-cover" loading="lazy">

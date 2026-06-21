@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Interlude: Clean Pain — Kevin Lee</title>
+    <meta name="description" content="On agape, Beef Season 2, and learning the difference between the pain you stay for and the pain you leave.">
+    <meta name="author" content="Kevin Lee">
+    <link rel="canonical" href="https://klee.page/newsletter/on-love/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://klee.page/newsletter/on-love/">
+    <meta property="og:title" content="An Interlude: Clean Pain — Kevin Lee">
+    <meta property="og:description" content="On agape, Beef Season 2, and learning the difference between the pain you stay for and the pain you leave.">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="An Interlude: Clean Pain — Kevin Lee">
+    <meta name="twitter:description" content="On agape, Beef Season 2, and learning the difference between the pain you stay for and the pain you leave.">
+
+    <!-- Smart App Banner -->
+    <meta name="apple-itunes-app" content="app-id=6761163892">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <!-- Detect theme + language before first paint -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+
+            var params = new URLSearchParams(window.location.search);
+            var urlLang = params.get('lang');
+            var storedLang = localStorage.getItem('dispatch-lang');
+            var navLang = (navigator.language || '').slice(0, 2);
+            var lang = (urlLang === 'ko' || urlLang === 'en') ? urlLang
+                     : (storedLang === 'ko' || storedLang === 'en') ? storedLang
+                     : navLang === 'ko' ? 'ko'
+                     : 'en';
+            document.documentElement.setAttribute('data-lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+        }
+
+        [data-lang="ko"] {
+            --font: 'Noto Serif KR', 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
+        }
+
+        /* Language toggle */
+        [data-lang="en"] [data-l="ko"],
+        [data-lang="ko"] [data-l="en"] {
+            display: none !important;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        ::selection {
+            background: rgba(0, 100, 255, 0.26);
+            color: inherit;
+        }
+
+        a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--accent);
+            z-index: 60;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== NAVIGATION ========== */
+        .back-link {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 50;
+            font-size: 15px;
+            font-weight: 400;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, color 0.3s ease;
+        }
+
+        .back-link:hover {
+            opacity: 0.75;
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 1.15rem;
+            right: 1.25rem;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .lang-pill {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 56px;
+            height: 24px;
+            background: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.5s ease;
+        }
+
+        .lang-pill:hover { opacity: 0.75; }
+
+        .lang-pill-label {
+            flex: 1;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            line-height: 22px;
+            color: var(--bg);
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease, opacity 0.2s ease;
+        }
+
+        .lang-pill-dot {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        [data-lang="ko"] .lang-pill-dot { transform: translateX(32px); }
+        [data-lang="en"] .lang-pill-ko { opacity: 0.4; }
+        [data-lang="ko"] .lang-pill-en { opacity: 0.4; }
+
+        .toggle-wrap {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-wrap input { display: none; }
+
+        .toggle-wrap label {
+            position: relative;
+            display: block;
+            width: 44px;
+            height: 24px;
+            background: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.5s ease;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border-radius: 50%;
+            transition: transform 0s, background-color 0.5s ease;
+        }
+
+        .toggle-wrap label.has-transition::after {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(
+                to top,
+                rgba(240, 238, 230, 0.95) 0%,
+                rgba(240, 238, 230, 0.5) 35%,
+                rgba(240, 238, 230, 0.05) 100%
+            );
+            transition: background 0.3s ease;
+        }
+
+        [data-theme="dark"] .hero-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(31, 30, 29, 0.95) 0%,
+                rgba(31, 30, 29, 0.4) 35%,
+                rgba(31, 30, 29, 0.05) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding-bottom: 3rem;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 10vw, 5.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            margin-bottom: 1rem;
+            opacity: 0;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: color 0.3s ease;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+        }
+
+        .scroll-hint span {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to bottom, var(--caption), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ========== TABLE OF CONTENTS ========== */
+        .toc {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .toc-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.25rem 1.25rem;
+        }
+
+        .toc-list a {
+            font-size: 14px;
+            color: var(--caption);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .toc-list a:hover {
+            color: var(--accent);
+            opacity: 1;
+        }
+
+        /* ========== ISSUE HEADER ========== */
+        .issue-intro {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 1.5rem;
+        }
+
+        .issue-number {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .issue-date {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .issue-opener {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 440px;
+            transition: color 0.3s ease;
+        }
+
+        .reading-time {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--caption);
+            margin-top: 1rem;
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SECTION HEADERS ========== */
+        .section-header {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        /* ========== TEXT BLOCKS ========== */
+        .text-block {
+            padding: 2rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .text-block p {
+            font-size: 20px;
+            line-height: 1.7;
+            margin-bottom: 1.25rem;
+        }
+
+        .text-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .text-block em { font-style: italic; }
+        .text-block strong { font-weight: 600; }
+
+        /* ========== PULL QUOTE ========== */
+        .pull-quote {
+            padding: 4rem 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pull-quote blockquote {
+            font-size: clamp(1.5rem, 5vw, 2.25rem);
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .pull-quote cite {
+            display: block;
+            margin-top: 1rem;
+            font-size: 14px;
+            font-style: normal;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* Pull quote variant with accent sidebar */
+        .pull-quote-side {
+            padding: 3rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .pull-quote-side blockquote {
+            border-left: 2px solid var(--accent);
+            padding-left: 1.5rem;
+            font-size: clamp(1.25rem, 4vw, 1.75rem);
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            transition: border-color 0.3s ease;
+        }
+
+        .pull-quote-side cite {
+            display: block;
+            margin-top: 0.75rem;
+            padding-left: 1.5rem;
+            font-size: 14px;
+            font-style: normal;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== PHOTO LAYOUTS ========== */
+        .photo-full {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .photo-full img {
+            width: 100%;
+            height: auto;
+            display: block;
+            will-change: transform;
+        }
+
+        .photo-full .photo-caption {
+            position: absolute;
+            bottom: 1rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            z-index: 2;
+            color: #f0f0ec;
+        }
+
+        .photo-full::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to top, rgba(10,10,10,0.5), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .photo-inset {
+            padding: 1rem 1.5rem;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .photo-inset img,
+        .photo-inset .gif-wrap img {
+            width: 100%;
+            border-radius: 3px;
+            display: block;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            padding: 0 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .photo-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        .photo-caption {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .photo-caption .caption-location {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .photo-full .photo-caption .caption-location {
+            color: #c4a882;
+        }
+
+        .photo-inset .photo-caption {
+            margin-top: 0.75rem;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SIGN OFF ========== */
+        .sign-off {
+            padding: 6rem 1.5rem 3rem;
+            text-align: center;
+        }
+
+        .sign-off-text {
+            font-size: 18px;
+            color: var(--caption);
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .sign-off-name {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* ========== DIVIDER ========== */
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 0 auto;
+            opacity: 0.5;
+            transition: background-color 0.3s ease;
+        }
+
+        /* ========== SPOILER NOTE ========== */
+        .spoiler-note {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .spoiler-text {
+            color: var(--caption);
+            font-style: italic;
+            font-size: 17px;
+            max-width: 480px;
+            margin: 0 auto;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SPACERS ========== */
+        .spacer { height: 4rem; }
+        .spacer-sm { height: 2rem; }
+        .spacer-lg { height: 8rem; }
+
+        /* ========== FOOTER ========== */
+        .story-footer {
+            padding: 4rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .story-footer p {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .story-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        /* ========== SUBSCRIBE ========== */
+        .subscribe {
+            padding: 5rem 1.5rem 3rem;
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .subscribe-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-desc {
+            font-size: 16px;
+            color: var(--caption);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .subscribe-input::placeholder { color: var(--caption); }
+        .subscribe-input:focus { border-color: var(--accent); }
+
+        .subscribe-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .subscribe-btn:hover { opacity: 0.7; }
+
+        .subscribe-success {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent);
+            display: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .subscribe.submitted .subscribe-form { display: none; }
+        .subscribe.submitted .subscribe-success { display: block; }
+
+        .subscribe-error {
+            font-size: 15px;
+            color: #c0392b;
+            display: none;
+            margin-bottom: 1rem;
+        }
+        [data-theme="dark"] .subscribe-error { color: #e8857a; }
+        .subscribe.error .subscribe-error { display: block; }
+
+        .subscribe-note {
+            font-size: 13px;
+            color: var(--caption);
+            opacity: 0.6;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .subscribe-form { flex-direction: column; }
+            .subscribe-btn { padding: 14px 24px; }
+        }
+
+        /* ========== COMMENTS ========== */
+        .comments {
+            padding: 3rem 1.5rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .comments-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .comments-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .comments-title {
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .comments-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 2.5rem;
+        }
+
+        .comments-input {
+            width: 100%;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 16px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .comments-input::placeholder { color: var(--caption); }
+        .comments-input:focus { border-color: var(--accent); }
+
+        .comments-textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .comments-btn {
+            background: var(--text);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg);
+            font-family: var(--font);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            align-self: flex-end;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .comments-btn:hover { opacity: 0.7; }
+
+        .comments-list { list-style: none; }
+
+        .comment-item {
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--rule);
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-item:first-child {
+            border-top: 1px solid var(--rule);
+        }
+
+        .comment-meta {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .comment-name { font-size: 15px; font-weight: 600; }
+
+        .comment-time {
+            font-size: 13px;
+            color: var(--caption);
+            transition: color 0.3s ease;
+        }
+
+        .comment-body {
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .comments-empty {
+            font-size: 16px;
+            color: var(--caption);
+            text-align: center;
+            padding: 2rem 0;
+            transition: color 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .comments-btn { align-self: stretch; padding: 14px 24px; }
+        }
+
+        /* ========== REVEAL ANIMATIONS ========== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal-fade { opacity: 0; }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.97);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .back-link { font-size: 14px; }
+            .text-block p { font-size: 18px; }
+            .section-header { padding: 5rem 1.5rem 2.5rem; }
+            .photo-full .photo-caption { bottom: 0.75rem; left: 1rem; right: 1rem; }
+            .toc-list { gap: 0.25rem 1rem; }
+        }
+
+        @media (min-width: 768px) {
+            .photo-inset { padding: 2rem 3rem; max-width: 700px; }
+            .photo-grid { gap: 1rem; padding: 0 3rem; max-width: 900px; }
+            .text-block { padding: 2.5rem 3rem; }
+            .pull-quote { padding: 5rem 3rem; }
+            .pull-quote-side { padding: 3rem 3rem; }
+        }
+
+        /* ========== KOMOREBI INTERSTITIAL ========== */
+        .komorebi {
+            position: fixed;
+            inset: 0;
+            z-index: 150;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 1s ease, visibility 0s;
+        }
+
+        .komorebi.exiting {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+
+        .komorebi-content {
+            max-width: 480px;
+            position: relative;
+        }
+
+        .komorebi-kanji {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(3.5rem, 14vw, 7rem);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            opacity: 0;
+            transform: translateY(20px) scale(0.96);
+            line-height: 1.2;
+        }
+
+        .komorebi-romaji {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--accent);
+            margin-top: 0.75rem;
+            letter-spacing: 0.04em;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-noun {
+            font-family: var(--font);
+            font-size: 12px;
+            font-style: italic;
+            color: var(--caption);
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-meaning {
+            font-family: var(--font);
+            font-size: 17px;
+            color: var(--caption);
+            line-height: 1.8;
+            margin-top: 2.5rem;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-divider {
+            width: 40px;
+            height: 1px;
+            background: var(--accent);
+            margin: 2rem auto;
+            opacity: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .komorebi-tagline {
+            font-size: 14px;
+            color: var(--caption);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: color 0.3s ease;
+        }
+
+        .komorebi-dismiss {
+            background: none;
+            border: none;
+            font-family: var(--font);
+            font-size: 15px;
+            color: var(--accent);
+            cursor: pointer;
+            margin-top: 2.5rem;
+            padding: 10px 28px;
+            letter-spacing: 0.03em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, color 0.3s ease, transform 0.8s cubic-bezier(0.22,0.61,0.36,1);
+        }
+
+        .komorebi-dismiss:hover {
+            opacity: 0.7 !important;
+        }
+
+        /* Dappled light system */
+        .komorebi-light {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            mix-blend-mode: plus-lighter;
+            transition: opacity 2.5s ease;
+        }
+
+        .komorebi-leaves {
+            position: absolute;
+            inset: -20%;
+            pointer-events: none;
+            opacity: 0;
+            filter: blur(8px);
+            animation: leafSway 12s ease-in-out infinite;
+        }
+
+        @keyframes leafSway {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(1%, -0.5%) rotate(0.3deg); }
+            66% { transform: translate(-0.5%, 0.5%) rotate(-0.2deg); }
+        }
+
+        .komorebi-sun {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            background: radial-gradient(
+                ellipse at 50% -10%,
+                rgba(160,130,109,0.25) 0%,
+                rgba(160,130,109,0.08) 30%,
+                transparent 65%
+            );
+            transition: opacity 3s ease;
+        }
+
+        .komorebi-spots {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .komorebi-spot {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(200,175,140,0.15);
+            filter: blur(20px);
+            animation: spotPulse 8s ease-in-out infinite;
+        }
+
+        .komorebi-spot:nth-child(1) { width: 120px; height: 80px; top: 8%; left: 15%; animation-delay: 0s; transform: rotate(-15deg); }
+        .komorebi-spot:nth-child(2) { width: 90px; height: 60px; top: 25%; right: 20%; animation-delay: 2.5s; transform: rotate(10deg); }
+        .komorebi-spot:nth-child(3) { width: 140px; height: 90px; bottom: 30%; left: 25%; animation-delay: 1.2s; transform: rotate(-8deg); }
+        .komorebi-spot:nth-child(4) { width: 70px; height: 50px; bottom: 15%; right: 30%; animation-delay: 4s; transform: rotate(20deg); }
+        .komorebi-spot:nth-child(5) { width: 100px; height: 70px; top: 50%; left: 55%; animation-delay: 3s; transform: rotate(-5deg); }
+
+        @keyframes spotPulse {
+            0%, 100% { opacity: 0.3; transform: rotate(-15deg) scale(0.9); }
+            50% { opacity: 0.7; transform: rotate(-12deg) scale(1.1); }
+        }
+
+        /* ========== REDUCED MOTION ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-fade, .reveal-scale {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .scroll-line { animation: none; }
+            .komorebi-spot, .komorebi-leaves { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+    <!-- ==================== KOMOREBI INTERSTITIAL ==================== -->
+    <div class="komorebi" id="komorebi">
+        <svg class="komorebi-leaves" id="komorebiLeaves" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <filter id="leafBlur"><feGaussianBlur stdDeviation="3"/></filter>
+            </defs>
+            <g fill="rgba(160,130,109,0.12)" filter="url(#leafBlur)">
+                <ellipse cx="120" cy="100" rx="45" ry="22" transform="rotate(-30 120 100)"/>
+                <ellipse cx="350" cy="80" rx="35" ry="18" transform="rotate(15 350 80)"/>
+                <ellipse cx="600" cy="150" rx="50" ry="25" transform="rotate(-20 600 150)"/>
+                <ellipse cx="200" cy="300" rx="40" ry="20" transform="rotate(25 200 300)"/>
+                <ellipse cx="500" cy="350" rx="55" ry="28" transform="rotate(-10 500 350)"/>
+                <ellipse cx="700" cy="400" rx="38" ry="19" transform="rotate(30 700 400)"/>
+                <ellipse cx="150" cy="550" rx="48" ry="24" transform="rotate(-15 150 550)"/>
+                <ellipse cx="400" cy="600" rx="42" ry="21" transform="rotate(20 400 600)"/>
+                <ellipse cx="650" cy="650" rx="35" ry="17" transform="rotate(-25 650 650)"/>
+                <ellipse cx="300" cy="750" rx="52" ry="26" transform="rotate(10 300 750)"/>
+            </g>
+        </svg>
+        <div class="komorebi-sun" id="komorebiSun"></div>
+        <div class="komorebi-spots" id="komorebiSpots">
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+            <div class="komorebi-spot"></div>
+        </div>
+        <div class="komorebi-content">
+            <p class="komorebi-kanji" id="komorebiKanji" style="font-family: var(--font-display); letter-spacing: 0.02em;">ἀγάπη</p>
+            <p class="komorebi-romaji" id="komorebiRomaji">agápe</p>
+            <p class="komorebi-noun" id="komorebiNoun">noun &middot; Greek</p>
+            <p class="komorebi-meaning" id="komorebiMeaning">
+                <span data-l="en">The highest, most selfless, unconditional form of love. Detached from the worth, status, or value of the person receiving it.</span>
+                <span data-l="ko">사랑의 가장 높은 형태 &mdash; 상대의 가치나 지위, 그 사람이 내 삶에 무엇을 가져다주는지와 상관없이 베푸는 조건 없는 사랑. 얻어낼 수도, 잃을 수도 없는 사랑.</span>
+            </p>
+            <div class="komorebi-divider" id="komorebiDivider"></div>
+            <p class="komorebi-tagline" id="komorebiTagline">
+                <span data-l="en">A letter for friends and family.</span>
+                <span data-l="ko">가까운 사람들한테 보내는 편지.</span>
+            </p>
+            <button class="komorebi-dismiss" id="komorebiDismiss">
+                <span data-l="en">Continue &rarr;</span>
+                <span data-l="ko">계속 &rarr;</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <a href="/newsletter" class="back-link">&larr; Dispatch</a>
+    <div class="top-controls">
+        <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
+            <span class="lang-pill-label lang-pill-en">EN</span>
+            <span class="lang-pill-label lang-pill-ko">한</span>
+            <span class="lang-pill-dot"></span>
+        </div>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </div>
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero" style="align-items: center;">
+        <div class="hero-content" style="padding-bottom: 0;">
+            <div class="hero-label">
+                <span data-l="en">Dispatch &middot; An Interlude</span>
+                <span data-l="ko">디스패치 &middot; 막간</span>
+            </div>
+            <h1 class="hero-title" style="font-style: italic;">
+                <span data-l="en">Clean Pain</span>
+                <span data-l="ko">깨끗한 고통</span>
+            </h1>
+            <p class="hero-description">
+                On agape, <em>Beef</em> Season 2, and learning the difference between the pain you stay for and the pain you leave.
+            </p>
+        </div>
+        <div class="scroll-hint">
+            <span data-l="en">Scroll</span>
+            <span data-l="ko">스크롤</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ==================== INTERLUDE: Clean Pain ==================== -->
+
+    <div class="divider reveal-fade"></div>
+
+    <div class="text-block reveal">
+        <p>My work has been breaking down narrative structures, and lately I&rsquo;ve been fascinated by how <a href="https://en.wikipedia.org/wiki/Beef_(TV_series)" target="_blank"><em>Beef</em></a> Season 2, much like <a href="https://en.wikipedia.org/wiki/The_White_Lotus" target="_blank"><em>White Lotus</em></a>, pulls this off. It shows you characters who look completely normal on the surface, and then every single thing they do turns out to be driven by some hidden insecurity that only gets revealed at the end. It&rsquo;s incredibly human. That&rsquo;s why I wanted to write this after finishing <em>Beef</em> 2.</p>
+        <p>For folks who grew up religious, the concept of God&rsquo;s love was always around. There&rsquo;s a Greek term for it: <a href="https://en.wikipedia.org/wiki/Agape" target="_blank"><em>agape</em></a>. The highest, most selfless, unconditional form of love. It&rsquo;s detached from the worth, the status, or the value of the person receiving it.</p>
+        <p>Through my own life, and going through my first breakup ever, I think I can sort people into two distinct categories based on how they handle this idea.</p>
+    </div>
+
+    <div class="text-block reveal" style="text-align: center;">
+        <p style="margin-bottom: 0.6rem;"><strong>Group A:</strong> loving a life with someone.</p>
+        <p style="margin-bottom: 0;"><strong>Group B:</strong> loving someone, regardless of what happens in life.</p>
+    </div>
+
+    <div class="text-block reveal">
+        <p>I know. I&rsquo;m just some 27 year old. I don&rsquo;t know shit about love or life, really. I&rsquo;ve only had my first real relationship. But the LOVE was real. That&rsquo;s why I want to share these two cents, my brothers.</p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <div class="section-header reveal">
+        <h2 class="section-title" style="font-style: italic;">The core question</h2>
+    </div>
+
+    <div class="text-block reveal">
+        <p>At what point do you stop asking yourself &ldquo;Do I love who this person is?&rdquo; and start asking &ldquo;What does this person bring to my own life, and to my future enjoyment of life?&rdquo;</p>
+        <p>They sound like the same question. They&rsquo;re not.</p>
+    </div>
+
+    <!-- spoiler callout -->
+    <div class="text-block reveal" style="text-align: center;">
+        <p class="spoiler-note">Spoiler Alert &middot; Beef Season 2</p>
+        <p class="spoiler-text">If you haven&rsquo;t finished it, skip ahead to Dr. Kim.</p>
+    </div>
+
+    <div class="text-block reveal">
+        <p>The end of Season 2 of <em>Beef</em> puts this concept into practice. Josh is Group B, choosing to go to prison with nothing to gain so that Lindsey can survive. Austin is Group A, driven by fear and uncertainty about what is real and what love even is. He&rsquo;s scared to take a chance on the unknown.</p>
+        <p>At the end, Austin is unhappy, and Josh is released from prison happy that everyone he loves is happy. So you get the predictable misery that Austin calculated and chose anyway, knowing his girl doesn&rsquo;t love him, versus the uncertainty of Josh choosing to sacrifice for Lindsey. And Lindsey doesn&rsquo;t even stay with him. She finds someone else.</p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <div class="text-block reveal">
+        <p>Dr. Kim, my favorite Korean actor, sums it up pretty well in one quote:</p>
+    </div>
+
+    <div class="pull-quote reveal">
+        <blockquote>&ldquo;So, it&rsquo;s like your first marriage, you&rsquo;re in love with each other. But eventually, enjoying life becomes more important. That&rsquo;s why in your second marriage, you&rsquo;re not looking to be in love with someone. You&rsquo;re looking to love life with someone.&rdquo;</blockquote>
+        <cite>Dr. Kim, <em>Beef</em> S2</cite>
+    </div>
+
+    <div class="text-block reveal">
+        <p>Transactional love only stays as long as the market is good, as long as your partner makes you enjoy life. Love becomes a currency to insulate us from our own selfish lives.</p>
+        <p>Recently I learned that love is a cousin of hate. And there&rsquo;s a tension between choosing safety and choosing radical devotion, which is what I keep seeing in some of my favorite films.</p>
+    </div>
+
+    <div class="text-block reveal">
+        <p><a href="https://en.wikipedia.org/wiki/Interstellar_(film)" target="_blank"><em>Interstellar</em></a>. Cooper voluntarily goes into the black hole to save Brand, knowing he&rsquo;ll never see his daughter again.</p>
+        <p><a href="https://en.wikipedia.org/wiki/La_La_Land" target="_blank"><em>La La Land</em></a>. The final flashback, the alternate reality of what their lives would have looked like if they hadn&rsquo;t chosen the utility of their careers over each other.</p>
+        <p><a href="https://en.wikipedia.org/wiki/Whiplash_(2014_film)" target="_blank"><em>Whiplash</em></a>. Miles Teller&rsquo;s character giving his absolute raw self to the one thing he loves: drumming, and middle-fingering JK Simmons.</p>
+        <p><a href="https://en.wikipedia.org/wiki/Before_Sunrise" target="_blank"><em>Before Sunrise</em></a>. Stripped of all societal expectations, believing you only have one night, you&rsquo;re forced to calculate long-term compatibility and decide whether to go all in.</p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <div class="text-block reveal">
+        <p>Growing up, my response to relationships was idealistic. &ldquo;Never leave! You should love someone not because of what they have, but because you like who they are!&rdquo; Now, in my prime adulthood, I see a heavy pragmatic shift among my friends. If your partner lost all their assets, their ambition and their finances, would you still be with them? Most people now say, &ldquo;Yes, it&rsquo;s okay to leave, and I don&rsquo;t judge them for it anymore.&rdquo; Capitalist survival has made Group A the default defense mechanism.</p>
+        <p>My personal take? You guys know me. I&rsquo;ve always been Group B, working toward being a partner whose baseline existence is enough. If they become useless and cause pain, your love does not depreciate. You love them for who they are, not for what they provide. I&rsquo;m not saying either path is easy.</p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <div class="text-block reveal" style="text-align: center;">
+        <p style="margin-bottom: 0.6rem;"><strong>Clean pain:</strong> the cost of connection.</p>
+        <p style="margin-bottom: 0;"><strong>Dirty pain:</strong> the cost of destruction.</p>
+    </div>
+
+    <div class="text-block reveal">
+        <p>Group A is transactional, contractual thinking. I entered this relationship to have you elevate my enjoyment of life. You are now causing me emotional pain, which means you&rsquo;re violating the contract. So they retaliate, and they draw back. Group B already expects pain, because it knows that humans are flawed, broken, and living in a harsh world.</p>
+    </div>
+
+    <div class="section-header reveal">
+        <p class="section-label">The price of intimacy</p>
+        <h2 class="section-title" style="font-style: italic;">Clean Pain</h2>
+    </div>
+
+    <div class="text-block reveal">
+        <p>Clean pain is the natural friction of two imperfect people trying to merge their universes. It&rsquo;s the pain of vulnerability, of admitting you&rsquo;re wrong, of staying by a partner&rsquo;s side through their clinical depression, their grief, or their career failure.</p>
+        <p>In Group B, this pain is accepted. You don&rsquo;t leave just because it hurts to watch them suffer, or because their healing is taking a toll on you. This pain is a crucible that purifies the love.</p>
+    </div>
+
+    <div class="section-header reveal">
+        <p class="section-label">The poison of abuse</p>
+        <h2 class="section-title" style="font-style: italic;">Dirty Pain</h2>
+    </div>
+
+    <div class="text-block reveal">
+        <p>Dirty pain is inflicted when a partner uses manipulation, betrayal, cruelty, or emotional abuse. This isn&rsquo;t the pain of human weakness. It&rsquo;s the pain of human malice, or of unchecked toxicity.</p>
+        <p>Here is the ultimate distinction: true agape never requires you to tolerate dirty pain, because enabling someone&rsquo;s destructive behavior is actually the opposite of love.</p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <div class="text-block reveal">
+        <p>All to say: love is not blind to harm. Love should never tolerate harm to you. If a partner is actively hurting you, lying to you, or abusing you, the most loving thing you can do, for them and for yourself, is to stop them.</p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Sign Off ——— -->
+    <div class="sign-off reveal">
+        <p class="sign-off-text">That&rsquo;s my two cents. Go finish <em>Beef</em>.</p>
+        <p class="sign-off-name">&mdash; Kevin</p>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="divider reveal-fade"></div>
+
+    <!-- ——— Subscribe ——— -->
+    <div class="subscribe reveal" id="subscribe">
+        <p class="subscribe-label">
+            <span data-l="en">Stay in the Loop</span>
+            <span data-l="ko">소식 받기</span>
+        </p>
+        <h2 class="subscribe-title">
+            <span data-l="en">Want this weekly?</span>
+            <span data-l="ko">매주 받고 싶다면?</span>
+        </h2>
+        <p class="subscribe-desc">
+            <span data-l="en">Drop your email and I'll send Dispatch straight to your inbox. No spam, just life updates from me.</span>
+            <span data-l="ko">이메일 남겨주면 매주 보내줄게. 스팸 같은 거 없고 그냥 내 근황.</span>
+        </p>
+        <form class="subscribe-form" id="subscribeForm">
+            <input type="email" class="subscribe-input" id="subscribeEmail" placeholder="your@email.com" required autocomplete="email">
+            <button type="submit" class="subscribe-btn" id="subscribeBtn">
+                <span data-l="en">Subscribe</span>
+                <span data-l="ko">구독</span>
+            </button>
+        </form>
+        <p class="subscribe-success" id="subscribeSuccess">
+            <span data-l="en">You're in. See you next week.</span>
+            <span data-l="ko">등록됨. 다음 주에 보자.</span>
+        </p>
+        <p class="subscribe-error" id="subscribeError">
+            <span data-l="en">Hmm, that didn't go through. Mind trying again?</span>
+            <span data-l="ko">앗, 등록이 안 됐어요. 다시 시도해줄래요?</span>
+        </p>
+        <p class="subscribe-note">
+            <span data-l="en">Just between us — no third parties, ever.</span>
+            <span data-l="ko">우리끼리만. 어디 넘기거나 그런 거 절대 없음.</span>
+        </p>
+    </div>
+
+    <div class="divider reveal-fade"></div>
+
+    <!-- ==================== COMMENTS ==================== -->
+    <div class="comments reveal" id="comments">
+        <div class="comments-header">
+            <p class="comments-label">
+                <span data-l="en">Discussion</span>
+                <span data-l="ko">댓글</span>
+            </p>
+            <h2 class="comments-title">
+                <span data-l="en">Leave a note</span>
+                <span data-l="ko">한마디 남기기</span>
+            </h2>
+        </div>
+        <form class="comments-form" id="commentsForm">
+            <input type="text" class="comments-input" id="commentName" placeholder="Your name" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <button type="submit" class="comments-btn" id="commentBtn">
+                <span data-l="en">Post</span>
+                <span data-l="ko">게시</span>
+            </button>
+        </form>
+        <div class="comments-list" id="commentsList"></div>
+        <p class="comments-empty" id="commentsEmpty" style="display:none;">
+            <span data-l="en">No comments yet. Be the first.</span>
+            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨 주세요.</span>
+        </p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="story-footer">
+        <p>
+            <span data-l="en">An Interlude &middot; Clean Pain &middot;</span>
+            <span data-l="ko">막간 &middot; 깨끗한 고통 &middot;</span>
+            <a href="/">klee.page</a>
+        </p>
+    </footer>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- Scripts -->
+    <script src="/js/theme.js"></script>
+    <script src="/js/subscribe.js"></script>
+    <script>
+        // ==================== KOMOREBI INTERSTITIAL ====================
+        (function() {
+            var komorebi = document.getElementById('komorebi');
+            if (!komorebi) return;
+
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            var seenKey = 'dispatch-seen-' + path;
+
+            // Skip interstitial for returning visitors this session
+            if (sessionStorage.getItem(seenKey) === '1') return;
+            sessionStorage.setItem(seenKey, '1');
+
+            komorebi.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            var leaves = document.getElementById('komorebiLeaves');
+            var sun = document.getElementById('komorebiSun');
+            var spots = document.getElementById('komorebiSpots');
+            var kanji = document.getElementById('komorebiKanji');
+            var romaji = document.getElementById('komorebiRomaji');
+            var noun = document.getElementById('komorebiNoun');
+            var meaning = document.getElementById('komorebiMeaning');
+            var divider = document.getElementById('komorebiDivider');
+            var tagline = document.getElementById('komorebiTagline');
+
+            var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+
+            function animate(el, d, dur) {
+                dur = dur || 1;
+                setTimeout(function() {
+                    el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0) scale(1)';
+                }, d);
+            }
+
+            setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
+            setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
+            setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
+
+            animate(kanji, 800, 1.4);
+            animate(romaji, 1800, 1);
+            animate(noun, 2200, 0.8);
+            animate(meaning, 2800, 1.1);
+            setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
+            animate(tagline, 3800, 0.9);
+
+            var dismiss = document.getElementById('komorebiDismiss');
+            setTimeout(function() {
+                dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
+                dismiss.style.opacity = '0.5';
+                dismiss.style.transform = 'translateY(0)';
+            }, 4200);
+
+            dismiss.addEventListener('click', function() {
+                komorebi.classList.add('exiting');
+                document.body.style.overflow = '';
+                setTimeout(function() {
+                    komorebi.style.display = 'none';
+                }, 1200);
+            });
+        })();
+    </script>
+    <script>
+        // ==================== LANGUAGE TOGGLE ====================
+        (function() {
+            var pill = document.getElementById('langPill');
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+
+            function toggle() {
+                current = current === 'en' ? 'ko' : 'en';
+                document.documentElement.setAttribute('data-lang', current);
+                document.documentElement.setAttribute('lang', current);
+                localStorage.setItem('dispatch-lang', current);
+            }
+
+            pill.addEventListener('click', toggle);
+            pill.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+            });
+        })();
+
+
+        // ==================== COMMENTS ====================
+        (function() {
+            var form = document.getElementById('commentsForm');
+            var nameInput = document.getElementById('commentName');
+            var textInput = document.getElementById('commentText');
+            var btn = document.getElementById('commentBtn');
+            var list = document.getElementById('commentsList');
+            var empty = document.getElementById('commentsEmpty');
+            var issue = 'on-love';
+
+            function escapeHtml(str) {
+                var div = document.createElement('div');
+                div.appendChild(document.createTextNode(str));
+                return div.innerHTML;
+            }
+
+            function timeAgo(dateStr) {
+                var seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+                if (seconds < 60) return 'just now';
+                var intervals = [
+                    [31536000, 'y'], [2592000, 'mo'], [86400, 'd'],
+                    [3600, 'h'], [60, 'm']
+                ];
+                for (var i = 0; i < intervals.length; i++) {
+                    var count = Math.floor(seconds / intervals[i][0]);
+                    if (count >= 1) return count + intervals[i][1] + ' ago';
+                }
+                return 'just now';
+            }
+
+            function renderComment(c) {
+                var div = document.createElement('div');
+                div.className = 'comment-item';
+                div.innerHTML = '<div class="comment-meta">'
+                    + '<span class="comment-name">' + escapeHtml(c.name) + '</span>'
+                    + '<span class="comment-time">' + timeAgo(c.created_at) + '</span>'
+                    + '</div>'
+                    + '<p class="comment-body">' + escapeHtml(c.comment) + '</p>';
+                return div;
+            }
+
+            function loadComments() {
+                fetch('/api/comments?issue=' + issue)
+                    .then(function(r) { return r.json(); })
+                    .then(function(comments) {
+                        list.innerHTML = '';
+                        if (!comments.length) {
+                            empty.style.display = '';
+                            return;
+                        }
+                        empty.style.display = 'none';
+                        comments.forEach(function(c) {
+                            list.appendChild(renderComment(c));
+                        });
+                    })
+                    .catch(function() {});
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var name = nameInput.value.trim();
+                var comment = textInput.value.trim();
+                if (!name || !comment) return;
+
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+
+                fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ issue: issue, name: name, comment: comment })
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error();
+                    localStorage.setItem('dispatch-comment-name', name);
+                    textInput.value = '';
+                    loadComments();
+                })
+                .catch(function() {})
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                });
+            });
+
+            var savedName = localStorage.getItem('dispatch-comment-name');
+            if (savedName) nameInput.value = savedName;
+
+            loadComments();
+        })();
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js" integrity="sha384-O55L/6rhHr9CFvrxqv5luxOCcmVaBmETbZbJDP+Do8T0pztTACsFBD/IXCNkj7DV" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener('load', function() { initDispatch(); });
+        setTimeout(function() {
+            if (typeof gsap !== 'undefined' && !window._dispatchInit) initDispatch();
+        }, 4000);
+
+        function initDispatch() {
+            if (window._dispatchInit) return;
+            window._dispatchInit = true;
+
+            // Smooth scroll
+            var lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            // Progress bar
+            gsap.to('#progressBar', {
+                width: '100%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: 0.3,
+                }
+            });
+
+            // Hero animations
+            var heroTl = gsap.timeline({ delay: 0.3 });
+            heroTl
+                .to('.hero-label', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+                .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
+                .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+                .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+
+            // Hero Ken Burns
+            gsap.to('#heroImg', {
+                scale: 1.15,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Hero title parallax
+            gsap.to('.hero-title', {
+                yPercent: -20,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
+
+            // Fade scroll hint
+            gsap.to('.scroll-hint', {
+                opacity: 0,
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: '15% top',
+                    end: '30% top',
+                    scrub: true,
+                }
+            });
+
+            // Reveals
+            gsap.utils.toArray('.reveal').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, y: 0, duration: 0.9, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-fade').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, duration: 1, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            gsap.utils.toArray('.reveal-scale').forEach(function(el) {
+                gsap.to(el, {
+                    opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+                });
+            });
+
+            // Ken Burns on full-bleed photos
+            gsap.utils.toArray('.photo-full img').forEach(function(img) {
+                gsap.fromTo(img,
+                    { scale: 1.03 },
+                    {
+                        scale: 1.1, ease: 'none',
+                        scrollTrigger: {
+                            trigger: img.closest('.photo-full'),
+                            start: 'top bottom',
+                            end: 'bottom top',
+                            scrub: true,
+                        }
+                    }
+                );
+            });
+
+            // Section title parallax
+            gsap.utils.toArray('.section-title').forEach(function(el) {
+                gsap.to(el, {
+                    yPercent: -10, ease: 'none',
+                    scrollTrigger: {
+                        trigger: el.closest('.section-header'),
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: true,
+                    }
+                });
+            });
+
+            // Pull quote scale
+            gsap.utils.toArray('.pull-quote blockquote, .pull-quote-side blockquote').forEach(function(el) {
+                gsap.fromTo(el,
+                    { scale: 0.92, opacity: 0 },
+                    {
+                        scale: 1, opacity: 1, duration: 1, ease: 'power2.out',
+                        scrollTrigger: { trigger: el, start: 'top 80%', once: true }
+                    }
+                );
+            });
+
+            // Smooth anchor scrolling for TOC links
+            document.querySelectorAll('.toc-list a').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    var target = document.querySelector(link.getAttribute('href'));
+                    if (target) {
+                        e.preventDefault();
+                        lenis.scrollTo(target, { offset: -40, duration: 1.2 });
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
