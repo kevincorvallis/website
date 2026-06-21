@@ -56,7 +56,7 @@
             }
         })();
     </script>
-    <noscript><style>.komorebi { display: none !important; }</style></noscript>
+    <noscript><style>.estadio { display: none !important; }</style></noscript>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -479,111 +479,120 @@
         .reveal-fade { opacity: 0; }
         .reveal-scale { opacity: 0; transform: scale(0.97); }
 
-        /* ========== WELCOME INTERSTITIAL ========== */
-        /* Covers from first paint so the article never "leaks" before the intro
-           mounts; html[data-seen] (set pre-paint) hides it for return visitors. */
-        .komorebi {
-            position: fixed; inset: 0; z-index: 150; background: var(--bg);
+        /* ========== WELCOME INTERSTITIAL — ESTADIO (night match) ========== */
+        /* Dark in BOTH themes — it's a night match. Covers from first paint so the
+           article never "leaks" before the intro mounts; html[data-seen] (set
+           pre-paint) hides it for return visitors. */
+        .estadio {
+            position: fixed; inset: 0; z-index: 150; background: #0a0d12; color: #f3efe6;
             display: flex; align-items: center; justify-content: center;
-            text-align: center; padding: 2rem; opacity: 1; visibility: visible;
-            pointer-events: auto; transition: background-color 0.3s ease;
+            text-align: center; padding: 2rem; overflow: hidden;
+            opacity: 1; visibility: visible; pointer-events: auto;
         }
-        html[data-seen="1"] .komorebi { display: none; }
-        .komorebi.active { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 1s ease, visibility 0s; }
-        .komorebi.exiting { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 1.2s ease, visibility 1.2s ease; }
-        .komorebi-content { max-width: 480px; position: relative; }
-        .komorebi-kanji {
-            font-family: 'Noto Serif KR', 'Noto Serif JP', serif; font-size: clamp(3.5rem, 14vw, 7rem);
-            font-weight: 400; letter-spacing: 0.08em; opacity: 0;
-            transform: translateY(20px) scale(0.96); line-height: 1.2;
+        html[data-seen="1"] .estadio { display: none; }
+        .estadio.active { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 1s ease, visibility 0s; }
+        .estadio.exiting { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 1.2s ease, visibility 1.2s ease; }
+        /* cool pitch-glow rising from the touchline */
+        .estadio::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+            background: radial-gradient(125% 80% at 50% 120%, rgba(54,116,158,0.42) 0%, rgba(22,46,68,0.20) 38%, transparent 70%);
         }
-        .komorebi-romaji {
-            font-family: var(--font-display); font-size: clamp(1.5rem, 5vw, 2rem);
-            font-weight: 400; font-style: italic; color: var(--accent); margin-top: 0.75rem;
-            letter-spacing: 0.04em; opacity: 0; transform: translateY(15px); transition: color 0.3s ease;
+        /* two floodlight banks blooming from above the rim */
+        .estadio-floods {
+            position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0;
+            background:
+                radial-gradient(58% 44% at 22% -14%, rgba(255,244,214,0.32) 0%, rgba(255,238,196,0.10) 34%, transparent 66%),
+                radial-gradient(58% 44% at 78% -14%, rgba(255,244,214,0.32) 0%, rgba(255,238,196,0.10) 34%, transparent 66%);
+            transition: opacity 3s ease; animation: floodPulse 7s ease-in-out infinite;
         }
-        .komorebi-noun {
-            font-family: var(--font); font-size: 12px; font-style: italic; color: var(--caption);
-            letter-spacing: 0.1em; margin-top: 0.5rem; opacity: 0; transform: translateY(10px); transition: color 0.3s ease;
+        @keyframes floodPulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.16); } }
+        /* static crowd-lights (fallback + reduced-motion); the canvas draws over these */
+        .estadio-stars {
+            position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0;
+            background-image: radial-gradient(circle, rgba(255,238,198,0.55) 1px, transparent 1.6px);
+            background-size: 40px 40px;
+            -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.55) 42%, transparent 72%);
+            mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.55) 42%, transparent 72%);
+            transition: opacity 2s ease;
         }
-        .komorebi-meaning {
-            font-family: var(--font); font-size: 17px; color: var(--caption); line-height: 1.8;
-            margin-top: 2.5rem; max-width: 380px; margin-left: auto; margin-right: auto;
-            opacity: 0; transform: translateY(15px); transition: color 0.3s ease;
-        }
-        .komorebi-divider { width: 40px; height: 1px; background: var(--accent); margin: 2rem auto; opacity: 0; transition: background-color 0.3s ease; }
-        .komorebi-tagline { font-size: 14px; color: var(--caption); opacity: 0; transform: translateY(10px); transition: color 0.3s ease; }
-        .komorebi-dismiss {
-            background: none; border: none; font-family: var(--font); font-size: 15px;
-            color: var(--accent); cursor: pointer; margin-top: 2.5rem; padding: 10px 28px;
-            letter-spacing: 0.03em; opacity: 0; transform: translateY(10px);
-            transition: opacity 0.3s ease, color 0.3s ease, transform 0.8s cubic-bezier(0.22,0.61,0.36,1);
-        }
-        .komorebi-dismiss:hover { opacity: 0.7 !important; }
-        .komorebi-leaves { position: absolute; inset: -20%; pointer-events: none; opacity: 0; filter: blur(8px); animation: leafSway 12s ease-in-out infinite; }
-        @keyframes leafSway {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(1%, -0.5%) rotate(0.3deg); }
-            66% { transform: translate(-0.5%, 0.5%) rotate(-0.2deg); }
-        }
-        .komorebi-sun {
-            position: absolute; inset: 0; pointer-events: none; opacity: 0;
-            background: radial-gradient(ellipse at 50% -10%, rgba(160,130,109,0.25) 0%, rgba(160,130,109,0.08) 30%, transparent 65%);
-            transition: opacity 3s ease;
-        }
-        .komorebi-spots { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
-        .komorebi-spot { position: absolute; border-radius: 50%; background: rgba(200,175,140,0.15); filter: blur(20px); animation: spotPulse 8s ease-in-out infinite; }
-        .komorebi-spot:nth-child(1) { width: 120px; height: 80px; top: 8%; left: 15%; animation-delay: 0s; transform: rotate(-15deg); }
-        .komorebi-spot:nth-child(2) { width: 90px; height: 60px; top: 25%; right: 20%; animation-delay: 2.5s; transform: rotate(10deg); }
-        .komorebi-spot:nth-child(3) { width: 140px; height: 90px; bottom: 30%; left: 25%; animation-delay: 1.2s; transform: rotate(-8deg); }
-        .komorebi-spot:nth-child(4) { width: 70px; height: 50px; bottom: 15%; right: 30%; animation-delay: 4s; transform: rotate(20deg); }
-        .komorebi-spot:nth-child(5) { width: 100px; height: 70px; top: 50%; left: 55%; animation-delay: 3s; transform: rotate(-5deg); }
-        @keyframes spotPulse {
-            0%, 100% { opacity: 0.3; transform: rotate(-15deg) scale(0.9); }
-            50% { opacity: 0.7; transform: rotate(-12deg) scale(1.1); }
-        }
-
-        /* ===== Interactive WebGL2 splash playground — Ice / Warmth ===== */
-        .komorebi-fx {
+        /* interactive crowd shimmer — drag to sweep the floodlight */
+        .estadio-fx {
             position: absolute; inset: 0; width: 100%; height: 100%;
             z-index: 1; pointer-events: none; opacity: 0;
             transition: opacity 1.4s ease; touch-action: none;
         }
-        .komorebi.fx-ready .komorebi-fx { opacity: 1; }
-        /* dragging carves the field — don't let it select the text */
-        .komorebi.fx-ready { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-        /* keep the word + controls above the canvas */
-        .komorebi-content { z-index: 2; }
-        /* the dappled-light ambience is redundant once the playground is live */
-        .komorebi.fx-ready .komorebi-leaves,
-        .komorebi.fx-ready .komorebi-sun,
-        .komorebi.fx-ready .komorebi-spots { opacity: 0 !important; }
+        .estadio.fx-ready .estadio-fx { opacity: 1; }
+        .estadio.fx-ready .estadio-stars { opacity: 0 !important; }   /* canvas supersedes the static dots */
+        .estadio.fx-ready { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
-        .komorebi-play {
+        .estadio-content { max-width: 480px; position: relative; z-index: 2; }
+        .estadio-word {
+            font-family: var(--font-display); font-weight: 700; font-size: clamp(4rem, 16vw, 8rem);
+            letter-spacing: 0.04em; line-height: 1; color: #fff6e0;
+            opacity: 0; transform: translateY(20px) scale(0.96);
+            text-shadow: 0 0 18px rgba(255,224,150,0.5), 0 0 48px rgba(255,200,110,0.32), 0 0 96px rgba(255,180,90,0.18);
+            animation: jumboGlow 4.5s ease-in-out infinite;
+        }
+        @keyframes jumboGlow {
+            0%, 100% { text-shadow: 0 0 16px rgba(255,224,150,0.45), 0 0 46px rgba(255,200,110,0.28), 0 0 92px rgba(255,180,90,0.16); }
+            50%      { text-shadow: 0 0 24px rgba(255,234,176,0.7),  0 0 64px rgba(255,214,134,0.46), 0 0 120px rgba(255,190,100,0.26); }
+        }
+        .estadio-romaji {
+            font-family: var(--font-display); font-size: clamp(1.4rem, 5vw, 1.9rem);
+            font-weight: 400; font-style: italic; color: #ffd27a; margin-top: 0.8rem;
+            letter-spacing: 0.06em; opacity: 0; transform: translateY(15px);
+        }
+        .estadio-noun {
+            font-family: var(--font); font-size: 12px; font-style: italic; color: rgba(243,239,230,0.58);
+            letter-spacing: 0.14em; margin-top: 0.5rem; opacity: 0; transform: translateY(10px);
+        }
+        .estadio-meaning {
+            font-family: var(--font); font-size: 17px; color: rgba(243,239,230,0.8); line-height: 1.8;
+            margin-top: 2.3rem; max-width: 400px; margin-left: auto; margin-right: auto;
+            opacity: 0; transform: translateY(15px);
+        }
+        .estadio-meaning em { font-style: italic; color: #fff6e0; }
+        .estadio-divider { width: 44px; height: 1px; background: rgba(255,224,150,0.5); margin: 2rem auto; opacity: 0; }
+        .estadio-tagline { font-size: 14px; color: rgba(243,239,230,0.55); opacity: 0; transform: translateY(10px); }
+        .estadio-dismiss {
+            background: none; border: 1px solid rgba(255,224,150,0.34); border-radius: 100px;
+            font-family: var(--font); font-size: 15px; color: #ffe9b8; cursor: pointer;
+            margin-top: 2.4rem; padding: 10px 30px; letter-spacing: 0.03em;
+            opacity: 0; transform: translateY(10px);
+            transition: opacity 0.3s ease, color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.8s cubic-bezier(0.22,0.61,0.36,1);
+        }
+        .estadio-dismiss:hover { background: rgba(255,224,150,0.12); border-color: rgba(255,224,150,0.6); opacity: 1 !important; }
+
+        .estadio-play {
             display: flex; flex-direction: column; align-items: center; gap: 0.7rem;
             margin-top: 2rem; opacity: 0; transform: translateY(10px);
             transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,0.61,0.36,1);
         }
-        .komorebi-modes {
-            display: inline-flex; padding: 3px;
-            border: 1px solid var(--rule); border-radius: 100px;
-            background: rgba(160,130,109,0.07);
+        .estadio-modes {
+            display: inline-flex; padding: 3px; border: 1px solid rgba(243,239,230,0.18);
+            border-radius: 100px; background: rgba(255,255,255,0.05);
             -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
         }
-        .kfx-mode {
+        .efx-mode {
             -webkit-appearance: none; appearance: none; border: none; background: none; cursor: pointer;
-            font-family: var(--font); font-size: 12px; letter-spacing: 0.06em;
-            color: var(--caption); padding: 6px 16px; border-radius: 100px;
+            font-family: var(--font); font-size: 12px; letter-spacing: 0.05em;
+            color: rgba(243,239,230,0.62); padding: 6px 15px; border-radius: 100px;
+            display: inline-flex; align-items: center; gap: 0.45em;
             transition: color 0.3s ease, background-color 0.3s ease;
         }
-        .kfx-mode:hover { color: var(--text); }
-        .kfx-mode.active { color: var(--bg); background: var(--text); }
-        .kfx-hint {
+        .efx-mode:hover { color: #fff6e0; }
+        .efx-mode.active { color: #0a0d12; background: #f3efe6; }
+        .efx-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
+        .efx-dot.kr { background: linear-gradient(135deg, #e23b4e 0 50%, #3a7bd5 50% 100%); }
+        .efx-dot.mx { background: linear-gradient(135deg, #2aa05c 0 50%, #ce1126 50% 100%); }
+        .efx-hint {
             font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
-            text-transform: uppercase; color: var(--caption); opacity: 0.7;
+            text-transform: uppercase; color: rgba(243,239,230,0.5);
         }
         @media (prefers-reduced-motion: reduce) {
-            .komorebi-fx, .komorebi-play { display: none !important; }
+            .estadio-fx, .estadio-play { display: none !important; }
+            .estadio-floods, .estadio-stars { opacity: 1 !important; }
+            .estadio-floods, .estadio-word { animation: none !important; }
         }
 
         /* shared REC pulse used by deal-wire + featured video */
@@ -898,7 +907,7 @@
         @media (prefers-reduced-motion: reduce) {
             .reveal, .reveal-fade, .reveal-scale { opacity: 1 !important; transform: none !important; }
             .scroll-line { animation: none; }
-            .komorebi-spot, .komorebi-leaves { animation: none; }
+            .estadio-floods, .estadio-word { animation: none; }
             .dw-marquee .track { animation: none; }
             .dw-tag .dot, .fv-flag .dot { animation: none; opacity: 0.85; transform: none; }
             .relay-rink .rink-lane { stroke-dashoffset: 0 !important; }
@@ -925,56 +934,38 @@
 
     <div class="gate-light" id="gateLight"></div>
 
-    <!-- ==================== WELCOME INTERSTITIAL — gol ==================== -->
-    <div class="komorebi" id="komorebi">
-        <canvas class="komorebi-fx" id="komorebiFx" aria-hidden="true"></canvas>
-        <svg class="komorebi-leaves" id="komorebiLeaves" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-            <defs><filter id="leafBlur"><feGaussianBlur stdDeviation="3"/></filter></defs>
-            <g fill="rgba(160,130,109,0.12)" filter="url(#leafBlur)">
-                <ellipse cx="120" cy="100" rx="45" ry="22" transform="rotate(-30 120 100)"/>
-                <ellipse cx="350" cy="80" rx="35" ry="18" transform="rotate(15 350 80)"/>
-                <ellipse cx="600" cy="150" rx="50" ry="25" transform="rotate(-20 600 150)"/>
-                <ellipse cx="200" cy="300" rx="40" ry="20" transform="rotate(25 200 300)"/>
-                <ellipse cx="500" cy="350" rx="55" ry="28" transform="rotate(-10 500 350)"/>
-                <ellipse cx="700" cy="400" rx="38" ry="19" transform="rotate(30 700 400)"/>
-                <ellipse cx="150" cy="550" rx="48" ry="24" transform="rotate(-15 150 550)"/>
-                <ellipse cx="400" cy="600" rx="42" ry="21" transform="rotate(20 400 600)"/>
-                <ellipse cx="650" cy="650" rx="35" ry="17" transform="rotate(-25 650 650)"/>
-                <ellipse cx="300" cy="750" rx="52" ry="26" transform="rotate(10 300 750)"/>
-            </g>
-        </svg>
-        <div class="komorebi-sun" id="komorebiSun"></div>
-        <div class="komorebi-spots" id="komorebiSpots">
-            <div class="komorebi-spot"></div><div class="komorebi-spot"></div><div class="komorebi-spot"></div>
-            <div class="komorebi-spot"></div><div class="komorebi-spot"></div>
-        </div>
-        <div class="komorebi-content">
-            <p class="komorebi-kanji" id="komorebiKanji">gol</p>
-            <p class="komorebi-romaji" id="komorebiRomaji">goal</p>
-            <p class="komorebi-noun" id="komorebiNoun">noun &middot; Spanish</p>
-            <p class="komorebi-meaning" id="komorebiMeaning">
+    <!-- ==================== WELCOME INTERSTITIAL — gol (Estadio) ==================== -->
+    <div class="estadio" id="estadio">
+        <div class="estadio-floods" id="estadioFloods" aria-hidden="true"></div>
+        <div class="estadio-stars" id="estadioStars" aria-hidden="true"></div>
+        <canvas class="estadio-fx" id="estadioFx" aria-hidden="true"></canvas>
+        <div class="estadio-content">
+            <p class="estadio-word" id="estadioWord">gol</p>
+            <p class="estadio-romaji" id="estadioRomaji">goal</p>
+            <p class="estadio-noun" id="estadioNoun">noun &middot; Spanish</p>
+            <p class="estadio-meaning" id="estadioMeaning">
                 <span data-l="en">What fifty thousand people scream when the ball finally does what you came for. Also what your dad yells when the parking lot opens before kickoff.</span>
                 <span data-l="ko">공이 드디어 당신이 온 이유대로 움직일 때 오만 명이 외치는 말. 킥오프 전 주차장이 열릴 때 아버지가 외치는 말이기도 하다.</span>
             </p>
-            <div class="komorebi-divider" id="komorebiDivider"></div>
-            <p class="komorebi-tagline" id="komorebiTagline">
+            <div class="estadio-divider" id="estadioDivider"></div>
+            <p class="estadio-tagline" id="estadioTagline">
                 <span data-l="en">A letter for friends and family.</span>
                 <span data-l="ko">친구와 가족에게 보내는 편지.</span>
             </p>
-            <div class="komorebi-play" id="komorebiPlay">
-                <div class="komorebi-modes" role="group" aria-label="Playground mode">
-                    <button type="button" class="kfx-mode" data-mode="ice" aria-pressed="false">
-                        <span data-l="en">Ice</span><span data-l="ko">얼음</span>
+            <div class="estadio-play" id="estadioPlay">
+                <div class="estadio-modes" role="group" aria-label="Crowd colors">
+                    <button type="button" class="efx-mode active" data-mode="korea" aria-pressed="true">
+                        <span class="efx-dot kr" aria-hidden="true"></span><span data-l="en">Korea</span><span data-l="ko">한국</span>
                     </button>
-                    <button type="button" class="kfx-mode active" data-mode="warmth" aria-pressed="true">
-                        <span data-l="en">Warmth</span><span data-l="ko">온기</span>
+                    <button type="button" class="efx-mode" data-mode="mexico" aria-pressed="false">
+                        <span class="efx-dot mx" aria-hidden="true"></span><span data-l="en">M&eacute;xico</span><span data-l="ko">멕시코</span>
                     </button>
                 </div>
-                <span class="kfx-hint">
-                    <span data-l="en">drag to play</span><span data-l="ko">드래그해서 만져보기</span>
+                <span class="efx-hint">
+                    <span data-l="en">drag to sweep the lights</span><span data-l="ko">드래그해서 조명 비추기</span>
                 </span>
             </div>
-            <button class="komorebi-dismiss" id="komorebiDismiss">
+            <button class="estadio-dismiss" id="estadioDismiss">
                 <span data-l="en">Continue &rarr;</span>
                 <span data-l="ko">계속 &rarr;</span>
             </button>
@@ -1634,31 +1625,30 @@
         // ==================== WELCOME INTERSTITIAL ====================
         (function() {
             var gate = document.getElementById('gate');
-            var komorebi = document.getElementById('komorebi');
+            var estadio = document.getElementById('estadio');
             if (!gate) return;
 
             var path = window.location.pathname.replace(/\/$/, '') || '/';
             var issueKey = 'dispatch-auth-' + path;
 
-            function animateKomorebi(callback) {
+            function animateEstadio(callback) {
                 var gateLight = document.getElementById('gateLight');
                 gateLight.classList.add('awakening');
-                komorebi.classList.add('active');
+                estadio.classList.add('active');
                 document.body.style.overflow = 'hidden';
 
                 setTimeout(function() {
                     gate.classList.add('unlocked');
                     gateLight.style.display = 'none';
 
-                    var leaves = document.getElementById('komorebiLeaves');
-                    var sun = document.getElementById('komorebiSun');
-                    var spots = document.getElementById('komorebiSpots');
-                    var kanji = document.getElementById('komorebiKanji');
-                    var romaji = document.getElementById('komorebiRomaji');
-                    var noun = document.getElementById('komorebiNoun');
-                    var meaning = document.getElementById('komorebiMeaning');
-                    var divider = document.getElementById('komorebiDivider');
-                    var tagline = document.getElementById('komorebiTagline');
+                    var floods = document.getElementById('estadioFloods');
+                    var stars = document.getElementById('estadioStars');
+                    var word = document.getElementById('estadioWord');
+                    var romaji = document.getElementById('estadioRomaji');
+                    var noun = document.getElementById('estadioNoun');
+                    var meaning = document.getElementById('estadioMeaning');
+                    var divider = document.getElementById('estadioDivider');
+                    var tagline = document.getElementById('estadioTagline');
                     var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
 
                     function animate(el, d, dur) {
@@ -1670,26 +1660,25 @@
                         }, d);
                     }
 
-                    setTimeout(function() { sun.style.transition = 'opacity 3s ease'; sun.style.opacity = '1'; }, 100);
-                    setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
-                    setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
+                    setTimeout(function() { floods.style.opacity = '1'; }, 100);   // floodlights bloom up
+                    setTimeout(function() { stars.style.opacity = '1'; }, 500);    // crowd lights rise
 
-                    animate(kanji, 800, 1.4);
+                    animate(word, 800, 1.4);
                     animate(romaji, 1800, 1);
                     animate(noun, 2200, 0.8);
                     animate(meaning, 2800, 1.1);
                     setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
                     animate(tagline, 3800, 0.9);
 
-                    var dismiss = document.getElementById('komorebiDismiss');
+                    var dismiss = document.getElementById('estadioDismiss');
                     setTimeout(function() {
                         dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
-                        dismiss.style.opacity = '0.5';
+                        dismiss.style.opacity = '0.85';
                         dismiss.style.transform = 'translateY(0)';
                     }, 4200);
 
                     dismiss.addEventListener('click', function() {
-                        komorebi.classList.add('exiting');
+                        estadio.classList.add('exiting');
                         document.body.style.overflow = '';
                         document.body.classList.add('gate-open');
                         setTimeout(callback, 1200);
@@ -1699,243 +1688,172 @@
 
             function unlock() {
                 sessionStorage.setItem(issueKey, '1');
-                animateKomorebi(function() { komorebi.style.display = 'none'; });
+                animateEstadio(function() { estadio.style.display = 'none'; });
             }
 
             if (sessionStorage.getItem(issueKey) === '1') {
                 gate.classList.add('unlocked');
                 document.body.classList.add('gate-open');
-                if (komorebi) komorebi.style.display = 'none';
+                if (estadio) estadio.style.display = 'none';
                 return;
             }
             unlock();
         })();
     </script>
     <script>
-        // ============ INTERACTIVE WEBGL2 SPLASH — Ice / Warmth playground ============
-        // A fragment-shader field behind the 우리 word. Drag (mouse/touch) to carve
-        // glowing blade-trails on ice, or stir warm dye that diffuses and rises.
-        // Self-contained: bails gracefully (static dappled-light splash stays) for
-        // returning visitors, reduced-motion, or no-WebGL2.
+        // ============ INTERACTIVE CROWD SHIMMER — Estadio (night match) ============
+        // A 2D-canvas field of phone/camera lights in the stands. Idle: they twinkle.
+        // Drag to sweep a floodlight beam across the crowd; lights flare, then decay.
+        // The Korea / México toggle tints the flares. Self-contained: bails gracefully
+        // (static crowd-lights stay) for returning visitors, reduced-motion, or no-canvas.
         (function () {
-            var komorebi = document.getElementById('komorebi');
-            var canvas = document.getElementById('komorebiFx');
-            var play = document.getElementById('komorebiPlay');
-            if (!komorebi || !canvas) return;
+            var stage = document.getElementById('estadio');
+            var canvas = document.getElementById('estadioFx');
+            var play = document.getElementById('estadioPlay');
+            if (!stage || !canvas) return;
 
-            // Only run while the interstitial is actually on screen. The gate IIFE runs
-            // first and, for returning visitors, sets the splash to display:none — so we
-            // check the rendered splash, not the session flag (which it sets for everyone).
-            if (window.getComputedStyle(komorebi).display === 'none') return;
+            // Only run while the splash is actually on screen. The gate IIFE runs first
+            // and, for returning visitors, sets the splash to display:none — so we check
+            // the rendered splash, not the session flag (which it sets for everyone).
+            if (window.getComputedStyle(stage).display === 'none') return;
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-            var gl = canvas.getContext('webgl2', { antialias: false, alpha: false });
-            if (!gl) return;
+            var ctx = canvas.getContext('2d');
+            if (!ctx) return;
 
             var DPR = Math.min(window.devicePixelRatio || 1, 2);
-            var SIM_MAX = 320; // simulation long-edge cap (mobile perf)
+            var W = 1, H = 1;
 
-            function compile(type, src) {
-                var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
-                if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn('fx shader:', gl.getShaderInfoLog(s)); return null; }
-                return s;
+            // Soft radial light sprite, tinted per team. Pre-rendered once, then blitted
+            // additively per particle — far cheaper than a gradient per draw.
+            function sprite(r, g, b) {
+                var s = 48, c = document.createElement('canvas'); c.width = c.height = s;
+                var x = c.getContext('2d'), m = s / 2;
+                var rg = x.createRadialGradient(m, m, 0, m, m, m);
+                rg.addColorStop(0,   'rgba(' + r + ',' + g + ',' + b + ',1)');
+                rg.addColorStop(0.3, 'rgba(' + r + ',' + g + ',' + b + ',0.45)');
+                rg.addColorStop(1,   'rgba(' + r + ',' + g + ',' + b + ',0)');
+                x.fillStyle = rg; x.fillRect(0, 0, s, s);
+                return c;
             }
-            function program(vs, fs) {
-                var v = compile(gl.VERTEX_SHADER, vs), f = compile(gl.FRAGMENT_SHADER, fs);
-                if (!v || !f) return null;
-                var p = gl.createProgram(); gl.attachShader(p, v); gl.attachShader(p, f); gl.linkProgram(p);
-                if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.warn('fx link:', gl.getProgramInfoLog(p)); return null; }
-                return p;
-            }
-
-            var VERT = '#version 300 es\nprecision highp float;\nconst vec2 V[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.));\nout vec2 uv;\nvoid main(){vec2 p=V[gl_VertexID];uv=p*0.5+0.5;gl_Position=vec4(p,0.,1.);}';
-
-            var UPDATE = '#version 300 es\nprecision highp float;\n' +
-              'in vec2 uv; out vec4 o;\n' +
-              'uniform sampler2D u_prev; uniform vec2 u_texel; uniform vec2 u_a; uniform vec2 u_b;\n' +
-              'uniform float u_down; uniform int u_mode; uniform float u_aspect; uniform float u_radius; uniform float u_strength;\n' +
-              'uniform vec2 u_auto; uniform float u_autoOn;\n' +
-              'void main(){\n' +
-              '  vec4 s=texture(u_prev,uv);\n' +
-              '  vec4 n=texture(u_prev,uv+vec2(u_texel.x,0.))+texture(u_prev,uv-vec2(u_texel.x,0.))+texture(u_prev,uv+vec2(0.,u_texel.y))+texture(u_prev,uv-vec2(0.,u_texel.y));\n' +
-              '  vec4 blur=s*0.4+n*0.15;\n' +
-              '  float warm=mix(s.r,blur.r,0.6);\n' +
-              '  warm=mix(warm,texture(u_prev,uv-vec2(0.,u_texel.y*1.5)).r,0.06);\n' +   // dye rises
-              '  warm*=0.976;\n' +
-              '  float ice=mix(s.g,blur.g,0.12);\n' +
-              '  ice*=0.95;\n' +                                                         // scratches slowly refreeze
-              '  vec2 pa=(uv-u_a); vec2 ba=(u_b-u_a); pa.x*=u_aspect; ba.x*=u_aspect;\n' +
-              '  float h=clamp(dot(pa,ba)/max(dot(ba,ba),1e-5),0.,1.);\n' +
-              '  float d=length(pa-ba*h);\n' +
-              '  float brush=smoothstep(u_radius,0.,d)*u_down*u_strength;\n' +
-              '  float da=length((uv-u_auto)*vec2(u_aspect,1.));\n' +
-              '  float ab=smoothstep(u_radius*1.4,0.,da)*u_autoOn*u_strength*0.25;\n' +
-              '  if(u_mode==0){ ice+=brush+ab; } else { warm+=(brush+ab)*0.92; }\n' +
-              '  o=vec4(clamp(warm,0.,1.), clamp(ice,0.,1.), 0., 1.);\n' +
-              '}';
-
-            var DISPLAY = '#version 300 es\nprecision highp float;\n' +
-              'in vec2 uv; out vec4 o;\n' +
-              'uniform sampler2D u_field; uniform int u_mode; uniform float u_dark; uniform vec3 u_accent;\n' +
-              'void main(){\n' +
-              '  vec4 f=texture(u_field,uv); float warm=f.r, ice=f.g; vec3 col;\n' +
-              '  if(u_mode==0){\n' +
-              '    vec3 top=mix(vec3(0.82,0.87,0.92),vec3(0.09,0.12,0.15),u_dark);\n' +
-              '    vec3 bot=mix(vec3(0.90,0.93,0.96),vec3(0.05,0.07,0.09),u_dark);\n' +
-              '    col=mix(bot,top,uv.y);\n' +
-              '    vec3 glow=mix(vec3(0.26,0.60,0.95),vec3(1.0),smoothstep(0.35,1.0,ice));\n' +
-              '    col+=glow*pow(ice,1.25)*1.8;\n' +
-              '  } else {\n' +
-              '    vec3 top=mix(vec3(0.945,0.93,0.90),vec3(0.13,0.115,0.10),u_dark);\n' +
-              '    vec3 bot=mix(vec3(0.90,0.875,0.83),vec3(0.085,0.075,0.065),u_dark);\n' +
-              '    col=mix(bot,top,uv.y);\n' +
-              '    vec3 dye=mix(u_accent,vec3(1.0,0.86,0.55),smoothstep(0.5,1.0,warm));\n' +
-              '    col+=dye*pow(warm,1.2)*1.4;\n' +
-              '  }\n' +
-              '  o=vec4(col,1.0);\n' +
-              '}';
-
-            var updP = program(VERT, UPDATE), dispP = program(VERT, DISPLAY);
-            if (!updP || !dispP) return;
-
-            var U = {
-                prev: gl.getUniformLocation(updP, 'u_prev'), texel: gl.getUniformLocation(updP, 'u_texel'),
-                a: gl.getUniformLocation(updP, 'u_a'), b: gl.getUniformLocation(updP, 'u_b'),
-                down: gl.getUniformLocation(updP, 'u_down'), mode: gl.getUniformLocation(updP, 'u_mode'),
-                aspect: gl.getUniformLocation(updP, 'u_aspect'), radius: gl.getUniformLocation(updP, 'u_radius'),
-                strength: gl.getUniformLocation(updP, 'u_strength'), auto: gl.getUniformLocation(updP, 'u_auto'),
-                autoOn: gl.getUniformLocation(updP, 'u_autoOn')
-            };
-            var D = {
-                field: gl.getUniformLocation(dispP, 'u_field'), mode: gl.getUniformLocation(dispP, 'u_mode'),
-                dark: gl.getUniformLocation(dispP, 'u_dark'), accent: gl.getUniformLocation(dispP, 'u_accent')
+            var SP = {
+                warm: sprite(255, 242, 210),
+                beam: sprite(255, 236, 184),
+                korea:  [sprite(226, 59, 78), sprite(58, 123, 213)],   // red, blue
+                mexico: [sprite(46, 168, 96), sprite(206, 30, 50)]     // green, red
             };
 
-            var vao = gl.createVertexArray(); // attribute-less fullscreen triangle
-            var simW, simH, texs = [], fbos = [];
-            function makeTarget() {
-                var t = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, t);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, simW, simH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                var fb = gl.createFramebuffer();
-                gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
-                return { t: t, f: fb };
-            }
-            function allocSim() {
-                texs.forEach(function (t) { gl.deleteTexture(t); });
-                fbos.forEach(function (f) { gl.deleteFramebuffer(f); });
-                texs = []; fbos = [];
-                for (var i = 0; i < 2; i++) { var m = makeTarget(); texs.push(m.t); fbos.push(m.f); }
-                for (var j = 0; j < 2; j++) {
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, fbos[j]); gl.viewport(0, 0, simW, simH);
-                    gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+            var parts = [], N = 0;
+            function build() {
+                var area = (W * H) / (DPR * DPR);
+                N = Math.max(90, Math.min(260, Math.round(area / 2600)));
+                parts = [];
+                for (var i = 0; i < N; i++) {
+                    parts.push({
+                        x: Math.random(),
+                        y: 0.34 + Math.pow(Math.random(), 0.6) * 0.64,  // denser toward the bottom
+                        r: 0.6 + Math.random() * 1.6,
+                        base: 0.16 + Math.random() * 0.32,
+                        tw: 0.6 + Math.random() * 1.9,                  // twinkle speed
+                        ph: Math.random() * 6.28,
+                        team: Math.random() < 0.5 ? 0 : 1,
+                        ex: 0                                           // excitement (beam flare)
+                    });
                 }
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             }
-
-            var aspect = 1;
             function resize() {
-                var r = komorebi.getBoundingClientRect();
-                var w = Math.max(1, r.width), h = Math.max(1, r.height);
-                aspect = w / h;
-                canvas.width = Math.round(w * DPR); canvas.height = Math.round(h * DPR);
-                var scale = Math.min(SIM_MAX / Math.max(w, h), 1);
-                simW = Math.max(2, Math.round(w * scale)); simH = Math.max(2, Math.round(h * scale));
-                allocSim();
+                var r = stage.getBoundingClientRect();
+                W = Math.max(1, Math.round(r.width * DPR));
+                H = Math.max(1, Math.round(r.height * DPR));
+                canvas.width = W; canvas.height = H;
+                build();
             }
             resize();
-            if ('ResizeObserver' in window) { new ResizeObserver(function () { resize(); }).observe(komorebi); }
+            if ('ResizeObserver' in window) { new ResizeObserver(function () { resize(); }).observe(stage); }
             else { window.addEventListener('resize', resize); }
 
-            var ptr = { x: 0.5, y: 0.5, px: 0.5, py: 0.5, down: 0 };
-            var frame = 0, lastInteract = -999;
+            var ptr = { x: 0.5, y: 0.55, life: 0, down: 0 };
             function setPos(e) {
-                var r = komorebi.getBoundingClientRect();
-                ptr.px = ptr.x; ptr.py = ptr.y;
+                var r = stage.getBoundingClientRect();
                 ptr.x = (e.clientX - r.left) / r.width;
-                ptr.y = 1.0 - (e.clientY - r.top) / r.height;
+                ptr.y = (e.clientY - r.top) / r.height;
             }
-            komorebi.addEventListener('pointerdown', function (e) {
-                if (e.target.closest && e.target.closest('button')) return; // don't draw on the controls
-                setPos(e); ptr.px = ptr.x; ptr.py = ptr.y; ptr.down = 1; lastInteract = frame;
+            stage.addEventListener('pointerdown', function (e) {
+                if (e.target.closest && e.target.closest('button')) return;  // don't sweep on the controls
+                setPos(e); ptr.down = 1; ptr.life = 1;
             });
-            komorebi.addEventListener('pointermove', function (e) { setPos(e); if (ptr.down) lastInteract = frame; });
+            stage.addEventListener('pointermove', function (e) { setPos(e); ptr.life = 1; });
             window.addEventListener('pointerup', function () { ptr.down = 0; });
-            komorebi.addEventListener('pointerleave', function () { ptr.down = 0; });
+            stage.addEventListener('pointerleave', function () { ptr.down = 0; });
 
-            var mode = 1; // 0 = ice, 1 = warmth (default warmth — matches the warm palette)
-            var modeBtns = play ? play.querySelectorAll('.kfx-mode') : [];
+            var mode = 'korea';   // matches the default-active toggle in the markup
+            var modeBtns = play ? play.querySelectorAll('.efx-mode') : [];
             Array.prototype.forEach.call(modeBtns, function (btn) {
                 btn.addEventListener('click', function () {
-                    mode = btn.getAttribute('data-mode') === 'warmth' ? 1 : 0;
+                    mode = btn.getAttribute('data-mode');
                     Array.prototype.forEach.call(modeBtns, function (b) {
                         var on = b === btn; b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
                     });
-                    lastInteract = frame;
+                    ptr.life = 1;
                 });
             });
 
-            function accent() {
-                return document.documentElement.getAttribute('data-theme') === 'dark'
-                    ? [0.769, 0.659, 0.510] : [0.627, 0.510, 0.427];
-            }
+            function drawSprite(sp, x, y, size) { ctx.drawImage(sp, x - size / 2, y - size / 2, size, size); }
 
-            var src = 0, running = true, raf = 0;
+            var t = 0, running = true, raf = 0;
             function step() {
                 if (!running) return;
-                frame++;
-                var idle = (frame - lastInteract) > 90;
-                var t = frame * 0.01;
-                var autoX = 0.5 + 0.28 * Math.sin(t * 0.9);
-                var autoY = 0.5 + 0.22 * Math.cos(t * 1.3);
-                var dst = 1 - src;
+                t += 0.016;
+                ctx.clearRect(0, 0, W, H);
+                ctx.globalCompositeOperation = 'lighter';
 
-                gl.useProgram(updP); gl.bindVertexArray(vao);
-                gl.bindFramebuffer(gl.FRAMEBUFFER, fbos[dst]); gl.viewport(0, 0, simW, simH);
-                gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texs[src]);
-                gl.uniform1i(U.prev, 0);
-                gl.uniform2f(U.texel, 1 / simW, 1 / simH);
-                gl.uniform2f(U.a, ptr.px, ptr.py);
-                gl.uniform2f(U.b, ptr.x, ptr.y);
-                gl.uniform1f(U.down, ptr.down);
-                gl.uniform1i(U.mode, mode);
-                gl.uniform1f(U.aspect, aspect);
-                gl.uniform1f(U.radius, mode === 0 ? 0.030 : 0.060);
-                gl.uniform1f(U.strength, mode === 0 ? 0.55 : 0.40);
-                gl.uniform2f(U.auto, autoX, autoY);
-                gl.uniform1f(U.autoOn, idle ? 1.0 : 0.0);
-                gl.drawArrays(gl.TRIANGLES, 0, 3);
+                ptr.life *= 0.96;
+                var auto = ptr.life < 0.05;                                  // idle → the beam drifts on its own
+                var bx = auto ? (0.5 + 0.34 * Math.sin(t * 0.5)) : ptr.x;
+                var by = auto ? 0.6 : ptr.y;
+                var power = auto ? 0.5 : (0.7 + 0.5 * ptr.down);
+                var team = SP[mode] || SP.korea;
+                var aspect = W / H;
 
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                gl.viewport(0, 0, canvas.width, canvas.height);
-                gl.useProgram(dispP); gl.bindVertexArray(vao);
-                gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texs[dst]);
-                gl.uniform1i(D.field, 0);
-                gl.uniform1i(D.mode, mode);
-                gl.uniform1f(D.dark, document.documentElement.getAttribute('data-theme') === 'dark' ? 1.0 : 0.0);
-                var ac = accent(); gl.uniform3f(D.accent, ac[0], ac[1], ac[2]);
-                gl.drawArrays(gl.TRIANGLES, 0, 3);
+                for (var i = 0; i < N; i++) {
+                    var p = parts[i];
+                    var tw = 0.6 + 0.4 * Math.sin(t * p.tw + p.ph);
+                    var dxs = (p.x - bx) * aspect, dys = (p.y - by);
+                    var col = Math.exp(-(p.x - bx) * (p.x - bx) * 17.0);     // vertical beam column (the sweep)
+                    var loc = Math.exp(-(dxs * dxs + dys * dys) * 9.0);      // local flare around the cursor
+                    p.ex += (col * 0.5 + loc) * power * 0.12;
+                    if (p.ex > 1.2) p.ex = 1.2;
+                    p.ex *= 0.94;
 
-                ptr.px = ptr.x; ptr.py = ptr.y; // held-stationary pointer keeps a dot
-                src = dst;
+                    var bright = p.base * tw + p.ex * 1.4;
+                    if (bright <= 0.02) continue;
+                    var px = p.x * W, py = p.y * H;
+                    var size = (8 + p.r * 10 + p.ex * 22) * DPR;
+                    var warmA = Math.min(1, bright) * (1 - Math.min(1, p.ex));
+                    var teamA = Math.min(1, p.ex * 1.1);
+                    if (warmA > 0.01) { ctx.globalAlpha = warmA * 0.9; drawSprite(SP.warm, px, py, size); }
+                    if (teamA > 0.01) { ctx.globalAlpha = teamA; drawSprite(team[p.team], px, py, size * 1.15); }
+                }
+
+                if (power > 0.05) {                                          // the floodlight bloom following the beam
+                    ctx.globalAlpha = 0.10 * power;
+                    drawSprite(SP.beam, bx * W, by * H, Math.max(W, H) * 0.5);
+                }
+
+                ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
                 raf = requestAnimationFrame(step);
             }
 
-            komorebi.classList.add('fx-ready');          // fade the canvas in (backdrop)
+            stage.classList.add('fx-ready');                                // fade the canvas in (over the static dots)
             raf = requestAnimationFrame(step);
-            setTimeout(function () {                       // reveal controls with the entrance
+            setTimeout(function () {                                         // reveal controls with the entrance
                 if (play) { play.style.opacity = '1'; play.style.transform = 'translateY(0)'; }
             }, 3900);
 
             function stop() { running = false; if (raf) cancelAnimationFrame(raf); }
-            var dismiss = document.getElementById('komorebiDismiss');
+            var dismiss = document.getElementById('estadioDismiss');
             if (dismiss) dismiss.addEventListener('click', function () { setTimeout(stop, 1300); });
-            canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); stop(); });
+            canvas.addEventListener('contextlost', function (e) { e.preventDefault(); stop(); });
         })();
     </script>
     <script>
@@ -2153,12 +2071,18 @@
                 var p = audio.play();
                 if (p && p.catch) p.catch(function () { player.classList.add('needs-tap'); });
             }
-            var dismiss = document.getElementById('komorebiDismiss');
+            var dismiss = document.getElementById('estadioDismiss');
             if (dismiss) dismiss.addEventListener('click', tryAutoplay);
 
             // Returning visitor (interstitial skipped) — nudge, then autoplay on first interaction.
+            // Guard on the splash actually being gone: on a first visit unlock() writes this
+            // flag immediately while the interstitial is still on screen, so the flag alone
+            // can't distinguish a returning visitor from a first-timer. Without this check the
+            // listener arms during the intro and the "drag to play" playground triggers the song.
             var path = window.location.pathname.replace(/\/$/, '') || '/';
-            if (sessionStorage.getItem('dispatch-auth-' + path) === '1') {
+            var splash = document.getElementById('estadio');
+            var splashGone = !splash || window.getComputedStyle(splash).display === 'none';
+            if (sessionStorage.getItem('dispatch-auth-' + path) === '1' && splashGone) {
                 setTimeout(function () { showPlayer(); player.classList.add('needs-tap'); }, 1200);
                 function onFirstInteract() {
                     document.removeEventListener('pointerdown', onFirstInteract, true);
