@@ -1259,11 +1259,17 @@
                     <span class="av-src">Open-Meteo</span>
                 </p>
                 <div class="av-body" id="wxBody">
-                    <p class="av-loading"><span data-l="en">pulling archive&hellip;</span><span data-l="ko">기록 불러오는 중&hellip;</span></p>
-                    <p class="av-fallback" id="wxFallback" hidden>
-                        <span data-l="en">~23&deg;C, light drizzle at 8pm &mdash; humid, loud, perfect stadium weather.</span>
-                        <span data-l="ko">오후 8시 약 23&deg;C, 가벼운 이슬비 &mdash; 습하고, 시끄럽고, 경기장 날씨 그 자체.</span>
-                    </p>
+                    <div class="wx-row">
+                        <span class="wx-icon" aria-hidden="true">🌦️</span>
+                        <div>
+                            <p class="wx-temp">23&deg;C</p>
+                            <p class="wx-meta">
+                                <b><span data-l="en">Light drizzle</span><span data-l="ko">가벼운 이슬비</span></b> &middot;
+                                <span data-l="en">8:00 PM kickoff</span><span data-l="ko">오후 8시 (킥오프)</span>
+                                <br><span data-l="en">Guadalajara &middot; humid, loud, perfect stadium weather</span><span data-l="ko">과달라하라 &middot; 습하고 시끄러운, 완벽한 경기장 날씨</span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2161,18 +2167,22 @@
                 fb.hidden = false;
             }
 
-            // Open-Meteo — archive weather at kickoff (~20:00 America/Mexico_City)
+            // Open-Meteo — archive weather at kickoff (~20:00 America/Mexico_City).
+            // The archive endpoint lags real time by several days, so wxBody ships
+            // with a fully-styled default block; we only OVERWRITE it if live data
+            // is actually available. On failure we keep the default (no dim fallback).
             var wxBody = document.getElementById('wxBody');
-            var wxFallback = document.getElementById('wxFallback');
             if (wxBody) {
                 fetch('https://archive-api.open-meteo.com/v1/archive?latitude=20.66&longitude=-103.35&start_date=2026-06-18&end_date=2026-06-18&hourly=temperature_2m,weather_code&timezone=America%2FMexico_City')
                     .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
                     .then(function(data) {
-                        var times = data.hourly.time || [];
+                        var times = (data.hourly && data.hourly.time) || [];
                         var idx = times.indexOf('2026-06-18T20:00');
                         if (idx < 0) idx = times.indexOf('2026-06-18T21:00');
                         if (idx < 0) throw new Error();
-                        var temp = Math.round(data.hourly.temperature_2m[idx]);
+                        var temp = data.hourly.temperature_2m[idx];
+                        if (temp == null) throw new Error();
+                        temp = Math.round(temp);
                         var code = data.hourly.weather_code[idx];
                         var w = WMO[code] || { en: 'Mixed clouds', ko: '구름 섞임', icon: '🌥️' };
                         wxBody.innerHTML = '<div class="wx-row">'
@@ -2184,7 +2194,7 @@
                             + '</p></div></div>';
                         if (window.dispatchApplyI18n) window.dispatchApplyI18n();
                     })
-                    .catch(function() { showFallback(wxBody, wxFallback); });
+                    .catch(function() { /* keep the styled default block */ });
             }
 
             // Frankfurter — USD→MXN on match day
