@@ -739,25 +739,23 @@
         .fx-seat { margin-top: 0.75rem; border-top: 1px solid var(--rule); padding-top: 0.6rem; display: flex; justify-content: space-between; gap: 0.5rem; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--caption); }
         .fx-seat b { color: var(--text); }
 
-        /* ========== MODULE: ROUTE LINE (LA → GDL) ========== */
-        .route-line { max-width: 620px; margin: 1.5rem auto 0.5rem; padding: 0 1.5rem; text-align: center; }
-        .route-line svg { display: block; width: 100%; height: auto; max-width: 480px; margin: 0 auto; overflow: visible; }
-        .route-line .rl-path { fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
-        .route-line .rl-dot { fill: var(--accent); }
-        .route-line .rl-dot-ring { fill: none; stroke: var(--accent); stroke-width: 1; opacity: 0.4; }
-        .route-line .rl-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; fill: var(--caption); opacity: 0.85; }
-        .route-line .rl-caption { display: block; margin-top: 0.5rem; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--caption); opacity: 0.7; }
-
-        /* ========== MODULE: ROSTER CARD ========== */
-        .roster { max-width: 520px; margin: 1.75rem auto; padding: 0 1.5rem; }
-        .roster-card { border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; background: linear-gradient(180deg, rgba(160,130,109,0.06), rgba(160,130,109,0.02)); }
-        .roster-head { font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); padding: 0.85rem 1rem; border-bottom: 1px solid var(--rule); }
-        .roster-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 0.5rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--rule); font-size: 14px; align-items: center; }
-        .roster-row:last-child { border-bottom: none; }
-        .roster-row .name { font-family: var(--font-display); font-style: italic; font-weight: 600; }
-        .roster-row .role { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--caption); }
-        .roster-row .kit { font-size: 18px; text-align: center; }
-        @media (max-width: 520px) { .roster-row { grid-template-columns: 1fr; text-align: center; } .roster-row .kit { margin-top: 0.25rem; } }
+        /* ========== MODULE: FLIGHT MAP (LAX → GDL) ========== */
+        .flightmap { max-width: 640px; margin: 1.75rem auto 0.75rem; padding: 0 1.5rem; text-align: center; }
+        .flightmap svg { display: block; width: 100%; height: auto; max-width: 540px; margin: 0 auto; overflow: visible; }
+        .fm-grid line { stroke: var(--rule); stroke-width: 1; }
+        .fm-land { fill: var(--accent); opacity: 0.05; }
+        [data-theme="dark"] .fm-land { opacity: 0.08; }
+        .fm-arc { fill: none; stroke: var(--accent); stroke-width: 1.2; stroke-dasharray: 1.5 6; stroke-linecap: round; opacity: 0.35; }
+        .fm-arc-draw { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; }
+        .fm-node-dot { fill: var(--accent); }
+        .fm-node-ring { fill: none; stroke: var(--accent); stroke-width: 1.2; opacity: 0.45; transform-box: fill-box; transform-origin: center; animation: fm-pulse 2.6s ease-out infinite; }
+        .fm-glow-stop { stop-color: var(--accent); stop-opacity: 0.28; }
+        .fm-glow-stop-out { stop-color: var(--accent); stop-opacity: 0; }
+        .fm-label { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; fill: var(--caption); }
+        .fm-plane path { fill: var(--accent); }
+        .fm-caption { display: block; margin-top: 0.6rem; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--caption); opacity: 0.75; }
+        @keyframes fm-pulse { 0% { opacity: 0.5; transform: scale(1); } 70% { opacity: 0; transform: scale(2.1); } 100% { opacity: 0; transform: scale(2.1); } }
+        @media (prefers-reduced-motion: reduce) { .fm-node-ring { animation: none; } }
 
         /* ========== MODULE: CROWD METER ========== */
         .crowd-meter { max-width: 420px; margin: 1.75rem auto; padding: 0 1.5rem; text-align: center; }
@@ -1049,12 +1047,12 @@
         <div class="text-block reveal">
             <div data-l="en">
                 <p>Hey. I took PTO.</p>
-                <p>That sentence has more gravity than it should. I've been at Paramount since March &mdash; manager title, merger weather, the whole cinematic universe &mdash; and until this week I had never once clicked <em>Submit</em> on a vacation request without a low-grade guilt stomachache. Not burnout guilt. <em>Good-employee</em> guilt. The kind that whispers you should be in a standup somewhere, nodding wisely at a Jira ticket.</p>
+                <p>That sentence has more gravity than it should. I've been heads-down at work since March, and until this week I had never once clicked <em>Submit</em> on a vacation request without a low-grade guilt stomachache. Not burnout guilt. <em>Good-employee</em> guilt. The kind that whispers you should be in a standup somewhere, nodding wisely at a Jira ticket.</p>
                 <p>Then: Korea vs. Mexico. June 18. Guadalajara. My dad, my brother Justin, and me &mdash; the trip I promised at the bottom of <a href="/newsletter/006/">last month's letter</a>. Three generations, one rental car, one group chat that started polite and ended in ALL CAPS.</p>
             </div>
             <div data-l="ko">
                 <p>안녕. PTO 냈다.</p>
-                <p>그 문장이 받아들일 만큼 무겁다. 3월부터 파라마운트 &mdash; 매니저 직함, 합병 날씨, 영화 같은 우주 &mdash; 이번 주 전까지는 휴가 신청서에서 <em>제출</em>을 누를 때마다 은근한 죄책감이 있었다. 번아웃 죄책감이 아니다. <em>모범 직원</em> 죄책감. 어딘가 스탠드업에 앉아 Jira 티켓을 현명하게 고개 끄덕여야 한다고 속삭이는 그 종류.</p>
+                <p>그 문장이 받아들일 만큼 무겁다. 3월부터 일에 파묻혀 지냈고, 이번 주 전까지는 휴가 신청서에서 <em>제출</em>을 누를 때마다 은근한 죄책감이 있었다. 번아웃 죄책감이 아니다. <em>모범 직원</em> 죄책감. 어딘가 스탠드업에 앉아 Jira 티켓을 현명하게 고개 끄덕여야 한다고 속삭이는 그 종류.</p>
                 <p>그다음: 6월 18일. 과달라하라. 한국 대 멕시코. 아빠, 동생 저스틴, 나 &mdash; <a href="/newsletter/006/">지난달 편지</a> 맨 아래에서 약속한 여행. 3대, 렌터카 한 대, 처음엔 예의 바르던 단톡방 하나.</p>
             </div>
         </div>
@@ -1104,22 +1102,58 @@
             </div>
         </div>
 
-        <div class="route-line reveal-fade" aria-hidden="true">
-            <svg id="routeLine" viewBox="0 0 480 140" preserveAspectRatio="xMidYMid meet">
-                <circle class="rl-dot-ring" cx="40" cy="108" r="6"></circle>
-                <circle class="rl-dot" cx="40" cy="108" r="2.4"></circle>
-                <text class="rl-label" x="40" y="128" text-anchor="middle">LA</text>
-                <circle class="rl-dot-ring" cx="440" cy="38" r="6"></circle>
-                <circle class="rl-dot" cx="440" cy="38" r="2.4"></circle>
-                <text class="rl-label" x="440" y="22" text-anchor="middle">GDL</text>
-                <path id="routeLinePath" class="rl-path"
-                      d="M 46 106
-                         C 120 98, 200 88, 280 72
-                         S 380 48, 434 38"></path>
+        <div class="flightmap reveal-fade" aria-hidden="true">
+            <svg id="flightMap" viewBox="0 0 480 300" preserveAspectRatio="xMidYMid meet" role="img"
+                 aria-label="Animated flight map from Los Angeles to Guadalajara">
+                <defs>
+                    <radialGradient id="fmGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" class="fm-glow-stop"/>
+                        <stop offset="100%" class="fm-glow-stop-out"/>
+                    </radialGradient>
+                </defs>
+
+                <!-- flight-tracker graticule -->
+                <g class="fm-grid">
+                    <line x1="0" y1="60" x2="480" y2="60"/>
+                    <line x1="0" y1="120" x2="480" y2="120"/>
+                    <line x1="0" y1="180" x2="480" y2="180"/>
+                    <line x1="0" y1="240" x2="480" y2="240"/>
+                    <line x1="80" y1="0" x2="80" y2="300"/>
+                    <line x1="180" y1="0" x2="180" y2="300"/>
+                    <line x1="280" y1="0" x2="280" y2="300"/>
+                    <line x1="380" y1="0" x2="380" y2="300"/>
+                </g>
+
+                <!-- stylized coastline hint: US southwest + Mexico's Pacific bend -->
+                <path class="fm-land" d="M -10 78 C 70 70, 130 96, 175 120 C 230 150, 250 196, 300 224 C 345 250, 420 262, 500 250 L 520 320 L -20 320 Z"/>
+
+                <!-- faint full route as a planned-path guide -->
+                <path id="fmArc" class="fm-arc" d="M 78 86 Q 250 36 402 226"/>
+                <!-- drawn (animated) route on top -->
+                <path id="fmArcDraw" class="fm-arc-draw" d="M 78 86 Q 250 36 402 226"/>
+
+                <!-- endpoints -->
+                <g class="fm-node">
+                    <circle class="fm-node-glow" cx="78" cy="86" r="16" fill="url(#fmGlow)"/>
+                    <circle class="fm-node-ring" cx="78" cy="86" r="7"/>
+                    <circle class="fm-node-dot" cx="78" cy="86" r="3"/>
+                    <text class="fm-label" x="78" y="68" text-anchor="middle">LAX · LOS ANGELES</text>
+                </g>
+                <g class="fm-node">
+                    <circle class="fm-node-glow" cx="402" cy="226" r="16" fill="url(#fmGlow)"/>
+                    <circle class="fm-node-ring" cx="402" cy="226" r="7"/>
+                    <circle class="fm-node-dot" cx="402" cy="226" r="3"/>
+                    <text class="fm-label" x="402" y="250" text-anchor="middle">GDL · GUADALAJARA</text>
+                </g>
+
+                <!-- the plane, moved along the path by JS -->
+                <g id="fmPlane" class="fm-plane">
+                    <path d="M 11 0 L -9 -6 L -3.5 0 L -9 6 Z"/>
+                </g>
             </svg>
-            <span class="rl-caption">
-                <span data-l="en">Hollywood to Guadalajara &middot; ~3h gate-to-gate</span>
-                <span data-l="ko">할리우드에서 과달라하라까지 &middot; 약 3시간</span>
+            <span class="fm-caption">
+                <span data-l="en">LAX &rarr; GDL &middot; ~3h gate-to-gate &middot; 1,560 mi</span>
+                <span data-l="ko">LAX &rarr; GDL &middot; 약 3시간 &middot; 2,510 km</span>
             </span>
         </div>
 
@@ -1130,11 +1164,8 @@
                     <span class="av-src">Frankfurter</span>
                 </p>
                 <div class="av-body" id="fxBody">
-                    <p class="av-loading"><span data-l="en">fetching rate&hellip;</span><span data-l="ko">환율 불러오는 중&hellip;</span></p>
-                    <p class="av-fallback" id="fxFallback" hidden>
-                        <span data-l="en">1 USD &asymp; 17.39 MXN on Jun 18 &mdash; tacos stayed cheap, pride did not.</span>
-                        <span data-l="ko">6월 18일 1 USD &asymp; 17.39 MXN &mdash; 타코는 여전히 쌌고, 자존심만 비쌌다.</span>
-                    </p>
+                    <p class="fx-rate">1 USD = 17.39 MXN<small> Jun 18, 2026</small></p>
+                    <p class="fx-note"><span data-l="en">spot rate I checked before leaving LA &mdash; tacos stayed cheap, pride did not.</span><span data-l="ko">LA 출발 전 확인한 환율 &mdash; 타코는 여전히 쌌고, 자존심만 비쌌다.</span></p>
                 </div>
             </div>
         </div>
@@ -1164,7 +1195,7 @@
          ============================================================ -->
     <div class="chapter">
         <p class="chapter-mark">
-            <span class="num">II</span><span class="ttl"><span data-l="en">The roster</span><span data-l="ko">명단</span></span>
+            <span class="num">II</span><span class="ttl"><span data-l="en">The crew</span><span data-l="ko">일행</span></span>
         </p>
         <div class="text-block reveal">
             <div data-l="en">
@@ -1175,35 +1206,14 @@
             </div>
         </div>
 
-        <div class="roster reveal-fade">
-            <div class="roster-card">
-                <p class="roster-head"><span data-l="en">Lee &times;3 &middot; starting XI</span><span data-l="ko">이씨 &times;3 &middot; 선발</span></p>
-                <div class="roster-row">
-                    <span class="name">Dad</span>
-                    <span class="role"><span data-l="en">captain</span><span data-l="ko">주장</span></span>
-                    <span class="kit" aria-label="Mexico jersey, Korea headband">🇲🇽+🇰🇷</span>
-                </div>
-                <div class="roster-row">
-                    <span class="name">Justin</span>
-                    <span class="role"><span data-l="en">hype man</span><span data-l="ko">분위기 메이커</span></span>
-                    <span class="kit" aria-label="Korea jersey">🇰🇷</span>
-                </div>
-                <div class="roster-row">
-                    <span class="name">Kevin</span>
-                    <span class="role"><span data-l="en">PTO submitter</span><span data-l="ko">PTO 제출자</span></span>
-                    <span class="kit" aria-label="Pink jersey">🩷</span>
-                </div>
-            </div>
-        </div>
-
         <div class="photo-inset reveal">
             <img src="/newsletter/007/images/dad-justin-concourse.jpg"
-                data-alt-en="Kevin's dad in a Mexico jersey and giant sombrero with Justin in a Korea jersey making a finger heart in the Estadio Akron concourse"
-                data-alt-ko="에스타디오 아크론 복도에서 멕시코 유니폼과 거대한 sombrero를 쓴 아버지와 한국 유니폼을 입고 손하트를 만드는 저스틴"
-                alt="Kevin's dad in a Mexico jersey and giant sombrero with Justin in a Korea jersey making a finger heart in the Estadio Akron concourse">
+                data-alt-en="Kevin in a red Korea jersey throwing a Korean finger heart next to a Mexico fan in a giant MEXICO sombrero and green jersey in the Estadio Akron concourse"
+                data-alt-ko="에스타디오 아크론 복도에서 빨간 한국 유니폼을 입고 손하트를 하는 케빈과 거대한 MEXICO 솜브레로에 초록 유니폼을 입은 멕시코 팬"
+                alt="Kevin in a red Korea jersey throwing a Korean finger heart next to a Mexico fan in a giant MEXICO sombrero and green jersey in the Estadio Akron concourse">
             <div class="photo-caption">
-                <span data-l="en">dad's sombrero says MEXICO in flag colors. justin's heart says 🇰🇷. diplomacy.</span>
-                <span data-l="ko">아빠 sombrero엔 MEXICO. 저스틴 손하트엔 🇰🇷. 외교.</span>
+                <span data-l="en">a total stranger in a MEXICO sombrero, me throwing a Korean finger heart. instant friends. that's the whole tournament, really.</span>
+                <span data-l="ko">처음 본 MEXICO 솜브레로 아저씨, 그리고 손하트 하는 나. 즉석 친구. 사실 이게 월드컵 전부다.</span>
             </div>
         </div>
     </div>
@@ -1380,11 +1390,11 @@
         <div class="text-block reveal">
             <div data-l="en">
                 <p>You cannot survive Guadalajara on vibes alone, though we tried. There was octopus &mdash; whole, charred, draped over plantain chips like it had won its own match. There was a chef in a grey coat scooping tartare with the focus of a surgeon, caught on a two-second clip I have watched forty times. Before we flew south, Justin and friends and I fueled up at Kobawoo House: bossam, sizzling squid, steam rising like we were sealing a pact.</p>
-                <p>The food was almost unfairly good. The company was better. Dad narrated every bite. Justin ranked everything. I mostly ate and listened &mdash; which, if you know me at Paramount, is the real vacation.</p>
+                <p>The food was almost unfairly good. The company was better. Dad narrated every bite. Justin ranked everything. I mostly ate and listened &mdash; which, if you know how loud my head usually is, is the real vacation.</p>
             </div>
             <div data-l="ko">
                 <p>과달라하라는 바이브만으론 못 버틴다, 비록 시도는 했다. 문어가 있었다 &mdash; 통째로, 그을리고, 자기 경기에서 이긴 것처럼 플랜틴 칩 위에 늘어진. 회색 코트의 셰프가 외과의사처럼 타르타르를 퍼 담는 2초 클립, 마흔 번은 본 것 같다. 남쪽으로 떠나기 전, 저스틴과 친구들과 고바우집에서 보쌈, 지글지글 오징어, 서약을 맺는 것 같은 김으로 연료를 채웠다.</p>
-                <p>음식은 거의 불공정할 만큼 좋았다. 동행은 더 좋았다. 아빠는 한 입마다 해설. 저스틴은 모든 걸 순위 매김. 나는 주로 먹고 들었다 &mdash; 파라마운트에서의 나에게, 그게 진짜 휴가다.</p>
+                <p>음식은 거의 불공정할 만큼 좋았다. 동행은 더 좋았다. 아빠는 한 입마다 해설. 저스틴은 모든 걸 순위 매김. 나는 주로 먹고 들었다 &mdash; 평소 머릿속이 얼마나 시끄러운지 안다면, 그게 진짜 휴가다.</p>
             </div>
         </div>
 
@@ -1436,11 +1446,11 @@
     <div class="chapter">
         <div class="text-block reveal">
             <div data-l="en">
-                <p>I'm writing this back in LA with a sunburn and a Workday inbox that waited, mostly patiently. First PTO from Paramount: logged, survived, would recommend. The merger is still happening. The manager title still fits like a coat I haven't broken in. Korea lost 0&ndash;1 and I am still not over the goalkeeper moment. But I came home with Dad and Justin in the same group chat, still sending stadium clips at 11pm, and that feels like the more important deliverable.</p>
+                <p>I'm writing this back in LA with a sunburn and an inbox that waited, mostly patiently. First real PTO in a long time: logged, survived, would recommend. Korea lost 0&ndash;1 and I am still not over the goalkeeper moment. But I came home with Dad and Justin in the same group chat, still sending stadium clips at 11pm, and that feels like the part that actually mattered.</p>
                 <p>Last month I ended with <em>see you next month.</em> Here I am. The World Cup is still going. So am I. Back at the lot Monday, probably. Still not over the marquee.</p>
             </div>
             <div data-l="ko">
-                <p>LA에 돌아와 화상과, 대체로 기다려준 Workday 받은편지함 앞에서 쓴다. 파라마운트 첫 PTO: 기록됨, 생존, 추천. 합병은 여전히 진행 중. 매니저 직함은 아직 안 길들여진 코트처럼 맞다. 한국은 0&ndash;1로 졌고 골키퍼 장면은 아직도 머릿속에 있다. 그런데 아빠와 저스틴과 같은 단톡방, 밤 11시에도 경기장 클립을 보내는 그게 더 중요한 deliverable처럼 느껴진다.</p>
+                <p>LA에 돌아와 화상과, 대체로 기다려준 받은편지함 앞에서 쓴다. 오랜만의 진짜 PTO: 기록됨, 생존, 추천. 한국은 0&ndash;1로 졌고 골키퍼 장면은 아직도 머릿속에 있다. 그런데 아빠와 저스틴과 같은 단톡방, 밤 11시에도 경기장 클립을 보내는 그게 진짜 중요한 부분처럼 느껴진다.</p>
                 <p>지난달 <em>다음 달에</em>로 끝냈다. 왔다. 월드컵은 아직 진행 중. 나도. 월요일엔 아마 부지로. 마키는 아직 안 무뎌졌다.</p>
             </div>
         </div>
@@ -2161,12 +2171,6 @@
                 51: { en: 'Light drizzle', ko: '가벼운 이슬비', icon: '🌦️' },
                 61: { en: 'Light rain', ko: '약한 비', icon: '🌧️' }
             };
-            function showFallback(el, fb) {
-                if (!el || !fb) return;
-                el.innerHTML = '';
-                fb.hidden = false;
-            }
-
             // Open-Meteo — archive weather at kickoff (~20:00 America/Mexico_City).
             // The archive endpoint lags real time by several days, so wxBody ships
             // with a fully-styled default block; we only OVERWRITE it if live data
@@ -2198,8 +2202,9 @@
             }
 
             // Frankfurter — USD→MXN on match day
+            // Frankfurter ships with a styled default (above); we only OVERWRITE it
+            // if a live rate comes back. On failure we keep the default (never blank).
             var fxBody = document.getElementById('fxBody');
-            var fxFallback = document.getElementById('fxFallback');
             if (fxBody) {
                 fetch('https://api.frankfurter.dev/v1/2026-06-18?from=USD&to=MXN')
                     .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
@@ -2211,8 +2216,57 @@
                             + '<span data-l="ko">6월 18일 기준 · LA 출발 전 환전 메모</span></p>';
                         if (window.dispatchApplyI18n) window.dispatchApplyI18n();
                     })
-                    .catch(function() { showFallback(fxBody, fxFallback); });
+                    .catch(function() { /* keep the styled default block */ });
             }
+        })();
+
+        // ==================== FLIGHT MAP (LAX → GDL) ====================
+        (function() {
+            var svg = document.getElementById('flightMap');
+            if (!svg) return;
+            var draw = document.getElementById('fmArcDraw');
+            var plane = document.getElementById('fmPlane');
+            if (!draw || !plane) return;
+            var len = draw.getTotalLength();
+            draw.style.strokeDasharray = len;
+
+            function place(t) {
+                var d = Math.max(0, Math.min(len, t * len));
+                var pt = draw.getPointAtLength(d);
+                var pt2 = draw.getPointAtLength(Math.min(len, d + 1.5));
+                var ang = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
+                plane.setAttribute('transform', 'translate(' + pt.x.toFixed(2) + ',' + pt.y.toFixed(2) + ') rotate(' + ang.toFixed(1) + ')');
+            }
+            function finalState() { draw.style.strokeDashoffset = 0; plane.style.opacity = 1; place(1); }
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+                finalState(); return;
+            }
+
+            draw.style.strokeDashoffset = len;
+            plane.style.opacity = 0;
+            place(0);
+
+            var played = false;
+            var io = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (!e.isIntersecting || played) return;
+                    played = true;
+                    io.disconnect();
+                    plane.style.opacity = 1;
+                    var start = null, dur = 2300;
+                    function frame(ts) {
+                        if (!start) start = ts;
+                        var p = Math.min(1, (ts - start) / dur);
+                        var eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+                        draw.style.strokeDashoffset = len * (1 - eased);
+                        place(eased);
+                        if (p < 1) requestAnimationFrame(frame);
+                    }
+                    requestAnimationFrame(frame);
+                });
+            }, { threshold: 0.4 });
+            io.observe(svg);
         })();
 
         // ==================== SCOREBOARD COUNT-UP ====================
@@ -2378,18 +2432,8 @@
                     scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
             });
 
-            // Route line — draws LA → GDL as you scroll
             var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             if (!reduceMotion) {
-                var routePath = document.getElementById('routeLinePath');
-                if (routePath) {
-                    var routeLen = routePath.getTotalLength();
-                    gsap.set(routePath, { strokeDasharray: routeLen, strokeDashoffset: routeLen });
-                    gsap.to(routePath, {
-                        strokeDashoffset: 0, duration: 2.4, ease: 'power1.inOut',
-                        scrollTrigger: { trigger: '.route-line', start: 'top 80%', once: true }
-                    });
-                }
                 var crowdFill = document.getElementById('crowdFill');
                 var crowdValue = document.getElementById('crowdValue');
                 if (crowdFill && crowdValue) {
