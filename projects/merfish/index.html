@@ -145,7 +145,7 @@
             left: 50%;
             transform: translateX(-50%);
             min-height: clamp(440px, 80vh, 760px);
-            background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(70,50,126,0.38), rgba(31,158,137,0.07) 45%, transparent 68%), var(--hero-bg);
+            background: radial-gradient(ellipse 85% 60% at 58% 38%, rgba(31,158,137,0.24), rgba(31,158,137,0.05) 52%, transparent 72%), var(--hero-bg);
             overflow: hidden;
             display: flex;
             align-items: flex-end;
@@ -350,6 +350,7 @@
             border-radius: 10px;
             overflow: hidden;
         }
+        .mf-stats.cols-2 { grid-template-columns: 1fr 1fr; }
         .mf-stat { background: var(--bg); padding: 1.1rem 1.15rem; }
         .mf-stat .v {
             font-size: 30px;
@@ -414,39 +415,42 @@
         .mf-dec-celltype { color: var(--accent-bright); }
         .mf-dec-note { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: rgba(233,231,223,0.45); margin-top: 1rem; }
 
-        /* ——— Pipeline ——— */
-        .mf-pipe {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin: 1.6rem 0 0.5rem;
-            counter-reset: step;
+        /* ——— Pipeline (vertical spine, not a card grid) ——— */
+        .mf-pipe-v {
+            list-style: none;
+            margin: 1.5rem 0 0.35rem;
+            padding: 0 0 0 1.1rem;
+            border-left: 1px solid var(--rule);
+            counter-reset: pstep;
         }
-        .mf-step {
+        .mf-pipe-v li {
+            counter-increment: pstep;
             position: relative;
-            background: var(--tag-bg);
-            border: 1px solid var(--rule);
-            border-radius: 10px;
-            padding: 0.95rem 0.85rem 1rem;
-            overflow: hidden;
+            padding: 0.55rem 0 0.55rem 0.85rem;
+            font-size: 17px;
+            line-height: 1.5;
         }
-        .mf-step::before {
-            counter-increment: step;
-            content: counter(step, decimal-leading-zero);
+        .mf-pipe-v li::before {
+            content: counter(pstep, decimal-leading-zero);
+            position: absolute;
+            left: -1.1rem;
+            top: 0.62rem;
+            transform: translateX(-50%);
             font-family: var(--mono);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--accent);
-            letter-spacing: 0.04em;
+            background: var(--bg);
+            padding: 0 0.35rem;
         }
-        .mf-step::after {
-            content: '';
-            position: absolute; left: 0; top: 0; height: 3px; width: 100%;
-            background: linear-gradient(90deg, var(--accent-deep), var(--accent), var(--accent-bright));
-            opacity: 0.85;
+        .mf-pipe-v li strong { font-weight: 600; }
+        .mf-pipe-v li span {
+            display: block;
+            font-family: var(--mono);
+            font-size: 12px;
+            opacity: 0.58;
+            margin-top: 0.15rem;
         }
-        .mf-step h4 { font-size: 15px; font-weight: 600; line-height: 1.25; margin: 0.5rem 0 0.35rem; }
-        .mf-step p { font-family: var(--mono); font-size: 11px; line-height: 1.5; opacity: 0.6; margin: 0; }
 
         /* ——— Comparison table ——— */
         .mf-table-wrap { margin: 1.5rem 0 0.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -475,11 +479,14 @@
         .mf-scope .badge.stub { background: var(--tag-bg); opacity: 0.7; border: 1px solid var(--rule); }
         [data-theme="dark"] .mf-scope .badge.real { color: var(--accent-bright); }
 
-        /* ——— Decisions ——— */
-        .mf-decision { border-left: 2px solid var(--accent); padding-left: 1.1rem; margin: 1.4rem 0; }
-        .mf-decision h3 { margin-top: 0; }
-        .mf-decision p { font-size: 16.5px; }
-        .mf-decision p:last-child { opacity: 0.7; }
+        .mf-meta-item a { color: inherit; text-decoration: none; opacity: 0.85; }
+        .mf-meta-item a:hover { opacity: 1; text-decoration: underline; }
+        .mf-meta-badge {
+            display: inline-block;
+            vertical-align: middle;
+            height: 16px;
+            margin-left: 0.15rem;
+        }
 
         /* ——— Tags + links ——— */
         .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 1.6rem 0 0; }
@@ -498,17 +505,13 @@
         @media (max-width: 760px) {
             body { font-size: 18px; }
             .lede { font-size: 19px; }
-            .mf-pipe { grid-template-columns: 1fr 1fr; }
             .mf-stats { grid-template-columns: 1fr; }
+            .mf-stats.cols-2 { grid-template-columns: 1fr; }
             .plate-pair { grid-template-columns: 1fr; }
             .mf-bits { gap: 4px; }
             .mf-replay { right: 16px; top: 16px; bottom: auto; }
             .mf-hero h1 { max-width: 100%; }
         }
-        @media (max-width: 460px) {
-            .mf-pipe { grid-template-columns: 1fr; }
-        }
-
         /* ——— Scroll reveal (armed by JS via html.anim; visible by default if JS/IO fails) ——— */
         @media (prefers-reduced-motion: no-preference) {
             html.anim .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
@@ -565,6 +568,8 @@
             <span class="mf-meta-item">~1.6×10⁸ transcripts</span>
             <span class="mf-meta-sep">/</span>
             <span class="mf-meta-item"><b>scanpy</b> · squidpy · STalign</span>
+            <span class="mf-meta-sep">/</span>
+            <span class="mf-meta-item"><a href="https://github.com/kevincorvallis/MERFISH/actions/workflows/test.yml" target="_blank" rel="noopener"><img class="mf-meta-badge" src="https://github.com/kevincorvallis/MERFISH/actions/workflows/test.yml/badge.svg" alt="CI status" width="88" height="16"></a></span>
         </div>
     </div>
 
@@ -573,7 +578,7 @@
         <!-- ——— Intro ——— -->
         <section class="mf-section first">
             <p class="lede">MERFISH (<em>multiplexed error-robust fluorescence in&nbsp;situ hybridization</em>) images individual RNA molecules right where they sit in tissue. Hundreds of genes per cell, positions kept — so the anatomy comes from the molecules themselves.</p>
-            <p class="muted">This project takes that raw scan all the way to a labeled, atlas-placed map — and proves every step on real data.</p>
+            <p class="muted">Portfolio repo, not a production pipeline: notebooks and pytest walk a Vizgen coronal cohort through QC, clustering, cell-type mapping, and CCF registration. Synthetic fixtures run offline in CI; live tests hit public downloads when you have network.</p>
         </section>
 
         <!-- ——— Method: barcode decoder ——— -->
@@ -602,16 +607,16 @@
         <!-- ——— Pipeline ——— -->
         <section class="mf-section">
             <div class="mf-kicker"><span class="idx">PIPELINE</span> Raw imagery to per-cell labels</div>
-            <h2>Six stages, one shared object.</h2>
-            <p>Raw scan in, labeled cells out. Every stage hands off through one <code>AnnData</code> object — and segmentation comes first, since it decides what counts as a cell.</p>
-            <div class="mf-pipe reveal">
-                <div class="mf-step"><h4>Ingest</h4><p>MERSCOPE mosaics, transcripts, cell-by-gene, boundaries</p></div>
-                <div class="mf-step"><h4>QC</h4><p>vs bulk RNAseq + replicate correlation</p></div>
-                <div class="mf-step"><h4>Cluster</h4><p>Scanpy PCA · UMAP · Leiden</p></div>
-                <div class="mf-step"><h4>Cell types</h4><p>marker correlation + bootstrap confidence</p></div>
-                <div class="mf-step"><h4>Segment</h4><p>transcript-aware re-assignment (upstream)</p></div>
-                <div class="mf-step"><h4>Register</h4><p>2D section → Allen CCFv3, per-cell region</p></div>
-            </div>
+            <h2>Six stages, one <code>AnnData</code> object.</h2>
+            <p>Segmentation comes first — it decides what counts as a cell — then QC, clustering, mapping, and atlas registration hand off through the same object.</p>
+            <ol class="mf-pipe-v reveal">
+                <li><strong>Ingest</strong><span>MERSCOPE mosaics, transcripts, cell-by-gene, boundaries</span></li>
+                <li><strong>Segment</strong><span>transcript-aware re-assignment (upstream of counts)</span></li>
+                <li><strong>QC</strong><span>vs bulk RNAseq + replicate correlation</span></li>
+                <li><strong>Cluster</strong><span>Scanpy PCA · UMAP · Leiden</span></li>
+                <li><strong>Cell types</strong><span>marker correlation + bootstrap confidence</span></li>
+                <li><strong>Register</strong><span>2D section → Allen CCFv3, per-cell region</span></li>
+            </ol>
         </section>
 
         <hr class="rule">
@@ -619,8 +624,8 @@
         <!-- ——— QC ——— -->
         <section class="mf-section">
             <div class="mf-kicker"><span class="idx">VALIDATION</span> Check the counts first</div>
-            <h2>Trust the numbers before the biology.</h2>
-            <p>First, make sure the numbers are real. MERFISH counts match an independent assay (bulk RNAseq) and reproduce across replicates — only then is clustering worth doing.</p>
+            <h2>QC before clustering.</h2>
+            <p>MERFISH counts should match bulk RNAseq and reproduce across replicates in the <code>MsBrain_VS38</code> aging cohort — rendered with seaborn from cohort data.</p>
             <div class="mf-stats reveal">
                 <div class="mf-stat"><div class="v">0.70–0.75</div><div class="l">Pearson r · MERFISH vs bulk RNAseq (per gene)</div></div>
                 <div class="mf-stat"><div class="v">0.98–1.00</div><div class="l">replicate ↔ replicate correlation</div></div>
@@ -637,12 +642,11 @@
         <!-- ——— Cell types in space ——— -->
         <section class="mf-section">
             <div class="mf-kicker"><span class="idx">CELL TYPES</span> Mapping with a confidence score</div>
-            <h2>Which cell type, and how sure?</h2>
-            <p>What cell is each cluster — and how sure are we? I reimplemented the Allen <code>cell_type_mapper</code> approach: match marker genes, attach a <strong>confidence score</strong>. It beats the old cosine heuristic, which hands you a label but no confidence.</p>
-            <div class="mf-stats reveal">
+            <h2>Cell types with a confidence score.</h2>
+            <p>I reimplemented the Allen <code>cell_type_mapper</code> approach on Moffitt 2018 hypothalamus hold-out data: marker-gene matching plus a bootstrap confidence that beats the old cosine heuristic (label only, no score). Fine subtype accuracy within correct classes: <span class="accent-num">0.82</span>.</p>
+            <div class="mf-stats cols-2 reveal">
                 <div class="mf-stat"><div class="v">0.77</div><div class="l">held-out class accuracy (vs 0.71 cosine) · 36,828 cells</div></div>
                 <div class="mf-stat"><div class="v">0.87</div><div class="l">mean per-cell confidence</div></div>
-                <div class="mf-stat"><div class="v">0.82</div><div class="l">fine subtype accuracy within correct classes</div></div>
             </div>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-celltype.png" alt="Four-panel principled cell-type mapping: calibration curve, correct-versus-incorrect confidence histogram, truth-versus-predicted concordance heatmap, and a coronal slice colored by per-cell confidence" loading="lazy" width="1600" height="1168">
@@ -665,13 +669,8 @@
         <!-- ——— Segmentation ——— -->
         <section class="mf-section">
             <div class="mf-kicker"><span class="idx">SEGMENTATION</span> The decision that sits upstream</div>
-            <h2>Where you draw the cell changes the answer.</h2>
-            <p>Draw the cell boundary wrong and everything downstream shifts. Assigning each molecule by position <em>and</em> expression — <strong>transcript-aware</strong> segmentation — beats the vendor-default Voronoi and recovers the true cell types.</p>
-            <div class="mf-stats reveal">
-                <div class="mf-stat"><div class="v">0.76</div><div class="l">transcript-assignment accuracy (vs 0.70 Voronoi, 0.17 nucleus-only)</div></div>
-                <div class="mf-stat"><div class="v">1.00</div><div class="l">downstream Leiden ARI (vs 0.96 baseline)</div></div>
-                <div class="mf-stat"><div class="v">3</div><div class="l">methods benchmarked end to end on shared ground truth</div></div>
-            </div>
+            <h2>Segmentation sits upstream.</h2>
+            <p>Draw the cell boundary wrong and everything downstream shifts. On shared ground truth, transcript-aware assignment hits <span class="accent-num">0.76</span> accuracy (Voronoi <span class="accent-num">0.70</span>, nucleus-only <span class="accent-num">0.17</span>); downstream Leiden ARI reaches <span class="accent-num">1.00</span> vs <span class="accent-num">0.96</span> baseline. Three methods benchmarked end-to-end (Baysor / proseg / segger-style).</p>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-segmentation.png" alt="Four-panel segmentation comparison: ground-truth transcripts, transcript-assignment accuracy bars, downstream Leiden ARI bars, and a crop of boundary transcripts the transcript-aware method rescues" loading="lazy" width="1600" height="1116">
                 <figcaption><b>Segmentation changes downstream cell types.</b> Transcript-aware assignment (Baysor / proseg / segger-style) rescues the boundary molecules a Voronoi baseline misassigns. A guarded <span class="mono">cellpose_sam_segment()</span> hook runs Cellpose-SAM on DAPI mosaics when installed.</figcaption>
@@ -683,13 +682,8 @@
         <!-- ——— Atlas registration ——— -->
         <section class="mf-section">
             <div class="mf-kicker"><span class="idx">REGISTRATION</span> The hardest part of a new scan</div>
-            <h2>Putting a single 2D slice into a 3D brain.</h2>
-            <p>Which brain region is each cell in? You have to fit a flat 2D slice into the 3D Allen atlas — right depth, right angle — before any label means anything. The pipeline does it (anchor → <strong>STalign</strong> warp → label lift-over) and adds what off-the-shelf tools skip: a <strong>per-cell confidence</strong> and a <strong>QC check</strong>.</p>
-            <div class="mf-stats reveal">
-                <div class="mf-stat"><div class="v">~98–99<small>%</small></div><div class="l">accuracy of high-confidence calls, at every ontology depth</div></div>
-                <div class="mf-stat"><div class="v">0.14→0.96</div><div class="l">QC score separates good vs deliberately-bad registration</div></div>
-                <div class="mf-stat"><div class="v">670</div><div class="l">CCFv3 leaf regions, rolled up the ontology for robust calls</div></div>
-            </div>
+            <h2>Register the section to CCFv3.</h2>
+            <p>Each cell needs a brain-region label — anchor the AP plane, warp with <strong>STalign</strong>, lift labels from the Allen atlas. The registration core adds per-cell confidence and a QC score that separates good fits from deliberately bad ones (<span class="accent-num">0.14→0.96</span> on synthetic misalignment). High-confidence calls hit ~98–99% at every ontology depth on that synthetic geometry; <span class="accent-num">670</span> leaf regions roll up the ontology tree.</p>
 
             <h3>STalign LDDMM, ground-truthed</h3>
             <p>On a slice cut from a known plane, STalign places it to <span class="accent-num">46.7 µm</span> — under half a voxel — and gets <span class="accent-num">0.89</span> of per-cell labels right, in about two minutes on CPU. A real 2D→3D fit, not a stub.</p>
@@ -699,12 +693,7 @@
             </figure>
 
             <h3>Auto AP-anchor for STalign's init-sensitivity</h3>
-            <p>STalign can misfire on its starting guess — a posterior slice landed <span class="mono">1.44 mm</span> off. A training-free anchor finds the right depth first by sliding the slice against every atlas plane: ~10× better, and all three test slices align.</p>
-            <div class="mf-stats reveal">
-                <div class="mf-stat"><div class="v">1440→148<small>µm</small></div><div class="l">posterior AP error with auto-anchor (~10× better)</div></div>
-                <div class="mf-stat"><div class="v">0.23→0.68</div><div class="l">thalamus IoU, posterior scan</div></div>
-                <div class="mf-stat"><div class="v">3 / 3</div><div class="l">thalamic scans aligned (was 1 / 3)</div></div>
-            </div>
+            <p>STalign can misfire on its starting guess — a posterior slice landed <span class="mono">1.44 mm</span> off before the anchor. Sliding the section against every atlas plane fixes depth first: posterior AP error drops <span class="accent-num">1440→148 µm</span>, thalamus IoU on that scan goes <span class="accent-num">0.23→0.68</span>, and all three thalamic test sections align (was 1/3). Anchor logic is unit-tested; posterior recovery is live-tested.</p>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-thalamus.png" alt="Two rows of three coronal scans: top shows ground-truth thalamus in crimson across anterior, mid, and posterior sections; bottom shows the thalamus recovered by STalign in green, including the posterior bilateral clusters" loading="lazy" width="1600" height="988">
                 <figcaption><b>Thalamus across three scans.</b> Truth (crimson, top) vs recovered by STalign→CCFv3 (green, bottom), including the posterior bilateral clusters the bare fit missed. The anchor is unit-tested; the posterior recovery is live-tested.</figcaption>
@@ -716,11 +705,11 @@
         <!-- ——— Real data ——— -->
         <section class="mf-section">
             <div class="mf-kicker"><span class="idx">PROOF</span> Tested on real data</div>
-            <h2>It recovers published biology on real data.</h2>
-            <p>The real test: take a <a href="https://www.science.org/doi/10.1126/science.aau5324" target="_blank" rel="noopener">published MERFISH dataset</a> (<span class="accent-num">73,626</span> cells) and run clustering blind. It recovers the authors' own cell types — <span class="accent-num">ARI = 0.28</span> vs ~0 for random labels — with matching UMAP structure and real anatomy in the slice.</p>
+            <h2>Live test on Moffitt 2018.</h2>
+            <p><a href="https://www.science.org/doi/10.1126/science.aau5324" target="_blank" rel="noopener">Moffitt et al.</a> hypothalamic MERFISH — <span class="accent-num">73,626</span> cells, 160 genes. Unsupervised Leiden (27 clusters) vs 16 published classes: ARI <span class="accent-num">0.28</span> (random ≈ 0), concordant UMAP, real coronal anatomy.</p>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-live.png" alt="Four-panel live validation: two UMAPs colored by Leiden clusters and by published cell classes, a coronal spatial slice, and a Leiden-versus-published concordance heatmap" loading="lazy" width="1600" height="1255">
-                <figcaption><b>Live validation on real MERFISH.</b> Unsupervised Leiden (27 clusters) vs 16 published classes: concordant UMAP, coronal anatomy, and a near-diagonal concordance heatmap. Generated live by the pytest suite (<span class="mono">21 offline / 26 total</span>); offline tests run in CI on Python 3.12.</figcaption>
+                <figcaption><b>Live validation on real MERFISH.</b> Unsupervised Leiden (27 clusters) vs 16 published classes: concordant UMAP, coronal anatomy, and a near-diagonal concordance heatmap. Generated by the pytest suite (<span class="mono">34 offline / 41 total</span>, 7 live); offline tests run in CI on Python 3.12.</figcaption>
             </figure>
         </section>
 
@@ -729,8 +718,8 @@
         <!-- ——— Context ——— -->
         <section class="mf-section">
             <div class="mf-kicker"><span class="idx">CONTEXT</span> Where MERFISH sits in the field</div>
-            <h2>One of three imaging-based platforms.</h2>
-            <p>MERFISH is one of three imaging platforms that read single molecules in place. Imaging trades panel size for subcellular precision; sequencing trades precision for whole-transcriptome reach. No single winner.</p>
+            <h2>Imaging vs sequencing.</h2>
+            <p>MERFISH is one of three imaging platforms that read single molecules in place. Imaging trades panel size for subcellular precision; sequencing trades precision for whole-transcriptome reach.</p>
             <div class="mf-table-wrap reveal">
                 <table class="mf-table">
                     <thead>
@@ -766,8 +755,8 @@
         <!-- ——— Honest scope ——— -->
         <section class="mf-section">
             <div class="mf-kicker"><span class="idx">SCOPE</span> What's implemented vs what's wired-in</div>
-            <h2>What's built, and what's wired in.</h2>
-            <p>A light core runs in CI; the heavy atlases and engines plug in behind the same interface — no rewrite needed.</p>
+            <h2>Repo status.</h2>
+            <p>Light core in CI; heavy atlases and engines plug in behind the same interface.</p>
             <ul class="mf-scope reveal">
                 <li><span class="badge real">implemented</span><span>Scanpy pipeline, cell-type mapper, segmentation benchmark, and the registration core (geometry, label transfer, uncertainty, QC), all covered by offline pytest.</span></li>
                 <li><span class="badge real">validated</span><span>Allen CCFv3 via brainglobe, and the STalign LDDMM deformable backend with a ground-truthed fit, in an isolated NumPy-2 / Python-3.12 environment.</span></li>
@@ -778,22 +767,11 @@
 
         <hr class="rule">
 
-        <!-- ——— Decisions ——— -->
+        <!-- ——— Notes ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">DECISIONS</span> Why it's built this way</div>
-            <h2>Engineering choices.</h2>
-            <div class="mf-decision">
-                <h3>A confidence score on every call</h3>
-                <p>Cell-type and region calls both ship with a calibrated confidence — trust the confident ones, flag the rest. Same trick, reused twice.</p>
-            </div>
-            <div class="mf-decision">
-                <h3>Light core, pluggable backends</h3>
-                <p>Every stage has a no-download synthetic path, so the whole pipeline runs in CI. The real engines slot in behind the same signatures — the test suite is the spec.</p>
-            </div>
-            <div class="mf-decision">
-                <h3>Modern stack, on purpose</h3>
-                <p>STalign pins an ancient <code>numpy==1.23</code>; a <code>--no-deps</code> install runs it on NumPy 2.4 / Python 3.12 with everything else. One environment, not two.</p>
-            </div>
+            <div class="mf-kicker"><span class="idx">NOTES</span> Engineering</div>
+            <h2>A few choices.</h2>
+            <p>Cell-type and region calls both ship calibrated confidence — same pattern, two stages. Every stage has a no-download synthetic path so pytest runs in CI without atlas downloads; real engines slot in behind the same function signatures. STalign upstream still pins <code>numpy==1.23</code>; I install it <code>--no-deps</code> beside NumPy 2.4 in one venv rather than maintaining a separate STalign-only environment.</p>
         </section>
 
         <hr class="rule">
