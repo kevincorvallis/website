@@ -469,9 +469,6 @@
             padding: 0 20px clamp(28px, 6vw, 64px);
             pointer-events: none;
         }
-        .mf-chapter-hero .mf-hero-actions {
-            pointer-events: auto;
-        }
 
         /* ——— Header ——— */
         header {
@@ -545,16 +542,6 @@
         .skip-link:focus { top: 0; }
 
         /* ——— Hero typography (over immersive stage) ——— */
-        .mf-hero-actions {
-            position: absolute;
-            right: max(20px, calc(50% - 410px + 20px));
-            bottom: clamp(72px, 12vw, 120px);
-            z-index: 3;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: flex-end;
-        }
         .mf-eyebrow {
             font-family: var(--mono);
             font-size: 12px;
@@ -605,21 +592,6 @@
             text-shadow: 0 1px 22px rgba(0, 0, 0, 0.88);
             font-weight: 400;
         }
-        .mf-replay {
-            font-family: var(--mono);
-            font-size: 11px;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: rgba(244,242,234,0.72);
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.22);
-            border-radius: 999px;
-            padding: 7px 14px;
-            cursor: pointer;
-            transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-        }
-        .mf-replay:hover { color: var(--accent-bright); border-color: var(--accent-bright); background: rgba(255,255,255,0.10); }
-
         /* ——— Metadata bar ——— */
         .mf-meta {
             padding: 0 clamp(1.25rem, 4vw, 2rem);
@@ -901,18 +873,32 @@
             .mf-stats.cols-2 { grid-template-columns: 1fr; }
             .plate-pair { grid-template-columns: 1fr; }
             .mf-bits { gap: 4px; }
-            .mf-hero-actions { right: 16px; top: max(56px, calc(env(safe-area-inset-top) + 46px)); bottom: auto; }
             .mf-scroll-hint { display: none; }
             .mf-hero h1 { max-width: 100%; }
             .mf-meta-inner { font-size: 11.5px; padding: 0.65rem 0.85rem; gap: 0.45rem 0.75rem; }
             .mf-meta-sep { display: none; }
             .mf-meta-item { white-space: normal; }
-            .mf-hero-wrap { height: 125vh; }
+            .mf-hero-wrap { height: 118vh; }
             .mf-progress { display: none; }
             .mf-grain { opacity: 0.028; animation: none; }
-            .mf-panel { margin-bottom: 9vh; --panel-r: 16px; }
             .mf-chapter-bridge { display: none; }
-            .mf-chapter-gap { height: 3vh; }
+            .mf-chapter-gap { height: 0; }
+
+            /* On phones the per-section cards read as a stack of disconnected
+               boxes — flatten the chrome so the page reads as one continuous,
+               scrollable article. */
+            .mf-panel {
+                max-width: 100%;
+                margin: 0 0 2.4rem;
+                padding: 0 20px;
+                background: none;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .mf-panel::before,
+            .mf-panel::after { display: none; }
+            .mf-panel.first { margin-top: 0; }
         }
         @media (max-width: 980px) {
             .mf-progress-dots { display: none; }
@@ -961,6 +947,10 @@
         @media (pointer: coarse) {
             .mf-cursor-ring { display: none; }
             #mf-trail-canvas { display: none; }
+            /* The brain is decorative on touch devices: never intercept the
+               swipe, so a vertical drag scrolls the page instead of panning
+               (and pinch-to-zoom the page works too). */
+            #mf-canvas { pointer-events: none; touch-action: pan-y; cursor: default; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
@@ -1015,9 +1005,6 @@
     <div class="mf-scroll">
         <div class="mf-hero-wrap" id="mf-hero-wrap">
         <section class="mf-chapter-hero mf-hero" aria-label="A coronal mouse-brain section reconstructed from individual RNA transcript positions">
-            <div class="mf-hero-actions">
-                <button class="mf-replay" id="mf-replay" type="button" data-i18n="merfish.replay">⟳ Replay</button>
-            </div>
             <div class="mf-hero-inner" id="mf-hero-inner">
                 <div class="mf-eyebrow" data-i18n="merfish.heroEyebrow">MERFISH · Mouse-Brain Atlas</div>
                 <h1 data-i18n-html="merfish.heroTitle"><span class="mf-title-line">Anatomy from</span> <em>RNA alone.</em></h1>
@@ -1549,6 +1536,7 @@
         function enableImmersive() {
             if (immersiveActive) return;
             immersiveActive = true;
+            if (coarse) { if (particles.length) drawStatic(); return; }
             if (!reduce && particles.length && !fellBack) {
                 if (settled) startLoop();
                 else start();
@@ -1575,6 +1563,10 @@
             if (allDone && elapsed > DUR + 0.5) {
                 settled = true;
                 if (doneTimer) { clearTimeout(doneTimer); doneTimer = null; }
+                // On touch devices, freeze once assembled — a perpetual redraw
+                // loop fights the scroll and drains battery. Scroll fade is
+                // CSS-only, so nothing else needs the loop.
+                if (coarse) { drawStatic(); raf = null; return; }
             }
             raf = requestAnimationFrame(frame);
         }
@@ -1613,6 +1605,7 @@
         }
 
         function onPointerDown(e) {
+            if (coarse) return;
             if (!settled || isOverPanel(e.target)) return;
             ptr.ids[e.pointerId] = { x: e.clientX, y: e.clientY };
             canvas.setPointerCapture(e.pointerId);
@@ -1632,7 +1625,7 @@
         }
 
         function onPointerMove(e) {
-            if (!immersiveActive) return;
+            if (!immersiveActive || coarse) return;
             var nx = e.clientX / W, ny = e.clientY / H;
             var rawVx = (nx - mouse.x) * W;
             var rawVy = (ny - mouse.y) * H;
@@ -1808,6 +1801,25 @@
             }
 
             scrollP = Math.min(1, y / (heroH * 1.55));
+
+            if (coarse) {
+                // Touch path: fade the stage with opacity only. Blur filters and
+                // per-frame canvas transforms are the main cause of scroll jank
+                // on phones, so skip them entirely.
+                stage.style.opacity = String(Math.max(0, 1 - scrollP * 0.9));
+                stage.style.filter = 'none';
+                stage.style.setProperty('--scroll-p', scrollP.toFixed(3));
+                if (stageInner) stageInner.style.transform = '';
+                if (heroInner) {
+                    heroInner.style.opacity = String(Math.max(0, 1 - pinP * 1.4));
+                    // reduced-motion users get a pure fade, no scroll-linked shift
+                    heroInner.style.transform = reduce ? '' : 'translateY(' + (pinP * -34).toFixed(1) + 'px)';
+                    heroInner.style.filter = 'none';
+                }
+                updateProgress();
+                return;
+            }
+
             var stageOpacity = 1 - scrollP * 0.68;
             var stageBlur = scrollP * 4.2;
             var stageScale = 1 + scrollP * 0.09;
@@ -1859,8 +1871,14 @@
         img.onload = start;
         img.src = '/projects/images/merfish-hero.png';
 
-        var rt;
+        var rt, lastVW = window.innerWidth;
         window.addEventListener('resize', function () {
+            // Mobile browser chrome (the URL bar) collapsing on scroll fires a
+            // resize with the SAME width — don't rebuild the particle field for
+            // those, or the brain jumps/re-assembles mid-scroll. Just re-fit the
+            // hero fade to the new viewport height.
+            if (coarse && window.innerWidth === lastVW) { applyScrollFx(); return; }
+            lastVW = window.innerWidth;
             clearTimeout(rt);
             rt = setTimeout(function () {
                 if (!img.width) return;
@@ -1873,13 +1891,6 @@
             }, 200);
         });
 
-        var replayBtn = document.getElementById('mf-replay');
-        if (replayBtn) {
-            replayBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                if (img.width) start();
-            });
-        }
     })();
     </script>
 
