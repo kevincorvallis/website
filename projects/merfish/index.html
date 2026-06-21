@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-page="merfish">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERFISH — Kevin Lee</title>
+    <meta name="description" content="Case study: a spatial-transcriptomics pipeline that turns Vizgen MERSCOPE mouse-brain data into cell-type-mapped, atlas-registered maps — one RNA molecule at a time.">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://klee.page/projects/merfish">
+    <meta property="og:title" content="MERFISH — Kevin Lee">
+    <meta property="og:description" content="Reading hundreds of genes per cell, in place — then rebuilding the mouse brain from the position of every transcript.">
+    <meta property="og:image" content="https://klee.page/projects/images/merfish-hero.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MERFISH — Kevin Lee">
+    <meta name="twitter:description" content="A spatial-transcriptomics pipeline: MERSCOPE mouse brain to cell-type-mapped, atlas-registered maps.">
+    <meta name="twitter:image" content="https://klee.page/projects/images/merfish-hero.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+
+    <!-- Prevent flash of wrong theme -->
+    <script>
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || systemPreference);
+        })();
+    </script>
+
+    <!-- Fonts: Newsreader (the site's display/body) + IBM Plex Mono (data readout register) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --tag-bg: rgba(31, 30, 29, 0.08);
+            --rule: rgba(31, 30, 29, 0.14);
+            --plate: #ffffff;                 /* figure mat — always light so matplotlib figures read as plates in both themes */
+            --plate-border: rgba(31, 30, 29, 0.10);
+            --plate-shadow: 0 2px 24px rgba(0, 0, 0, 0.08);
+            /* viridis-derived accents — the colormap of single-cell biology */
+            --accent: #1f9e89;                /* viridis teal-green (workhorse) */
+            --accent-bright: #93c01f;         /* viridis chartreuse (rare highlight) */
+            --accent-deep: #46327e;           /* viridis violet (depth) */
+            --hero-bg: #0b0c0a;
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --tag-bg: rgba(240, 238, 230, 0.1);
+            --rule: rgba(240, 238, 230, 0.16);
+            --plate: #f7f6f1;
+            --plate-border: rgba(240, 238, 230, 0.12);
+            --plate-shadow: 0 2px 28px rgba(0, 0, 0, 0.45);
+            --accent: #2bb39b;
+            --accent-bright: #aadc32;
+        }
+
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        ::selection { background: rgba(43, 179, 155, 0.30); color: inherit; }
+
+        a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s ease, opacity 0.2s ease; }
+        a:hover { opacity: 0.6; }
+
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+            border-radius: 2px;
+        }
+
+        /* ——— Header ——— */
+        header {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 15px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 5;
+        }
+        .back-link {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            letter-spacing: 0.02em;
+            text-decoration: none;
+            opacity: 0.5;
+            transition: opacity 0.2s ease, color 0.3s ease;
+        }
+        .back-link:hover { opacity: 0.85; }
+
+        .toggle-wrap { display: flex; align-items: center; }
+        .toggle-wrap input {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        }
+        .toggle-wrap input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 10px; }
+        .toggle-wrap label {
+            position: relative; display: block; width: 40px; height: 20px;
+            background: var(--text); border-radius: 10px; cursor: pointer;
+        }
+        .toggle-wrap label::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 16px; height: 16px; background: var(--bg);
+            border-radius: 50%; transition: transform 0s;
+        }
+        .toggle-wrap label.has-transition::after { transition: transform 0.2s; }
+        .toggle-wrap input:checked + label::after { transform: translateX(20px); }
+
+        .skip-link {
+            position: absolute; top: -48px; left: 0; padding: 8px 16px;
+            background: var(--text); color: var(--bg); z-index: 100;
+            font-family: var(--mono); font-size: 13px; text-decoration: none; transition: top 0.2s ease;
+        }
+        .skip-link:focus { top: 0; }
+
+        /* ——— Hero (full-bleed dark, particle reconstruction) ——— */
+        .mf-hero {
+            position: relative;
+            width: 100vw;
+            left: 50%;
+            transform: translateX(-50%);
+            min-height: clamp(440px, 80vh, 760px);
+            background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(70,50,126,0.38), rgba(31,158,137,0.07) 45%, transparent 68%), var(--hero-bg);
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            margin-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        #mf-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: crosshair;
+        }
+        /* legibility scrim under the headline */
+        .mf-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(11,12,10,0.92) 0%, rgba(11,12,10,0.55) 26%, rgba(11,12,10,0.0) 56%);
+            pointer-events: none;
+        }
+        .mf-hero-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 820px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px clamp(28px, 5vw, 56px);
+            pointer-events: none;
+        }
+        .mf-eyebrow {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent-bright);
+            margin-bottom: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+        }
+        .mf-eyebrow::before {
+            content: '';
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--accent-bright);
+            box-shadow: 0 0 10px var(--accent-bright);
+        }
+        .mf-hero h1 {
+            font-size: clamp(44px, 9vw, 104px);
+            font-weight: 600;
+            line-height: 0.98;
+            letter-spacing: -0.02em;
+            color: #f4f2ea;
+            margin-bottom: 1.1rem;
+            max-width: 14ch;
+        }
+        .mf-hero h1 em {
+            font-style: italic;
+            font-weight: 500;
+            color: var(--accent);
+        }
+        .mf-hero-sub {
+            font-size: clamp(17px, 2.3vw, 21px);
+            line-height: 1.5;
+            color: rgba(244,242,234,0.82);
+            max-width: 52ch;
+        }
+        .mf-replay {
+            position: absolute;
+            right: max(20px, calc(50% - 410px + 20px));
+            bottom: clamp(28px, 5vw, 56px);
+            z-index: 3;
+            pointer-events: auto;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(244,242,234,0.55);
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 999px;
+            padding: 7px 14px;
+            cursor: pointer;
+            transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .mf-replay:hover { color: var(--accent-bright); border-color: var(--accent-bright); background: rgba(255,255,255,0.10); }
+
+        /* ——— Metadata bar (sample-sheet readout) ——— */
+        .mf-meta {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 1.1rem 20px 0;
+        }
+        .mf-meta-inner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.55rem 1.15rem;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            letter-spacing: 0.01em;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            background: var(--tag-bg);
+        }
+        .mf-meta-item { white-space: nowrap; opacity: 0.85; }
+        .mf-meta-item b { font-weight: 600; opacity: 1; color: var(--accent); }
+        .mf-meta-sep { opacity: 0.25; }
+
+        /* ——— Main column ——— */
+        main {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .mf-section { padding: 2.8rem 0 0; }
+        .mf-section.first { padding-top: 2.6rem; }
+
+        .mf-kicker {
+            font-family: var(--mono);
+            font-size: 11.5px;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.7em;
+        }
+        .mf-kicker .idx { opacity: 0.5; }
+
+        h2 {
+            font-size: clamp(26px, 4vw, 33px);
+            font-weight: 600;
+            line-height: 1.12;
+            letter-spacing: -0.015em;
+            margin-bottom: 1.1rem;
+            max-width: 22ch;
+        }
+        h3 {
+            font-size: 19px;
+            font-weight: 600;
+            line-height: 1.35;
+            margin: 1.75rem 0 0.5rem;
+        }
+        p { margin-bottom: 1rem; }
+        p:last-child { margin-bottom: 0; }
+        .lede { font-size: 21px; line-height: 1.55; }
+        .muted { opacity: 0.62; }
+        strong { font-weight: 600; }
+        code, .mono { font-family: var(--mono); }
+        .mf-section p code {
+            font-size: 0.82em;
+            background: var(--tag-bg);
+            padding: 1px 6px;
+            border-radius: 5px;
+        }
+        .accent-num { color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+        hr.rule {
+            border: none;
+            border-top: 1px solid var(--rule);
+            margin: 2.8rem 0 0;
+        }
+
+        /* ——— Figure plate ——— */
+        figure.plate {
+            margin: 1.6rem 0 0.5rem;
+            background: var(--plate);
+            border: 1px solid var(--plate-border);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: var(--plate-shadow);
+        }
+        figure.plate img { width: 100%; height: auto; display: block; border-radius: 6px; }
+        figure.plate figcaption {
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.55;
+            color: #4a4a45;
+            padding: 0.7rem 0.4rem 0.15rem;
+            letter-spacing: 0.005em;
+        }
+        figure.plate figcaption b { color: #1f1e1d; font-weight: 600; }
+        .plate-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .plate-pair figure.plate { margin-top: 0; }
+
+        /* ——— Stat callout row ——— */
+        .mf-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            margin: 1.8rem 0 0.4rem;
+            background: var(--rule);
+            border: 1px solid var(--rule);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .mf-stat { background: var(--bg); padding: 1.1rem 1.15rem; }
+        .mf-stat .v {
+            font-size: 30px;
+            font-weight: 600;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            color: var(--accent);
+            font-variant-numeric: tabular-nums;
+        }
+        .mf-stat .v small { font-size: 0.5em; opacity: 0.65; font-weight: 500; }
+        .mf-stat .l {
+            font-family: var(--mono);
+            font-size: 11px;
+            line-height: 1.45;
+            letter-spacing: 0.02em;
+            opacity: 0.62;
+            margin-top: 0.5rem;
+        }
+
+        /* ——— MERFISH barcode decoder ——— */
+        .mf-decoder {
+            background: var(--hero-bg);
+            border-radius: 14px;
+            padding: clamp(1.3rem, 3vw, 2rem);
+            margin: 1.6rem 0 0.6rem;
+            color: #e9e7df;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .mf-dec-top {
+            display: flex; justify-content: space-between; align-items: baseline;
+            gap: 1rem; margin-bottom: 1.3rem; flex-wrap: wrap;
+        }
+        .mf-dec-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(233,231,223,0.5); }
+        .mf-dec-round { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--accent-bright); }
+        .mf-bits {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            gap: clamp(4px, 1vw, 8px);
+            margin-bottom: 1.3rem;
+        }
+        .mf-bit {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+            transition: background 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, transform 0.28s ease;
+        }
+        .mf-bit.lit {
+            background: var(--accent);
+            border-color: var(--accent-bright);
+            box-shadow: 0 0 14px rgba(170,220,50,0.5);
+        }
+        .mf-bit.on-final.lit { background: var(--accent-bright); }
+        .mf-bit.read { border-color: rgba(255,255,255,0.28); }
+        .mf-dec-readout {
+            display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap;
+            font-family: var(--mono); font-size: 13px;
+        }
+        .mf-dec-arrow { color: rgba(233,231,223,0.4); }
+        .mf-dec-gene { font-size: 20px; font-weight: 600; color: #f4f2ea; letter-spacing: 0.01em; }
+        .mf-dec-celltype { color: var(--accent-bright); }
+        .mf-dec-note { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: rgba(233,231,223,0.45); margin-top: 1rem; }
+
+        /* ——— Pipeline ——— */
+        .mf-pipe {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 1.6rem 0 0.5rem;
+            counter-reset: step;
+        }
+        .mf-step {
+            position: relative;
+            background: var(--tag-bg);
+            border: 1px solid var(--rule);
+            border-radius: 10px;
+            padding: 0.95rem 0.85rem 1rem;
+            overflow: hidden;
+        }
+        .mf-step::before {
+            counter-increment: step;
+            content: counter(step, decimal-leading-zero);
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.04em;
+        }
+        .mf-step::after {
+            content: '';
+            position: absolute; left: 0; top: 0; height: 3px; width: 100%;
+            background: linear-gradient(90deg, var(--accent-deep), var(--accent), var(--accent-bright));
+            opacity: 0.85;
+        }
+        .mf-step h4 { font-size: 15px; font-weight: 600; line-height: 1.25; margin: 0.5rem 0 0.35rem; }
+        .mf-step p { font-family: var(--mono); font-size: 11px; line-height: 1.5; opacity: 0.6; margin: 0; }
+
+        /* ——— Comparison table ——— */
+        .mf-table-wrap { margin: 1.5rem 0 0.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table.mf-table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 560px; }
+        table.mf-table th, table.mf-table td { text-align: left; padding: 0.7rem 0.85rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+        table.mf-table thead th {
+            font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+            opacity: 0.55; font-weight: 500; border-bottom: 1px solid var(--text);
+        }
+        table.mf-table tbody tr.is-this { background: var(--tag-bg); }
+        table.mf-table td.platform { font-weight: 600; white-space: nowrap; }
+        table.mf-table td .sub { font-family: var(--mono); font-size: 11px; opacity: 0.5; display: block; margin-top: 2px; }
+        table.mf-table .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+        /* ——— Scope / status list ——— */
+        .mf-scope { list-style: none; margin: 1.3rem 0 0.5rem; display: grid; gap: 0.55rem; }
+        .mf-scope li {
+            display: grid; grid-template-columns: auto 1fr; gap: 0.75rem; align-items: start;
+            font-size: 16px; line-height: 1.5;
+        }
+        .mf-scope .badge {
+            font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 3px 8px; border-radius: 999px; white-space: nowrap; margin-top: 3px;
+        }
+        .mf-scope .badge.real { background: rgba(31,158,137,0.16); color: var(--accent); border: 1px solid rgba(31,158,137,0.35); }
+        .mf-scope .badge.stub { background: var(--tag-bg); opacity: 0.7; border: 1px solid var(--rule); }
+        [data-theme="dark"] .mf-scope .badge.real { color: var(--accent-bright); }
+
+        /* ——— Decisions ——— */
+        .mf-decision { border-left: 2px solid var(--accent); padding-left: 1.1rem; margin: 1.4rem 0; }
+        .mf-decision h3 { margin-top: 0; }
+        .mf-decision p { font-size: 16.5px; }
+        .mf-decision p:last-child { opacity: 0.7; }
+
+        /* ——— Tags + links ——— */
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 1.6rem 0 0; }
+        .tag {
+            font-family: var(--mono); font-size: 11.5px; padding: 3px 9px; border-radius: 999px;
+            background: var(--tag-bg); opacity: 0.85; white-space: nowrap; letter-spacing: 0.01em;
+        }
+        .project-links { display: flex; flex-wrap: wrap; gap: 1.5rem; font-family: var(--mono); font-size: 14px; margin-top: 1.6rem; }
+        .project-links a { text-decoration: none; color: var(--accent); }
+        .project-links a:hover { text-decoration: underline; opacity: 1; }
+
+        footer { max-width: 820px; margin: 0 auto; padding: 3.5rem 20px 2.5rem; }
+        footer p { font-family: var(--mono); font-size: 12.5px; opacity: 0.5; }
+
+        /* ——— Responsive ——— */
+        @media (max-width: 760px) {
+            body { font-size: 18px; }
+            .lede { font-size: 19px; }
+            .mf-pipe { grid-template-columns: 1fr 1fr; }
+            .mf-stats { grid-template-columns: 1fr; }
+            .plate-pair { grid-template-columns: 1fr; }
+            .mf-bits { gap: 4px; }
+            .mf-replay { right: 16px; top: 16px; bottom: auto; }
+            .mf-hero h1 { max-width: 100%; }
+        }
+        @media (max-width: 460px) {
+            .mf-pipe { grid-template-columns: 1fr; }
+        }
+
+        /* ——— Scroll reveal (armed by JS via html.anim; visible by default if JS/IO fails) ——— */
+        @media (prefers-reduced-motion: no-preference) {
+            html.anim .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+            html.anim .reveal.in { opacity: 1; transform: none; }
+            .mf-hero-inner > * { opacity: 0; transform: translateY(14px); animation: heroUp 0.7s ease forwards; }
+            .mf-eyebrow { animation-delay: 0.15s; }
+            .mf-hero h1 { animation-delay: 0.28s; }
+            .mf-hero-sub { animation-delay: 0.42s; }
+            @keyframes heroUp { to { opacity: 1; transform: none; } }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+            html { scroll-behavior: auto; }
+        }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <header>
+        <a href="/projects" class="back-link">← PROJECTS</a>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
+        </div>
+    </header>
+
+    <!-- ——— HERO: transcripts reconstruct the real coronal section ——— -->
+    <section class="mf-hero" aria-label="A coronal mouse-brain section reconstructed from individual RNA transcript positions">
+        <canvas id="mf-canvas"></canvas>
+        <button class="mf-replay" id="mf-replay" type="button">⟳ Replay</button>
+        <div class="mf-hero-inner">
+            <div class="mf-eyebrow">MERFISH · Mouse-Brain Atlas</div>
+            <h1>Anatomy from <em>RNA alone.</em></h1>
+            <p class="mf-hero-sub">Read the RNA inside an intact mouse brain — one molecule at a time — then rebuild the brain from where those molecules sit.</p>
+        </div>
+    </section>
+
+    <!-- ——— Sample-sheet metadata bar ——— -->
+    <div class="mf-meta">
+        <div class="mf-meta-inner">
+            <span class="mf-meta-item">MOUSE BRAIN · CORONAL</span>
+            <span class="mf-meta-sep">/</span>
+            <span class="mf-meta-item"><b>483</b> genes</span>
+            <span class="mf-meta-sep">/</span>
+            <span class="mf-meta-item"><b>83,546</b> cells</span>
+            <span class="mf-meta-sep">/</span>
+            <span class="mf-meta-item">~1.6×10⁸ transcripts</span>
+            <span class="mf-meta-sep">/</span>
+            <span class="mf-meta-item"><b>scanpy</b> · squidpy · STalign</span>
+        </div>
+    </div>
+
+    <main id="main">
+
+        <!-- ——— Intro ——— -->
+        <section class="mf-section first">
+            <p class="lede">MERFISH (<em>multiplexed error-robust fluorescence in&nbsp;situ hybridization</em>) images individual RNA molecules right where they sit in tissue. Hundreds of genes per cell, positions kept — so the anatomy comes from the molecules themselves.</p>
+            <p class="muted">This project takes that raw scan all the way to a labeled, atlas-placed map — and proves every step on real data.</p>
+        </section>
+
+        <!-- ——— Method: barcode decoder ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">METHOD</span> Reading a gene as a barcode</div>
+            <h2>Every gene gets an error-correcting binary code.</h2>
+            <p>MERFISH reads each gene as a binary <strong>codeword</strong> spread across many imaging rounds — the on/off pattern names the gene. The code self-corrects (<strong>16-bit, Hamming-distance-4</strong>), so one misread round can't change the answer. That's the "ER" in MERFISH.</p>
+
+            <div class="mf-decoder reveal" id="mf-decoder" aria-hidden="true">
+                <div class="mf-dec-top">
+                    <span class="mf-dec-label">Imaging rounds · 16-bit codeword</span>
+                    <span class="mf-dec-round" id="mf-dec-round">round 00 / 16</span>
+                </div>
+                <div class="mf-bits" id="mf-bits"></div>
+                <div class="mf-dec-readout">
+                    <span class="mf-dec-arrow">decode →</span>
+                    <span class="mf-dec-gene" id="mf-dec-gene">··········</span>
+                    <span class="mf-dec-celltype" id="mf-dec-celltype"></span>
+                </div>
+                <p class="mf-dec-note">Illustrative codewords (weight-4, Hamming distance 4). A real panel spreads hundreds of genes across the rounds, and misreading one round can't flip a call to another valid gene.</p>
+            </div>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Pipeline ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">PIPELINE</span> Raw imagery to per-cell labels</div>
+            <h2>Six stages, one shared object.</h2>
+            <p>Raw scan in, labeled cells out. Every stage hands off through one <code>AnnData</code> object — and segmentation comes first, since it decides what counts as a cell.</p>
+            <div class="mf-pipe reveal">
+                <div class="mf-step"><h4>Ingest</h4><p>MERSCOPE mosaics, transcripts, cell-by-gene, boundaries</p></div>
+                <div class="mf-step"><h4>QC</h4><p>vs bulk RNAseq + replicate correlation</p></div>
+                <div class="mf-step"><h4>Cluster</h4><p>Scanpy PCA · UMAP · Leiden</p></div>
+                <div class="mf-step"><h4>Cell types</h4><p>marker correlation + bootstrap confidence</p></div>
+                <div class="mf-step"><h4>Segment</h4><p>transcript-aware re-assignment (upstream)</p></div>
+                <div class="mf-step"><h4>Register</h4><p>2D section → Allen CCFv3, per-cell region</p></div>
+            </div>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— QC ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">VALIDATION</span> Check the counts first</div>
+            <h2>Trust the numbers before the biology.</h2>
+            <p>First, make sure the numbers are real. MERFISH counts match an independent assay (bulk RNAseq) and reproduce across replicates — only then is clustering worth doing.</p>
+            <div class="mf-stats reveal">
+                <div class="mf-stat"><div class="v">0.70–0.75</div><div class="l">Pearson r · MERFISH vs bulk RNAseq (per gene)</div></div>
+                <div class="mf-stat"><div class="v">0.98–1.00</div><div class="l">replicate ↔ replicate correlation</div></div>
+                <div class="mf-stat"><div class="v">~1.6<small>×10⁸</small></div><div class="l">transcripts per sample (~74k–87k / FOV)</div></div>
+            </div>
+            <figure class="plate reveal">
+                <img src="/projects/images/merfish-qc.png" alt="Four-panel MERSCOPE QC dashboard: total transcript counts, mean counts per FOV, replicate reproducibility heatmap, and MERFISH-versus-bulk-RNAseq correlation" loading="lazy" width="1600" height="1200">
+                <figcaption><b>MERSCOPE QC summary.</b> Yield, replicate reproducibility, and the MERFISH↔bulk-RNAseq check, rendered with seaborn from cohort data.</figcaption>
+            </figure>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Cell types in space ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">CELL TYPES</span> Mapping with a confidence score</div>
+            <h2>Which cell type, and how sure?</h2>
+            <p>What cell is each cluster — and how sure are we? I reimplemented the Allen <code>cell_type_mapper</code> approach: match marker genes, attach a <strong>confidence score</strong>. It beats the old cosine heuristic, which hands you a label but no confidence.</p>
+            <div class="mf-stats reveal">
+                <div class="mf-stat"><div class="v">0.77</div><div class="l">held-out class accuracy (vs 0.71 cosine) · 36,828 cells</div></div>
+                <div class="mf-stat"><div class="v">0.87</div><div class="l">mean per-cell confidence</div></div>
+                <div class="mf-stat"><div class="v">0.82</div><div class="l">fine subtype accuracy within correct classes</div></div>
+            </div>
+            <figure class="plate reveal">
+                <img src="/projects/images/merfish-celltype.png" alt="Four-panel principled cell-type mapping: calibration curve, correct-versus-incorrect confidence histogram, truth-versus-predicted concordance heatmap, and a coronal slice colored by per-cell confidence" loading="lazy" width="1600" height="1168">
+                <figcaption><b>Cell-type mapping with a confidence score.</b> Accuracy rises with confidence (top-left); correct calls concentrate at high confidence (top-right); a coronal slice (bottom-right) flags where the 161-gene panel can't resolve a type. The cosine heuristic gives none of this.</figcaption>
+            </figure>
+            <div class="plate-pair reveal">
+                <figure class="plate" style="margin-top:0;">
+                    <img src="/projects/images/merfish-ependymal.png" alt="Coronal brain slice with the ependymal/glial cluster highlighted along the ventricle lining" loading="lazy" width="500" height="362">
+                    <figcaption><b>Cluster 22 — ependymal / glial.</b> <span class="mono">Aqp4, Gfap, Mlc1</span> lining the ventricles.</figcaption>
+                </figure>
+                <figure class="plate" style="margin-top:0;">
+                    <img src="/projects/images/merfish-inhibitory.png" alt="Coronal brain slice with an inhibitory-neuron cluster highlighted as two symmetric arcs" loading="lazy" width="500" height="383">
+                    <figcaption><b>Cluster 24 — inhibitory neurons.</b> <span class="mono">Gad1, Slc32a1, Cckar</span>, recovered bilaterally.</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Segmentation ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">SEGMENTATION</span> The decision that sits upstream</div>
+            <h2>Where you draw the cell changes the answer.</h2>
+            <p>Draw the cell boundary wrong and everything downstream shifts. Assigning each molecule by position <em>and</em> expression — <strong>transcript-aware</strong> segmentation — beats the vendor-default Voronoi and recovers the true cell types.</p>
+            <div class="mf-stats reveal">
+                <div class="mf-stat"><div class="v">0.76</div><div class="l">transcript-assignment accuracy (vs 0.70 Voronoi, 0.17 nucleus-only)</div></div>
+                <div class="mf-stat"><div class="v">1.00</div><div class="l">downstream Leiden ARI (vs 0.96 baseline)</div></div>
+                <div class="mf-stat"><div class="v">3</div><div class="l">methods benchmarked end to end on shared ground truth</div></div>
+            </div>
+            <figure class="plate reveal">
+                <img src="/projects/images/merfish-segmentation.png" alt="Four-panel segmentation comparison: ground-truth transcripts, transcript-assignment accuracy bars, downstream Leiden ARI bars, and a crop of boundary transcripts the transcript-aware method rescues" loading="lazy" width="1600" height="1116">
+                <figcaption><b>Segmentation changes downstream cell types.</b> Transcript-aware assignment (Baysor / proseg / segger-style) rescues the boundary molecules a Voronoi baseline misassigns. A guarded <span class="mono">cellpose_sam_segment()</span> hook runs Cellpose-SAM on DAPI mosaics when installed.</figcaption>
+            </figure>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Atlas registration ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">REGISTRATION</span> The hardest part of a new scan</div>
+            <h2>Putting a single 2D slice into a 3D brain.</h2>
+            <p>Which brain region is each cell in? You have to fit a flat 2D slice into the 3D Allen atlas — right depth, right angle — before any label means anything. The pipeline does it (anchor → <strong>STalign</strong> warp → label lift-over) and adds what off-the-shelf tools skip: a <strong>per-cell confidence</strong> and a <strong>QC check</strong>.</p>
+            <div class="mf-stats reveal">
+                <div class="mf-stat"><div class="v">~98–99<small>%</small></div><div class="l">accuracy of high-confidence calls, at every ontology depth</div></div>
+                <div class="mf-stat"><div class="v">0.14→0.96</div><div class="l">QC score separates good vs deliberately-bad registration</div></div>
+                <div class="mf-stat"><div class="v">670</div><div class="l">CCFv3 leaf regions, rolled up the ontology for robust calls</div></div>
+            </div>
+
+            <h3>STalign LDDMM, ground-truthed</h3>
+            <p>On a slice cut from a known plane, STalign places it to <span class="accent-num">46.7 µm</span> — under half a voxel — and gets <span class="accent-num">0.89</span> of per-cell labels right, in about two minutes on CPU. A real 2D→3D fit, not a stub.</p>
+            <figure class="plate reveal">
+                <img src="/projects/images/merfish-stalign.png" alt="Three-panel real STalign result: input 2D section with true regions, regions assigned after warping into the CCFv3, and an anterior-posterior position histogram peaking at the true plane" loading="lazy" width="1600" height="585">
+                <figcaption><b>STalign 2D→3D, validated.</b> Input section (left), regions STalign assigns after warping into the CCFv3 (center, near-identical), and the recovered AP position peaking at the true plane (right).</figcaption>
+            </figure>
+
+            <h3>Auto AP-anchor for STalign's init-sensitivity</h3>
+            <p>STalign can misfire on its starting guess — a posterior slice landed <span class="mono">1.44 mm</span> off. A training-free anchor finds the right depth first by sliding the slice against every atlas plane: ~10× better, and all three test slices align.</p>
+            <div class="mf-stats reveal">
+                <div class="mf-stat"><div class="v">1440→148<small>µm</small></div><div class="l">posterior AP error with auto-anchor (~10× better)</div></div>
+                <div class="mf-stat"><div class="v">0.23→0.68</div><div class="l">thalamus IoU, posterior scan</div></div>
+                <div class="mf-stat"><div class="v">3 / 3</div><div class="l">thalamic scans aligned (was 1 / 3)</div></div>
+            </div>
+            <figure class="plate reveal">
+                <img src="/projects/images/merfish-thalamus.png" alt="Two rows of three coronal scans: top shows ground-truth thalamus in crimson across anterior, mid, and posterior sections; bottom shows the thalamus recovered by STalign in green, including the posterior bilateral clusters" loading="lazy" width="1600" height="988">
+                <figcaption><b>Thalamus across three scans.</b> Truth (crimson, top) vs recovered by STalign→CCFv3 (green, bottom), including the posterior bilateral clusters the bare fit missed. The anchor is unit-tested; the posterior recovery is live-tested.</figcaption>
+            </figure>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Real data ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">PROOF</span> Tested on real data</div>
+            <h2>It recovers published biology on real data.</h2>
+            <p>The real test: take a <a href="https://www.science.org/doi/10.1126/science.aau5324" target="_blank" rel="noopener">published MERFISH dataset</a> (<span class="accent-num">73,626</span> cells) and run clustering blind. It recovers the authors' own cell types — <span class="accent-num">ARI = 0.28</span> vs ~0 for random labels — with matching UMAP structure and real anatomy in the slice.</p>
+            <figure class="plate reveal">
+                <img src="/projects/images/merfish-live.png" alt="Four-panel live validation: two UMAPs colored by Leiden clusters and by published cell classes, a coronal spatial slice, and a Leiden-versus-published concordance heatmap" loading="lazy" width="1600" height="1255">
+                <figcaption><b>Live validation on real MERFISH.</b> Unsupervised Leiden (27 clusters) vs 16 published classes: concordant UMAP, coronal anatomy, and a near-diagonal concordance heatmap. Generated live by the pytest suite (<span class="mono">21 offline / 26 total</span>); offline tests run in CI on Python 3.12.</figcaption>
+            </figure>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Context ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">CONTEXT</span> Where MERFISH sits in the field</div>
+            <h2>One of three imaging-based platforms.</h2>
+            <p>MERFISH is one of three imaging platforms that read single molecules in place. Imaging trades panel size for subcellular precision; sequencing trades precision for whole-transcriptome reach. No single winner.</p>
+            <div class="mf-table-wrap reveal">
+                <table class="mf-table">
+                    <thead>
+                        <tr><th>Platform</th><th>Chemistry</th><th>Max panel</th><th>Resolution</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="is-this">
+                            <td class="platform">Vizgen MERSCOPE<span class="sub">this project</span></td>
+                            <td>MERFISH — iterative smFISH barcoding</td>
+                            <td class="num">~1,000 genes</td>
+                            <td>100 nm pixel</td>
+                        </tr>
+                        <tr>
+                            <td class="platform">10x Xenium<span class="sub">Prime 5K</span></td>
+                            <td>Padlock-probe ligation + RCA</td>
+                            <td class="num">~5,000 genes</td>
+                            <td>XY &lt;30 nm</td>
+                        </tr>
+                        <tr>
+                            <td class="platform">Bruker CosMx<span class="sub">WTX</span></td>
+                            <td>Cyclic FISH, no RT/PCR</td>
+                            <td class="num">~19,000 genes</td>
+                            <td>≤100 nm FOV-scale</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="muted">The field is standardizing on SpatialData, segmentation is the active research front, and panels keep growing toward whole-transcriptome imaging.</p>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Honest scope ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">SCOPE</span> What's implemented vs what's wired-in</div>
+            <h2>What's built, and what's wired in.</h2>
+            <p>A light core runs in CI; the heavy atlases and engines plug in behind the same interface — no rewrite needed.</p>
+            <ul class="mf-scope reveal">
+                <li><span class="badge real">implemented</span><span>Scanpy pipeline, cell-type mapper, segmentation benchmark, and the registration core (geometry, label transfer, uncertainty, QC), all covered by offline pytest.</span></li>
+                <li><span class="badge real">validated</span><span>Allen CCFv3 via brainglobe, and the STalign LDDMM deformable backend with a ground-truthed fit, in an isolated NumPy-2 / Python-3.12 environment.</span></li>
+                <li><span class="badge stub">wired-in</span><span>DeepSlice, ANTs, and the Allen <code>cell_type_mapper</code> are stubbed behind the live interfaces with install hints. They need large downloads, not new architecture.</span></li>
+            </ul>
+            <p class="muted" style="margin-top:1.2rem;">Honest caveat (also in the repo): the calibration and QC numbers use a synthetic registration error on <em>real</em> atlas geometry — so they test the math, not an engine's end-to-end accuracy. The STalign result is a real fit.</p>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Decisions ——— -->
+        <section class="mf-section">
+            <div class="mf-kicker"><span class="idx">DECISIONS</span> Why it's built this way</div>
+            <h2>Engineering choices.</h2>
+            <div class="mf-decision">
+                <h3>A confidence score on every call</h3>
+                <p>Cell-type and region calls both ship with a calibrated confidence — trust the confident ones, flag the rest. Same trick, reused twice.</p>
+            </div>
+            <div class="mf-decision">
+                <h3>Light core, pluggable backends</h3>
+                <p>Every stage has a no-download synthetic path, so the whole pipeline runs in CI. The real engines slot in behind the same signatures — the test suite is the spec.</p>
+            </div>
+            <div class="mf-decision">
+                <h3>Modern stack, on purpose</h3>
+                <p>STalign pins an ancient <code>numpy==1.23</code>; a <code>--no-deps</code> install runs it on NumPy 2.4 / Python 3.12 with everything else. One environment, not two.</p>
+            </div>
+        </section>
+
+        <hr class="rule">
+
+        <!-- ——— Tags + links ——— -->
+        <section class="mf-section">
+            <div class="tags">
+                <span class="tag">Python 3.12</span>
+                <span class="tag">scanpy</span>
+                <span class="tag">squidpy</span>
+                <span class="tag">AnnData</span>
+                <span class="tag">STalign</span>
+                <span class="tag">LDDMM</span>
+                <span class="tag">brainglobe</span>
+                <span class="tag">Allen CCFv3</span>
+                <span class="tag">Leiden</span>
+                <span class="tag">Cellpose-SAM</span>
+                <span class="tag">NumPy 2.x</span>
+                <span class="tag">pytest · CI</span>
+                <span class="tag">Observable</span>
+            </div>
+            <div class="project-links">
+                <a href="https://github.com/kevincorvallis/MERFISH" target="_blank" rel="noopener">GitHub →</a>
+                <a href="https://www.science.org/doi/10.1126/science.aaa6090" target="_blank" rel="noopener">MERFISH paper →</a>
+                <a href="https://alleninstitute.github.io/abc_atlas_access/" target="_blank" rel="noopener">Allen ABC Atlas →</a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© <span id="copyrightYear"></span> Kevin Lee · built with scanpy, STalign &amp; the Allen CCFv3</p>
+    </footer>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/theme.js"></script>
+
+    <!-- ——— Hero particle reconstruction ——— -->
+    <script>
+    (function () {
+        var canvas = document.getElementById('mf-canvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var img = new Image();
+        var particles = [], W = 0, H = 0, dpr = 1, raf = null, t0 = 0, settled = false, doneTimer = null, fellBack = false;
+
+        function resize() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            var r = canvas.getBoundingClientRect();
+            W = r.width; H = r.height;
+            canvas.width = Math.max(1, Math.round(W * dpr));
+            canvas.height = Math.max(1, Math.round(H * dpr));
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function build() {
+            if (!img.width) return;
+            var off = document.createElement('canvas');
+            var scale = Math.min(W / img.width, H / img.height) * 0.94;
+            var dw = Math.max(1, Math.round(img.width * scale));
+            var dh = Math.max(1, Math.round(img.height * scale));
+            var ox = (W - dw) / 2, oy = (H - dh) / 2;
+            off.width = dw; off.height = dh;
+            var octx = off.getContext('2d', { willReadFrequently: true });
+            octx.drawImage(img, 0, 0, dw, dh);
+            var data;
+            try { data = octx.getImageData(0, 0, dw, dh).data; }
+            catch (e) { return; }
+
+            var area = W * H;
+            var N = Math.min(13000, Math.max(1800, Math.round(area / 95)));
+            if (W < 560) N = Math.min(N, 3200);
+            particles = [];
+            var tries = 0, max = N * 60;
+            while (particles.length < N && tries < max) {
+                tries++;
+                var px = (Math.random() * dw) | 0;
+                var py = (Math.random() * dh) | 0;
+                var i = (py * dw + px) * 4;
+                var rr = data[i], gg = data[i + 1], bb = data[i + 2], aa = data[i + 3];
+                var lum = 0.299 * rr + 0.587 * gg + 0.114 * bb;
+                if (aa > 12 && lum > 14 && Math.random() < Math.pow(lum / 255, 0.62)) {
+                    var ang = Math.random() * Math.PI * 2;
+                    var rad = (0.4 + Math.random() * 0.8) * Math.max(W, H);
+                    var br = 1.32;
+                    var R = Math.min(255, Math.round(rr * br));
+                    var G = Math.min(255, Math.round(gg * br));
+                    var B = Math.min(255, Math.round(bb * br));
+                    particles.push({
+                        tx: ox + px, ty: oy + py,
+                        sx: W / 2 + Math.cos(ang) * rad, sy: H / 2 + Math.sin(ang) * rad,
+                        x: 0, y: 0,
+                        col: 'rgb(' + R + ',' + G + ',' + B + ')',
+                        sz: lum > 165 ? 2.5 : (lum > 90 ? 1.9 : 1.5),
+                        d: Math.random() * 0.34,
+                        ph: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+        }
+
+        function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
+
+        function drawStatic() {
+            ctx.clearRect(0, 0, W, H);
+            ctx.globalCompositeOperation = 'lighter';
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                ctx.fillStyle = p.col;
+                ctx.fillRect(p.tx, p.ty, p.sz, p.sz);
+            }
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function frame(ts) {
+            if (fellBack) return;
+            if (!t0) t0 = ts;
+            var elapsed = (ts - t0) / 1000;
+            var DUR = 1.7;
+            ctx.clearRect(0, 0, W, H);
+            ctx.globalCompositeOperation = 'lighter';
+            var allDone = true;
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                var local = (elapsed - p.d) / DUR;
+                if (local < 0) { allDone = false; continue; }
+                if (local > 1) local = 1; else allDone = false;
+                var e = easeOutCubic(local);
+                var x = p.sx + (p.tx - p.sx) * e;
+                var y = p.sy + (p.ty - p.sy) * e;
+                if (local >= 1) {
+                    var sh = Math.sin(elapsed * 1.3 + p.ph) * 0.5;
+                    x = p.tx + sh; y = p.ty + Math.cos(elapsed * 1.1 + p.ph) * 0.5;
+                }
+                ctx.globalAlpha = local < 0.25 ? local / 0.25 : 1;
+                ctx.fillStyle = p.col;
+                ctx.fillRect(x, y, p.sz, p.sz);
+            }
+            ctx.globalAlpha = 1;
+            ctx.globalCompositeOperation = 'source-over';
+            if (allDone && elapsed > DUR + 0.5) {
+                settled = true;
+                if (doneTimer) { clearTimeout(doneTimer); doneTimer = null; } // animation finished cleanly; cancel the safety net
+            }
+            raf = requestAnimationFrame(frame);
+        }
+
+        function start() {
+            if (raf) cancelAnimationFrame(raf);
+            resize();
+            build();
+            if (!particles.length) return;
+            if (reduce) { drawStatic(); return; }
+            t0 = 0; settled = false; fellBack = false;
+            raf = requestAnimationFrame(frame);
+            // safety net: if rAF is throttled (backgrounded/idle tab) and the fly-in never completes,
+            // paint the settled brain anyway so the hero is never empty
+            if (doneTimer) clearTimeout(doneTimer);
+            doneTimer = setTimeout(function () {
+                if (settled) return;
+                fellBack = true;
+                if (raf) cancelAnimationFrame(raf);
+                raf = null;
+                drawStatic();
+                doneTimer = null;
+            }, 2800);
+        }
+
+        img.onload = start;
+        img.src = '/projects/images/merfish-hero.png';
+
+        var rt;
+        window.addEventListener('resize', function () {
+            clearTimeout(rt);
+            rt = setTimeout(function () {
+                if (!img.width) return;
+                if (reduce) { resize(); build(); drawStatic(); }
+                else { start(); }
+            }, 200);
+        });
+
+        var replay = document.getElementById('mf-replay');
+        if (replay) replay.addEventListener('click', function () { if (img.width) start(); });
+        canvas.addEventListener('click', function () { if (img.width && !reduce) start(); });
+    })();
+    </script>
+
+    <!-- ——— Barcode decoder ——— -->
+    <script>
+    (function () {
+        var bitsEl = document.getElementById('mf-bits');
+        if (!bitsEl) return;
+        var roundEl = document.getElementById('mf-dec-round');
+        var geneEl = document.getElementById('mf-dec-gene');
+        var typeEl = document.getElementById('mf-dec-celltype');
+        var decoder = document.getElementById('mf-decoder');
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // illustrative weight-4 codewords over 16 rounds
+        var genes = [
+            { name: 'Slc17a7', type: 'excitatory neuron', bits: [1,4,9,14] },
+            { name: 'Gad1',    type: 'inhibitory neuron', bits: [0,6,10,15] },
+            { name: 'Aqp4',    type: 'astrocyte',         bits: [2,5,11,13] },
+            { name: 'Mbp',     type: 'oligodendrocyte',   bits: [3,7,8,12] }
+        ];
+
+        var cells = [];
+        for (var i = 0; i < 16; i++) {
+            var c = document.createElement('div');
+            c.className = 'mf-bit';
+            bitsEl.appendChild(c);
+            cells.push(c);
+        }
+
+        var timers = [];
+        function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+        function showStatic() {
+            var g = genes[0];
+            cells.forEach(function (c, i) {
+                c.className = 'mf-bit read' + (g.bits.indexOf(i) >= 0 ? ' lit on-final' : '');
+            });
+            roundEl.textContent = 'round 16 / 16';
+            geneEl.textContent = g.name;
+            typeEl.textContent = '· ' + g.type;
+        }
+
+        var gi = 0;
+        function runGene() {
+            var g = genes[gi % genes.length];
+            cells.forEach(function (c) { c.className = 'mf-bit'; });
+            geneEl.textContent = '··········';
+            typeEl.textContent = '';
+            var round = 0;
+            function step() {
+                if (round < 16) {
+                    cells[round].classList.add('read');
+                    if (g.bits.indexOf(round) >= 0) cells[round].classList.add('lit');
+                    roundEl.textContent = 'round ' + String(round + 1).padStart(2, '0') + ' / 16';
+                    round++;
+                    timers.push(setTimeout(step, 115));
+                } else {
+                    g.bits.forEach(function (b) { cells[b].classList.add('on-final'); });
+                    geneEl.textContent = g.name;
+                    typeEl.textContent = '· ' + g.type;
+                    gi++;
+                    timers.push(setTimeout(runGene, 2600));
+                }
+            }
+            timers.push(setTimeout(step, 350));
+        }
+
+        if (reduce) { showStatic(); return; }
+
+        var started = false;
+        function maybeStart() {
+            if (started) return;
+            var r = decoder.getBoundingClientRect();
+            var vh = window.innerHeight || document.documentElement.clientHeight;
+            if (r.top < vh * 0.85 && r.bottom > 0) {
+                started = true;
+                window.removeEventListener('scroll', onScroll);
+                runGene();
+            }
+        }
+        function onScroll() { maybeStart(); }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('load', maybeStart);
+        maybeStart();
+    })();
+    </script>
+
+    <!-- ——— Scroll reveal (scroll-driven; content stays visible if JS fails) ——— -->
+    <script>
+    (function () {
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var els = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+        if (reduce || !els.length) return; // visible by default — no arming
+        document.documentElement.classList.add('anim'); // arm the hidden-then-reveal state
+        function reveal() {
+            var vh = window.innerHeight || document.documentElement.clientHeight;
+            for (var i = els.length - 1; i >= 0; i--) {
+                var r = els[i].getBoundingClientRect();
+                if (r.top < vh * 0.92 && r.bottom > -40) { els[i].classList.add('in'); els.splice(i, 1); }
+            }
+            if (!els.length) { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); }
+        }
+        function onScroll() { reveal(); }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll);
+        window.addEventListener('load', reveal);
+        reveal();
+    })();
+    </script>
+
+</body>
+</html>

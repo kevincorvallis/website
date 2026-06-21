@@ -607,7 +607,7 @@
                         <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS app" onerror="this.closest('.phone-frame').style.display='none'">
                     </div>
                 </div>
-                <p class="featured-desc">Real-time powder conditions for 53 ski resorts across 11 regions. 90 API routes, 7 data sources, 8-factor powder scoring, AI chat, social trip planning. Next.js, Supabase, SwiftUI.</p>
+                <p class="featured-desc">Real-time powder conditions for 53 ski resorts. Pulls snowpack, forecasts, road conditions, and webcams into a single score, with trip planning to sort out who's driving. Web and iOS.</p>
                 <div class="tags">
                     <span class="tag">Next.js</span>
                     <span class="tag">Supabase</span>
@@ -617,7 +617,28 @@
                 </div>
                 <div class="featured-links">
                     <a href="/projects/shredders">Read the case study &rarr;</a>
-                    <a href="https://shredders-bay.vercel.app" target="_blank" rel="noopener">Visit &rarr;</a>
+                </div>
+            </section>
+
+            <section class="featured">
+                <a href="/projects/merfish" class="case-study-link">
+                    <h2 class="featured-name">MERFISH</h2>
+                </a>
+                <div class="browser-frame">
+                    <img src="/projects/images/merfish-hero.png" alt="MERFISH coronal mouse-brain section reconstructed from spatial transcript positions" onerror="this.closest('.browser-frame').style.display='none'">
+                </div>
+                <p class="featured-desc">A spatial-transcriptomics pipeline for Vizgen MERSCOPE mouse brain. QC against bulk RNAseq, Scanpy clustering, cell-type mapping with a per-cell confidence score, and registration of each section to the Allen CCFv3 atlas with STalign. Covered by an offline pytest suite and CI.</p>
+                <div class="tags">
+                    <span class="tag">scanpy</span>
+                    <span class="tag">squidpy</span>
+                    <span class="tag">STalign</span>
+                    <span class="tag">Allen CCFv3</span>
+                    <span class="tag">PyTorch</span>
+                    <span class="tag">Python</span>
+                </div>
+                <div class="featured-links">
+                    <a href="/projects/merfish">Read the case study &rarr;</a>
+                    <a href="https://github.com/kevincorvallis/MERFISH" target="_blank" rel="noopener">GitHub &rarr;</a>
                 </div>
             </section>
 
@@ -625,7 +646,7 @@
                 <a href="/projects/spacec" class="case-study-link">
                     <h2 class="featured-name">SPACEc</h2>
                 </a>
-                <p class="featured-desc">Stanford academic Python library for multiplexed imaging analysis. 19,123 lines covering the full pipeline from cell segmentation to spatial analysis, with a novel Patch Proximity Analysis method. Published on PyPI and bioRxiv.</p>
+                <p class="featured-desc">A Stanford Python library for multiplexed imaging analysis, covering the full pipeline from cell segmentation to spatial analysis. Introduces Patch Proximity Analysis. Published on PyPI and bioRxiv.</p>
                 <div class="tags">
                     <span class="tag">Python</span>
                     <span class="tag">AnnData</span>
@@ -652,7 +673,7 @@
                         <span class="row-name">SmartSpender</span>
                         <span class="row-live"><a href="https://github.com/kevincorvallis/SmartSpender" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">GitHub &rarr;</a></span>
                     </div>
-                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">AI financial decision engine with a 3-stage pipeline: natural language question &rarr; deterministic calculations &rarr; narrative explanation. 13 AWS Lambda functions orchestrated by Step Functions, Bedrock Claude for analysis, GPT-4o Vision for receipt OCR. SwiftUI companion app for expense splitting.</p>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Ask a money question in plain English, get back real math and an explanation. Runs the numbers deterministically rather than letting the model guess, reads receipts with GPT-4o Vision, and has a SwiftUI app for splitting expenses. Built on AWS Lambda and Bedrock.</p>
                 </div>
 
                 <div class="project-row">
@@ -660,7 +681,7 @@
                         <span class="row-name">Colette</span>
                         <span class="row-live"><a href="https://colette.pookiebco.com" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">Visit &rarr;</a></span>
                     </div>
-                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">AI language tutor with conversation practice across 5 languages, FSRS spaced repetition, journal with real-time AI analysis, and a persistent learner memory that adapts to your mistakes and interests. Next.js, Supabase, dual AI providers.</p>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">A language tutor that holds a conversation in five languages, drills vocabulary with spaced repetition, and remembers the mistakes you keep making so it can come back to them. Next.js and Supabase.</p>
                 </div>
 
                 <div class="project-row">
@@ -668,7 +689,7 @@
                         <span class="row-name">Wilco</span>
                         <span class="row-live"><a href="https://ai-atc-sigma.vercel.app" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">Visit &rarr;</a></span>
                     </div>
-                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">ATC radio trainer for student pilots. 20 scenarios across 4 categories, ICAO phraseology scoring (0&ndash;100), voice I/O, live METAR/TAF weather. Built for learning to talk to air traffic control.</p>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Radio practice for student pilots learning to talk to air traffic control. You speak the call, it scores your phraseology against ICAO standards, and the scenarios run on live METAR/TAF weather.</p>
                 </div>
 
                 <div class="project-row">
@@ -676,7 +697,7 @@
                         <span class="row-name">Pookie B News Daily</span>
                         <span class="row-live"><a href="https://github.com/kevincorvallis/PookieBNews" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">GitHub &rarr;</a></span>
                     </div>
-                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Automated news aggregation from 9 sources with AI-generated summaries and NPR-style podcast episodes via custom ElevenLabs voice. iOS app with widgets.</p>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Pulls headlines from nine sources, summarizes them, and turns the day's news into a short podcast in a custom ElevenLabs voice. iOS app with widgets.</p>
                 </div>
 
                 <div class="project-row">
@@ -684,7 +705,7 @@
                         <span class="row-name">DayByDay</span>
                         <span class="row-live"><a href="https://daybyday.klee.page" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">Visit &rarr;</a></span>
                     </div>
-                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Social journaling with photo uploads, streaks, accountability partners, and trip organization with MapKit on iOS.</p>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">A journaling app built around showing up. Photos, streaks, an accountability partner, and trip planning on MapKit. iOS.</p>
                 </div>
 
                 <div class="project-row">
@@ -692,7 +713,7 @@
                         <span class="row-name">Harmony Tracker</span>
                         <span class="row-live"><a href="https://github.com/kevincorvallis/IWBH" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">GitHub &rarr;</a></span>
                     </div>
-                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">iOS relationship coaching app with AI coach, custom habit trackers, partner pairing, communication analysis, and WidgetKit integration. 86 Swift files.</p>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">An iOS app for couples: pair with your partner, build shared habit trackers, and get coaching prompts on how you communicate. WidgetKit on the home screen.</p>
                 </div>
 
                 <div class="project-row">
@@ -700,7 +721,7 @@
                         <span class="row-name">ADU Checker</span>
                         <span class="row-live"><a href="https://github.com/kevincorvallis/san-jose-adu-checker" target="_blank" rel="noopener" style="text-decoration:none;opacity:0.6;">GitHub &rarr;</a></span>
                     </div>
-                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Automates 17 ADU permit eligibility checks against San Jose regulations using 11 government GIS APIs. FEMA flood zones, fire severity, zoning, building footprints.</p>
+                    <p class="row-desc" style="padding-left:0; margin-bottom: 1.25rem;">Checks whether a San Jose lot can add a backyard unit. Runs the city's permit eligibility rules against government GIS data: flood zones, fire risk, zoning, and building footprints.</p>
                 </div>
 
             </div>
