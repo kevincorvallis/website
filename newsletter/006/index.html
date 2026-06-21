@@ -5,21 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="canonical" href="https://klee.page/newsletter/006/">
     <title>Dispatch 006: Us — Kevin Lee</title>
-    <meta name="description" content="A $111-billion merger, a manager title I'm too tired to celebrate, Pride with Justin and the Jackass crew, and a Korean relay I can't stop crying over — on the people and the country that held the line while work redrew the whole map.">
+    <meta name="description" content="Merger fever, a promotion I forgot to celebrate, Claude Fable 5, a mystery gift in the mail, Steve-O at Pride, and a Korean relay that broke me — Dispatch 006, shorter and meaner.">
     <meta name="author" content="Kevin Lee">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://klee.page/newsletter/006/">
     <meta property="og:title" content="Dispatch 006: Us — Kevin Lee">
-    <meta property="og:description" content="A merger, a promotion, a parade, and a country I can't stop crying about — and the people who held the line through all of it.">
+    <meta property="og:description" content="Merger fever, a promotion, Claude Fable 5, a mystery Anthropic gift, Steve-O at Pride, and a Korean relay that broke me.">
     <meta property="og:image" content="https://klee.page/newsletter/006/images/korea-relay-poster.jpg">
     <meta property="og:locale" content="en_US">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Dispatch 006: Us — Kevin Lee">
-    <meta name="twitter:description" content="A merger, a promotion, a parade, and a country I can't stop crying about — and the people who held the line through all of it.">
+    <meta name="twitter:description" content="Merger fever, a promotion, Claude Fable 5, a mystery Anthropic gift, Steve-O at Pride, and a Korean relay that broke me.">
     <meta name="twitter:image" content="https://klee.page/newsletter/006/images/korea-relay-poster.jpg">
 
     <!-- Favicon -->
@@ -718,28 +718,6 @@
         .fv-play-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; text-shadow: 0 1px 8px rgba(0,0,0,0.55); }
         .fv-stage.playing .fv-play { opacity: 0; pointer-events: none; }
 
-        /* ===== Click-to-watch lightbox (e.g., "penciling") ===== */
-        .vid-link { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
-        .vid-link:hover { opacity: 0.7; }
-        .vid-lightbox {
-            position: fixed; inset: 0; z-index: 400;
-            display: flex; align-items: center; justify-content: center; padding: 1.5rem;
-            background: rgba(10,10,10,0.82);
-            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .vid-lightbox.open { opacity: 1; visibility: visible; }
-        .vlb-inner { max-width: 860px; width: 100%; position: relative; }
-        .vid-lightbox video { width: 100%; display: block; border-radius: 6px; background: #000; box-shadow: 0 30px 90px -30px rgba(0,0,0,0.85); }
-        .vlb-cap { margin-top: 0.7rem; text-align: center; font-family: var(--font-display); font-style: italic; color: rgba(240,238,230,0.7); font-size: 14px; }
-        .vlb-close {
-            position: absolute; top: 1rem; right: 1.2rem; z-index: 1;
-            background: none; border: none; color: rgba(255,255,255,0.85);
-            font-size: 32px; line-height: 1; cursor: pointer; padding: 6px 10px;
-        }
-        .vlb-close:hover { color: #fff; }
-        @media (prefers-reduced-motion: reduce) { .vid-lightbox { transition: none; } }
-
         /* ===== Song of the week — refined bottom-left mini player ===== */
         .mini-player {
             position: fixed; bottom: max(1.1rem, env(safe-area-inset-bottom, 0)); left: 1.1rem; z-index: 90;
@@ -797,6 +775,28 @@
         .relay-medal { font-size: 30px; line-height: 1; }
         .relay-time { font-size: clamp(1.8rem, 8vw, 2.6rem); font-weight: 700; font-style: italic; letter-spacing: -0.01em; margin: 0.2rem 0; }
         .relay-cap { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--caption); line-height: 1.9; }
+
+        /* ========== MODULE: REFERENCES + PHOTO DUO ========== */
+        .refs-block { max-width: 620px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .refs-block .refs-label {
+            font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 1rem;
+        }
+        .refs-block ul { list-style: none; }
+        .refs-block li {
+            font-size: 16px; line-height: 1.55; color: var(--caption);
+            padding: 0.85rem 0; border-top: 1px solid var(--rule);
+        }
+        .refs-block li:last-child { border-bottom: 1px solid var(--rule); }
+        .refs-block li strong { display: block; color: var(--text); font-weight: 600; font-size: 17px; margin-bottom: 0.25rem; }
+        .refs-block li em { font-style: italic; color: var(--text); opacity: 0.85; }
+        .photo-duo {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+            max-width: 620px; margin: 0 auto; padding: 0 1.5rem;
+        }
+        .photo-duo img { width: 100%; border-radius: 3px; display: block; border: 1px solid var(--rule); }
+        .photo-duo .photo-caption { grid-column: 1 / -1; margin-top: 0.25rem; color: var(--caption); font-size: 14px; }
+        @media (max-width: 520px) { .photo-duo { grid-template-columns: 1fr; } }
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
@@ -929,8 +929,8 @@
                 <span data-l="ko">우리</span>
             </h1>
             <p class="hero-description">
-                <span data-l="en">a merger, a promotion, a parade, and a country I can't stop crying about</span>
-                <span data-l="ko">합병 하나, 승진 하나, 퍼레이드 하나, 그리고 자꾸 울게 만드는 나라 하나</span>
+                <span data-l="en">a merger, a promotion, Claude Fable 5, a mystery gift, Steve-O at Pride, and a country I can't stop crying about</span>
+                <span data-l="ko">합병, 승진, Claude Fable 5, 미스터리 선물, 프라이드의 스티브오, 그리고 자꾸 울게 만드는 나라</span>
             </p>
         </div>
         <div class="scroll-hint">
@@ -963,12 +963,10 @@
     <div class="chapter">
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Hey. Before anything else: just below this there's a photo of me passed out face-down, 2pm on a Saturday, on a daybed that isn't even mine. Just sit with it for a second.</p>
-                <p>It looks worse than it is &mdash; honestly it might be the high point of my month &mdash; but it lands better if we rewind a few weeks first. So, rewinding.</p>
+                <p>Hey. Right below this: me, face-down, 2pm Saturday, on a daybed that isn't mine. It looks worse than it is. It might be the high point of my month. We'll get back to it.</p>
             </div>
             <div data-l="ko">
-                <p>안녕. 시작하기 전에: 바로 아래에 내가 토요일 오후 두 시에, 그것도 내 것도 아닌 데이베드에 얼굴을 박고 뻗어 있는 사진이 나온다. 일단 그 장면 한번 음미해 보길.</p>
-                <p>보이는 것만큼 심각하진 않다 &mdash; 솔직히 이번 달 최고의 순간일지도 &mdash; 그래도 몇 주 되감고 보면 더 와닿을 거다. 자, 되감기.</p>
+                <p>안녕. 바로 아래: 토요일 오후 두 시, 내 것도 아닌 데이베드에 얼굴을 박고 뻗은 나. 보이는 것만큼 심각하진 않다. 이번 달 최고의 순간일지도. 이따 다시 온다.</p>
             </div>
         </div>
         <div class="photo-inset reveal">
@@ -977,8 +975,8 @@
                 data-alt-ko="햇살 가득한 잔디 마당의 나무 야외 데이베드에 엎드려 잠든 케빈, 폰은 옆 잔디밭에 놓여 있다"
                 alt="Kevin asleep face-down on a wooden outdoor daybed in a sunny grassy backyard, phone lying on the grass nearby">
             <div class="photo-caption">
-                <span data-l="en">yep, that's me. Ayeshna's backyard, Saturday, right after the Brazil&ndash;Morocco game. we'll circle back.</span>
-                <span data-l="ko">응, 나다. 아예슈나네 뒷마당, 토요일, 브라질 대 모로코 경기 직후. 이따 다시 옴.</span>
+                <span data-l="en">Ayeshna's backyard, post Brazil&ndash;Morocco. foreshadowing.</span>
+                <span data-l="ko">아예슈나네 뒷마당, 브라질 대 모로코 직후. 복선.</span>
             </div>
         </div>
     </div>
@@ -991,12 +989,10 @@
     <div class="chapter">
         <div class="text-block reveal">
             <div data-l="en">
-                <p>So, work. If you've caught a headline you already know: Paramount and Warner Bros. are becoming one company &mdash; a $111-billion deal the government looked at on Friday and went, <a href="https://www.npr.org/2026/06/13/nx-s1-5856558/doj-approves-paramount-skydances-111-billion-acquisition-of-warner-bros-discovery" target="_blank" rel="noopener">sure, fine</a>. I'm nowhere near that number on the org chart. I feel it anyway, daily, like a low-grade fever.</p>
-                <p>When two companies this size merge, everyone inside quietly starts auditioning for a chair that might not be there when the music stops &mdash; execs, contractors, me, all running the same three-step program: be useful, be visible, don't flinch. My boss and I called it in week one. <em>No beef.</em> We don't elbow each other; we just work out in the open and bet that being actually useful beats playing politics. Going great so far. Ask me again next quarter, assuming we both still have chairs.</p>
+                <p>Work first, unfortunately. Paramount and Warner Bros. are becoming one company &mdash; a <a href="https://www.npr.org/2026/06/13/nx-s1-5856558/doj-approves-paramount-skydances-111-billion-acquisition-of-warner-bros-discovery" target="_blank" rel="noopener">$111-billion deal</a> the government looked at and went, sure, fine. I'm nowhere near that number on the org chart. I feel it anyway, like a low-grade fever. Everyone inside is quietly auditioning for a chair that might not exist when the music stops. My boss and I agreed on week one: <em>no beef.</em> Be useful, be visible, don't flinch. Ask me again next quarter, assuming we both still have chairs.</p>
             </div>
             <div data-l="ko">
-                <p>늘 그렇듯, 시작은 숫자다. 1,110억 달러 &mdash; 워너브라더스를 파라마운트에 접어 넣는 값이고, 금요일에 정부가 들여다보더니 <a href="https://www.npr.org/2026/06/13/nx-s1-5856558/doj-approves-paramount-skydances-111-billion-acquisition-of-warner-bros-discovery" target="_blank" rel="noopener">뭐, 그러라지</a> 했다. 나는 그 숫자에서 조직도상 한참 아래라 기도를 해도 못 움직이는데, 그래도 이가 시릴 만큼 느껴진다.</p>
-                <p>이 규모의 두 회사가 합쳐지면, 안에 있는 모두가 음악이 멈췄을 때 있을지 모를 의자를 두고 조용히 오디션을 보기 시작한다 &mdash; 임원도, 계약직도, 나도, 똑같은 프로그램을 돌린다: 쓸모 있을 것, 눈에 띌 것, 무슨 일이 있어도 흔들리지 말 것. 보스와 나는 첫 주에 조약을 맺었다. <em>비프 없기.</em> 서로 안 민다. 드러내놓고 일하면서, 진짜 쓸모 있는 게 결국 전략으로 읽힌다는 데 건다. 아주 잘 되고 있다. 다음 분기에 다시 물어봐 달라 &mdash; 둘 다 아직 의자가 있다는 가정하에.</p>
+                <p>아쉽게도 일부터. 파라마운트와 워너브라더스가 한 회사가 된다 &mdash; 정부가 <a href="https://www.npr.org/2026/06/13/nx-s1-5856558/doj-approves-paramount-skydances-111-billion-acquisition-of-warner-bros-discovery" target="_blank" rel="noopener">1,110억 달러짜리 딜</a>을 보고 뭐, 그러라지 한 그 거래. 조직도상 한참 아래인데도 이가 시릴 만큼 느껴진다. 안의 모두가 음악이 멈췄을 때 있을지 모를 의자를 두고 조용히 오디션 중이다. 보스와 나는 첫 주에 <em>비프 없기</em>로 합의했다. 쓸모 있을 것, 눈에 띌 것, 무슨 일이 있어도 흔들리지 말 것. 다음 분기에 다시 물어봐 달라 &mdash; 둘 다 아직 의자가 있다는 가정하에.</p>
             </div>
         </div>
 
@@ -1007,20 +1003,18 @@
                 <p class="dw-stats">
                     <b>$111B</b><span class="sep">&middot;</span>
                     <span data-l="en"><b>DOJ cleared</b></span><span data-l="ko"><b>법무부 승인</b></span><span class="sep">&middot;</span>
-                    <span data-l="en">EU review pending (Jul 7)</span><span data-l="ko">EU 심사 진행 중 (7월 7일)</span><span class="sep">&middot;</span>
-                    <span data-l="en">everyone slightly nervous</span><span data-l="ko">다들 살짝 긴장 중</span>
+                    <span data-l="en">EU review pending</span><span data-l="ko">EU 심사 진행 중</span><span class="sep">&middot;</span>
+                    <span data-l="en">everyone slightly nervous</span><span data-l="ko">다들 살짝 긴장</span>
                 </p>
                 <div class="dw-marquee" aria-hidden="true">
                     <div class="track">
                         <span data-l="en">SYNERGY</span><span data-l="ko">시너지</span>
                         <span>&middot;</span><span data-l="en">REORG TBD</span><span data-l="ko">조직 개편 미정</span>
-                        <span>&middot;</span><span data-l="en">ORG CHART v0.3</span><span data-l="ko">조직도 v0.3</span>
                         <span>&middot;</span><span data-l="en">BE USEFUL</span><span data-l="ko">쓸모 있기</span>
                         <span>&middot;</span><span data-l="en">NO BEEF</span><span data-l="ko">노 비프</span>
                         <span>&middot;</span>
                         <span data-l="en">SYNERGY</span><span data-l="ko">시너지</span>
                         <span>&middot;</span><span data-l="en">REORG TBD</span><span data-l="ko">조직 개편 미정</span>
-                        <span>&middot;</span><span data-l="en">ORG CHART v0.3</span><span data-l="ko">조직도 v0.3</span>
                         <span>&middot;</span><span data-l="en">BE USEFUL</span><span data-l="ko">쓸모 있기</span>
                         <span>&middot;</span><span data-l="en">NO BEEF</span><span data-l="ko">노 비프</span>
                         <span>&middot;</span>
@@ -1031,10 +1025,10 @@
 
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Case in point: here's me at a coffee shop on a Saturday, allegedly not working. Kobe did not consent to any of it and registered his complaint by collapsing his full body weight onto my leg until I acknowledged him.</p>
+                <p>Case in point: Saturday "coffee." Laptop open, standup on screen, Kobe the dog filing a formal complaint by collapsing his full body weight onto my leg until I acknowledged him.</p>
             </div>
             <div data-l="ko">
-                <p>바로 그 증거: 토요일에 카페에서 (명목상) 일 안 하는 중인 나. 코비는 거기에 동의한 적 없으며, 내가 알은척할 때까지 자기 몸무게 전체를 내 다리에 얹는 방식으로 항의를 접수했다.</p>
+                <p>증거: 토요일 "커피." 노트북 열림, 스탠드업 화면 띄움, 코비는 내가 알아주기 전까지 몸무게 전체를 내 다리에 얹는 방식으로 정식 항의를 접수했다.</p>
             </div>
         </div>
         <div class="photo-inset reveal">
@@ -1043,8 +1037,8 @@
                 data-alt-ko="케빈이 야외 카페 테이블에서 화상회의 화면이 띄워진 노트북을 켜놓고 있고, 파란 목줄을 한 코비가 다리에 기대어 있다"
                 alt="Kevin at an outdoor cafe table with a laptop open to a video-call grid, Kobe the dog on a blue leash leaning against his leg">
             <div class="photo-caption">
-                <span data-l="en">Saturday "coffee." laptop's open, standup's up, and Kobe has filed a formal complaint</span>
-                <span data-l="ko">토요일 "커피." 노트북 열림, 스탠드업 화면 띄움, 그리고 코비의 정식 항의 1건</span>
+                <span data-l="en">not working (officially)</span>
+                <span data-l="ko">(공식적으로) 일 안 하는 중</span>
             </div>
         </div>
     </div>
@@ -1055,12 +1049,30 @@
     <div class="chapter">
         <div class="text-block reveal">
             <div data-l="en">
-                <p>The other thing nobody at my level can stop thinking about: the job itself keeps changing shape under our feet. AI rewrote what "software engineer" means around last Tuesday, and it'll do it again next Tuesday. There's a talk I keep sending people &mdash; <a href="https://www.youtube.com/watch?v=2n41YjR5QfU" target="_blank" rel="noopener">"Software engineering at the tipping point"</a> by <a href="https://www.linkedin.com/in/theadambender/" target="_blank" rel="noopener">Adam Bender</a> &mdash; that names the feeling: the work is sliding from <em>writing the thing</em> to <em>deciding what the thing should be, and whether the machine got it right.</em></p>
-                <p>And as Paramount scales overnight into something enormous, my role gets redrawn faster than HR can update the doc. Some weeks that's thrilling. Some weeks it's the professional equivalent of this video: two AI-generated cats, upright, dancing with total commitment for reasons no human can name. That's the frontier. Against all logic, I find it comforting.</p>
+                <p>The other thing eating my brain: the job keeps changing shape under our feet. AI rewrote what "software engineer" means around last Tuesday and will do it again next Tuesday. Adam Bender's talk <a href="https://www.youtube.com/watch?v=2n41YjR5QfU" target="_blank" rel="noopener">"Software engineering at the tipping point"</a> names it &mdash; the work is sliding from <em>writing the thing</em> to <em>deciding what the thing should be and whether the machine got it right.</em> Which tracks with what Google calls "programming integrated over time" in <cite>Software Engineering at Google</cite>: clever is a compliment in a hackathon and an accusation in production. Also Hyrum's Law &mdash; given enough users, even your most innocent API change will break something somewhere. Comforting, in a cosmic-horror kind of way.</p>
+                <p>DORA's 2025 research backs this up with numbers: AI is an <em>amplifier</em>, not a shortcut. Ninety percent of devs use it; thirty percent barely trust what it writes. Throughput is up, instability is up. The teams winning aren't the ones with the shiniest model &mdash; they're the ones with version control, small batches, and a platform that doesn't hate you. Seven capabilities, if you're scoring at home. Systems problem, not tools problem. I keep a PDF of this open like it's scripture and then ignore half of it, same as everyone.</p>
+                <p>Then Anthropic dropped <a href="https://www.anthropic.com/news/claude-fable-5-mythos-5" target="_blank" rel="noopener">Claude Fable 5</a> &mdash; Mythos-class, million-token context, the kind of model that makes you rethink what "one sitting" means for a refactor. I had roughly four days to play with it before access got weird. Perfect metaphor for the month, honestly.</p>
+                <p>Also: I got an email calling me a "top Claude Code power user," which is either a compliment or an intervention. They're sending me something. A physical thing. Via Brilliant. Tracking number and everything. I have no idea what it is. I'm unreasonably excited. My manager title says Engineering Manager; my browser history says otherwise.</p>
             </div>
             <div data-l="ko">
-                <p>내 레벨에 있는 사람들이 또 하나 머릿속에서 떨쳐내지 못하는 것: 일 자체가 발밑에서 계속 모양을 바꾼다는 거다. AI는 지난 화요일쯤 '소프트웨어 엔지니어'의 정의를 다시 썼고, 다음 화요일에 또 다시 쓸 거다. 사람들한테 자꾸 보내는 강연이 있다 &mdash; 애덤 벤더의 <a href="https://www.youtube.com/watch?v=2n41YjR5QfU" target="_blank" rel="noopener">"Software engineering at the tipping point"</a>(<a href="https://www.linkedin.com/in/theadambender/" target="_blank" rel="noopener">강연자 링크</a>) &mdash; 그게 내가 느끼던 걸 말로 정리해준다: 일이 <em>물건을 만드는 것</em>에서 <em>물건이 무엇이어야 하는지, 그리고 기계가 제대로 만들었는지를 판단하는 것</em>으로 넘어가고 있다.</p>
-                <p>그리고 파라마운트가 하룻밤 사이에 거대한 무언가로 커지면서, 내 역할은 인사팀이 문서를 업데이트하는 속도보다 빠르게 다시 그려진다. 어떤 주는 그게 짜릿하다. 어떤 주는 이 영상의 직장 버전 같다: AI가 만든 고양이 두 마리가, 두 발로 서서, 아무도 설명 못 할 이유로 전력을 다해 춤춘다. 그게 최전선이다. 말도 안 되지만, 이상하게 위로가 된다.</p>
+                <p>머릿속을 파먹는 또 다른 것: 일 자체가 발밑에서 계속 모양을 바꾼다. AI는 지난 화요일쯤 '소프트웨어 엔지니어' 정의를 다시 썼고, 다음 화요일에 또 쓸 거다. 애덤 벤더의 <a href="https://www.youtube.com/watch?v=2n41YjR5QfU" target="_blank" rel="noopener">"Software engineering at the tipping point"</a> 강연이 그걸 말해준다 &mdash; 일이 <em>물건을 만드는 것</em>에서 <em>물건이 뭔지, 기계가 제대로 만들었는지 판단하는 것</em>으로 넘어가고 있다. <cite>Software Engineering at Google</cite>이 말하는 "시간에 걸친 프로그래밍"과도 맞닿는다: 해커톤에선 clever가 칭찬, 프로덕션에선 고발이다. 그리고 Hyrum's Law &mdash; 사용자가 충분히 많으면, 가장 순진한 API 변경도 어딘가를 부순다. 우주적 공포물 느낌으로 위로가 된다.</p>
+                <p>DORA 2025 연구가 숫자로 뒷받침한다: AI는 <em>증폭기</em>지 지름길이 아니다. 개발자 90%가 쓰고, 30%는 AI가 쓴 코드를 거의 못 믿는다. 처리량은 올랐고, 불안정성도 올랐다. 이기는 팀은 제일 화려한 모델 가진 팀이 아니라, 버전 관리·작은 배치·안 미워하는 플랫폼 가진 팀이다. 일곱 가지 역량, 집에서 채점 중이면. 도구 문제가 아니라 시스템 문제. 나도 PDF를 성경처럼 띄워놓고 절반은 무시한다, 남들처럼.</p>
+                <p>그다음 Anthropic이 <a href="https://www.anthropic.com/news/claude-fable-5-mythos-5" target="_blank" rel="noopener">Claude Fable 5</a>를 내렸다 &mdash; Mythos급, 100만 토큰 컨텍스트, 리팩터링 "한 번에"의 정의를 바꾸는 모델. 이상하게 접근하기 전에 겨우 나흘 정도 써봤다. 이번 달 은유로 완벽하다.</p>
+                <p>그리고: "탑 Claude Code 파워 유저"라는 이메일이 왔다. 칭찬인지 개입인지 모르겠다. 뭔가 보내준다. 실물. Brilliant 경유. 송장 번호까지. 뭔지 전혀 모른다. 이유 없이 설렌다. 직함은 Engineering Manager, 브라우저 기록은 다른 말을 한다.</p>
+            </div>
+        </div>
+        <div class="photo-duo reveal">
+            <img src="/newsletter/006/images/claude-power-user.png"
+                data-alt-en="Email from the Claude Code team congratulating Kevin as a top Claude Code power user and offering a gift"
+                data-alt-ko="케빈을 탑 Claude Code 파워 유저로 축하하고 선물을 제안하는 Claude Code 팀 이메일"
+                alt="Email from the Claude Code team congratulating Kevin as a top Claude Code power user and offering a gift">
+            <img src="/newsletter/006/images/claude-gift.png"
+                data-alt-en="Shipping notification from Anthropic saying something special is on its way, fulfilled via Brilliant"
+                data-alt-ko="Brilliant 경유로 특별한 무언가가 배송 중이라는 Anthropic 발송 알림"
+                alt="Shipping notification from Anthropic saying something special is on its way, fulfilled via Brilliant">
+            <div class="photo-caption">
+                <span data-l="en">top user, mystery box. the job is mostly vibes now.</span>
+                <span data-l="ko">탑 유저, 미스터리 박스. 일은 이제 대부분 바이브다.</span>
             </div>
         </div>
         <div class="video-inset portrait reveal">
@@ -1077,8 +1089,8 @@
                 </button>
             </div>
             <div class="photo-caption">
-                <span data-l="en">two cats, fully committed, zero notes &mdash; courtesy @humantix, undefeated</span>
-                <span data-l="ko">고양이 두 마리, 완전 진심, 군말 없음 &mdash; @humantix 제공, 무패</span>
+                <span data-l="en">the frontier, apparently</span>
+                <span data-l="ko">최전선, 아마</span>
             </div>
         </div>
     </div>
@@ -1087,15 +1099,6 @@
          III — M1 (the promotion)
          ============================================================ -->
     <div class="chapter">
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>Now the part that's supposed to go on a highlight reel: I got promoted this month. Senior Engineer &rarr; Manager. They crossed out the old title and wrote the new one under it like a receipt correction, which felt about right. I'm told it's a big deal. I believe them.</p>
-            </div>
-            <div data-l="ko">
-                <p>이제 하이라이트 영상에 들어가야 마땅한 부분: 이번 달에 승진했다. 시니어 엔지니어 &rarr; 매니저. 옛 직함에 줄 긋고 그 아래 새 직함을 적어줬는데, 영수증 정정 같아서 묘하게 적절했다. 큰일이라고들 한다. 나도 믿는다.</p>
-            </div>
-        </div>
-
         <div class="role-diff reveal-fade">
             <div class="rd-card">
                 <div class="rd-head">
@@ -1113,15 +1116,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>What the reel leaves out: the same month also dropped a merger on me, a full rewrite of what "engineer" even means now that the machine does the first draft, and roughly nine hundred Slack threads, of which I have read four. The title's real and also kind of a costume &mdash; one reorg and it folds right back up. But I'll take it.</p>
-            </div>
-            <div data-l="ko">
-                <p>영상이 빼먹은 것: 같은 달이 합병도, 기계가 초안을 쓰는 시대에 '엔지니어'가 대체 뭔지에 대한 전면 재정의도, 슬랙 스레드 약 900개도 같이 던져줬다 &mdash; 그중 내가 읽은 건 네 개. 직함은 진짜이면서 좀 의상 같기도 하다 &mdash; 조직 개편 한 번이면 바로 도로 접힌다. 그래도 받는다.</p>
-            </div>
-        </div>
     </div>
 
     <!-- ============================================================
@@ -1131,12 +1125,10 @@
         <div class="rainbow-rule reveal-fade"><div class="bar"></div></div>
         <div class="text-block reveal">
             <div data-l="en">
-                <p>The best work day of the month barely felt like work: Justin and I did the Pride parade through Paramount, helping out the <em>Jackass</em> crew the studio was marching with. Yes. That Jackass. Picture it: blue sky, a float dripping rainbow fringe, Steve-O shirtless under a rainbow umbrella doing precisely what your brain just predicted, and the two of us handing out swag and completely losing the plot.</p>
-                <p>I've never seen Justin happier. The man was <em>thriving</em> &mdash; he found his people for one glorious afternoon and I'm not convinced he's fully come back from it. Pretty sure part of him is still up on that float.</p>
+                <p>Best work day of the month: Justin and I at the Pride parade with the <em>Jackass</em> crew. Yes, that Jackass. Steve-O, shirtless, rainbow umbrella, doing exactly what you predicted. Justin found his people for one afternoon and I'm not convinced he's fully come back.</p>
             </div>
             <div data-l="ko">
-                <p>이번 달 최고의 회사 일정은 회사 일 같지도 않았다: 저스틴이랑 프라이드 퍼레이드에 갔다 &mdash; 파라마운트를 통해서, 스튜디오가 함께 행진한 <em>잭애스</em> 크루를 도우러. 그래, 그 잭애스. 그려보자: 파란 하늘, 무지개 술 장식이 줄줄 달린 플로트, 무지개 우산 아래 웃통 벗은 스티브오가 방금 네 머릿속이 예측한 바로 그 짓을 하고 있고, 우리 둘은 굿즈를 나눠주며 완전히 정신줄을 놓고 있다.</p>
-                <p>저스틴이 그렇게 행복한 건 처음 봤다. 그날 그 형은 완전 <em>물 만난 물고기</em>였다 &mdash; 한나절 동안 제대로 자기 사람들을 만났고, 아직 거기서 다 돌아온 것 같지 않다. 영혼의 절반은 아직 그 플로트 위에 있는 듯.</p>
+                <p>이번 달 최고의 회사 일: 저스틴이랑 <em>잭애스</em> 크루와 함께한 프라이드 퍼레이드. 그 잭애스. 스티브오, 웃통 벗음, 무지개 우산, 예측한 그대로. 저스틴은 한나절 동안 제 사람들을 만났고, 아직 완전히 돌아온 것 같지 않다.</p>
             </div>
         </div>
         <div class="video-inset portrait reveal">
@@ -1153,8 +1145,8 @@
                 </button>
             </div>
             <div class="photo-caption">
-                <span data-l="en">Steve-O, a rainbow umbrella, and a studio sponsorship &mdash; the afternoon contained multitudes</span>
-                <span data-l="ko">스티브오, 무지개 우산, 그리고 스튜디오 협찬 &mdash; 그 오후는 참 많은 걸 품고 있었다</span>
+                <span data-l="en">corporate sponsorship, divine chaos</span>
+                <span data-l="ko">기업 협찬, 신성한 혼돈</span>
             </div>
         </div>
     </div>
@@ -1165,10 +1157,10 @@
     <div class="chapter">
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Anyway &mdash; not everything this month was a merger, thank god. There's a dog who keeps folding himself into shapes a spine should not allow, and a cat who clears four feet between shelves like he's being chased by rent, and I've started to suspect I film them this much because I'm quietly asking them the question I can't ask myself: <em>what are you doing, and why like this.</em></p>
+                <p>Not everything was a merger, thank god. Kobe folds into shapes a spine shouldn't allow. The cat clears four feet between shelves like rent is due. I film them because I'm quietly asking the question I can't ask myself: <em>what are you doing, and why like this.</em> Dinner with Dakota and Maddie at <a href="https://www.theinfatuation.com/los-angeles/reviews/quarter-sheets-pizza" target="_blank" rel="noopener">Quarter Sheets</a> &mdash; closed the place down talking about nothing. Perfect night.</p>
             </div>
             <div data-l="ko">
-                <p>아무튼 &mdash; 이번 달이 전부 합병은 아니었다, 다행히. 척추가 허락하면 안 될 자세로 자꾸 접히는 개가 있고, 월세에 쫓기듯 선반 사이 1.2미터를 건너뛰는 고양이가 있다. 내가 이걸 이렇게까지 찍는 건, 정작 나한텐 못 하는 질문을 걔네한테 던지고 있어서인 것 같다: <em>너 지금 뭐 하는 거고, 왜 하필 이렇게.</em></p>
+                <p>다행히 전부 합병은 아니었다. 코비는 척추가 허락하면 안 될 자세로 접힌다. 고양이는 월세가 밀린 것처럼 선반 사이 1.2미터를 뛴다. 내가 이렇게 찍는 건, 정작 나한텐 못 하는 질문을 걔네한테 던지기 때문인 것 같다: <em>너 지금 뭐 하는 거고, 왜 하필 이렇게.</em> 다코타랑 매디랑 <a href="https://www.theinfatuation.com/los-angeles/reviews/quarter-sheets-pizza" target="_blank" rel="noopener">Quarter Sheets</a>에서 &mdash; 별것 아닌 얘기로 가게 문 닫을 때까지. 완벽한 밤.</p>
             </div>
         </div>
         <div class="video-inset portrait reveal">
@@ -1185,36 +1177,8 @@
                 </button>
             </div>
             <div class="photo-caption">
-                <span data-l="en">"Kobe. why." &mdash; he has no answer. he has never had an answer.</span>
-                <span data-l="ko">"코비. 왜." &mdash; 답이 없다. 한 번도 답이 있던 적이 없다.</span>
-            </div>
-        </div>
-        <div class="video-inset reveal">
-            <div class="fv-stage">
-                <video controls playsinline preload="metadata" poster="/newsletter/006/images/cat-jump-poster.jpg"
-                    data-aria-en="A tuxedo cat leaping between two wall-mounted shelves while Kevin watches from below"
-                    data-aria-ko="케빈이 아래에서 지켜보는 가운데 벽에 달린 두 선반 사이를 뛰어 건너는 턱시도 고양이"
-                    aria-label="A tuxedo cat leaping between two wall-mounted shelves while Kevin watches from below">
-                    <source src="/newsletter/006/images/cat-jump.mp4" type="video/mp4">
-                </video>
-                <button class="fv-play" type="button" aria-label="Play with sound">
-                    <span class="fv-play-disc" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-                    <span class="fv-play-label"><span data-l="en">Play with sound</span><span data-l="ko">소리와 함께 재생</span></span>
-                </button>
-            </div>
-            <div class="photo-caption">
-                <span data-l="en">unbothered, airborne, gold-medal form &mdash; more on relays later</span>
-                <span data-l="ko">동요 없음, 공중에 떠 있음, 금메달 폼 &mdash; 계주 얘긴 이따 더</span>
-            </div>
-        </div>
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>And the people, who are the actual point of any of this. Dinner with Dakota and Maddie at <a href="https://www.theinfatuation.com/los-angeles/reviews/quarter-sheets-pizza" target="_blank" rel="noopener">Quarter Sheets</a> &mdash; the loud little Echo Park spot whose princess cake I would, with a completely straight face, walk into traffic for. We closed the place down talking about nothing in particular, which is my favorite kind of night.</p>
-                <p>And Lauren, who is a one-woman hype machine right up until the wave gets real. Ayeshna sent us to Staircase; Lauren took one look, deemed it beneath her, and rerouted us to County Line, where the swell was a very sincere six-to-seven feet &mdash; and somewhere around the paddle-out she remembered that <a class="vid-link" role="button" tabindex="0" data-lightbox="pencilingLightbox">penciling</a> is a real and terrifying thing. We barely caught anything. Still the best day I've had in a while.</p>
-            </div>
-            <div data-l="ko">
-                <p>그리고 사람들, 사실 이 모든 것의 진짜 핵심. 다코타랑 매디랑 <a href="https://www.theinfatuation.com/los-angeles/reviews/quarter-sheets-pizza" target="_blank" rel="noopener">Quarter Sheets</a>에서 저녁 &mdash; 에코파크의 시끄럽고 작은 가게인데, 거기 프린세스 케이크는 정말이지 차도에 뛰어들어도 좋을 만큼 맛있다. 별것 아닌 얘기로 가게 문 닫을 때까지 앉아 있었는데, 내가 제일 좋아하는 종류의 밤이다.</p>
-                <p>그리고 로런. 파도가 진짜로 커지기 전까진 일인 응원단이다. 아예슈나가 스테어케이스에서 보자고 했는데 로런이 딱 보더니 거긴 성에 안 찬다며 바로 옆 카운티 라인으로 데려갔고, 6~7피트짜리 아주 진지한 너울 앞 패들 아웃 즈음에 <a class="vid-link" role="button" tabindex="0" data-lightbox="pencilingLightbox">페널링</a>이 실재하는 무서운 거라는 걸 떠올렸다. 사실 거의 못 탔다. 그래도 오랜만에 제일 좋은 하루였다.</p>
+                <span data-l="en">"Kobe. why." &mdash; no answer on file.</span>
+                <span data-l="ko">"코비. 왜." &mdash; 답변 없음.</span>
             </div>
         </div>
         <div class="photo-inset reveal">
@@ -1227,16 +1191,6 @@
                 <span data-l="ko">다코타 &amp; 매디, Quarter Sheets에서</span>
             </div>
         </div>
-        <div class="photo-inset reveal">
-            <img src="/newsletter/006/images/lauren-surf.jpg"
-                data-alt-en="Lauren in a wetsuit throwing double peace signs on a coastal bluff under an overcast sky, the ocean behind her"
-                data-alt-ko="흐린 하늘 아래 해안 절벽에서 웻수트를 입고 양손 브이를 하는 로런, 뒤로는 바다"
-                alt="Lauren in a wetsuit throwing double peace signs on a coastal bluff under an overcast sky, the ocean behind her">
-            <div class="photo-caption">
-                <span data-l="en">Lauren at County Line, moments before remembering she's mortal</span>
-                <span data-l="ko">로런, 카운티 라인 &mdash; 자기가 인간임을 떠올리기 직전</span>
-            </div>
-        </div>
     </div>
 
     <!-- ============================================================
@@ -1245,12 +1199,12 @@
     <div class="chapter">
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Okay. The real reason I've been emotional this month.</p>
-                <p>The World Cup started, Korea is in it, and I am &mdash; to use the technical term &mdash; not okay about it, in the best way. Last Thursday, opening week, Korea played Czechia down in Guadalajara and went a goal down early. Then Hwang In-beom decided the match was his, and we came all the way back to win it.</p>
+                <p>Okay. The real reason I've been emotional.</p>
+                <p>World Cup started. Korea is in it. Opening week, down 0&ndash;1 to Czechia, then Hwang In-beom decided the match was his. 2&ndash;1. I watched alone and made noises my neighbors have kindly not mentioned. Next up: Korea vs. Mexico, June 18, Guadalajara &mdash; my brother, my dad, and me, three generations, one rental car, one unhinged group chat.</p>
             </div>
             <div data-l="ko">
-                <p>자, 이번 달 내가 감정적이었던 진짜 이유.</p>
-                <p>월드컵이 시작됐고, 한국이 거기 있고, 나는 &mdash; 전문 용어로 &mdash; 가장 좋은 의미로 제정신이 아니다. 지난 목요일, 개막 주에 한국은 과달라하라에서 체코와 붙어 일찍 한 골을 내줬다. 그러다 황인범이 이 경기는 자기 거라고 마음먹었고, 우리는 끝까지 따라잡아 역전승했다.</p>
+                <p>자. 내가 감정적이었던 진짜 이유.</p>
+                <p>월드컵 시작. 한국 출전. 개막 주, 체코에 0&ndash;1로 끌려가다 황인범이 경기를 자기 거라고 선언. 2&ndash;1. 혼자 보며 이웃들이 언급하지 않기로 한 소리를 냈다. 다음: 6월 18일 과달라하라, 한국 대 멕시코 &mdash; 동생, 아빠, 나, 3대, 렌터카 한 대, 미친 단톡방.</p>
             </div>
         </div>
 
@@ -1269,17 +1223,6 @@
             </div>
             <p class="sc-meta"><span class="ft">FT</span> <span class="sep">&middot;</span> <span data-l="en">Estadio Akron &middot; Guadalajara &middot; Jun 11</span><span data-l="ko">에스타디오 아크론 &middot; 과달라하라 &middot; 6월 11일</span></p>
             <p class="sc-note"><span data-l="en">down 0&ndash;1, then Hwang In-beom happened</span><span data-l="ko">0&ndash;1로 끌려가다, 황인범이 폭발했다</span></p>
-        </div>
-
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>Two&ndash;one. A comeback. In the <em>first</em> match. I watched alone in my living room, making noises my neighbors definitely heard and have kindly chosen not to mention.</p>
-                <p>And it gets better: my brother, my dad, and I are driving down to Guadalajara for the next one &mdash; Korea vs. Mexico, June 18, Estadio Akron, in front of a sea of green. Three generations of Lee men, one rental car, one increasingly unhinged group chat. If you'll somehow be there too: catch us. We'll be the ones crying during the anthem.</p>
-            </div>
-            <div data-l="ko">
-                <p>2 대 1. 역전. 그것도 <em>첫</em> 경기에서. 거실에서 혼자 보면서 이웃들이 분명히 들었을, 그리고 고맙게도 언급하지 않기로 한 소리를 냈다.</p>
-                <p>그리고 더 좋아진다: 동생이랑 아빠랑 나는 다음 경기를 보러 과달라하라로 차를 몰고 내려간다 &mdash; 한국 대 멕시코, 6월 18일, 에스타디오 아크론, 초록 물결의 관중석 앞에서. 이씨 집안 3대, 렌터카 한 대, 점점 미쳐가는 단톡방 하나. 혹시 거기 올 일 있으면: 우리 찾아라. 애국가 때 울고 있는 사람들이 우리다.</p>
-            </div>
         </div>
 
         <div class="fixture reveal-fade">
@@ -1305,12 +1248,14 @@
     <div class="chapter">
         <div class="text-block reveal">
             <div data-l="en">
-                <p>Okay &mdash; the thing I actually dragged you all the way down here for, and the reason this whole letter is called <em>Us</em>.</p>
-                <p>Back in February, at the Milano-Cortina Olympics, the Korean women's 3000m short-track relay team did this. Watch it with the sound on. Two laps to go, Italy out front on home ice, the entire building roaring against them &mdash; and Korea just&hellip; goes. Slingshots through on the final exchange. 4:04.014. Gold. Their seventh relay title in the event's history.</p>
+                <p>And the thing this whole letter is named for.</p>
+                <p>February, Milano-Cortina: the Korean women's 3000m short-track relay. Two laps left, Italy out front on home ice, the building roaring against them &mdash; and Korea just goes. Slingshot on the final exchange. 4:04.014. Gold. Seventh relay title ever. Watch with sound. I have watched this more times than I'll admit in writing.</p>
+                <p>I am not a crier. I cry at this. In Korean you'd never call it <em>my</em> country. It's 우리나라. <em>Ours.</em> That's the nap &mdash; not burnout, not the merger. One afternoon where nobody's auditioning for anything. Worth it. See you next month.</p>
             </div>
             <div data-l="ko">
-                <p>자 &mdash; 사실 너를 여기까지 끌고 내려온 진짜 이유, 그리고 이 편지 제목이 <em>'우리'</em>인 이유.</p>
-                <p>지난 2월, 밀라노-코르티나 올림픽에서 한국 여자 3000m 쇼트트랙 계주 팀이 이걸 해냈다. 소리 켜고 봐라. 두 바퀴 남기고, 홈 빙판의 이탈리아가 앞서 있고, 경기장 전체가 그들을 향해 포효하는데 &mdash; 한국이 그냥&hellip; 간다. 마지막 교대에서 슬링샷처럼 튀어나간다. 4분 04초 014. 금메달. 역대 일곱 번째 계주 금메달.</p>
+                <p>그리고 이 편지 제목의 이유.</p>
+                <p>2월, 밀라노-코르티나: 한국 여자 3000m 쇼트트랙 계주. 두 바퀴 남기고 홈 빙판의 이탈리아가 앞서 있고, 경기장 전체가 그들을 향해 포효 &mdash; 한국이 그냥 간다. 마지막 교대에서 슬링샷. 4분 04초 014. 금. 역대 일곱 번째 계주 금. 소리 켜고 봐라. 글로는 인정 못 할 만큼 여러 번 돌려봤다.</p>
+                <p>나는 잘 우는 사람이 아니다. 이것엔 운다. 한국어로는 <em>'내 나라'</em>라고 안 한다. 우리나라. <em>우리</em>의. 그게 그 낮잠 &mdash; 번아웃도 합병도 아니다. 한 오후, 아무도 오디션 안 봐도 되는. 그럴 만했다. 다음 달에.</p>
             </div>
         </div>
 
@@ -1328,7 +1273,7 @@
                     <span class="fv-play-label"><span data-l="en">Play with sound</span><span data-l="ko">소리와 함께 재생</span></span>
                 </button>
             </div>
-            <p class="fv-cap"><span data-l="en">the final laps. I have watched this more times than I'll admit in writing.</span><span data-l="ko">마지막 바퀴. 글로는 인정 못 할 만큼 여러 번 돌려봤다.</span></p>
+            <p class="fv-cap"><span data-l="en">the final laps</span><span data-l="ko">마지막 바퀴</span></p>
         </div>
 
         <div class="relay reveal-fade">
@@ -1348,17 +1293,44 @@
                 </p>
             </div>
         </div>
+    </div>
 
-        <div class="text-block reveal">
-            <div data-l="en">
-                <p>I am not a crier. I cry at this. Something about four women I've never met, on the other side of the planet, refusing to lose for a country I just happen to share with them. In Korean you'd never call it <em>my</em> country. It's 우리나라. <em>Ours.</em></p>
-                <p>And that's the nap. Not burnout, not the merger &mdash; the merger's just background noise. It's what happens when, for one whole afternoon, nobody's auditioning for anything. Worth it. See you next month.</p>
-            </div>
-            <div data-l="ko">
-                <p>나는 잘 우는 사람이 아니다. 이것엔 운다. 한 번도 만난 적 없는 네 명의 여자가, 지구 반대편에서, 그냥 나와 공유하게 된 나라를 위해 지지 않으려 한다. 한국어로는 절대 <em>'내 나라'</em>라고 안 한다. 우리나라다. <em>우리</em>의.</p>
-                <p>그래서, 그게 그 낮잠이다. 번아웃도 합병도 아니고 &mdash; 합병은 그냥 배경 소음이다. 한 오후 내내 아무도 오디션을 안 봐도 될 때 나오는 장면. 그럴 만했다. 다음 달에 봐요.</p>
-            </div>
-        </div>
+    <!-- REFERENCES -->
+    <div class="divider reveal-fade"></div>
+    <div class="refs-block reveal">
+        <p class="refs-label"><span data-l="en">Reading that survived the cut</span><span data-l="ko">살아남은 읽을거리</span></p>
+        <ul>
+            <li>
+                <span data-l="en">
+                    <strong><a href="https://www.oreilly.com/library/view/software-engineering-at/9781492082791/" target="_blank" rel="noopener">Software Engineering at Google</a></strong>
+                    <em>Winters, Manshreck &amp; Wright</em> &mdash; "Programming integrated over time." Hyrum's Law: given enough users, your innocent change breaks something. Clever is a compliment in a hackathon, an accusation in prod.
+                </span>
+                <span data-l="ko">
+                    <strong><a href="https://www.oreilly.com/library/view/software-engineering-at/9781492082791/" target="_blank" rel="noopener">Software Engineering at Google</a></strong>
+                    <em>Winters, Manshreck &amp; Wright</em> &mdash; "시간에 걸친 프로그래밍." Hyrum's Law: 사용자가 충분하면 순진한 변경도 뭔가를 부순다. clever는 해커톤에선 칭찬, 프로덕션에선 고발.
+                </span>
+            </li>
+            <li>
+                <span data-l="en">
+                    <strong><a href="https://dora.dev/dora-report-2025/" target="_blank" rel="noopener">State of AI-assisted Software Development (2025)</a></strong>
+                    <em>DORA / Google Cloud</em> &mdash; AI is an amplifier, not a shortcut. 90% adoption, 30% trust issues. Throughput up, instability up. Systems problem, not tools problem.
+                </span>
+                <span data-l="ko">
+                    <strong><a href="https://dora.dev/dora-report-2025/" target="_blank" rel="noopener">State of AI-assisted Software Development (2025)</a></strong>
+                    <em>DORA / Google Cloud</em> &mdash; AI는 증폭기지 지름길이 아니다. 90% 도입, 30% 신뢰 문제. 처리량↑, 불안정성↑. 도구 문제가 아니라 시스템 문제.
+                </span>
+            </li>
+            <li>
+                <span data-l="en">
+                    <strong><a href="https://dora.dev/ai-capabilities-model/" target="_blank" rel="noopener">DORA AI Capabilities Model (2025)</a></strong>
+                    <em>DORA / Google Cloud</em> &mdash; Seven things that actually matter: clear AI policy, healthy data, AI-accessible docs, version control, small batches, user-centric focus, quality platforms. The boring stuff wins.
+                </span>
+                <span data-l="ko">
+                    <strong><a href="https://dora.dev/ai-capabilities-model/" target="_blank" rel="noopener">DORA AI Capabilities Model (2025)</a></strong>
+                    <em>DORA / Google Cloud</em> &mdash; 진짜 중요한 일곱 가지: 명확한 AI 정책, 건강한 데이터, AI가 읽을 수 있는 문서, 버전 관리, 작은 배치, 사용자 중심, 좋은 플랫폼. 지루한 게 이긴다.
+                </span>
+            </li>
+        </ul>
     </div>
 
     <!-- ——— Sign Off ——— -->
@@ -1473,17 +1445,6 @@
         </div>
         <button class="mini-player-close" id="miniPlayerClose" type="button"
             data-aria-en="Close mini player" data-aria-ko="미니 플레이어 닫기" aria-label="Close mini player">&times;</button>
-    </div>
-
-    <!-- Click-to-watch lightbox: "penciling" -->
-    <div class="vid-lightbox" id="pencilingLightbox" role="dialog" aria-modal="true" aria-label="Penciling, demonstrated" hidden>
-        <button class="vlb-close" type="button" aria-label="Close video">&times;</button>
-        <div class="vlb-inner">
-            <video class="vlb-video" controls loop playsinline preload="none" poster="/newsletter/006/images/penciling-poster.jpg">
-                <source src="/newsletter/006/images/penciling.mp4" type="video/mp4">
-            </video>
-            <p class="vlb-cap"><span data-l="en">penciling, demonstrated &mdash; do not attempt</span><span data-l="ko">페널링 시연 &mdash; 따라 하지 마시오</span></p>
-        </div>
     </div>
 
     <!-- Analytics -->
@@ -1901,40 +1862,6 @@
                     stage.classList.add('playing');
                 });
                 v.addEventListener('play', function () { stage.classList.add('playing'); });
-            });
-        })();
-
-        // ==================== CLICK-TO-WATCH LIGHTBOX ("penciling") ====================
-        (function () {
-            var links = document.querySelectorAll('.vid-link[data-lightbox]');
-            if (!links.length) return;
-            function open(box) {
-                box.hidden = false;
-                requestAnimationFrame(function () { box.classList.add('open'); });
-                document.body.style.overflow = 'hidden';
-                var v = box.querySelector('video');
-                if (v) {
-                    try { v.currentTime = 0; } catch (e) {}
-                    v.muted = false;
-                    var p = v.play(); if (p && p.catch) p.catch(function () { v.muted = true; v.play().catch(function () {}); });
-                }
-            }
-            function close(box) {
-                box.classList.remove('open');
-                var v = box.querySelector('video'); if (v) v.pause();
-                document.body.style.overflow = '';
-                setTimeout(function () { box.hidden = true; }, 300);
-            }
-            Array.prototype.forEach.call(links, function (link) {
-                var box = document.getElementById(link.getAttribute('data-lightbox'));
-                if (!box) return;
-                function trigger(e) { e.preventDefault(); open(box); }
-                link.addEventListener('click', trigger);
-                link.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') trigger(e); });
-                var closeBtn = box.querySelector('.vlb-close');
-                if (closeBtn) closeBtn.addEventListener('click', function () { close(box); });
-                box.addEventListener('click', function (e) { if (e.target === box) close(box); });
-                document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box.classList.contains('open')) close(box); });
             });
         })();
 
