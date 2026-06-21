@@ -28,10 +28,18 @@
     <link rel="stylesheet" href="../css/main.css">
 
     <style>
+        .legal-header {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 24px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         .legal-page {
             max-width: 680px;
             margin: 0 auto;
-            padding: 80px 24px 120px;
+            padding: 24px 24px 120px;
         }
         .legal-page .back-link {
             font-family: var(--font-body);
@@ -77,80 +85,91 @@
     </style>
 </head>
 <body>
+    <header class="legal-header">
+        <span></span>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
+        </div>
+    </header>
+
     <div class="legal-page">
-        <a href="/" class="back-link">← klee.page</a>
+        <a href="/" class="back-link" data-i18n="terms.backLink">← klee.page</a>
 
-        <h1>Terms of Service</h1>
-        <p class="updated">Last updated: March 25, 2026</p>
+        <h1 data-i18n="terms.heading">Terms of Service</h1>
+        <p class="updated" data-i18n="terms.updated">Last updated: March 25, 2026</p>
 
-        <h2>Agreement</h2>
-        <p>By accessing klee.page or using Dispatch, you agree to these terms. If you don't agree, please don't use our services.</p>
+        <h2 data-i18n="terms.agreementHeading">Agreement</h2>
+        <p data-i18n="terms.agreementP">By accessing klee.page or using Dispatch, you agree to these terms. If you don't agree, please don't use our services.</p>
 
-        <h2>Dispatch Service</h2>
-        <p>Dispatch is a platform for creating and sending beautiful personal letters to friends and family. The service includes a mobile app (iOS) and a web reader for recipients.</p>
+        <h2 data-i18n="terms.serviceHeading">Dispatch Service</h2>
+        <p data-i18n="terms.serviceP">Dispatch is a platform for creating and sending beautiful personal letters to friends and family. The service includes a mobile app (iOS) and a web reader for recipients.</p>
 
-        <h2>Your Account</h2>
+        <h2 data-i18n="terms.accountHeading">Your Account</h2>
         <ul>
-            <li>You must be at least 13 years old (16 in the EU) to create a Dispatch account.</li>
-            <li>You are responsible for maintaining the security of your account credentials.</li>
-            <li>You must provide accurate information when creating your account.</li>
-            <li>You can delete your account at any time from Settings in the app.</li>
-            <li>One person, one account. Don't create multiple accounts.</li>
+            <li data-i18n="terms.accountLi1">You must be at least 13 years old (16 in the EU) to create a Dispatch account.</li>
+            <li data-i18n="terms.accountLi2">You are responsible for maintaining the security of your account credentials.</li>
+            <li data-i18n="terms.accountLi3">You must provide accurate information when creating your account.</li>
+            <li data-i18n="terms.accountLi4">You can delete your account at any time from Settings in the app.</li>
+            <li data-i18n="terms.accountLi5">One person, one account. Don't create multiple accounts.</li>
         </ul>
 
-        <h2>Your Content</h2>
-        <p>You own everything you create on Dispatch — your letters, photos, and media belong to you. We don't claim any intellectual property rights over your content.</p>
-        <p>By sending a letter through Dispatch, you grant us a limited, non-exclusive license to store, process, and deliver that content to your intended recipients. We don't use your content for any other purpose.</p>
-        <p>You are responsible for the content of your letters. Don't send anything illegal, harmful, or that violates someone else's rights.</p>
+        <h2 data-i18n="terms.contentHeading">Your Content</h2>
+        <p data-i18n="terms.contentP1">You own everything you create on Dispatch — your letters, photos, and media belong to you. We don't claim any intellectual property rights over your content.</p>
+        <p data-i18n="terms.contentP2">By sending a letter through Dispatch, you grant us a limited, non-exclusive license to store, process, and deliver that content to your intended recipients. We don't use your content for any other purpose.</p>
+        <p data-i18n="terms.contentP3">You are responsible for the content of your letters. Don't send anything illegal, harmful, or that violates someone else's rights.</p>
 
-        <h2>Acceptable Use</h2>
-        <p>You agree not to use Dispatch to:</p>
+        <h2 data-i18n="terms.acceptableHeading">Acceptable Use</h2>
+        <p data-i18n="terms.acceptableIntro">You agree not to use Dispatch to:</p>
         <ul>
-            <li>Send unsolicited messages, spam, or bulk communications</li>
-            <li>Harass, threaten, defame, or abuse other people</li>
-            <li>Share content that is illegal, obscene, or violates others' intellectual property rights</li>
-            <li>Attempt to access other users' accounts, letters, or data</li>
-            <li>Reverse engineer, decompile, or attempt to extract our source code</li>
-            <li>Use automated systems to access the service (bots, scrapers, etc.)</li>
-            <li>Interfere with or disrupt the service or its infrastructure</li>
+            <li data-i18n="terms.acceptableLi1">Send unsolicited messages, spam, or bulk communications</li>
+            <li data-i18n="terms.acceptableLi2">Harass, threaten, defame, or abuse other people</li>
+            <li data-i18n="terms.acceptableLi3">Share content that is illegal, obscene, or violates others' intellectual property rights</li>
+            <li data-i18n="terms.acceptableLi4">Attempt to access other users' accounts, letters, or data</li>
+            <li data-i18n="terms.acceptableLi5">Reverse engineer, decompile, or attempt to extract our source code</li>
+            <li data-i18n="terms.acceptableLi6">Use automated systems to access the service (bots, scrapers, etc.)</li>
+            <li data-i18n="terms.acceptableLi7">Interfere with or disrupt the service or its infrastructure</li>
         </ul>
-        <p>We may suspend or terminate accounts that violate these terms.</p>
+        <p data-i18n="terms.acceptableP">We may suspend or terminate accounts that violate these terms.</p>
 
-        <h2>AI Features</h2>
-        <p>Dispatch offers optional AI-powered writing assistance (polishing, translation, voice-to-letter). These features are provided as-is. AI suggestions are just that — suggestions. You are responsible for reviewing and approving the final content of every letter you send. AI outputs may not always be accurate, appropriate, or complete.</p>
+        <h2 data-i18n="terms.aiHeading">AI Features</h2>
+        <p data-i18n="terms.aiP">Dispatch offers optional AI-powered writing assistance (polishing, translation, voice-to-letter). These features are provided as-is. AI suggestions are just that — suggestions. You are responsible for reviewing and approving the final content of every letter you send. AI outputs may not always be accurate, appropriate, or complete.</p>
 
-        <h2>Intellectual Property</h2>
-        <p>The Dispatch name, logo, design, and underlying technology are owned by Kevin Lee. You may not use our trademarks or branding without written permission. The open-source components we use retain their respective licenses.</p>
+        <h2 data-i18n="terms.ipHeading">Intellectual Property</h2>
+        <p data-i18n="terms.ipP">The Dispatch name, logo, design, and underlying technology are owned by Kevin Lee. You may not use our trademarks or branding without written permission. The open-source components we use retain their respective licenses.</p>
 
-        <h2>Service Availability</h2>
-        <p>We strive to keep Dispatch available and reliable, but we can't guarantee 100% uptime. We may perform maintenance, updates, or modifications that temporarily affect availability. We'll provide reasonable notice when possible.</p>
-        <p>We reserve the right to modify, suspend, or discontinue any part of the service with reasonable notice. If we discontinue the service entirely, we'll give you at least 30 days to export your data.</p>
+        <h2 data-i18n="terms.availabilityHeading">Service Availability</h2>
+        <p data-i18n="terms.availabilityP1">We strive to keep Dispatch available and reliable, but we can't guarantee 100% uptime. We may perform maintenance, updates, or modifications that temporarily affect availability. We'll provide reasonable notice when possible.</p>
+        <p data-i18n="terms.availabilityP2">We reserve the right to modify, suspend, or discontinue any part of the service with reasonable notice. If we discontinue the service entirely, we'll give you at least 30 days to export your data.</p>
 
-        <h2>Payment & Pricing</h2>
-        <p>Dispatch is currently free. If we introduce paid features in the future, we'll notify you in advance. We will never retroactively charge for features that were free when you used them.</p>
+        <h2 data-i18n="terms.paymentHeading">Payment & Pricing</h2>
+        <p data-i18n="terms.paymentP">Dispatch is currently free. If we introduce paid features in the future, we'll notify you in advance. We will never retroactively charge for features that were free when you used them.</p>
 
-        <h2>Limitation of Liability</h2>
-        <p>Dispatch is provided "as is" without warranties of any kind, express or implied. To the maximum extent permitted by law:</p>
+        <h2 data-i18n="terms.liabilityHeading">Limitation of Liability</h2>
+        <p data-i18n="terms.liabilityIntro">Dispatch is provided "as is" without warranties of any kind, express or implied. To the maximum extent permitted by law:</p>
         <ul>
-            <li>We are not liable for any indirect, incidental, special, consequential, or punitive damages</li>
-            <li>Our total liability shall not exceed $100 USD or the amount you paid us in the 12 months preceding the claim, whichever is greater</li>
-            <li>We are not responsible for content created or sent by users</li>
+            <li data-i18n="terms.liabilityLi1">We are not liable for any indirect, incidental, special, consequential, or punitive damages</li>
+            <li data-i18n="terms.liabilityLi2">Our total liability shall not exceed $100 USD or the amount you paid us in the 12 months preceding the claim, whichever is greater</li>
+            <li data-i18n="terms.liabilityLi3">We are not responsible for content created or sent by users</li>
         </ul>
 
-        <h2>Indemnification</h2>
-        <p>You agree to indemnify and hold harmless Kevin Lee and Dispatch from any claims, damages, or expenses arising from your use of the service or violation of these terms.</p>
+        <h2 data-i18n="terms.indemnificationHeading">Indemnification</h2>
+        <p data-i18n="terms.indemnificationP">You agree to indemnify and hold harmless Kevin Lee and Dispatch from any claims, damages, or expenses arising from your use of the service or violation of these terms.</p>
 
-        <h2>Governing Law</h2>
-        <p>These terms are governed by the laws of the State of California, United States. Any disputes shall be resolved in the courts of Los Angeles County, California.</p>
+        <h2 data-i18n="terms.governingHeading">Governing Law</h2>
+        <p data-i18n="terms.governingP">These terms are governed by the laws of the State of California, United States. Any disputes shall be resolved in the courts of Los Angeles County, California.</p>
 
-        <h2>Changes</h2>
-        <p>We may update these terms from time to time. We'll notify you of material changes via email or in-app notification at least 14 days before they take effect. Continued use after changes constitutes acceptance of the new terms.</p>
+        <h2 data-i18n="terms.changesHeading">Changes</h2>
+        <p data-i18n="terms.changesP">We may update these terms from time to time. We'll notify you of material changes via email or in-app notification at least 14 days before they take effect. Continued use after changes constitutes acceptance of the new terms.</p>
 
-        <h2>Severability</h2>
-        <p>If any provision of these terms is found to be unenforceable, the remaining provisions will continue in full force and effect.</p>
+        <h2 data-i18n="terms.severabilityHeading">Severability</h2>
+        <p data-i18n="terms.severabilityP">If any provision of these terms is found to be unenforceable, the remaining provisions will continue in full force and effect.</p>
 
-        <h2>Contact</h2>
-        <p>Questions about these terms? Contact <a href="mailto:kevin@klee.page">kevin@klee.page</a></p>
+        <h2 data-i18n="terms.contactHeading">Contact</h2>
+        <p data-i18n-html="terms.contactP">Questions about these terms? Contact <a href="mailto:kevin@klee.page">kevin@klee.page</a></p>
     </div>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/theme.js"></script>
 </body>
 </html>

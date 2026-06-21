@@ -344,7 +344,7 @@
 <body>
 
     <header>
-        <a href="/projects" class="back-link">&larr; Projects</a>
+        <a href="/projects" class="back-link" data-i18n="spacec.backLink">&larr; Projects</a>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle">
             <label for="theme-toggle"></label>
@@ -354,8 +354,8 @@
     <main>
         <div class="hero">
             <h1 class="page-title">SPACEc</h1>
-            <p class="tagline">A Stanford library for multiplexed imaging analysis, from cell segmentation through spatial analysis.</p>
-            <p class="stats">
+            <p class="tagline" data-i18n="spacec.tagline">A Stanford library for multiplexed imaging analysis, from cell segmentation through spatial analysis.</p>
+            <p class="stats" data-i18n-html="spacec.stats">
                 Python &middot; six core modules &middot;
                 published on <strong>PyPI</strong> and <strong>bioRxiv</strong>
             </p>
@@ -363,7 +363,7 @@
 
         <div class="logo-intro">
             <img src="/projects/images/spacec-logo.png" alt="SPACEc logo" width="100" height="100">
-            <p>An interactive Python workflow for multiplexed image processing, from tissue extraction to spatial analysis, in one library.</p>
+            <p data-i18n="spacec.logoIntro">An interactive Python workflow for multiplexed image processing, from tissue extraction to spatial analysis, in one library.</p>
         </div>
 
         <div class="code-block">
@@ -376,107 +376,107 @@
             <span class="code-fn">sp.pl</span>.spatial(adata, color=<span style="opacity:0.7">'cell_type'</span>)
         </div>
 
-        <h2>The Problem</h2>
-        <p>Multiplexed imaging lets researchers see 40+ proteins in a single tissue section, which matters for studying how cells interact in cancer, autoimmunity, and neuroscience. But the analysis is stitched together from separate tools: Cellpose for segmentation, scanpy for clustering, custom scripts for spatial analysis, matplotlib for visualization.</p>
-        <p>That means more time spent wrangling code than doing science. Each lab ends up with its own collection of notebooks that break when a dependency updates.</p>
+        <h2 data-i18n="spacec.problemHeading">The Problem</h2>
+        <p data-i18n="spacec.problemP1">Multiplexed imaging lets researchers see 40+ proteins in a single tissue section, which matters for studying how cells interact in cancer, autoimmunity, and neuroscience. But the analysis is stitched together from separate tools: Cellpose for segmentation, scanpy for clustering, custom scripts for spatial analysis, matplotlib for visualization.</p>
+        <p data-i18n="spacec.problemP2">That means more time spent wrangling code than doing science. Each lab ends up with its own collection of notebooks that break when a dependency updates.</p>
 
-        <h2>The Idea</h2>
-        <p>One library that handles the whole workflow, from raw TIFF images to spatial results, behind a consistent API. SPACEc follows the scanpy convention: <code>sp.tl</code> (tools), <code>sp.pp</code> (preprocessing), <code>sp.pl</code> (plotting), <code>sp.hf</code> (helpers). It's built on AnnData, the standard format in single-cell biology.</p>
+        <h2 data-i18n="spacec.ideaHeading">The Idea</h2>
+        <p data-i18n-html="spacec.ideaP">One library that handles the whole workflow, from raw TIFF images to spatial results, behind a consistent API. SPACEc follows the scanpy convention: <code>sp.tl</code> (tools), <code>sp.pp</code> (preprocessing), <code>sp.pl</code> (plotting), <code>sp.hf</code> (helpers). It's built on AnnData, the standard format in single-cell biology.</p>
 
         <hr>
 
-        <h2>Architecture</h2>
+        <h2 data-i18n="spacec.architectureHeading">Architecture</h2>
 
         <div class="full-image">
             <img src="/projects/images/spacec-overview.jpg" alt="SPACEc pipeline overview — tissue extraction, segmentation, preprocessing, clustering, annotation, and spatial analysis" loading="lazy" width="1200" height="848">
         </div>
-        <p class="image-caption">Full pipeline overview from the SPACEc paper</p>
+        <p class="image-caption" data-i18n="spacec.overviewCaption">Full pipeline overview from the SPACEc paper</p>
 
         <div class="diagram">
             <div class="diagram-flow">
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Input</span>
-                    <span class="diagram-node-body">Multi-channel<br>TIFF images<br>CSV markers</span>
+                    <span class="diagram-node-label" data-i18n="spacec.diagInput">Input</span>
+                    <span class="diagram-node-body" data-i18n-html="spacec.diagInputBody">Multi-channel<br>TIFF images<br>CSV markers</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Segmentation</span>
-                    <span class="diagram-node-body">Cellpose<br>DeepCell (Mesmer)<br>QuPath import</span>
+                    <span class="diagram-node-label" data-i18n="spacec.diagSegmentation">Segmentation</span>
+                    <span class="diagram-node-body" data-i18n-html="spacec.diagSegmentationBody">Cellpose<br>DeepCell (Mesmer)<br>QuPath import</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Preprocessing</span>
-                    <span class="diagram-node-body">Spillover comp<br>Noise removal<br>Normalization</span>
+                    <span class="diagram-node-label" data-i18n="spacec.diagPreprocessing">Preprocessing</span>
+                    <span class="diagram-node-body" data-i18n-html="spacec.diagPreprocessingBody">Spillover comp<br>Noise removal<br>Normalization</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Clustering</span>
-                    <span class="diagram-node-body">Leiden / Louvain<br>FlowSOM<br>GPU (RAPIDS)</span>
+                    <span class="diagram-node-label" data-i18n="spacec.diagClustering">Clustering</span>
+                    <span class="diagram-node-body" data-i18n-html="spacec.diagClusteringBody">Leiden / Louvain<br>FlowSOM<br>GPU (RAPIDS)</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Annotation</span>
-                    <span class="diagram-node-body">SVM / k-NN<br>STELLAR (GNN)<br>Hyperparameter tuning</span>
+                    <span class="diagram-node-label" data-i18n="spacec.diagAnnotation">Annotation</span>
+                    <span class="diagram-node-body" data-i18n-html="spacec.diagAnnotationBody">SVM / k-NN<br>STELLAR (GNN)<br>Hyperparameter tuning</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Spatial</span>
-                    <span class="diagram-node-body">Neighborhoods<br>Cell interactions<br>Patch Proximity*</span>
+                    <span class="diagram-node-label" data-i18n="spacec.diagSpatial">Spatial</span>
+                    <span class="diagram-node-body" data-i18n-html="spacec.diagSpatialBody">Neighborhoods<br>Cell interactions<br>Patch Proximity*</span>
                 </div>
             </div>
         </div>
 
-        <p>*Patch Proximity Analysis is the novel research contribution.</p>
+        <p data-i18n="spacec.patchNote">*Patch Proximity Analysis is the novel research contribution.</p>
 
-        <h3>Module Structure</h3>
+        <h3 data-i18n="spacec.moduleHeading">Module Structure</h3>
         <ul class="module-list">
-            <li><span class="module-name">sp.tl._general</span> &mdash; core analysis, clustering, annotation, spatial</li>
-            <li><span class="module-name">sp.pl._general</span> &mdash; visualization and plotting</li>
-            <li><span class="module-name">sp.tl._segmentation</span> &mdash; Cellpose, DeepCell, image processing</li>
-            <li><span class="module-name">sp.hf._general</span> &mdash; helper functions</li>
-            <li><span class="module-name">sp.pp._general</span> &mdash; preprocessing pipelines</li>
-            <li><span class="module-name">sp._shared.segmentation</span> &mdash; shared segmentation logic</li>
+            <li data-i18n-html="spacec.module1"><span class="module-name">sp.tl._general</span> &mdash; core analysis, clustering, annotation, spatial</li>
+            <li data-i18n-html="spacec.module2"><span class="module-name">sp.pl._general</span> &mdash; visualization and plotting</li>
+            <li data-i18n-html="spacec.module3"><span class="module-name">sp.tl._segmentation</span> &mdash; Cellpose, DeepCell, image processing</li>
+            <li data-i18n-html="spacec.module4"><span class="module-name">sp.hf._general</span> &mdash; helper functions</li>
+            <li data-i18n-html="spacec.module5"><span class="module-name">sp.pp._general</span> &mdash; preprocessing pipelines</li>
+            <li data-i18n-html="spacec.module6"><span class="module-name">sp._shared.segmentation</span> &mdash; shared segmentation logic</li>
         </ul>
 
         <hr>
 
-        <h2>The Novel Contribution</h2>
-        <h3>Patch Proximity Analysis</h3>
-        <p>Standard neighborhood analysis works on cell-to-cell distances. It tells you cell A is near cell B, but not how groups of cells are organized at the tissue level.</p>
-        <p>Patch Proximity Analysis takes a different route. DBSCAN finds spatial clusters of a given cell type (patches of tumor cells, immune aggregates, stromal clusters), concave hulls draw boundaries around each patch, and the analysis then measures how other cell types sit relative to those boundaries: inside, on the border, or nearby.</p>
-        <p>That picks up tissue-level organization the cell-level view misses. A tumor microenvironment isn't just a set of pairwise interactions; it's the arrangement of which populations sit next to which.</p>
+        <h2 data-i18n="spacec.contributionHeading">The Novel Contribution</h2>
+        <h3 data-i18n="spacec.patchHeading">Patch Proximity Analysis</h3>
+        <p data-i18n="spacec.patchP1">Standard neighborhood analysis works on cell-to-cell distances. It tells you cell A is near cell B, but not how groups of cells are organized at the tissue level.</p>
+        <p data-i18n="spacec.patchP2">Patch Proximity Analysis takes a different route. DBSCAN finds spatial clusters of a given cell type (patches of tumor cells, immune aggregates, stromal clusters), concave hulls draw boundaries around each patch, and the analysis then measures how other cell types sit relative to those boundaries: inside, on the border, or nearby.</p>
+        <p data-i18n="spacec.patchP3">That picks up tissue-level organization the cell-level view misses. A tumor microenvironment isn't just a set of pairwise interactions; it's the arrangement of which populations sit next to which.</p>
 
         <hr>
 
-        <h2>Decisions</h2>
+        <h2 data-i18n="spacec.decisionsHeading">Decisions</h2>
 
-        <h3>AnnData</h3>
-        <p>AnnData is the standard data structure in single-cell biology, so building on it lets SPACEc work directly with scanpy. Researchers don't learn a new format, and they can move between the two. The <code>.obs</code>, <code>.var</code>, and <code>.obsm</code> fields map cleanly onto cell metadata, marker metadata, and spatial coordinates.</p>
+        <h3 data-i18n="spacec.annDataHeading">AnnData</h3>
+        <p data-i18n-html="spacec.annDataP">AnnData is the standard data structure in single-cell biology, so building on it lets SPACEc work directly with scanpy. Researchers don't learn a new format, and they can move between the two. The <code>.obs</code>, <code>.var</code>, and <code>.obsm</code> fields map cleanly onto cell metadata, marker metadata, and spatial coordinates.</p>
 
-        <h3>Both Cellpose and DeepCell</h3>
-        <p>Different imaging modalities call for different segmentation. Cellpose does well on cytoplasm with limited training data; DeepCell (Mesmer) is better for nuclear segmentation in whole-cell multiplex images. Supporting both lets researchers pick the right tool without leaving the library.</p>
+        <h3 data-i18n="spacec.cellposeHeading">Both Cellpose and DeepCell</h3>
+        <p data-i18n="spacec.cellposeP">Different imaging modalities call for different segmentation. Cellpose does well on cytoplasm with limited training data; DeepCell (Mesmer) is better for nuclear segmentation in whole-cell multiplex images. Supporting both lets researchers pick the right tool without leaving the library.</p>
 
-        <h3>GPU acceleration</h3>
-        <p>These datasets get large: tens of thousands of cells per sample, hundreds of samples per study. Leiden clustering that takes about 20 minutes on CPU runs in under 2 on GPU via RAPIDS, which matters when you're iterating.</p>
+        <h3 data-i18n="spacec.gpuHeading">GPU acceleration</h3>
+        <p data-i18n="spacec.gpuP">These datasets get large: tens of thousands of cells per sample, hundreds of samples per study. Leiden clustering that takes about 20 minutes on CPU runs in under 2 on GPU via RAPIDS, which matters when you're iterating.</p>
 
-        <h3>The scanpy API convention</h3>
-        <p>Most computational biologists already know <code>sc.tl</code>, <code>sc.pp</code>, and <code>sc.pl</code>. Mirroring it with <code>sp.tl</code>, <code>sp.pp</code>, and <code>sp.pl</code> keeps the learning curve on the science rather than the API, which makes people more likely to actually use the library.</p>
-
-        <hr>
-
-        <h2>Tradeoffs</h2>
-        <p><strong>Python 3.9&ndash;3.10 only.</strong> TensorFlow, PyTorch, and RAPIDS have version requirements that don't overlap cleanly above 3.10. This is the biggest friction point for adoption, which is why the CPU and GPU Docker images are the recommended install path.</p>
-        <p><strong>Monolithic modules.</strong> The <code>_general.py</code> files are large and hard to navigate. The scanpy convention keeps the public API consistent (<code>sp.tl.function()</code>) at the cost of file organization. That was a deliberate call: clean API, dense internals.</p>
-        <p><strong>Dependency sprawl.</strong> Cellpose, DeepCell, RAPIDS, PyTorch Geometric, GeoPandas, and TensorFlow each pull in transitive dependencies that fight each other, so a clean install outside Docker takes real effort. That's the cost of wrapping the best tool for each step instead of reimplementing them.</p>
+        <h3 data-i18n="spacec.scanpyHeading">The scanpy API convention</h3>
+        <p data-i18n-html="spacec.scanpyP">Most computational biologists already know <code>sc.tl</code>, <code>sc.pp</code>, and <code>sc.pl</code>. Mirroring it with <code>sp.tl</code>, <code>sp.pp</code>, and <code>sp.pl</code> keeps the learning curve on the science rather than the API, which makes people more likely to actually use the library.</p>
 
         <hr>
 
-        <h2>Talk</h2>
+        <h2 data-i18n="spacec.tradeoffsHeading">Tradeoffs</h2>
+        <p data-i18n-html="spacec.tradeoffsPython"><strong>Python 3.9&ndash;3.10 only.</strong> TensorFlow, PyTorch, and RAPIDS have version requirements that don't overlap cleanly above 3.10. This is the biggest friction point for adoption, which is why the CPU and GPU Docker images are the recommended install path.</p>
+        <p data-i18n-html="spacec.tradeoffsModules"><strong>Monolithic modules.</strong> The <code>_general.py</code> files are large and hard to navigate. The scanpy convention keeps the public API consistent (<code>sp.tl.function()</code>) at the cost of file organization. That was a deliberate call: clean API, dense internals.</p>
+        <p data-i18n-html="spacec.tradeoffsDeps"><strong>Dependency sprawl.</strong> Cellpose, DeepCell, RAPIDS, PyTorch Geometric, GeoPandas, and TensorFlow each pull in transitive dependencies that fight each other, so a clean install outside Docker takes real effort. That's the cost of wrapping the best tool for each step instead of reimplementing them.</p>
+
+        <hr>
+
+        <h2 data-i18n="spacec.talkHeading">Talk</h2>
         <a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener" class="talk-card">
             <img src="/projects/images/spacec-talk.jpg" alt="SPACEc presentation at Stanford" loading="lazy" width="180" height="101">
             <div class="talk-card-text">
-                <span class="talk-card-title">SPACEc: A Streamlined, Interactive Python Workflow</span>
-                <span class="talk-card-sub">Stanford University &middot; Nolan Lab</span>
+                <span class="talk-card-title" data-i18n="spacec.talkTitle">SPACEc: A Streamlined, Interactive Python Workflow</span>
+                <span class="talk-card-sub" data-i18n="spacec.talkSub">Stanford University &middot; Nolan Lab</span>
             </div>
         </a>
 
@@ -497,13 +497,13 @@
         </div>
 
         <div class="project-links">
-            <a href="https://pypi.org/project/spacec/" target="_blank" rel="noopener">PyPI &rarr;</a>
-            <a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener">GitHub &rarr;</a>
+            <a href="https://pypi.org/project/spacec/" target="_blank" rel="noopener" data-i18n="spacec.linkPyPI">PyPI &rarr;</a>
+            <a href="https://github.com/nolanlab/SPACEc" target="_blank" rel="noopener" data-i18n="spacec.linkGitHub">GitHub &rarr;</a>
         </div>
     </main>
 
     <footer>
-        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+        <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
 
     <script defer src="/_vercel/insights/script.js"></script>

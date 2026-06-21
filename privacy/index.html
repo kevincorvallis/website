@@ -28,10 +28,18 @@
     <link rel="stylesheet" href="../css/main.css">
 
     <style>
+        .legal-header {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 24px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         .legal-page {
             max-width: 680px;
             margin: 0 auto;
-            padding: 80px 24px 120px;
+            padding: 24px 24px 120px;
         }
         .legal-page .back-link {
             font-family: var(--font-body);
@@ -77,73 +85,84 @@
     </style>
 </head>
 <body>
+    <header class="legal-header">
+        <span></span>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
+        </div>
+    </header>
+
     <div class="legal-page">
-        <a href="/" class="back-link">← klee.page</a>
+        <a href="/" class="back-link" data-i18n="privacy.backLink">← klee.page</a>
 
-        <h1>Privacy Policy</h1>
-        <p class="updated">Last updated: March 25, 2026</p>
+        <h1 data-i18n="privacy.heading">Privacy Policy</h1>
+        <p class="updated" data-i18n="privacy.updated">Last updated: March 25, 2026</p>
 
-        <h2>Overview</h2>
-        <p>This privacy policy covers klee.page (personal website) and Dispatch (letter-sending app). Your privacy matters — here's exactly what we do and don't do with your data.</p>
+        <h2 data-i18n="privacy.overviewHeading">Overview</h2>
+        <p data-i18n="privacy.overviewP">This privacy policy covers klee.page (personal website) and Dispatch (letter-sending app). Your privacy matters — here's exactly what we do and don't do with your data.</p>
 
-        <h2>klee.page (Personal Website)</h2>
-        <p>klee.page is a static personal website. It does not collect personal data, use cookies, or track individual visitors. Anonymous analytics are collected via Vercel Web Analytics to understand aggregate traffic patterns (page views, referrers). No personally identifiable information is stored.</p>
+        <h2 data-i18n="privacy.websiteHeading">klee.page (Personal Website)</h2>
+        <p data-i18n="privacy.websiteP">klee.page is a static personal website. It does not collect personal data, use cookies, or track individual visitors. Anonymous analytics are collected via Vercel Web Analytics to understand aggregate traffic patterns (page views, referrers). No personally identifiable information is stored.</p>
 
-        <h2>Dispatch (Letter App)</h2>
-        <p>Dispatch is a platform for creating and sending personal letters. When you use Dispatch, we collect:</p>
+        <h2 data-i18n="privacy.dispatchHeading">Dispatch (Letter App)</h2>
+        <p data-i18n="privacy.dispatchIntro">Dispatch is a platform for creating and sending personal letters. When you use Dispatch, we collect:</p>
         <ul>
-            <li><strong>Account information:</strong> Name, email, profile photo. Used to identify you and deliver letters.</li>
-            <li><strong>Letter content:</strong> Text, photos, media in your letters. Stored encrypted. Only accessible to you and your recipients.</li>
-            <li><strong>Device tokens:</strong> Push notification tokens. Used solely to notify you when you receive a letter.</li>
-            <li><strong>Photo metadata:</strong> When you use the photo compose feature, EXIF data (GPS coordinates, date) is read locally on your device to auto-tag locations. This data is not sent to our servers unless you choose to include it in your letter.</li>
+            <li data-i18n-html="privacy.dispatchLi1"><strong>Account information:</strong> Name, email, profile photo. Used to identify you and deliver letters.</li>
+            <li data-i18n-html="privacy.dispatchLi2"><strong>Letter content:</strong> Text, photos, media in your letters. Stored encrypted. Only accessible to you and your recipients.</li>
+            <li data-i18n-html="privacy.dispatchLi3"><strong>Device tokens:</strong> Push notification tokens. Used solely to notify you when you receive a letter.</li>
+            <li data-i18n-html="privacy.dispatchLi4"><strong>Photo metadata:</strong> When you use the photo compose feature, EXIF data (GPS coordinates, date) is read locally on your device to auto-tag locations. This data is not sent to our servers unless you choose to include it in your letter.</li>
         </ul>
 
-        <h2>What We Don't Do</h2>
+        <h2 data-i18n="privacy.dontHeading">What We Don't Do</h2>
         <ul>
-            <li>We don't read your letters.</li>
-            <li>We don't sell your data to anyone, ever.</li>
-            <li>We don't show you ads.</li>
-            <li>We don't share your information with third parties for marketing.</li>
-            <li>We don't use your content to train AI models.</li>
-            <li>We don't track you across websites.</li>
+            <li data-i18n="privacy.dontLi1">We don't read your letters.</li>
+            <li data-i18n="privacy.dontLi2">We don't sell your data to anyone, ever.</li>
+            <li data-i18n="privacy.dontLi3">We don't show you ads.</li>
+            <li data-i18n="privacy.dontLi4">We don't share your information with third parties for marketing.</li>
+            <li data-i18n="privacy.dontLi5">We don't use your content to train AI models.</li>
+            <li data-i18n="privacy.dontLi6">We don't track you across websites.</li>
         </ul>
 
-        <h2>AI Features</h2>
-        <p>When you use AI writing assistance (polish, translate, voice-to-letter), your text is processed by our AI provider to generate suggestions. This content is processed in real-time and is not stored by the AI provider. AI features are always optional — you can write without them.</p>
+        <h2 data-i18n="privacy.aiHeading">AI Features</h2>
+        <p data-i18n="privacy.aiP">When you use AI writing assistance (polish, translate, voice-to-letter), your text is processed by our AI provider to generate suggestions. This content is processed in real-time and is not stored by the AI provider. AI features are always optional — you can write without them.</p>
 
-        <h2>Data Storage & Security</h2>
-        <p>Data is stored on Supabase (hosted on AWS in the US). All data is encrypted at rest and in transit. Database backups are encrypted and retained for 30 days. We use row-level security (RLS) policies to ensure users can only access their own data.</p>
+        <h2 data-i18n="privacy.storageHeading">Data Storage & Security</h2>
+        <p data-i18n="privacy.storageP">Data is stored on Supabase (hosted on AWS in the US). All data is encrypted at rest and in transit. Database backups are encrypted and retained for 30 days. We use row-level security (RLS) policies to ensure users can only access their own data.</p>
 
-        <h2>Third-Party Services</h2>
+        <h2 data-i18n="privacy.thirdPartyHeading">Third-Party Services</h2>
         <ul>
-            <li><strong>Supabase:</strong> Database, authentication, and file storage</li>
-            <li><strong>Vercel:</strong> Website hosting, serverless functions, analytics</li>
-            <li><strong>Apple:</strong> Sign in with Apple, push notifications (APNs)</li>
-            <li><strong>AI providers:</strong> Text processing for writing assistance (no data retention)</li>
+            <li data-i18n-html="privacy.thirdPartyLi1"><strong>Supabase:</strong> Database, authentication, and file storage</li>
+            <li data-i18n-html="privacy.thirdPartyLi2"><strong>Vercel:</strong> Website hosting, serverless functions, analytics</li>
+            <li data-i18n-html="privacy.thirdPartyLi3"><strong>Apple:</strong> Sign in with Apple, push notifications (APNs)</li>
+            <li data-i18n-html="privacy.thirdPartyLi4"><strong>AI providers:</strong> Text processing for writing assistance (no data retention)</li>
         </ul>
 
-        <h2>Your Rights</h2>
+        <h2 data-i18n="privacy.rightsHeading">Your Rights</h2>
         <ul>
-            <li><strong>Access:</strong> View all your data within the app at any time.</li>
-            <li><strong>Export:</strong> Download all your letters and profile data.</li>
-            <li><strong>Correction:</strong> Update your profile information in Settings.</li>
-            <li><strong>Deletion:</strong> Delete your account and all associated data permanently from Settings > Delete Account. This cannot be undone.</li>
-            <li><strong>Portability:</strong> Request a machine-readable export of your data.</li>
+            <li data-i18n-html="privacy.rightsLi1"><strong>Access:</strong> View all your data within the app at any time.</li>
+            <li data-i18n-html="privacy.rightsLi2"><strong>Export:</strong> Download all your letters and profile data.</li>
+            <li data-i18n-html="privacy.rightsLi3"><strong>Correction:</strong> Update your profile information in Settings.</li>
+            <li data-i18n-html="privacy.rightsLi4"><strong>Deletion:</strong> Delete your account and all associated data permanently from Settings > Delete Account. This cannot be undone.</li>
+            <li data-i18n-html="privacy.rightsLi5"><strong>Portability:</strong> Request a machine-readable export of your data.</li>
         </ul>
-        <p>For EU/EEA users: You have additional rights under GDPR including the right to object to processing and the right to lodge a complaint with a supervisory authority.</p>
-        <p>For California users: Under CCPA, you have the right to know what personal information we collect, request deletion, and opt out of the sale of personal information (we don't sell your data).</p>
+        <p data-i18n="privacy.rightsP1">For EU/EEA users: You have additional rights under GDPR including the right to object to processing and the right to lodge a complaint with a supervisory authority.</p>
+        <p data-i18n="privacy.rightsP2">For California users: Under CCPA, you have the right to know what personal information we collect, request deletion, and opt out of the sale of personal information (we don't sell your data).</p>
 
-        <h2>Children</h2>
-        <p>Our services are not intended for users under 13 years of age (16 in the EU). We do not knowingly collect personal information from children. If we learn we have collected data from a child, we will delete it promptly.</p>
+        <h2 data-i18n="privacy.childrenHeading">Children</h2>
+        <p data-i18n="privacy.childrenP">Our services are not intended for users under 13 years of age (16 in the EU). We do not knowingly collect personal information from children. If we learn we have collected data from a child, we will delete it promptly.</p>
 
-        <h2>Data Retention</h2>
-        <p>We retain your data as long as your account is active. When you delete your account, all personal data is permanently deleted within 30 days. Anonymized, aggregate analytics data may be retained indefinitely.</p>
+        <h2 data-i18n="privacy.retentionHeading">Data Retention</h2>
+        <p data-i18n="privacy.retentionP">We retain your data as long as your account is active. When you delete your account, all personal data is permanently deleted within 30 days. Anonymized, aggregate analytics data may be retained indefinitely.</p>
 
-        <h2>Changes</h2>
-        <p>We may update this policy from time to time. Significant changes will be communicated via email or in-app notification. The "Last updated" date at the top reflects the most recent revision.</p>
+        <h2 data-i18n="privacy.changesHeading">Changes</h2>
+        <p data-i18n="privacy.changesP">We may update this policy from time to time. Significant changes will be communicated via email or in-app notification. The "Last updated" date at the top reflects the most recent revision.</p>
 
-        <h2>Contact</h2>
-        <p>Questions about privacy? Contact <a href="mailto:kevin@klee.page">kevin@klee.page</a></p>
+        <h2 data-i18n="privacy.contactHeading">Contact</h2>
+        <p data-i18n-html="privacy.contactP">Questions about privacy? Contact <a href="mailto:kevin@klee.page">kevin@klee.page</a></p>
     </div>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/theme.js"></script>
 </body>
 </html>

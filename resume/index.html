@@ -759,10 +759,10 @@
 </head>
 <body>
 
-    <a href="#main" class="skip-link">Skip to content</a>
+    <a href="#main" class="skip-link" data-i18n="common.skipLink">Skip to content</a>
 
     <header>
-        <a href="/" class="back-link">&larr; Kevin Lee</a>
+        <a href="/" class="back-link" data-i18n-html="common.backHome">&larr; Kevin Lee</a>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
             <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
@@ -919,6 +919,7 @@
             var history = [];
             var isLoading = false;
             var suggestionRound = 0;
+            var localeStrings = {};
 
             var SUGGESTIONS = [
                 [
@@ -947,7 +948,27 @@
                 ],
             ];
 
-            function renderSuggestions(set) {
+            function loadLocaleStrings(lang, callback) {
+                fetch('/i18n/' + lang + '.json')
+                    .then(function(res) { return res.ok ? res.json() : null; })
+                    .then(function(data) {
+                        if (data && data.resume) {
+                            localeStrings = data.resume;
+                            if (data.resume.chatSuggestions && data.resume.chatSuggestions.length) {
+                                SUGGESTIONS = data.resume.chatSuggestions;
+                            }
+                        }
+                        if (callback) callback();
+                    })
+                    .catch(function() { if (callback) callback(); });
+            }
+
+            function getLabel(role) {
+                if (role === 'user') {
+                    return localeStrings.chatRoleUser || 'You';
+                }
+                return localeStrings.chatRoleAssistant || 'Kevin';
+            }
                 suggestionsEl.innerHTML = '';
                 suggestionsEl.scrollLeft = 0;
                 if (!set || !set.length) {
@@ -972,11 +993,7 @@
 
             suggestionsEl.addEventListener('scroll', checkScrollEnd, { passive: true });
 
-            function getLabel(role) {
-                return role === 'user' ? 'You' : 'Kevin';
-            }
-
-            function addMessage(role, text) {
+            function renderSuggestions(set) {
                 var div = document.createElement('div');
                 div.className = 'chat-message ' + (role === 'user' ? 'user-msg' : 'assistant-msg');
                 div.innerHTML = '<div class="chat-role">' + getLabel(role) + '</div><div class="chat-body">' + escapeHtml(text) + '</div>';
@@ -1082,16 +1099,16 @@
 
                     bodyEl.classList.remove('streaming');
 
-                    if (!fullReply) fullReply = 'Sorry, something went wrong.';
+                    if (!fullReply) fullReply = localeStrings.chatErrorEmpty || 'Sorry, something went wrong.';
                     history.push({ role: 'user', content: text.trim() });
                     history.push({ role: 'assistant', content: fullReply });
                     if (history.length > 20) history.splice(0, 2);
                 } catch (err) {
                     removeThinking();
                     if (err.message === 'rate-limit') {
-                        addMessage('assistant', 'You\'re sending messages too fast. Please wait a minute before trying again.');
+                        addMessage('assistant', localeStrings.chatErrorRateLimit || 'You\'re sending messages too fast. Please wait a minute before trying again.');
                     } else {
-                        addMessage('assistant', 'Sorry, I couldn\'t respond right now. Please try again.');
+                        addMessage('assistant', localeStrings.chatErrorGeneric || 'Sorry, I couldn\'t respond right now. Please try again.');
                     }
                 }
 
@@ -1124,8 +1141,18 @@
                 sendMessage(btn.textContent);
             });
 
-            // Render initial suggestions
-            renderSuggestions(SUGGESTIONS[0]);
+            document.addEventListener('i18n:applied', function() {
+                var lang = localStorage.getItem('lang') || 'en';
+                loadLocaleStrings(lang, function() {
+                    suggestionRound = 0;
+                    renderSuggestions(SUGGESTIONS[0]);
+                });
+            });
+
+            var initialLang = localStorage.getItem('lang') || 'en';
+            loadLocaleStrings(initialLang, function() {
+                renderSuggestions(SUGGESTIONS[0]);
+            });
         })();
     </script>
 </body>

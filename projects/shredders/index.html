@@ -346,7 +346,7 @@
 <body>
 
     <header>
-        <a href="/projects" class="back-link">&larr; Projects</a>
+        <a href="/projects" class="back-link" data-i18n="shredders.backLink">&larr; Projects</a>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle">
             <label for="theme-toggle"></label>
@@ -356,8 +356,8 @@
     <main>
         <div class="hero">
             <h1 class="page-title">Shredders</h1>
-            <p class="tagline">Real-time powder conditions for 53 ski resorts across 11 regions.</p>
-            <p class="stats">
+            <p class="tagline" data-i18n="shredders.tagline">Real-time powder conditions for 53 ski resorts across 11 regions.</p>
+            <p class="stats" data-i18n-html="shredders.stats">
                 <strong>53</strong> resorts &middot;
                 <strong>11</strong> regions &middot;
                 web + iOS &middot;
@@ -382,76 +382,76 @@
                 <img src="/projects/images/shredders-mountains.jpg" alt="Shredders iOS app — Mountains list sorted by best conditions with powder scores" loading="lazy" width="591" height="1280">
             </div>
         </div>
-        <p class="gallery-caption">iOS app — Today's forecast and Mountain rankings</p>
+        <p class="gallery-caption" data-i18n="shredders.galleryCaption">iOS app — Today's forecast and Mountain rankings</p>
 
-        <h2>The Problem</h2>
-        <p>Planning a ski day means checking five different websites. SNOTEL for snowpack. NOAA for the forecast. WSDOT for road conditions. The resort's webcam page. Your group chat for who's actually going. By the time you've pieced it together, the alarm is set for 5 AM and you've talked yourself out of it.</p>
-        <p>Shredders pulls all of that into one place, on web and iOS: a powder score, 7-day forecasts, weather alerts, an AI chat for trip planning, and the social bits for sorting out who's driving.</p>
+        <h2 data-i18n="shredders.problemHeading">The Problem</h2>
+        <p data-i18n="shredders.problemP1">Planning a ski day means checking five different websites. SNOTEL for snowpack. NOAA for the forecast. WSDOT for road conditions. The resort's webcam page. Your group chat for who's actually going. By the time you've pieced it together, the alarm is set for 5 AM and you've talked yourself out of it.</p>
+        <p data-i18n="shredders.problemP2">Shredders pulls all of that into one place, on web and iOS: a powder score, 7-day forecasts, weather alerts, an AI chat for trip planning, and the social bits for sorting out who's driving.</p>
 
         <hr>
 
-        <h2>Architecture</h2>
+        <h2 data-i18n="shredders.architectureHeading">Architecture</h2>
 
         <div class="diagram">
             <div class="diagram-flow">
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Data Sources</span>
-                    <span class="diagram-node-body">SNOTEL (USDA)<br>NOAA / Weather.gov<br>Open-Meteo<br>NWAC (avalanche)<br>WSDOT<br>RainViewer<br>Resort websites</span>
+                    <span class="diagram-node-label" data-i18n="shredders.diagDataSources">Data Sources</span>
+                    <span class="diagram-node-body" data-i18n-html="shredders.diagDataSourcesBody">SNOTEL (USDA)<br>NOAA / Weather.gov<br>Open-Meteo<br>NWAC (avalanche)<br>WSDOT<br>RainViewer<br>Resort websites</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Ingestion</span>
-                    <span class="diagram-node-body">Cheerio (HTML)<br>Puppeteer (JS-rendered)<br>REST APIs<br>Cron schedules</span>
+                    <span class="diagram-node-label" data-i18n="shredders.diagIngestion">Ingestion</span>
+                    <span class="diagram-node-body" data-i18n-html="shredders.diagIngestionBody">Cheerio (HTML)<br>Puppeteer (JS-rendered)<br>REST APIs<br>Cron schedules</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Storage</span>
-                    <span class="diagram-node-body">PostgreSQL<br>24 tables &middot; 14 migrations<br>Upstash Redis cache</span>
+                    <span class="diagram-node-label" data-i18n="shredders.diagStorage">Storage</span>
+                    <span class="diagram-node-body" data-i18n-html="shredders.diagStorageBody">PostgreSQL<br>24 tables &middot; 14 migrations<br>Upstash Redis cache</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">API Layer</span>
-                    <span class="diagram-node-body">87 Next.js routes<br>Claude chat (streaming)<br>GPT-4 predictions</span>
+                    <span class="diagram-node-label" data-i18n="shredders.diagApi">API Layer</span>
+                    <span class="diagram-node-body" data-i18n-html="shredders.diagApiBody">87 Next.js routes<br>Claude chat (streaming)<br>GPT-4 predictions</span>
                 </div>
                 <span class="diagram-edge">&rarr;</span>
                 <div class="diagram-node">
-                    <span class="diagram-node-label">Clients</span>
-                    <span class="diagram-node-body">Web (React 19)<br>iOS (SwiftUI)<br>Push notifications</span>
+                    <span class="diagram-node-label" data-i18n="shredders.diagClients">Clients</span>
+                    <span class="diagram-node-body" data-i18n-html="shredders.diagClientsBody">Web (React 19)<br>iOS (SwiftUI)<br>Push notifications</span>
                 </div>
             </div>
         </div>
 
-        <p>The backend is a Next.js app. Routes are grouped by what they serve: mountains (conditions, forecasts, powder score, alerts, webcams, lifts, parking, trip advice), auth (email and Apple Sign-In), events (RSVP, carpool, recurring series), social (check-ins, likes, photos), and AI chat. Three Vercel cron jobs send daily event reminders, weather alerts, and powder notifications.</p>
-        <p>Storage is Supabase Postgres. The schema covers users, events and everything attached to them (attendees, comments, photos, activity feeds, date polls, invite tokens), social features, push tokens, alert subscriptions, sessions, audit logs, mountain status, and scraper health.</p>
+        <p data-i18n="shredders.architectureP1">The backend is a Next.js app. Routes are grouped by what they serve: mountains (conditions, forecasts, powder score, alerts, webcams, lifts, parking, trip advice), auth (email and Apple Sign-In), events (RSVP, carpool, recurring series), social (check-ins, likes, photos), and AI chat. Three Vercel cron jobs send daily event reminders, weather alerts, and powder notifications.</p>
+        <p data-i18n="shredders.architectureP2">Storage is Supabase Postgres. The schema covers users, events and everything attached to them (attendees, comments, photos, activity feeds, date polls, invite tokens), social features, push tokens, alert subscriptions, sessions, audit logs, mountain status, and scraper health.</p>
 
-        <h3>The Powder Score</h3>
-        <p>One number from 0 to 100 that answers a single question: is it worth the drive? It weighs recent snowfall (24h, 48h, 7d), temperature at elevation, wind, visibility, current conditions, snow still in the forecast, base depth, and seasonal trends.</p>
+        <h3 data-i18n="shredders.powderScoreHeading">The Powder Score</h3>
+        <p data-i18n="shredders.powderScoreP">One number from 0 to 100 that answers a single question: is it worth the drive? It weighs recent snowfall (24h, 48h, 7d), temperature at elevation, wind, visibility, current conditions, snow still in the forecast, base depth, and seasonal trends.</p>
 
-        <h3>Performance</h3>
-        <p>The first version of the frontend fired off dozens of API calls on page load. Batch endpoints brought that down to three. A 10-minute response cache keeps Supabase query volume in check, and the iOS app launches with two calls. Images are AVIF/WebP and lazy-loaded.</p>
-
-        <hr>
-
-        <h2>Decisions</h2>
-
-        <h3>Why Supabase over Firebase?</h3>
-        <p>I wanted real-time subscriptions, auth, and a relational database in one place, and I didn't want to run infrastructure for a side project. Supabase gave me Postgres with real SQL, built-in auth that handles Apple Sign-In, and auto-generated APIs. The auto-generated APIs are quick to build against, but you give up fine control over query tuning as the number of endpoints grows.</p>
-
-        <h3>Why scrape resort websites?</h3>
-        <p>No resort offers a usable API. Lift status, webcam URLs, parking capacity all live on PHP pages that haven't been touched since 2014. Cheerio parses the static HTML, Puppeteer handles the JavaScript-rendered pages. It's fragile: every time Crystal Mountain redesigns their snow report, a scraper breaks. So I track scraper health in its own tables and check it on a cron.</p>
-
-        <h3>Why dual platform from day one?</h3>
-        <p>People check conditions at 5 AM from bed, deciding whether to make the drive. That's a phone moment. The web app is better for planning, with the bigger screen, map view, and event coordination, but the iOS app is where most of the use happens. SwiftUI was quick to build, and powder-alert push notifications only make sense on the phone.</p>
-
-        <h3>Why so many small API routes?</h3>
-        <p>Each route does one thing, so each one is easy to reason about. Lots of small endpoints over a few big ones let me move fast: add a feature, add a route. The cost is surface area. A refactor touches a lot of files, and the frontend got chatty, which is what the batch endpoints fixed.</p>
+        <h3 data-i18n="shredders.performanceHeading">Performance</h3>
+        <p data-i18n="shredders.performanceP">The first version of the frontend fired off dozens of API calls on page load. Batch endpoints brought that down to three. A 10-minute response cache keeps Supabase query volume in check, and the iOS app launches with two calls. Images are AVIF/WebP and lazy-loaded.</p>
 
         <hr>
 
-        <h2>Tradeoffs</h2>
-        <p><strong>Scraping is fragile.</strong> Resort sites change without warning. Monitoring catches the failures quickly, but a broken scraper still means missing data until I fix the parser. There's no way around that without official APIs.</p>
-        <p><strong>Free tiers shape the architecture.</strong> Supabase and Vercel free tiers are generous but not infinite. Upstash Redis keeps Supabase query volume down, and batch endpoints keep Vercel invocations reasonable. At ten times the usage I'd need paid tiers or a different host.</p>
-        <p><strong>Dual auth is a lot for a side project.</strong> Supporting both email/password and Apple Sign-In means JWT rotation, token blacklisting, session tracking, and rate limiting across two flows. An iOS app needs it, but it's more auth code than a side project usually warrants.</p>
+        <h2 data-i18n="shredders.decisionsHeading">Decisions</h2>
+
+        <h3 data-i18n="shredders.whySupabaseHeading">Why Supabase over Firebase?</h3>
+        <p data-i18n="shredders.whySupabaseP">I wanted real-time subscriptions, auth, and a relational database in one place, and I didn't want to run infrastructure for a side project. Supabase gave me Postgres with real SQL, built-in auth that handles Apple Sign-In, and auto-generated APIs. The auto-generated APIs are quick to build against, but you give up fine control over query tuning as the number of endpoints grows.</p>
+
+        <h3 data-i18n="shredders.whyScrapeHeading">Why scrape resort websites?</h3>
+        <p data-i18n="shredders.whyScrapeP">No resort offers a usable API. Lift status, webcam URLs, parking capacity all live on PHP pages that haven't been touched since 2014. Cheerio parses the static HTML, Puppeteer handles the JavaScript-rendered pages. It's fragile: every time Crystal Mountain redesigns their snow report, a scraper breaks. So I track scraper health in its own tables and check it on a cron.</p>
+
+        <h3 data-i18n="shredders.whyDualHeading">Why dual platform from day one?</h3>
+        <p data-i18n="shredders.whyDualP">People check conditions at 5 AM from bed, deciding whether to make the drive. That's a phone moment. The web app is better for planning, with the bigger screen, map view, and event coordination, but the iOS app is where most of the use happens. SwiftUI was quick to build, and powder-alert push notifications only make sense on the phone.</p>
+
+        <h3 data-i18n="shredders.whyRoutesHeading">Why so many small API routes?</h3>
+        <p data-i18n="shredders.whyRoutesP">Each route does one thing, so each one is easy to reason about. Lots of small endpoints over a few big ones let me move fast: add a feature, add a route. The cost is surface area. A refactor touches a lot of files, and the frontend got chatty, which is what the batch endpoints fixed.</p>
+
+        <hr>
+
+        <h2 data-i18n="shredders.tradeoffsHeading">Tradeoffs</h2>
+        <p data-i18n-html="shredders.tradeoffsScraping"><strong>Scraping is fragile.</strong> Resort sites change without warning. Monitoring catches the failures quickly, but a broken scraper still means missing data until I fix the parser. There's no way around that without official APIs.</p>
+        <p data-i18n-html="shredders.tradeoffsFreeTiers"><strong>Free tiers shape the architecture.</strong> Supabase and Vercel free tiers are generous but not infinite. Upstash Redis keeps Supabase query volume down, and batch endpoints keep Vercel invocations reasonable. At ten times the usage I'd need paid tiers or a different host.</p>
+        <p data-i18n-html="shredders.tradeoffsDualAuth"><strong>Dual auth is a lot for a side project.</strong> Supporting both email/password and Apple Sign-In means JWT rotation, token blacklisting, session tracking, and rate limiting across two flows. An iOS app needs it, but it's more auth code than a side project usually warrants.</p>
 
         <hr>
 
@@ -471,7 +471,7 @@
     </main>
 
     <footer>
-        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+        <p data-i18n-html="common.copyright">&copy; <span id="copyrightYear"></span> Kevin Lee</p>
     </footer>
 
     <script defer src="/_vercel/insights/script.js"></script>
