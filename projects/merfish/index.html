@@ -535,10 +535,10 @@
 </head>
 <body>
 
-    <a href="#main" class="skip-link">Skip to content</a>
+    <a href="#main" class="skip-link" data-i18n="merfish.skipLink">Skip to content</a>
 
     <header>
-        <a href="/projects" class="back-link">← PROJECTS</a>
+        <a href="/projects" class="back-link" data-i18n="merfish.backLink">← PROJECTS</a>
         <div class="toggle-wrap">
             <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
             <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
@@ -548,11 +548,11 @@
     <!-- ——— HERO: transcripts reconstruct the real coronal section ——— -->
     <section class="mf-hero" aria-label="A coronal mouse-brain section reconstructed from individual RNA transcript positions">
         <canvas id="mf-canvas"></canvas>
-        <button class="mf-replay" id="mf-replay" type="button">⟳ Replay</button>
+        <button class="mf-replay" id="mf-replay" type="button" data-i18n="merfish.replay">⟳ Replay</button>
         <div class="mf-hero-inner">
-            <div class="mf-eyebrow">MERFISH · Mouse-Brain Atlas</div>
-            <h1>Anatomy from <em>RNA alone.</em></h1>
-            <p class="mf-hero-sub">Read the RNA inside an intact mouse brain — one molecule at a time — then rebuild the brain from where those molecules sit.</p>
+            <div class="mf-eyebrow" data-i18n="merfish.heroEyebrow">MERFISH · Mouse-Brain Atlas</div>
+            <h1 data-i18n-html="merfish.heroTitle">Anatomy from <em>RNA alone.</em></h1>
+            <p class="mf-hero-sub" data-i18n="merfish.heroSub">Read the RNA inside an intact mouse brain — one molecule at a time — then rebuild the brain from where those molecules sit.</p>
         </div>
     </section>
 
@@ -577,15 +577,15 @@
 
         <!-- ——— Intro ——— -->
         <section class="mf-section first">
-            <p class="lede">MERFISH (<em>multiplexed error-robust fluorescence in&nbsp;situ hybridization</em>) images individual RNA molecules right where they sit in tissue. Hundreds of genes per cell, positions kept — so the anatomy comes from the molecules themselves.</p>
-            <p class="muted">Portfolio repo, not a production pipeline: notebooks and pytest walk a Vizgen coronal cohort through QC, clustering, cell-type mapping, and CCF registration. Synthetic fixtures run offline in CI; live tests hit public downloads when you have network.</p>
+            <p class="lede" data-i18n-html="merfish.lede">MERFISH (<em>multiplexed error-robust fluorescence in&nbsp;situ hybridization</em>) images individual RNA molecules right where they sit in tissue. Hundreds of genes per cell, positions kept — so the anatomy comes from the molecules themselves.</p>
+            <p class="muted" data-i18n="merfish.introNote">Portfolio repo, not a production pipeline: notebooks and pytest walk a Vizgen coronal cohort through QC, clustering, cell-type mapping, and CCF registration. Synthetic fixtures run offline in CI; live tests hit public downloads when you have network.</p>
         </section>
 
         <!-- ——— Method: barcode decoder ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">METHOD</span> Reading a gene as a barcode</div>
-            <h2>Every gene gets an error-correcting binary code.</h2>
-            <p>MERFISH reads each gene as a binary <strong>codeword</strong> spread across many imaging rounds — the on/off pattern names the gene. The code self-corrects (<strong>16-bit, Hamming-distance-4</strong>), so one misread round can't change the answer. That's the "ER" in MERFISH.</p>
+            <div class="mf-kicker"><span class="idx">METHOD</span> <span data-i18n="merfish.methodKicker">Reading a gene as a barcode</span></div>
+            <h2 data-i18n="merfish.methodTitle">Every gene gets an error-correcting binary code.</h2>
+            <p data-i18n-html="merfish.methodP1">MERFISH reads each gene as a binary <strong>codeword</strong> spread across many imaging rounds — the on/off pattern names the gene. The code self-corrects (<strong>16-bit, Hamming-distance-4</strong>), so one misread round can't change the answer. That's the "ER" in MERFISH.</p>
 
             <div class="mf-decoder reveal" id="mf-decoder" aria-hidden="true">
                 <div class="mf-dec-top">
@@ -598,7 +598,7 @@
                     <span class="mf-dec-gene" id="mf-dec-gene">··········</span>
                     <span class="mf-dec-celltype" id="mf-dec-celltype"></span>
                 </div>
-                <p class="mf-dec-note">Illustrative codewords (weight-4, Hamming distance 4). A real panel spreads hundreds of genes across the rounds, and misreading one round can't flip a call to another valid gene.</p>
+                <p class="mf-dec-note" data-i18n="merfish.methodNote">Illustrative codewords (weight-4, Hamming distance 4). A real panel spreads hundreds of genes across the rounds, and misreading one round can't flip a call to another valid gene.</p>
             </div>
         </section>
 
@@ -606,16 +606,16 @@
 
         <!-- ——— Pipeline ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">PIPELINE</span> Raw imagery to per-cell labels</div>
-            <h2>Six stages, one <code>AnnData</code> object.</h2>
-            <p>Segmentation comes first — it decides what counts as a cell — then QC, clustering, mapping, and atlas registration hand off through the same object.</p>
+            <div class="mf-kicker"><span class="idx">PIPELINE</span> <span data-i18n="merfish.pipelineKicker">Raw imagery to per-cell labels</span></div>
+            <h2 data-i18n-html="merfish.pipelineTitle">Six stages, one <code>AnnData</code> object.</h2>
+            <p data-i18n="merfish.pipelineP">Segmentation comes first — it decides what counts as a cell — then QC, clustering, mapping, and atlas registration hand off through the same object.</p>
             <ol class="mf-pipe-v reveal">
-                <li><strong>Ingest</strong><span>MERSCOPE mosaics, transcripts, cell-by-gene, boundaries</span></li>
-                <li><strong>Segment</strong><span>transcript-aware re-assignment (upstream of counts)</span></li>
-                <li><strong>QC</strong><span>vs bulk RNAseq + replicate correlation</span></li>
-                <li><strong>Cluster</strong><span>Scanpy PCA · UMAP · Leiden</span></li>
-                <li><strong>Cell types</strong><span>marker correlation + bootstrap confidence</span></li>
-                <li><strong>Register</strong><span>2D section → Allen CCFv3, per-cell region</span></li>
+                <li><strong data-i18n="merfish.pipe1Label">Ingest</strong><span data-i18n="merfish.pipe1Desc">MERSCOPE mosaics, transcripts, cell-by-gene, boundaries</span></li>
+                <li><strong data-i18n="merfish.pipe2Label">Segment</strong><span data-i18n="merfish.pipe2Desc">transcript-aware re-assignment (upstream of counts)</span></li>
+                <li><strong data-i18n="merfish.pipe3Label">QC</strong><span data-i18n="merfish.pipe3Desc">vs bulk RNAseq + replicate correlation</span></li>
+                <li><strong data-i18n="merfish.pipe4Label">Cluster</strong><span data-i18n="merfish.pipe4Desc">Scanpy PCA · UMAP · Leiden</span></li>
+                <li><strong data-i18n="merfish.pipe5Label">Cell types</strong><span data-i18n="merfish.pipe5Desc">marker correlation + bootstrap confidence</span></li>
+                <li><strong data-i18n="merfish.pipe6Label">Register</strong><span data-i18n="merfish.pipe6Desc">2D section → Allen CCFv3, per-cell region</span></li>
             </ol>
         </section>
 
@@ -623,17 +623,17 @@
 
         <!-- ——— QC ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">VALIDATION</span> Check the counts first</div>
-            <h2>QC before clustering.</h2>
-            <p>MERFISH counts should match bulk RNAseq and reproduce across replicates in the <code>MsBrain_VS38</code> aging cohort — rendered with seaborn from cohort data.</p>
+            <div class="mf-kicker"><span class="idx">VALIDATION</span> <span data-i18n="merfish.validationKicker">Check the counts first</span></div>
+            <h2 data-i18n="merfish.validationTitle">QC before clustering.</h2>
+            <p data-i18n-html="merfish.validationP">MERFISH counts should match bulk RNAseq and reproduce across replicates in the <code>MsBrain_VS38</code> aging cohort — rendered with seaborn from cohort data.</p>
             <div class="mf-stats reveal">
-                <div class="mf-stat"><div class="v">0.70–0.75</div><div class="l">Pearson r · MERFISH vs bulk RNAseq (per gene)</div></div>
-                <div class="mf-stat"><div class="v">0.98–1.00</div><div class="l">replicate ↔ replicate correlation</div></div>
-                <div class="mf-stat"><div class="v">~1.6<small>×10⁸</small></div><div class="l">transcripts per sample (~74k–87k / FOV)</div></div>
+                <div class="mf-stat"><div class="v">0.70–0.75</div><div class="l" data-i18n="merfish.stat1Label">Pearson r · MERFISH vs bulk RNAseq (per gene)</div></div>
+                <div class="mf-stat"><div class="v">0.98–1.00</div><div class="l" data-i18n="merfish.stat2Label">replicate ↔ replicate correlation</div></div>
+                <div class="mf-stat"><div class="v">~1.6<small>×10⁸</small></div><div class="l" data-i18n="merfish.stat3Label">transcripts per sample (~74k–87k / FOV)</div></div>
             </div>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-qc.png" alt="Four-panel MERSCOPE QC dashboard: total transcript counts, mean counts per FOV, replicate reproducibility heatmap, and MERFISH-versus-bulk-RNAseq correlation" loading="lazy" width="1600" height="1200">
-                <figcaption><b>MERSCOPE QC summary.</b> Yield, replicate reproducibility, and the MERFISH↔bulk-RNAseq check, rendered with seaborn from cohort data.</figcaption>
+                <figcaption data-i18n-html="merfish.qcCaption"><b>MERSCOPE QC summary.</b> Yield, replicate reproducibility, and the MERFISH↔bulk-RNAseq check, rendered with seaborn from cohort data.</figcaption>
             </figure>
         </section>
 
@@ -641,25 +641,25 @@
 
         <!-- ——— Cell types in space ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">CELL TYPES</span> Mapping with a confidence score</div>
-            <h2>Cell types with a confidence score.</h2>
-            <p>I reimplemented the Allen <code>cell_type_mapper</code> approach on Moffitt 2018 hypothalamus hold-out data: marker-gene matching plus a bootstrap confidence that beats the old cosine heuristic (label only, no score). Fine subtype accuracy within correct classes: <span class="accent-num">0.82</span>.</p>
+            <div class="mf-kicker"><span class="idx">CELL TYPES</span> <span data-i18n="merfish.celltypesKicker">Mapping with a confidence score</span></div>
+            <h2 data-i18n="merfish.celltypesTitle">Cell types with a confidence score.</h2>
+            <p data-i18n-html="merfish.celltypesP">I reimplemented the Allen <code>cell_type_mapper</code> approach on Moffitt 2018 hypothalamus hold-out data: marker-gene matching plus a bootstrap confidence that beats the old cosine heuristic (label only, no score). Fine subtype accuracy within correct classes: <span class="accent-num">0.82</span>.</p>
             <div class="mf-stats cols-2 reveal">
-                <div class="mf-stat"><div class="v">0.77</div><div class="l">held-out class accuracy (vs 0.71 cosine) · 36,828 cells</div></div>
-                <div class="mf-stat"><div class="v">0.87</div><div class="l">mean per-cell confidence</div></div>
+                <div class="mf-stat"><div class="v">0.77</div><div class="l" data-i18n="merfish.celltypesStat1">held-out class accuracy (vs 0.71 cosine) · 36,828 cells</div></div>
+                <div class="mf-stat"><div class="v">0.87</div><div class="l" data-i18n="merfish.celltypesStat2">mean per-cell confidence</div></div>
             </div>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-celltype.png" alt="Four-panel principled cell-type mapping: calibration curve, correct-versus-incorrect confidence histogram, truth-versus-predicted concordance heatmap, and a coronal slice colored by per-cell confidence" loading="lazy" width="1600" height="1168">
-                <figcaption><b>Cell-type mapping with a confidence score.</b> Accuracy rises with confidence (top-left); correct calls concentrate at high confidence (top-right); a coronal slice (bottom-right) flags where the 161-gene panel can't resolve a type. The cosine heuristic gives none of this.</figcaption>
+                <figcaption data-i18n-html="merfish.celltypesCaption"><b>Cell-type mapping with a confidence score.</b> Accuracy rises with confidence (top-left); correct calls concentrate at high confidence (top-right); a coronal slice (bottom-right) flags where the 161-gene panel can't resolve a type. The cosine heuristic gives none of this.</figcaption>
             </figure>
             <div class="plate-pair reveal">
                 <figure class="plate" style="margin-top:0;">
                     <img src="/projects/images/merfish-ependymal.png" alt="Coronal brain slice with the ependymal/glial cluster highlighted along the ventricle lining" loading="lazy" width="500" height="362">
-                    <figcaption><b>Cluster 22 — ependymal / glial.</b> <span class="mono">Aqp4, Gfap, Mlc1</span> lining the ventricles.</figcaption>
+                    <figcaption data-i18n-html="merfish.ependymalCaption"><b>Cluster 22 — ependymal / glial.</b> <span class="mono">Aqp4, Gfap, Mlc1</span> lining the ventricles.</figcaption>
                 </figure>
                 <figure class="plate" style="margin-top:0;">
                     <img src="/projects/images/merfish-inhibitory.png" alt="Coronal brain slice with an inhibitory-neuron cluster highlighted as two symmetric arcs" loading="lazy" width="500" height="383">
-                    <figcaption><b>Cluster 24 — inhibitory neurons.</b> <span class="mono">Gad1, Slc32a1, Cckar</span>, recovered bilaterally.</figcaption>
+                    <figcaption data-i18n-html="merfish.inhibitoryCaption"><b>Cluster 24 — inhibitory neurons.</b> <span class="mono">Gad1, Slc32a1, Cckar</span>, recovered bilaterally.</figcaption>
                 </figure>
             </div>
         </section>
@@ -668,12 +668,12 @@
 
         <!-- ——— Segmentation ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">SEGMENTATION</span> The decision that sits upstream</div>
-            <h2>Segmentation sits upstream.</h2>
-            <p>Draw the cell boundary wrong and everything downstream shifts. On shared ground truth, transcript-aware assignment hits <span class="accent-num">0.76</span> accuracy (Voronoi <span class="accent-num">0.70</span>, nucleus-only <span class="accent-num">0.17</span>); downstream Leiden ARI reaches <span class="accent-num">1.00</span> vs <span class="accent-num">0.96</span> baseline. Three methods benchmarked end-to-end (Baysor / proseg / segger-style).</p>
+            <div class="mf-kicker"><span class="idx">SEGMENTATION</span> <span data-i18n="merfish.segmentationKicker">The decision that sits upstream</span></div>
+            <h2 data-i18n="merfish.segmentationTitle">Segmentation sits upstream.</h2>
+            <p data-i18n-html="merfish.segmentationP">Draw the cell boundary wrong and everything downstream shifts. On shared ground truth, transcript-aware assignment hits <span class="accent-num">0.76</span> accuracy (Voronoi <span class="accent-num">0.70</span>, nucleus-only <span class="accent-num">0.17</span>); downstream Leiden ARI reaches <span class="accent-num">1.00</span> vs <span class="accent-num">0.96</span> baseline. Three methods benchmarked end-to-end (Baysor / proseg / segger-style).</p>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-segmentation.png" alt="Four-panel segmentation comparison: ground-truth transcripts, transcript-assignment accuracy bars, downstream Leiden ARI bars, and a crop of boundary transcripts the transcript-aware method rescues" loading="lazy" width="1600" height="1116">
-                <figcaption><b>Segmentation changes downstream cell types.</b> Transcript-aware assignment (Baysor / proseg / segger-style) rescues the boundary molecules a Voronoi baseline misassigns. A guarded <span class="mono">cellpose_sam_segment()</span> hook runs Cellpose-SAM on DAPI mosaics when installed.</figcaption>
+                <figcaption data-i18n-html="merfish.segmentationCaption"><b>Segmentation changes downstream cell types.</b> Transcript-aware assignment (Baysor / proseg / segger-style) rescues the boundary molecules a Voronoi baseline misassigns. A guarded <span class="mono">cellpose_sam_segment()</span> hook runs Cellpose-SAM on DAPI mosaics when installed.</figcaption>
             </figure>
         </section>
 
@@ -681,22 +681,22 @@
 
         <!-- ——— Atlas registration ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">REGISTRATION</span> The hardest part of a new scan</div>
-            <h2>Register the section to CCFv3.</h2>
-            <p>Each cell needs a brain-region label — anchor the AP plane, warp with <strong>STalign</strong>, lift labels from the Allen atlas. The registration core adds per-cell confidence and a QC score that separates good fits from deliberately bad ones (<span class="accent-num">0.14→0.96</span> on synthetic misalignment). High-confidence calls hit ~98–99% at every ontology depth on that synthetic geometry; <span class="accent-num">670</span> leaf regions roll up the ontology tree.</p>
+            <div class="mf-kicker"><span class="idx">REGISTRATION</span> <span data-i18n="merfish.registrationKicker">The hardest part of a new scan</span></div>
+            <h2 data-i18n="merfish.registrationTitle">Register the section to CCFv3.</h2>
+            <p data-i18n-html="merfish.registrationP">Each cell needs a brain-region label — anchor the AP plane, warp with <strong>STalign</strong>, lift labels from the Allen atlas. The registration core adds per-cell confidence and a QC score that separates good fits from deliberately bad ones (<span class="accent-num">0.14→0.96</span> on synthetic misalignment). High-confidence calls hit ~98–99% at every ontology depth on that synthetic geometry; <span class="accent-num">670</span> leaf regions roll up the ontology tree.</p>
 
-            <h3>STalign LDDMM, ground-truthed</h3>
-            <p>On a slice cut from a known plane, STalign places it to <span class="accent-num">46.7 µm</span> — under half a voxel — and gets <span class="accent-num">0.89</span> of per-cell labels right, in about two minutes on CPU. A real 2D→3D fit, not a stub.</p>
+            <h3 data-i18n="merfish.stalignTitle">STalign LDDMM, ground-truthed</h3>
+            <p data-i18n-html="merfish.stalignP">On a slice cut from a known plane, STalign places it to <span class="accent-num">46.7 µm</span> — under half a voxel — and gets <span class="accent-num">0.89</span> of per-cell labels right, in about two minutes on CPU. A real 2D→3D fit, not a stub.</p>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-stalign.png" alt="Three-panel real STalign result: input 2D section with true regions, regions assigned after warping into the CCFv3, and an anterior-posterior position histogram peaking at the true plane" loading="lazy" width="1600" height="585">
-                <figcaption><b>STalign 2D→3D, validated.</b> Input section (left), regions STalign assigns after warping into the CCFv3 (center, near-identical), and the recovered AP position peaking at the true plane (right).</figcaption>
+                <figcaption data-i18n-html="merfish.stalignCaption"><b>STalign 2D→3D, validated.</b> Input section (left), regions STalign assigns after warping into the CCFv3 (center, near-identical), and the recovered AP position peaking at the true plane (right).</figcaption>
             </figure>
 
-            <h3>Auto AP-anchor for STalign's init-sensitivity</h3>
-            <p>STalign can misfire on its starting guess — a posterior slice landed <span class="mono">1.44 mm</span> off before the anchor. Sliding the section against every atlas plane fixes depth first: posterior AP error drops <span class="accent-num">1440→148 µm</span>, thalamus IoU on that scan goes <span class="accent-num">0.23→0.68</span>, and all three thalamic test sections align (was 1/3). Anchor logic is unit-tested; posterior recovery is live-tested.</p>
+            <h3 data-i18n="merfish.anchorTitle">Auto AP-anchor for STalign's init-sensitivity</h3>
+            <p data-i18n-html="merfish.anchorP">STalign can misfire on its starting guess — a posterior slice landed <span class="mono">1.44 mm</span> off before the anchor. Sliding the section against every atlas plane fixes depth first: posterior AP error drops <span class="accent-num">1440→148 µm</span>, thalamus IoU on that scan goes <span class="accent-num">0.23→0.68</span>, and all three thalamic test sections align (was 1/3). Anchor logic is unit-tested; posterior recovery is live-tested.</p>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-thalamus.png" alt="Two rows of three coronal scans: top shows ground-truth thalamus in crimson across anterior, mid, and posterior sections; bottom shows the thalamus recovered by STalign in green, including the posterior bilateral clusters" loading="lazy" width="1600" height="988">
-                <figcaption><b>Thalamus across three scans.</b> Truth (crimson, top) vs recovered by STalign→CCFv3 (green, bottom), including the posterior bilateral clusters the bare fit missed. The anchor is unit-tested; the posterior recovery is live-tested.</figcaption>
+                <figcaption data-i18n-html="merfish.thalamusCaption"><b>Thalamus across three scans.</b> Truth (crimson, top) vs recovered by STalign→CCFv3 (green, bottom), including the posterior bilateral clusters the bare fit missed. The anchor is unit-tested; the posterior recovery is live-tested.</figcaption>
             </figure>
         </section>
 
@@ -704,12 +704,12 @@
 
         <!-- ——— Real data ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">PROOF</span> Tested on real data</div>
-            <h2>Live test on Moffitt 2018.</h2>
-            <p><a href="https://www.science.org/doi/10.1126/science.aau5324" target="_blank" rel="noopener">Moffitt et al.</a> hypothalamic MERFISH — <span class="accent-num">73,626</span> cells, 160 genes. Unsupervised Leiden (27 clusters) vs 16 published classes: ARI <span class="accent-num">0.28</span> (random ≈ 0), concordant UMAP, real coronal anatomy.</p>
+            <div class="mf-kicker"><span class="idx">PROOF</span> <span data-i18n="merfish.proofKicker">Tested on real data</span></div>
+            <h2 data-i18n="merfish.proofTitle">Live test on Moffitt 2018.</h2>
+            <p data-i18n-html="merfish.proofP"><a href="https://www.science.org/doi/10.1126/science.aau5324" target="_blank" rel="noopener">Moffitt et al.</a> hypothalamic MERFISH — <span class="accent-num">73,626</span> cells, 160 genes. Unsupervised Leiden (27 clusters) vs 16 published classes: ARI <span class="accent-num">0.28</span> (random ≈ 0), concordant UMAP, real coronal anatomy.</p>
             <figure class="plate reveal">
                 <img src="/projects/images/merfish-live.png" alt="Four-panel live validation: two UMAPs colored by Leiden clusters and by published cell classes, a coronal spatial slice, and a Leiden-versus-published concordance heatmap" loading="lazy" width="1600" height="1255">
-                <figcaption><b>Live validation on real MERFISH.</b> Unsupervised Leiden (27 clusters) vs 16 published classes: concordant UMAP, coronal anatomy, and a near-diagonal concordance heatmap. Generated by the pytest suite (<span class="mono">34 offline / 41 total</span>, 7 live); offline tests run in CI on Python 3.12.</figcaption>
+                <figcaption data-i18n-html="merfish.proofCaption"><b>Live validation on real MERFISH.</b> Unsupervised Leiden (27 clusters) vs 16 published classes: concordant UMAP, coronal anatomy, and a near-diagonal concordance heatmap. Generated by the pytest suite (<span class="mono">34 offline / 41 total</span>, 7 live); offline tests run in CI on Python 3.12.</figcaption>
             </figure>
         </section>
 
@@ -717,17 +717,17 @@
 
         <!-- ——— Context ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">CONTEXT</span> Where MERFISH sits in the field</div>
-            <h2>Imaging vs sequencing.</h2>
-            <p>MERFISH is one of three imaging platforms that read single molecules in place. Imaging trades panel size for subcellular precision; sequencing trades precision for whole-transcriptome reach.</p>
+            <div class="mf-kicker"><span class="idx">CONTEXT</span> <span data-i18n="merfish.contextKicker">Where MERFISH sits in the field</span></div>
+            <h2 data-i18n="merfish.contextTitle">Imaging vs sequencing.</h2>
+            <p data-i18n="merfish.contextP">MERFISH is one of three imaging platforms that read single molecules in place. Imaging trades panel size for subcellular precision; sequencing trades precision for whole-transcriptome reach.</p>
             <div class="mf-table-wrap reveal">
                 <table class="mf-table">
                     <thead>
-                        <tr><th>Platform</th><th>Chemistry</th><th>Max panel</th><th>Resolution</th></tr>
+                        <tr><th data-i18n="merfish.tablePlatform">Platform</th><th data-i18n="merfish.tableChemistry">Chemistry</th><th data-i18n="merfish.tablePanel">Max panel</th><th data-i18n="merfish.tableResolution">Resolution</th></tr>
                     </thead>
                     <tbody>
                         <tr class="is-this">
-                            <td class="platform">Vizgen MERSCOPE<span class="sub">this project</span></td>
+                            <td class="platform">Vizgen MERSCOPE<span class="sub" data-i18n="merfish.tableThisProject">this project</span></td>
                             <td>MERFISH — iterative smFISH barcoding</td>
                             <td class="num">~1,000 genes</td>
                             <td>100 nm pixel</td>
@@ -747,31 +747,31 @@
                     </tbody>
                 </table>
             </div>
-            <p class="muted">The field is standardizing on SpatialData, segmentation is the active research front, and panels keep growing toward whole-transcriptome imaging.</p>
+            <p class="muted" data-i18n="merfish.contextNote">The field is standardizing on SpatialData, segmentation is the active research front, and panels keep growing toward whole-transcriptome imaging.</p>
         </section>
 
         <hr class="rule">
 
         <!-- ——— Honest scope ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">SCOPE</span> What's implemented vs what's wired-in</div>
-            <h2>Repo status.</h2>
-            <p>Light core in CI; heavy atlases and engines plug in behind the same interface.</p>
+            <div class="mf-kicker"><span class="idx">SCOPE</span> <span data-i18n="merfish.scopeKicker">What's implemented vs what's wired-in</span></div>
+            <h2 data-i18n="merfish.scopeTitle">Repo status.</h2>
+            <p data-i18n="merfish.scopeP">Light core in CI; heavy atlases and engines plug in behind the same interface.</p>
             <ul class="mf-scope reveal">
-                <li><span class="badge real">implemented</span><span>Scanpy pipeline, cell-type mapper, segmentation benchmark, and the registration core (geometry, label transfer, uncertainty, QC), all covered by offline pytest.</span></li>
-                <li><span class="badge real">validated</span><span>Allen CCFv3 via brainglobe, and the STalign LDDMM deformable backend with a ground-truthed fit, in an isolated NumPy-2 / Python-3.12 environment.</span></li>
-                <li><span class="badge stub">wired-in</span><span>DeepSlice, ANTs, and the Allen <code>cell_type_mapper</code> are stubbed behind the live interfaces with install hints. They need large downloads, not new architecture.</span></li>
+                <li><span class="badge real">implemented</span><span data-i18n-html="merfish.scopeImplemented">Scanpy pipeline, cell-type mapper, segmentation benchmark, and the registration core (geometry, label transfer, uncertainty, QC), all covered by offline pytest.</span></li>
+                <li><span class="badge real">validated</span><span data-i18n-html="merfish.scopeValidated">Allen CCFv3 via brainglobe, and the STalign LDDMM deformable backend with a ground-truthed fit, in an isolated NumPy-2 / Python-3.12 environment.</span></li>
+                <li><span class="badge stub">wired-in</span><span data-i18n-html="merfish.scopeStubbed">DeepSlice, ANTs, and the Allen <code>cell_type_mapper</code> are stubbed behind the live interfaces with install hints. They need large downloads, not new architecture.</span></li>
             </ul>
-            <p class="muted" style="margin-top:1.2rem;">Honest caveat (also in the repo): the calibration and QC numbers use a synthetic registration error on <em>real</em> atlas geometry — so they test the math, not an engine's end-to-end accuracy. The STalign result is a real fit.</p>
+            <p class="muted" style="margin-top:1.2rem;" data-i18n-html="merfish.scopeCaveat">Honest caveat (also in the repo): the calibration and QC numbers use a synthetic registration error on <em>real</em> atlas geometry — so they test the math, not an engine's end-to-end accuracy. The STalign result is a real fit.</p>
         </section>
 
         <hr class="rule">
 
         <!-- ——— Notes ——— -->
         <section class="mf-section">
-            <div class="mf-kicker"><span class="idx">NOTES</span> Engineering</div>
-            <h2>A few choices.</h2>
-            <p>Cell-type and region calls both ship calibrated confidence — same pattern, two stages. Every stage has a no-download synthetic path so pytest runs in CI without atlas downloads; real engines slot in behind the same function signatures. STalign upstream still pins <code>numpy==1.23</code>; I install it <code>--no-deps</code> beside NumPy 2.4 in one venv rather than maintaining a separate STalign-only environment.</p>
+            <div class="mf-kicker"><span class="idx">NOTES</span> <span data-i18n="merfish.notesKicker">Engineering</span></div>
+            <h2 data-i18n="merfish.notesTitle">A few choices.</h2>
+            <p data-i18n-html="merfish.notesP">Cell-type and region calls both ship calibrated confidence — same pattern, two stages. Every stage has a no-download synthetic path so pytest runs in CI without atlas downloads; real engines slot in behind the same function signatures. STalign upstream still pins <code>numpy==1.23</code>; I install it <code>--no-deps</code> beside NumPy 2.4 in one venv rather than maintaining a separate STalign-only environment.</p>
         </section>
 
         <hr class="rule">
@@ -794,16 +794,16 @@
                 <span class="tag">Observable</span>
             </div>
             <div class="project-links">
-                <a href="https://github.com/kevincorvallis/MERFISH" target="_blank" rel="noopener">GitHub →</a>
-                <a href="https://www.science.org/doi/10.1126/science.aaa6090" target="_blank" rel="noopener">MERFISH paper →</a>
-                <a href="https://alleninstitute.github.io/abc_atlas_access/" target="_blank" rel="noopener">Allen ABC Atlas →</a>
+                <a href="https://github.com/kevincorvallis/MERFISH" target="_blank" rel="noopener" data-i18n="merfish.linkGitHub">GitHub →</a>
+                <a href="https://www.science.org/doi/10.1126/science.aaa6090" target="_blank" rel="noopener" data-i18n="merfish.linkPaper">MERFISH paper →</a>
+                <a href="https://alleninstitute.github.io/abc_atlas_access/" target="_blank" rel="noopener" data-i18n="merfish.linkAtlas">Allen ABC Atlas →</a>
             </div>
         </section>
 
     </main>
 
     <footer>
-        <p>© <span id="copyrightYear"></span> Kevin Lee · built with scanpy, STalign &amp; the Allen CCFv3</p>
+        <p data-i18n-html="merfish.footer">© <span id="copyrightYear"></span> Kevin Lee · built with scanpy, STalign &amp; the Allen CCFv3</p>
     </footer>
 
     <!-- Analytics -->
