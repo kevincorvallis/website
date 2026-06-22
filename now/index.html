@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Now — Kevin Lee</title>
+    <meta name="description" content="What Kevin Lee is focused on right now — building, flying, shooting, reading.">
+    <meta name="author" content="Kevin Lee">
+    <link rel="canonical" href="https://klee.page/now/">
+
+    <meta property="og:type" content="profile">
+    <meta property="og:url" content="https://klee.page/now/">
+    <meta property="og:title" content="Now — Kevin Lee">
+    <meta property="og:description" content="What I'm focused on right now — building, flying, shooting, reading.">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <script>
+        (function () {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #f0eee6; --text: #1f1e1d; --caption: #8a8880; --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.12);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            color-scheme: light dark;
+        }
+        [data-theme="dark"] {
+            --bg: #1f1e1d; --text: #f0eee6; --caption: #7a7a75; --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.1);
+        }
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body {
+            font-family: var(--font); background: var(--bg); color: var(--text);
+            font-size: 20px; line-height: 1.7; transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        ::selection { background: rgba(0, 100, 255, 0.26); color: inherit; }
+        a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s ease, opacity 0.2s ease; }
+        a:hover { opacity: 0.6; }
+        .wrap { max-width: 620px; margin: 0 auto; padding: 0 20px; }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0 0.5rem; }
+        .back-link { font-size: 15px; text-decoration: none; opacity: 0.5; transition: opacity 0.2s ease; }
+        .back-link:hover { opacity: 0.85; }
+        .toggle-wrap input { display: none; }
+        .toggle-wrap label {
+            position: relative; display: block; width: 40px; height: 20px;
+            background: var(--text); border-radius: 10px; cursor: pointer; transition: background-color 0.5s ease;
+        }
+        .toggle-wrap label::after {
+            content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px;
+            background: var(--bg); border-radius: 50%; transition: transform 0s, background-color 0.5s ease;
+        }
+        .toggle-wrap label.has-transition::after { transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), background-color 0.5s ease; }
+        .toggle-wrap input:checked + label::after { transform: translateX(20px); }
+
+        .masthead { padding: 3rem 0 1.5rem; }
+        h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(3rem, 12vw, 5rem); line-height: 0.9; letter-spacing: -0.02em; font-style: italic; }
+        .stamp { font-size: 13px; letter-spacing: 0.04em; color: var(--caption); margin-top: 1rem; }
+        .lede { font-size: 18px; color: var(--caption); margin-top: 1.25rem; line-height: 1.6; }
+
+        section.block { padding: 2rem 0; border-top: 1px solid var(--rule); }
+        section.block:first-of-type { border-top: none; }
+        .block h2 { font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.85rem; }
+        .block p { margin-bottom: 0.85rem; }
+        .block p:last-child { margin-bottom: 0; }
+        .block em { font-style: italic; }
+        /* TODO lines Kevin fills in — quiet prompt styling */
+        .todo { color: var(--caption); font-style: italic; }
+
+        footer { padding: 3rem 0 4rem; border-top: 1px solid var(--rule); margin-top: 1rem; }
+        footer p { font-size: 13px; color: var(--caption); }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        @media (max-width: 600px) { body { font-size: 18px; } }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <a href="/" class="back-link">&larr; klee.page</a>
+            <div class="toggle-wrap">
+                <input type="checkbox" id="theme-toggle">
+                <label for="theme-toggle"></label>
+            </div>
+        </header>
+
+        <div class="masthead">
+            <h1>Now</h1>
+            <p class="stamp">Last updated &middot; June 21, 2026</p>
+            <p class="lede">What I&rsquo;m focused on at the moment. Less a r&eacute;sum&eacute;, more a postcard &mdash; updated whenever life shifts enough to mention.</p>
+        </div>
+
+        <!-- ============================================================
+             KEVIN — fill in the bracketed [ ... ] lines and update the
+             "Last updated" date above. The .todo spans are the placeholders.
+             ============================================================ -->
+
+        <section class="block">
+            <h2>Building</h2>
+            <p>By day I&rsquo;m a software engineer at Paramount, working on video gisting and short-form ML. Nights and weekends go to <a href="https://github.com/kevincorvallis" target="_blank" rel="noopener">PookieB</a>, my little studio of side projects.</p>
+            <p class="todo">Right now I&rsquo;m heads-down on [the current project / what&rsquo;s shipping next].</p>
+        </section>
+
+        <section class="block">
+            <h2>Flying</h2>
+            <p>When I&rsquo;m not at a keyboard I&rsquo;m usually in the air &mdash; flying medical-transport missions for Angel Flight West around the Pacific Northwest.</p>
+            <p class="todo">Currently working toward [next rating / hours milestone]; next flight on the calendar is [where &amp; when].</p>
+        </section>
+
+        <section class="block">
+            <h2>Shooting</h2>
+            <p>Still mostly a film guy. The <a href="/film/">recent frames</a> live here, and I just put together <a href="/exposure/">an interactive on the exposure triangle</a>.</p>
+            <p class="todo">On the current roll: [camera + film stock you&rsquo;re shooting].</p>
+        </section>
+
+        <section class="block">
+            <h2>Reading &amp; watching</h2>
+            <p>Just finished <em>Beef</em> Season 2, which turned into <a href="/newsletter/on-love/">an essay on love</a>.</p>
+            <p class="todo">Now: [the book / show / album you&rsquo;re into].</p>
+        </section>
+
+        <section class="block">
+            <h2>Writing</h2>
+            <p>I send <a href="/newsletter/">Dispatch</a>, a letter to friends and family, every so often. <a href="/newsletter/feed.xml">RSS here</a> &mdash; no Substack, no tracking.</p>
+        </section>
+
+        <footer>
+            <p>This is a <a href="https://nownownow.com/about" target="_blank" rel="noopener">now page</a> &mdash; the idea&rsquo;s from Derek Sivers. &middot; <a href="/">klee.page</a></p>
+        </footer>
+    </div>
+
+    <script src="/js/theme.js"></script>
+</body>
+</html>
