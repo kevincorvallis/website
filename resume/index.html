@@ -970,6 +970,8 @@
                 }
                 return localeStrings.chatRoleAssistant || 'Kevin';
             }
+
+            function renderSuggestions(set) {
                 suggestionsEl.innerHTML = '';
                 suggestionsEl.scrollLeft = 0;
                 if (!set || !set.length) {
@@ -994,7 +996,7 @@
 
             suggestionsEl.addEventListener('scroll', checkScrollEnd, { passive: true });
 
-            function renderSuggestions(set) {
+            function addMessage(role, text) {
                 var div = document.createElement('div');
                 div.className = 'chat-message ' + (role === 'user' ? 'user-msg' : 'assistant-msg');
                 div.innerHTML = '<div class="chat-role">' + getLabel(role) + '</div><div class="chat-body">' + escapeHtml(text) + '</div>';
