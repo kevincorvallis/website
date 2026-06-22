@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <title>Dispatch — Kevin Lee</title>
+  <subtitle>A personal letter to friends and family. No Substack, no tracking.</subtitle>
+  <link href="https://klee.page/newsletter/" rel="alternate" type="text/html"/>
+  <link href="https://klee.page/newsletter/feed.xml" rel="self" type="application/atom+xml"/>
+  <id>https://klee.page/newsletter/</id>
+  <updated>2026-06-21T12:00:00Z</updated>
+  <author><name>Kevin Lee</name><uri>https://klee.page</uri></author>
+  <!-- HAND-MAINTAINED: when you publish a new issue, add an <entry> here (newest first) and bump <updated>. Dates for 001/004 are approximate. -->
+  <entry>
+    <title>An Interlude: Clean Pain</title>
+    <link href="https://klee.page/newsletter/on-love/" rel="alternate" type="text/html"/>
+    <id>https://klee.page/newsletter/on-love/</id>
+    <updated>2026-06-21T12:00:00Z</updated>
+    <published>2026-06-21T12:00:00Z</published>
+    <category term="interlude"/>
+    <summary>On agape, Beef Season 2, and learning the difference between the pain you stay for and the pain you leave.</summary>
+  </entry>
+  <entry>
+    <title>Dispatch 007: Leave</title>
+    <link href="https://klee.page/newsletter/007/" rel="alternate" type="text/html"/>
+    <id>https://klee.page/newsletter/007/</id>
+    <updated>2026-06-20T12:00:00Z</updated>
+    <published>2026-06-20T12:00:00Z</published>
+    <summary>First PTO from Paramount. Three generations, one rental car, Korea 0–1 Mexico at Estadio Akron — frustrating score, unforgettable trip.</summary>
+  </entry>
+  <entry>
+    <title>Dispatch 006: Us</title>
+    <link href="https://klee.page/newsletter/006/" rel="alternate" type="text/html"/>
+    <id>https://klee.page/newsletter/006/</id>
+    <updated>2026-06-14T12:00:00Z</updated>
+    <published>2026-06-14T12:00:00Z</published>
+    <summary>Merger fever, a promotion I forgot to celebrate, Claude Fable 5, a mystery gift in the mail, Steve-O at Pride, and a Korean relay that broke me — Dispatch 006, shorter and meaner.</summary>
+  </entry>
+  <entry>
+    <title>Dispatch 005: Margin</title>
+    <link href="https://klee.page/newsletter/005/" rel="alternate" type="text/html"/>
+    <id>https://klee.page/newsletter/005/</id>
+    <updated>2026-05-24T12:00:00Z</updated>
+    <published>2026-05-24T12:00:00Z</published>
+    <summary>A long weekend — a Friday screening on the Paramount lot with Justin (who lives in Frogtown and was not happy about parking), a Sunday that started in a church courtyard and ended on a sandy ridge above Big Bear, and a Monday that refused to put on real pants.</summary>
+  </entry>
+  <entry>
+    <title>Dispatch 004: Open House</title>
+    <link href="https://klee.page/newsletter/004/" rel="alternate" type="text/html"/>
+    <id>https://klee.page/newsletter/004/</id>
+    <updated>2026-05-17T12:00:00Z</updated>
+    <published>2026-05-17T12:00:00Z</published>
+    <summary>A receipt of a few weeks. Friends flew in, a cousin graduated from USC, Kobe stole a snack. Itemized accordingly.</summary>
+  </entry>
+  <entry>
+    <title>Dispatch 003: Field of Daisies</title>
+    <link href="https://klee.page/newsletter/003/" rel="alternate" type="text/html"/>
+    <id>https://klee.page/newsletter/003/</id>
+    <updated>2026-04-27T12:00:00Z</updated>
+    <published>2026-04-27T12:00:00Z</published>
+    <summary>Youbin's H1B, Kobe back from Germany, first 1:1s as a manager, and Justin Bieber crashing Coachella. Flip your phone.</summary>
+  </entry>
+  <entry>
+    <title>Dispatch 002: Spring on the Mountain</title>
+    <link href="https://klee.page/newsletter/002/" rel="alternate" type="text/html"/>
+    <id>https://klee.page/newsletter/002/</id>
+    <updated>2026-03-21T12:00:00Z</updated>
+    <published>2026-03-21T12:00:00Z</published>
+    <summary>Closing out ski season at Mammoth, producing at Paramount, free furniture from London, and Dylan's first visit.</summary>
+  </entry>
+  <entry>
+    <title>Dispatch 001: Week One in LA</title>
+    <link href="https://klee.page/newsletter/001/" rel="alternate" type="text/html"/>
+    <id>https://klee.page/newsletter/001/</id>
+    <updated>2026-03-07T12:00:00Z</updated>
+    <published>2026-03-07T12:00:00Z</published>
+    <summary>First week at Paramount, apartment hunting in Hollywood, and film photos from the drive down.</summary>
+  </entry>
+</feed>
