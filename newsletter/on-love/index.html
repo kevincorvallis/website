@@ -681,33 +681,7 @@
             transition: color 0.3s ease;
         }
 
-        /* ========== SIDENOTES (marginalia) ========== */
-        .sidenote {
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--caption);
-            font-style: normal;
-            transition: color 0.3s ease;
-        }
-        .sidenote em { font-style: italic; }
-        @media (min-width: 1180px) {
-            .sidenote {
-                float: right;
-                clear: right;
-                width: 195px;
-                margin: 0.2rem 0 1.1rem 1.5rem;
-                margin-right: -235px;
-                text-align: left;
-            }
-        }
-        @media (max-width: 1179px) {
-            .sidenote {
-                display: block;
-                margin: 1rem 0 1.25rem;
-                padding-left: 1rem;
-                border-left: 2px solid var(--accent);
-            }
-        }
+        /* Sidenotes are provided by the shared css/microfeatures.css (.mfx-sn) */
 
         /* ========== SPACERS ========== */
         .spacer { height: 4rem; }
@@ -1191,6 +1165,8 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/css/microfeatures.css">
+    <link rel="alternate" type="application/atom+xml" title="Dispatch" href="/newsletter/feed.xml">
 </head>
 <body>
 
@@ -1288,16 +1264,16 @@
     <div class="text-block reveal">
         <div data-l="en">
             <p>My work has been breaking down narrative structures, and lately I&rsquo;ve been fascinated by how <a href="https://en.wikipedia.org/wiki/Beef_(TV_series)" target="_blank"><em>Beef</em></a> Season 2, much like <a href="https://en.wikipedia.org/wiki/The_White_Lotus" target="_blank"><em>White Lotus</em></a>, pulls this off. It shows you characters who look completely normal on the surface, and then every single thing they do turns out to be driven by some hidden insecurity that only gets revealed at the end. It&rsquo;s incredibly human. That&rsquo;s why I wanted to write this after finishing <em>Beef</em> 2.</p>
-            <aside class="sidenote">In Korea, <em>Beef</em> is titled 성난 사람들, literally &ldquo;angry people.&rdquo; The English title is the other kind of beef: a grudge.</aside>
+            <aside class="mfx-sn">In Korea, <em>Beef</em> is titled 성난 사람들, literally &ldquo;angry people.&rdquo; The English title is the other kind of beef: a grudge.</aside>
             <p>For folks who grew up religious, the concept of God&rsquo;s love was always around. There&rsquo;s a Greek term for it: <a href="https://en.wikipedia.org/wiki/Agape" target="_blank"><em>agape</em></a>. The highest, most selfless, unconditional form of love. It&rsquo;s detached from the worth, the status, or the value of the person receiving it.</p>
-            <aside class="sidenote">The Greeks had several words for love: <em>eros</em> (desire), <em>philia</em> (friendship), <em>storge</em> (family), and <em>agape</em>, the unconditional one. This one is the hardest.</aside>
+            <aside class="mfx-sn">The Greeks had several words for love: <em>eros</em> (desire), <em>philia</em> (friendship), <em>storge</em> (family), and <em>agape</em>, the unconditional one. This one is the hardest.</aside>
             <p>Through my own life, and going through my first breakup ever, I think I can sort people into two distinct categories based on how they handle this idea.</p>
         </div>
         <div data-l="ko">
             <p>내 일은 주로 이야기의 구조를 분석하는 것인데, 요즘은 <a href="https://en.wikipedia.org/wiki/The_White_Lotus" target="_blank"><em>더 화이트 로터스</em></a>처럼 <a href="https://en.wikipedia.org/wiki/Beef_(TV_series)" target="_blank"><em>성난 사람들</em></a> 시즌 2가 이걸 어떻게 풀어냈는지에 완전히 매료되어 있어. 겉보기에는 지극히 평범해 보이는 인물들을 보여주고는, 결국 그들이 하는 모든 행동이 마지막에야 밝혀지는 마음속 깊은 불안감에서 비롯된 것임을 드러내거든. 그게 정말 지독하리만큼 인간적이야. 그래서 <em>성난 사람들</em> 2를 다 보고 나서 이 글을 꼭 쓰고 싶었어.</p>
-            <aside class="sidenote"><em>성난 사람들</em>의 영어 제목은 &lsquo;Beef&rsquo;야. 소고기가 아니라 &lsquo;시비, 앙금&rsquo;을 뜻하는 속어지.</aside>
+            <aside class="mfx-sn"><em>성난 사람들</em>의 영어 제목은 &lsquo;Beef&rsquo;야. 소고기가 아니라 &lsquo;시비, 앙금&rsquo;을 뜻하는 속어지.</aside>
             <p>종교를 믿으면서 자란 사람들에게는 신의 사랑이라는 개념이 늘 익숙할 거야. 그리스어로 이걸 뜻하는 단어가 있는데, 바로 <a href="https://en.wikipedia.org/wiki/Agape" target="_blank"><em>아가페</em></a>야. 가장 숭고하고 이타적이며, 조건 없는 형태의 사랑이지. 사랑을 받는 사람의 가치나 지위, 혹은 자격 따위와는 전혀 상관없는 사랑이야.</p>
-            <aside class="sidenote">그리스인들은 사랑을 여러 단어로 나눴어. <em>에로스</em>(욕망), <em>필리아</em>(우정), <em>스토르게</em>(가족애), 그리고 무조건적인 사랑 <em>아가페</em>. 이게 제일 어려운 거야.</aside>
+            <aside class="mfx-sn">그리스인들은 사랑을 여러 단어로 나눴어. <em>에로스</em>(욕망), <em>필리아</em>(우정), <em>스토르게</em>(가족애), 그리고 무조건적인 사랑 <em>아가페</em>. 이게 제일 어려운 거야.</aside>
             <p>내 삶을 돌아보고, 또 난생처음 이별이라는 걸 겪으면서, 사람들이 이 사랑이라는 개념을 대하는 방식에 따라 크게 두 부류로 나눌 수 있겠다는 생각이 들었어.</p>
         </div>
     </div>
@@ -1897,5 +1873,6 @@
             });
         }
     </script>
+    <script src="/js/microfeatures.js" defer></script>
 </body>
 </html>
