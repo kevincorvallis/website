@@ -54,8 +54,9 @@
         doc.querySelectorAll('[id]').forEach(function (el) { used[el.id] = 1; });
         var hs = [].slice.call(doc.querySelectorAll('h2, h3'));
         hs.forEach(function (h) {
-            if (h.closest('header, nav, footer')) return;
+            if (h.closest('header, nav, footer, form, .subscribe, .comments')) return;
             if (h.classList.contains('sr-only') || h.querySelector('.mfx-anchor')) return;
+            if (h.querySelector('[data-l]')) return; // bilingual chrome (e.g. Dispatch headers) — skip
             var id = h.id;
             if (!id) {
                 id = slugify(h.textContent);
@@ -64,6 +65,17 @@
                 h.id = id;
             }
             used[id] = 1;
+            // Translated heading: move the i18n attr onto an inner span so
+            // re-translation updates only the text and never wipes the anchor.
+            var i18nAttr = h.hasAttribute('data-i18n') ? 'data-i18n'
+                : (h.hasAttribute('data-i18n-html') ? 'data-i18n-html' : null);
+            if (i18nAttr) {
+                var span = doc.createElement('span');
+                span.setAttribute(i18nAttr, h.getAttribute(i18nAttr));
+                while (h.firstChild) span.appendChild(h.firstChild);
+                h.removeAttribute(i18nAttr);
+                h.appendChild(span);
+            }
             var a = doc.createElement('a');
             a.className = 'mfx-anchor';
             a.href = '#' + id;
@@ -103,7 +115,7 @@
     /* ── 3. Reading progress ─────────────────────────────────────────────── */
     function readingProgress() {
         if (skip('progress')) return;
-        if (doc.querySelector('.mf-progress-top, .mfx-progress')) return; // MERFISH already has one
+        if (doc.querySelector('.mf-progress-top, .mfx-progress, .progress-bar')) return; // page already has a progress bar (MERFISH, Dispatch)
         var bar = doc.createElement('div');
         bar.className = 'mfx-progress';
         bar.setAttribute('aria-hidden', 'true');
@@ -129,7 +141,6 @@
     /* ── 4. Hover link previews ──────────────────────────────────────────── */
     var GLOBE = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6'><circle cx='12' cy='12' r='9'/><path d='M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18'/></svg>";
     function linkPreviews() {
-        if (!fine || reduce && false) { /* keep on focus for a11y even if reduce */ }
         if (!fine) return;
         var card = null, showT = null, ctrl = null, current = null;
         var cache = {};      // href -> {title, desc} | null (internal)
@@ -217,6 +228,7 @@
         function onEnter(e) {
             var a = e.target.closest && e.target.closest('a[href]');
             if (!a || a.classList.contains('mfx-anchor')) return;
+            if (a === current) return; // already tracking this link — ignore intra-link child moves
             var href = a.getAttribute('href');
             if (!href || href[0] === '#' || /^(mailto:|tel:|javascript:)/i.test(href)) return;
             current = a;
@@ -225,7 +237,8 @@
         }
         function onLeave(e) {
             var a = e.target.closest && e.target.closest('a[href]');
-            if (a && a === current) hide();
+            // ignore transitions that stay inside the same link (it has inline children)
+            if (a && a === current && !a.contains(e.relatedTarget)) hide();
         }
         body.addEventListener('mouseover', onEnter);
         body.addEventListener('mouseout', onLeave);
