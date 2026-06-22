@@ -377,7 +377,8 @@
         }
         .morph:not(.is-morph) .morph-hint { display: none; }
         /* enhanced: ghibli lifts over the real photo and cross-dissolves on scroll */
-        .morph.is-morph .morph-ghibli { position: absolute; inset: 0; margin: 0; opacity: 0; will-change: opacity; }
+        .morph.is-morph .morph-ghibli { position: absolute; inset: 0; margin: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; will-change: opacity; }
+        .morph.is-morph .morph-pair { overflow: hidden; border-radius: 3px; }
 
         /* ========== CHAPTERS ========== */
         .chapter { position: relative; padding: 4rem 0 3rem; }
@@ -1092,16 +1093,22 @@
             </div>
         </div>
 
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/in-n-out.jpg" loading="lazy"
-                data-alt-en="An In-N-Out 4x4 — four patties, four slices of cheese — with fries on a red tray, a protein-style burger beside it"
-                data-alt-ko="인앤아웃 4x4 — 패티 네 장, 치즈 네 장 — 빨간 트레이 위 감자튀김, 옆에는 프로틴 스타일 버거"
-                alt="An In-N-Out 4x4 — four patties, four slices of cheese — with fries on a red tray, a protein-style burger beside it">
-            <div class="photo-caption">
+        <figure class="morph reveal-fade">
+            <div class="morph-pair">
+                <img class="morph-img morph-real" src="/newsletter/007/images/in-n-out.jpg" loading="lazy"
+                    data-alt-en="An In-N-Out 4x4 — four patties, four slices of cheese — with fries on a red tray, a protein-style burger beside it"
+                    data-alt-ko="인앤아웃 4x4 — 패티 네 장, 치즈 네 장 — 빨간 트레이 위 감자튀김, 옆에는 프로틴 스타일 버거"
+                    alt="An In-N-Out 4x4 — four patties, four slices of cheese — with fries on a red tray, a protein-style burger beside it">
+                <img class="morph-img morph-ghibli" src="/newsletter/007/images/in-n-out-ghibli.jpg" loading="lazy"
+                    data-alt-en="The same In-N-Out 4x4, redrawn as a Studio Ghibli-style illustration"
+                    data-alt-ko="같은 인앤아웃 4x4를 지브리풍 일러스트로 다시 그린 모습"
+                    alt="The same In-N-Out 4x4, redrawn as a Studio Ghibli-style illustration">
+            </div>
+            <figcaption class="morph-cap">
                 <span data-l="en">the 4&times;4 on the drive down to Tijuana. off-menu, fully earned.</span>
                 <span data-l="ko">티후아나로 내려가는 길의 4&times;4. 메뉴엔 없지만 충분히 자격 있음.</span>
-            </div>
-        </div>
+            </figcaption>
+        </figure>
 
         <div class="flightmap reveal-fade" aria-hidden="true">
             <svg id="flightMap" viewBox="0 0 480 300" preserveAspectRatio="xMidYMid meet" role="img"
@@ -1196,16 +1203,22 @@
             </div>
         </div>
 
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/dad-justin-concourse.jpg"
-                data-alt-en="Kevin in a red Korea jersey throwing a Korean finger heart next to a Mexico fan in a giant MEXICO sombrero and green jersey in the Estadio Akron concourse"
-                data-alt-ko="에스타디오 아크론 복도에서 빨간 한국 유니폼을 입고 손하트를 하는 케빈과 거대한 MEXICO 솜브레로에 초록 유니폼을 입은 멕시코 팬"
-                alt="Kevin in a red Korea jersey throwing a Korean finger heart next to a Mexico fan in a giant MEXICO sombrero and green jersey in the Estadio Akron concourse">
-            <div class="photo-caption">
+        <figure class="morph reveal-fade">
+            <div class="morph-pair">
+                <img class="morph-img morph-real" src="/newsletter/007/images/dad-justin-concourse.jpg" loading="lazy"
+                    data-alt-en="Kevin in a red Korea jersey throwing a Korean finger heart next to a Mexico fan in a giant MEXICO sombrero and green jersey in the Estadio Akron concourse"
+                    data-alt-ko="에스타디오 아크론 복도에서 빨간 한국 유니폼을 입고 손하트를 하는 케빈과 거대한 MEXICO 솜브레로에 초록 유니폼을 입은 멕시코 팬"
+                    alt="Kevin in a red Korea jersey throwing a Korean finger heart next to a Mexico fan in a giant MEXICO sombrero and green jersey in the Estadio Akron concourse">
+                <img class="morph-img morph-ghibli" src="/newsletter/007/images/dad-justin-concourse-ghibli.jpg" loading="lazy"
+                    data-alt-en="The same moment — finger heart next to the sombrero stranger — redrawn as a Studio Ghibli-style illustration"
+                    data-alt-ko="같은 순간 — 솜브레로 아저씨 옆 손하트 — 을 지브리풍 일러스트로 다시 그린 모습"
+                    alt="The same moment — finger heart next to the sombrero stranger — redrawn as a Studio Ghibli-style illustration">
+            </div>
+            <figcaption class="morph-cap">
                 <span data-l="en">a total stranger in a MEXICO sombrero, me throwing a <a href="https://www.cathaypacific.com/cx/en_US/inspiration/travel/brief-history-korean-finger-hearts.html" target="_blank" rel="noopener">Korean finger heart</a>. instant friends. that's the whole tournament, really.</span>
                 <span data-l="ko">처음 본 MEXICO 솜브레로 아저씨, 그리고 <a href="https://www.cathaypacific.com/cx/en_US/inspiration/travel/brief-history-korean-finger-hearts.html" target="_blank" rel="noopener">손하트</a> 하는 나. 즉석 친구. 사실 이게 월드컵 전부다.</span>
-            </div>
-        </div>
+            </figcaption>
+        </figure>
 
         <div class="text-block reveal">
             <div data-l="en">
@@ -1257,27 +1270,39 @@
             </div>
         </div>
 
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/family-selfie.jpg"
-                data-alt-en="Selfie of Kevin, his dad, and Justin in stadium seats with giant Korea and Mexico flags spread on the pitch below"
-                data-alt-ko="아래 잔디에 펼쳐진 거대한 한국·멕시코 국기 위, 관중석에 앉은 케빈, 아버지, 저스틴의 셀카"
-                alt="Selfie of Kevin, his dad, and Justin in stadium seats with giant Korea and Mexico flags spread on the pitch below">
-            <div class="photo-caption">
+        <figure class="morph reveal-fade">
+            <div class="morph-pair">
+                <img class="morph-img morph-real" src="/newsletter/007/images/family-selfie.jpg" loading="lazy"
+                    data-alt-en="Selfie of Kevin, his dad, and Justin in stadium seats with giant Korea and Mexico flags spread on the pitch below"
+                    data-alt-ko="아래 잔디에 펼쳐진 거대한 한국·멕시코 국기 위, 관중석에 앉은 케빈, 아버지, 저스틴의 셀카"
+                    alt="Selfie of Kevin, his dad, and Justin in stadium seats with giant Korea and Mexico flags spread on the pitch below">
+                <img class="morph-img morph-ghibli" src="/newsletter/007/images/family-selfie-ghibli.jpg" loading="lazy"
+                    data-alt-en="The three-generation selfie redrawn as a Studio Ghibli-style illustration"
+                    data-alt-ko="3대 셀카를 지브리풍 일러스트로 다시 그린 모습"
+                    alt="The three-generation selfie redrawn as a Studio Ghibli-style illustration">
+            </div>
+            <figcaption class="morph-cap">
                 <span data-l="en">three generations, two flags, one afternoon we won't forget (score notwithstanding)</span>
                 <span data-l="ko">3대, 두 깃발, 스코어와 무관하게 잊지 못할 한 오후</span>
-            </div>
-        </div>
+            </figcaption>
+        </figure>
 
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/flag-ceremony.jpg"
-                data-alt-en="Estadio Akron filled with fans during the pre-match flag ceremony for Korea vs Mexico"
-                data-alt-ko="한국 대 멕시코 경기 전 국기 의식이 열리는 가득 찬 에스타디오 아크론"
-                alt="Estadio Akron filled with fans during the pre-match flag ceremony for Korea vs Mexico">
-            <div class="photo-caption">
+        <figure class="morph reveal-fade">
+            <div class="morph-pair">
+                <img class="morph-img morph-real" src="/newsletter/007/images/flag-ceremony.jpg" loading="lazy"
+                    data-alt-en="Estadio Akron filled with fans during the pre-match flag ceremony for Korea vs Mexico"
+                    data-alt-ko="한국 대 멕시코 경기 전 국기 의식이 열리는 가득 찬 에스타디오 아크론"
+                    alt="Estadio Akron filled with fans during the pre-match flag ceremony for Korea vs Mexico">
+                <img class="morph-img morph-ghibli" src="/newsletter/007/images/flag-ceremony-ghibli.jpg" loading="lazy"
+                    data-alt-en="The packed stadium and flag ceremony redrawn as a Studio Ghibli-style illustration"
+                    data-alt-ko="가득 찬 경기장과 국기 의식을 지브리풍 일러스트로 다시 그린 모습"
+                    alt="The packed stadium and flag ceremony redrawn as a Studio Ghibli-style illustration">
+            </div>
+            <figcaption class="morph-cap">
                 <span data-l="en">everyone filming. nobody watching through the screen later.</span>
                 <span data-l="ko">다들 찍는다. 나중에 화면으로 다시 안 본다.</span>
-            </div>
-        </div>
+            </figcaption>
+        </figure>
 
         <div class="video-inset portrait reveal">
             <p class="fv-flag" style="margin-bottom:0.6rem;"><span class="dot" aria-hidden="true"></span><span data-l="en">Watch with sound &middot; Estadio Akron</span><span data-l="ko">소리 켜고 &middot; 에스타디오 아크론</span></p>
@@ -1326,6 +1351,25 @@
             </svg>
             <p class="cm-cap"><span data-l="en">measured in goosebumps, not science</span><span data-l="ko">과학이 아니라 소름으로 측정</span></p>
         </div>
+
+        <div class="video-inset portrait reveal">
+            <div class="fv-stage">
+                <video controls playsinline preload="metadata" poster="/newsletter/007/images/streets-night-poster.jpg"
+                    data-aria-en="Studio-Ghibli-style video of the Guadalajara streets at night after the match, fans spilling out"
+                    data-aria-ko="경기 후 밤 과달라하라 거리를 지브리풍으로 그린 영상, 거리로 쏟아져 나온 팬들"
+                    aria-label="Studio-Ghibli-style video of the Guadalajara streets at night after the match, fans spilling out">
+                    <source src="/newsletter/007/images/streets-night.mp4" type="video/mp4">
+                </video>
+                <button class="fv-play" type="button" aria-label="Play with sound">
+                    <span class="fv-play-disc" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+                    <span class="fv-play-label"><span data-l="en">Play with sound</span><span data-l="ko">소리와 함께 재생</span></span>
+                </button>
+            </div>
+            <div class="photo-caption">
+                <span data-l="en">spilling into the streets after &mdash; already the version my memory keeps.</span>
+                <span data-l="ko">끝나고 거리로 쏟아져 나온 밤 &mdash; 이미 내 기억이 간직한 버전.</span>
+            </div>
+        </div>
     </div>
 
     <div class="divider reveal-fade"></div>
@@ -1348,16 +1392,22 @@
             </div>
         </div>
 
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/octopus.jpg"
-                data-alt-en="Grilled octopus on plantain chips served on a wooden board at a Guadalajara restaurant"
-                data-alt-ko="과달라하라 식당에서 나무 보드 위 플랜틴 칩과 함께 나온 통째 구이 문어"
-                alt="Grilled octopus on plantain chips served on a wooden board at a Guadalajara restaurant">
-            <div class="photo-caption">
+        <figure class="morph reveal-fade">
+            <div class="morph-pair">
+                <img class="morph-img morph-real" src="/newsletter/007/images/octopus.jpg" loading="lazy"
+                    data-alt-en="Grilled octopus on plantain chips served on a wooden board at a Guadalajara restaurant"
+                    data-alt-ko="과달라하라 식당에서 나무 보드 위 플랜틴 칩과 함께 나온 통째 구이 문어"
+                    alt="Grilled octopus on plantain chips served on a wooden board at a Guadalajara restaurant">
+                <img class="morph-img morph-ghibli" src="/newsletter/007/images/octopus-ghibli.jpg" loading="lazy"
+                    data-alt-en="The grilled octopus plate redrawn as a Studio Ghibli-style illustration"
+                    data-alt-ko="구이 문어 접시를 지브리풍 일러스트로 다시 그린 모습"
+                    alt="The grilled octopus plate redrawn as a Studio Ghibli-style illustration">
+            </div>
+            <figcaption class="morph-cap">
                 <span data-l="en">the octopus arrived like it owned the table</span>
                 <span data-l="ko">문어는 테이블 주인처럼 등장했다</span>
-            </div>
-        </div>
+            </figcaption>
+        </figure>
 
         <div class="video-inset portrait reveal">
             <div class="fv-stage">
@@ -1387,16 +1437,22 @@
             </div>
         </div>
 
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/kobawoo.jpg"
-                data-alt-en="Sean and Val sharing bossam and a sizzling squid platter at Kobawoo House in LA Koreatown after the trip"
-                data-alt-ko="여행 후 LA 코리아타운 고바우집에서 보쌈과 지글지글 오징어를 나눠 먹는 션과 발"
-                alt="Sean and Val sharing bossam and a sizzling squid platter at Kobawoo House in LA Koreatown after the trip">
-            <div class="photo-caption">
+        <figure class="morph reveal-fade">
+            <div class="morph-pair">
+                <img class="morph-img morph-real" src="/newsletter/007/images/kobawoo.jpg" loading="lazy"
+                    data-alt-en="Sean and Val sharing bossam and a sizzling squid platter at Kobawoo House in LA Koreatown after the trip"
+                    data-alt-ko="여행 후 LA 코리아타운 고바우집에서 보쌈과 지글지글 오징어를 나눠 먹는 션과 발"
+                    alt="Sean and Val sharing bossam and a sizzling squid platter at Kobawoo House in LA Koreatown after the trip">
+                <img class="morph-img morph-ghibli" src="/newsletter/007/images/kobawoo-ghibli.jpg" loading="lazy"
+                    data-alt-en="Sean and Val at the Kobawoo House table redrawn as a Studio Ghibli-style illustration"
+                    data-alt-ko="고바우집 테이블의 션과 발을 지브리풍 일러스트로 다시 그린 모습"
+                    alt="Sean and Val at the Kobawoo House table redrawn as a Studio Ghibli-style illustration">
+            </div>
+            <figcaption class="morph-cap">
                 <span data-l="en">Kobawoo House &mdash; the welcome-home lunch, basically booked before I cleared baggage claim.</span>
                 <span data-l="ko">고바우집 &mdash; 짐 찾기도 전에 잡힌 &lsquo;잘 돌아왔다&rsquo; 점심.</span>
-            </div>
-        </div>
+            </figcaption>
+        </figure>
 
         <div class="text-block reveal">
             <div data-l="en">
@@ -1406,16 +1462,22 @@
                 <p>그리고 LA에 돌아와서도 먹는 건 안 멈췄다 &mdash; <a href="https://www.google.com/maps/search/?api=1&amp;query=Erewhon+Los+Angeles" target="_blank" rel="noopener">에어원</a>에 완전히 귀화한 아빠, 스무디 두 잔에 여행이 안 끝난 듯한 미소.</p>
             </div>
         </div>
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/dad-erewhon.jpg" loading="lazy"
-                data-alt-en="Kevin's dad smiling at an outdoor Erewhon table with two smoothies in front of him"
-                data-alt-ko="에어원 야외 테이블에서 스무디 두 잔을 앞에 두고 웃는 케빈의 아버지"
-                alt="Kevin's dad smiling at an outdoor Erewhon table with two smoothies in front of him">
-            <div class="photo-caption">
+        <figure class="morph reveal-fade">
+            <div class="morph-pair">
+                <img class="morph-img morph-real" src="/newsletter/007/images/dad-erewhon.jpg" loading="lazy"
+                    data-alt-en="Kevin's dad smiling at an outdoor Erewhon table with two smoothies in front of him"
+                    data-alt-ko="에어원 야외 테이블에서 스무디 두 잔을 앞에 두고 웃는 케빈의 아버지"
+                    alt="Kevin's dad smiling at an outdoor Erewhon table with two smoothies in front of him">
+                <img class="morph-img morph-ghibli" src="/newsletter/007/images/dad-erewhon-ghibli.jpg" loading="lazy"
+                    data-alt-en="Dad at the Erewhon table redrawn as a Studio Ghibli-style illustration"
+                    data-alt-ko="에어원 테이블의 아빠를 지브리풍 일러스트로 다시 그린 모습"
+                    alt="Dad at the Erewhon table redrawn as a Studio Ghibli-style illustration">
+            </div>
+            <figcaption class="morph-cap">
                 <span data-l="en">Dad at Erewhon, two smoothies deep, fully acclimated to LA.</span>
                 <span data-l="ko">에어원의 아빠, 스무디 두 잔째, LA 완전 적응 완료.</span>
-            </div>
-        </div>
+            </figcaption>
+        </figure>
     </div>
 
     <!-- ============================================================
@@ -2274,15 +2336,19 @@
 
             var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            // Real → Ghibli cross-dissolve on the young-me photos. Reduced motion skips
-            // this and the two images simply stack as normal stills.
-            var morph = document.getElementById('youngMeMorph');
-            if (morph && window.ScrollTrigger && !reduceMotion) {
-                morph.classList.add('is-morph');
-                gsap.fromTo(morph.querySelector('.morph-ghibli'),
-                    { opacity: 0 },
-                    { opacity: 1, ease: 'none',
-                      scrollTrigger: { trigger: morph, start: 'top 72%', end: 'center 42%', scrub: 0.4 } });
+            // Real → Ghibli cross-dissolve — the issue's signature: every photo melts into
+            // its Studio-Ghibli memory-version as it scrolls through. Reduced motion skips it
+            // and the two images simply stack as normal stills.
+            if (window.ScrollTrigger && !reduceMotion) {
+                gsap.utils.toArray('.morph').forEach(function (m) {
+                    var gh = m.querySelector('.morph-ghibli');
+                    if (!gh) return;
+                    m.classList.add('is-morph');
+                    gsap.fromTo(gh,
+                        { opacity: 0 },
+                        { opacity: 1, ease: 'none',
+                          scrollTrigger: { trigger: m, start: 'top 78%', end: 'center 48%', scrub: 0.5 } });
+                });
             }
 
             if (!reduceMotion) {
