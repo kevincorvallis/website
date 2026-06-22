@@ -103,7 +103,9 @@
         "가장 흥미로웠던 문제?",
         "새 분야를 빠르게 배우는 방법?"
       ]
-    ]
+    ],
+    "sn1": "MERFISH는 조직 안 RNA 분자를 그 자리에서 하나씩 이미징합니다. 이후 그 전체 파이프라인을 <a href=\"/projects/merfish\">사례 연구</a>로 다시 만들었습니다.",
+    "sn2": "Battalion S-4는 500명 규모 부대의 보급·정비·이동을 담당합니다 — 분산 시스템 연습으로 꽤 쓸모 있었던 규모의 군수입니다."
   },
   "projects": {
     "pageTitle": "프로젝트 — Kevin Lee",
@@ -315,7 +317,9 @@
     "tradeoffsHeading": "트레이드오프",
     "tradeoffsScraping": "<strong>스크래핑은 fragile.</strong> 공식 API 없이는 대안 없음.",
     "tradeoffsFreeTiers": "<strong>무료 티어가 아키텍처를 형성.</strong> 10배 사용 시 유료 필요.",
-    "tradeoffsDualAuth": "<strong>이중 auth 부담.</strong> iOS에 필요하지만 코드량 많음."
+    "tradeoffsDualAuth": "<strong>이중 auth 부담.</strong> iOS에 필요하지만 코드량 많음.",
+    "sn1": "SNOTEL — SNOwpack TELemetry — 은 서부 산악 전역에 깔린 USDA의 자동 적설 센서 네트워크입니다.",
+    "sn2": "페이지 로드마다 수십 번 호출하는 건 정확성 버그가 아니었습니다. 신호 한 칸짜리 주차장 폰에서 녹아내리는 버그였습니다."
   },
   "spacec": {
     "pageTitle": "SPACEc — Kevin Lee",
@@ -373,7 +377,9 @@
     "talkTitle": "SPACEc: 간소화된 대화형 Python 워크플로",
     "talkSub": "Stanford University · Nolan Lab",
     "linkPyPI": "PyPI →",
-    "linkGitHub": "GitHub →"
+    "linkGitHub": "GitHub →",
+    "sn1": "멀티플렉스 이미징은 한 조직 절편을 한 번에 40+ 단백질로 염색합니다 — 기존 방식이 겨우 몇 개만 구분하던 데서.",
+    "sn2": "scanpy의 <code>sp.tl</code>/<code>sp.pl</code> 관례를 따르면, scanpy를 써본 사람은 누구나 이미 SPACEc의 형태를 안다는 뜻입니다."
   },
   "terms": {
     "pageTitle": "이용약관 — Kevin Lee",

@@ -157,20 +157,22 @@ a[data-mfx-noicon]::after { content: none; }
     margin-right: 0.4em;
 }
 
-/* Wide: float both inline notes and asides into the right margin */
-@media (min-width: 1180px) {
+/* Wide: float both inline notes and asides into the right margin.
+   Geometry (11rem note, -12rem pull) fits the widest content column we use
+   (~800px case studies) once the viewport clears 1200px without clipping. */
+@media (min-width: 1200px) {
     .mfx-sn {
         float: right;
         clear: right;
-        width: 13rem;
-        margin: 0.25rem -14.5rem 0.9rem 0;
+        width: 11rem;
+        margin: 0.25rem -12rem 0.9rem 0;
         position: relative;
         text-align: left;
     }
     .mfx-sn-ref { color: var(--mfx-accent); }
 }
 /* Narrow: inline notes collapse (tap the ref); asides stay visible as a block */
-@media (max-width: 1179px) {
+@media (max-width: 1199px) {
     .mfx-sn--inline,
     .mfx-sn--aside {
         margin: 0.7rem 0;

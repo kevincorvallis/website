@@ -103,7 +103,9 @@
         "最も面白かった問題？",
         "新しい分野を素早く学ぶ方法？"
       ]
-    ]
+    ],
+    "sn1": "MERFISHは組織内の個々のRNA分子を、その存在する場所そのままにイメージングする。後にパイプライン全体を<a href=\"/projects/merfish\">ケーススタディ</a>として作り直した。",
+    "sn2": "Battalion S-4は500名規模の部隊の補給・整備・移動を担う — その規模での兵站は、結果的に分散システムの良い予行演習になった。"
   },
   "projects": {
     "pageTitle": "プロジェクト — Kevin Lee",
@@ -315,7 +317,9 @@
     "tradeoffsHeading": "トレードオフ",
     "tradeoffsScraping": "<strong>スクレイピングは脆い。</strong> 公式APIなしでは回避不能。",
     "tradeoffsFreeTiers": "<strong>Free tiers shape the architecture.</strong> Supabase and Vercel free tiers are generous but not infinite. Upstash Redis keeps Supabase query volume down, and batch endpoints keep Vercel invocations reasonable. At ten times the usage I'd need paid tiers or a different host.",
-    "tradeoffsDualAuth": "<strong>Dual auth is a lot for a side project.</strong> Supporting both email/password and Apple Sign-In means JWT rotation, token blacklisting, session tracking, and rate limiting across two flows. An iOS app needs it, but it's more auth code than a side project usually warrants."
+    "tradeoffsDualAuth": "<strong>Dual auth is a lot for a side project.</strong> Supporting both email/password and Apple Sign-In means JWT rotation, token blacklisting, session tracking, and rate limiting across two flows. An iOS app needs it, but it's more auth code than a side project usually warrants.",
+    "sn1": "SNOTEL — SNOwpack TELemetry — はUSDAによる、西部山岳一帯に展開された自動積雪センサーのネットワーク。",
+    "sn2": "ページ読み込み時に数十回の呼び出しが走るのは、正しさのバグではなかった。電波1本の駐車場でスマホが溶けるバグだった。"
   },
   "spacec": {
     "pageTitle": "SPACEc — Kevin Lee",
@@ -373,7 +377,9 @@
     "talkTitle": "SPACEc: A Streamlined, Interactive Python Workflow",
     "talkSub": "Stanford University · Nolan Lab",
     "linkPyPI": "PyPI →",
-    "linkGitHub": "GitHub →"
+    "linkGitHub": "GitHub →",
+    "sn1": "マルチプレックスイメージングは1枚の組織切片を40以上のタンパク質で同時に染色する — 旧来の手法では数種類しか解像できなかったところを。",
+    "sn2": "scanpyの<code>sp.tl</code>/<code>sp.pl</code>の流儀に倣うということは、scanpyを使ったことのある人なら誰でもSPACEcの構造をすでに知っている、ということだ。"
   },
   "terms": {
     "pageTitle": "利用規約 — Kevin Lee",

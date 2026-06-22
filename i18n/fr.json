@@ -103,7 +103,9 @@
         "Problème le plus intéressant ?",
         "Comment apprendre vite un nouveau domaine ?"
       ]
-    ]
+    ],
+    "sn1": "MERFISH image les molécules d'ARN individuelles là où elles se trouvent dans le tissu. J'ai ensuite reconstruit tout le pipeline sous forme d'<a href=\"/projects/merfish\">étude de cas</a>.",
+    "sn2": "Un Battalion S-4 gère l'approvisionnement, la maintenance et les mouvements d'une unité de 500 soldats — de la logistique à une échelle qui s'est révélée un bon entraînement pour les systèmes distribués."
   },
   "projects": {
     "pageTitle": "Projets — Kevin Lee",
@@ -315,7 +317,9 @@
     "tradeoffsHeading": "Compromis",
     "tradeoffsScraping": "<strong>Le scraping est fragile.</strong> Les sites changent sans prévenir. La surveillance détecte vite, mais un scraper cassé = données manquantes jusqu'à correction. Pas d'alternative sans APIs officielles.",
     "tradeoffsFreeTiers": "<strong>Les free tiers façonnent l'architecture.</strong> Supabase et Vercel sont généreux mais limités. Redis Upstash et endpoints batch gardent volume et invocations raisonnables. À 10× l'usage, il faudrait des tiers payants.",
-    "tradeoffsDualAuth": "<strong>Double auth lourde pour un side project.</strong> Email/mot de passe et Apple Sign-In : rotation JWT, blacklist, sessions, rate limiting sur deux flux. Nécessaire pour iOS, mais plus de code auth que d'habitude."
+    "tradeoffsDualAuth": "<strong>Double auth lourde pour un side project.</strong> Email/mot de passe et Apple Sign-In : rotation JWT, blacklist, sessions, rate limiting sur deux flux. Nécessaire pour iOS, mais plus de code auth que d'habitude.",
+    "sn1": "SNOTEL — SNOwpack TELemetry — est le réseau de capteurs de neige automatisés de l'USDA réparti dans les montagnes de l'Ouest.",
+    "sn2": "Des dizaines d'appels au chargement de la page n'étaient pas un bug de correction. C'était un bug qui-fond-sur-un-téléphone-au-parking-avec-une-seule-barre."
   },
   "spacec": {
     "pageTitle": "SPACEc — Kevin Lee",
@@ -373,7 +377,9 @@
     "talkTitle": "SPACEc : workflow Python interactif et rationalisé",
     "talkSub": "Stanford University · Nolan Lab",
     "linkPyPI": "PyPI →",
-    "linkGitHub": "GitHub →"
+    "linkGitHub": "GitHub →",
+    "sn1": "L'imagerie multiplexée marque une seule coupe de tissu pour 40+ protéines à la fois — là où les méthodes plus anciennes n'en résolvaient qu'une poignée.",
+    "sn2": "Suivre la convention <code>sp.tl</code>/<code>sp.pl</code> de scanpy signifie que quiconque a déjà utilisé scanpy connaît déjà la forme de SPACEc."
   },
   "terms": {
     "pageTitle": "Conditions d'utilisation — Kevin Lee",

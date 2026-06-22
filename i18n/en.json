@@ -103,7 +103,9 @@
         "What's the most interesting problem you've worked on?",
         "How do you learn new domains quickly?"
       ]
-    ]
+    ],
+    "sn1": "MERFISH images individual RNA molecules right where they sit in tissue. I later rebuilt the whole pipeline as a <a href=\"/projects/merfish\">case study</a>.",
+    "sn2": "A Battalion S-4 runs supply, maintenance, and movement for a 500-soldier unit — logistics at a scale that turned out to be good practice for distributed systems."
   },
   "projects": {
     "pageTitle": "Projects — Kevin Lee",
@@ -313,7 +315,9 @@
     "tradeoffsHeading": "Tradeoffs",
     "tradeoffsScraping": "<strong>Scraping is fragile.</strong> Resort sites change without warning. Monitoring catches the failures quickly, but a broken scraper still means missing data until I fix the parser. There's no way around that without official APIs.",
     "tradeoffsFreeTiers": "<strong>Free tiers shape the architecture.</strong> Supabase and Vercel free tiers are generous but not infinite. Upstash Redis keeps Supabase query volume down, and batch endpoints keep Vercel invocations reasonable. At ten times the usage I'd need paid tiers or a different host.",
-    "tradeoffsDualAuth": "<strong>Dual auth is a lot for a side project.</strong> Supporting both email/password and Apple Sign-In means JWT rotation, token blacklisting, session tracking, and rate limiting across two flows. An iOS app needs it, but it's more auth code than a side project usually warrants."
+    "tradeoffsDualAuth": "<strong>Dual auth is a lot for a side project.</strong> Supporting both email/password and Apple Sign-In means JWT rotation, token blacklisting, session tracking, and rate limiting across two flows. An iOS app needs it, but it's more auth code than a side project usually warrants.",
+    "sn1": "SNOTEL — SNOwpack TELemetry — is the USDA’s network of automated snow sensors across the western mountains.",
+    "sn2": "Dozens of calls on page load wasn’t a correctness bug. It was a melts-on-a-phone-in-the-parking-lot-with-one-bar bug."
   },
   "spacec": {
     "pageTitle": "SPACEc — Kevin Lee",
@@ -371,7 +375,9 @@
     "talkTitle": "SPACEc: A Streamlined, Interactive Python Workflow",
     "talkSub": "Stanford University · Nolan Lab",
     "linkPyPI": "PyPI →",
-    "linkGitHub": "GitHub →"
+    "linkGitHub": "GitHub →",
+    "sn1": "Multiplexed imaging stains a single tissue section for 40+ proteins at once — where older methods could resolve only a handful.",
+    "sn2": "Following scanpy’s <code>sp.tl</code>/<code>sp.pl</code> convention means anyone who has used scanpy already knows the shape of SPACEc."
   },
   "terms": {
     "pageTitle": "Terms of Service — Kevin Lee",

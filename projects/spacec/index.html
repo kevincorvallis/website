@@ -379,10 +379,12 @@
 
         <h2 data-i18n="spacec.problemHeading">The Problem</h2>
         <p data-i18n="spacec.problemP1">Multiplexed imaging lets researchers see 40+ proteins in a single tissue section, which matters for studying how cells interact in cancer, autoimmunity, and neuroscience. But the analysis is stitched together from separate tools: Cellpose for segmentation, scanpy for clustering, custom scripts for spatial analysis, matplotlib for visualization.</p>
+        <aside class="mfx-sn"><span data-i18n-html="spacec.sn1">Multiplexed imaging stains a single tissue section for 40+ proteins at once — where older methods could resolve only a handful.</span></aside>
         <p data-i18n="spacec.problemP2">That means more time spent wrangling code than doing science. Each lab ends up with its own collection of notebooks that break when a dependency updates.</p>
 
         <h2 data-i18n="spacec.ideaHeading">The Idea</h2>
         <p data-i18n-html="spacec.ideaP">One library that handles the whole workflow, from raw TIFF images to spatial results, behind a consistent API. SPACEc follows the scanpy convention: <code>sp.tl</code> (tools), <code>sp.pp</code> (preprocessing), <code>sp.pl</code> (plotting), <code>sp.hf</code> (helpers). It's built on AnnData, the standard format in single-cell biology.</p>
+        <aside class="mfx-sn"><span data-i18n-html="spacec.sn2">Following scanpy’s <code>sp.tl</code>/<code>sp.pl</code> convention means anyone who has used scanpy already knows the shape of SPACEc.</span></aside>
 
         <hr>
 
