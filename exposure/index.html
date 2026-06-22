@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Exposure Triangle — Kevin Lee</title>
+    <meta name="description" content="An interactive on aperture, shutter, and ISO — the three dials behind every photograph — played out on a frame from an Oregon road.">
+    <meta name="author" content="Kevin Lee">
+    <link rel="canonical" href="https://klee.page/exposure/">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://klee.page/exposure/">
+    <meta property="og:title" content="The Exposure Triangle — Kevin Lee">
+    <meta property="og:description" content="Aperture, shutter, ISO — drag the three dials and watch light, depth, motion, and grain trade off in real time.">
+    <meta property="og:image" content="https://klee.page/film/images/oregon-01.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Exposure Triangle — Kevin Lee">
+    <meta name="twitter:description" content="Aperture, shutter, ISO — drag the three dials and watch light, depth, motion, and grain trade off in real time.">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <script>
+        (function () {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.12);
+            --track: rgba(31, 30, 29, 0.14);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            color-scheme: light dark;
+        }
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.1);
+            --track: rgba(240, 238, 230, 0.16);
+        }
+
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.7;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        ::selection { background: rgba(0, 100, 255, 0.26); color: inherit; }
+
+        a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s ease, opacity 0.2s ease; }
+        a:hover { opacity: 0.6; }
+
+        .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0 0.5rem; }
+        .back-link { font-size: 15px; text-decoration: none; opacity: 0.5; transition: opacity 0.2s ease; }
+        .back-link:hover { opacity: 0.85; }
+        .toggle-wrap input { display: none; }
+        .toggle-wrap label {
+            position: relative; display: block; width: 40px; height: 20px;
+            background: var(--text); border-radius: 10px; cursor: pointer; transition: background-color 0.5s ease;
+        }
+        .toggle-wrap label::after {
+            content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px;
+            background: var(--bg); border-radius: 50%; transition: transform 0s, background-color 0.5s ease;
+        }
+        .toggle-wrap label.has-transition::after { transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), background-color 0.5s ease; }
+        .toggle-wrap input:checked + label::after { transform: translateX(20px); }
+
+        /* Masthead */
+        .masthead { text-align: center; padding: 2.5rem 0 1.5rem; }
+        .kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+        h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.6rem, 9vw, 4.5rem); line-height: 0.95; letter-spacing: -0.02em; font-style: italic; }
+        .dek { font-size: 18px; color: var(--caption); max-width: 460px; margin: 1.1rem auto 0; line-height: 1.6; }
+
+        .prose p { margin: 0 auto 1.25rem; max-width: 620px; }
+        .prose p:last-child { margin-bottom: 0; }
+        .prose em { font-style: italic; }
+        .prose strong { font-weight: 600; }
+
+        .divider { width: 40px; height: 1px; background: var(--accent); margin: 3rem auto; opacity: 0.5; }
+
+        /* ===== Widget ===== */
+        .lab { margin: 2.5rem auto; max-width: 640px; }
+        .stage {
+            position: relative; width: 100%; max-width: 400px; margin: 0 auto;
+            aspect-ratio: 522 / 797; border-radius: 4px; overflow: hidden;
+            background: #0d0d0c; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+        }
+        .stage .frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: filter; }
+        .stage .frame.back { filter: blur(0px) url(#motionblur) brightness(1); }
+        .stage .frame.front {
+            filter: url(#motionblur) brightness(1);
+            -webkit-mask-image: radial-gradient(ellipse 58% 46% at 50% 44%, #000 38%, transparent 78%);
+            mask-image: radial-gradient(ellipse 58% 46% at 50% 44%, #000 38%, transparent 78%);
+        }
+        .grain {
+            position: absolute; inset: -50%; width: 200%; height: 200%;
+            pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
+            background-repeat: repeat; background-size: 150px 150px;
+        }
+        .badge {
+            position: absolute; bottom: 8px; left: 8px; right: 8px;
+            display: flex; justify-content: space-between; gap: 8px;
+            font-family: var(--font); font-size: 11px; letter-spacing: 0.08em;
+            color: #f3efe6; text-shadow: 0 1px 3px rgba(0,0,0,0.7); pointer-events: none;
+        }
+        .badge span { background: rgba(0,0,0,0.32); padding: 2px 7px; border-radius: 3px; backdrop-filter: blur(2px); }
+
+        /* Meter */
+        .meter { max-width: 400px; margin: 1rem auto 0; text-align: center; }
+        .meter-bar { position: relative; height: 6px; border-radius: 3px; background: linear-gradient(90deg,#2a2a44 0%, var(--track) 50%, #d9a23f 100%); }
+        .meter-needle { position: absolute; top: -4px; width: 2px; height: 14px; background: var(--text); left: 50%; transform: translateX(-50%); transition: left 0.18s ease, background-color 0.3s ease; }
+        .meter-verdict { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 0.6rem; color: var(--caption); transition: color 0.3s ease; }
+        .meter-verdict.ok { color: var(--accent); }
+
+        /* Dials */
+        .dials { max-width: 440px; margin: 1.8rem auto 0; display: flex; flex-direction: column; gap: 1.4rem; }
+        .dial-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.35rem; }
+        .dial-name { font-size: 12px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+        .dial-val { font-family: var(--font-display); font-size: 22px; font-weight: 600; }
+        .dial-sub { font-size: 12px; color: var(--caption); margin-top: 0.25rem; }
+        input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; border-radius: 2px; background: var(--track); outline: none; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); cursor: pointer; transition: transform 0.15s ease; }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+        input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); cursor: pointer; }
+        .reset { display: block; margin: 1.6rem auto 0; background: none; border: 1px solid var(--rule); border-radius: 8px; color: var(--caption); font-family: var(--font); font-size: 14px; padding: 8px 18px; cursor: pointer; transition: border-color 0.2s ease, color 0.2s ease; }
+        .reset:hover { border-color: var(--accent); color: var(--accent); }
+
+        .section-label { text-align: center; font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+        h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 6vw, 2.6rem); text-align: center; letter-spacing: -0.01em; font-style: italic; margin-bottom: 1.5rem; }
+
+        footer { text-align: center; padding: 4rem 0 3rem; border-top: 1px solid var(--rule); margin-top: 4rem; }
+        footer p { font-size: 13px; color: var(--caption); }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition-duration: 0.01ms !important; }
+            .frame { will-change: auto; }
+        }
+        @media (max-width: 600px) { body { font-size: 18px; } .stage { max-width: 320px; } }
+    </style>
+</head>
+<body>
+    <!-- hidden SVG filter: horizontal motion blur driven by shutter speed -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <filter id="motionblur" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur id="mb" in="SourceGraphic" stdDeviation="0 0"/>
+        </filter>
+    </svg>
+
+    <div class="wrap">
+        <header>
+            <a href="/" class="back-link">&larr; klee.page</a>
+            <div class="toggle-wrap">
+                <input type="checkbox" id="theme-toggle">
+                <label for="theme-toggle"></label>
+            </div>
+        </header>
+
+        <div class="masthead">
+            <p class="kicker">An Interactive</p>
+            <h1>The Exposure Triangle</h1>
+            <p class="dek">Aperture, shutter, ISO. Three dials, one budget of light. Drag them and watch a photograph change its mind.</p>
+        </div>
+
+        <div class="prose">
+            <p>Every photograph is a negotiation. The film (or sensor) needs a certain amount of light to make a correct picture &mdash; too little and it&rsquo;s a muddy underexposure, too much and the highlights blow out to white. You have exactly three ways to control that light, and the catch is that each one changes something <em>else</em> about the image. That trade-off is the whole craft. Photographers call it the exposure triangle.</p>
+            <p>Here&rsquo;s a frame I shot on a road through the Oregon redwoods. Move the three dials below and watch what each one costs.</p>
+        </div>
+
+        <div class="lab">
+            <div class="stage" id="stage">
+                <img class="frame back" id="frameBack" src="/film/images/oregon-01.jpg" alt="A road receding through Oregon redwoods toward a bright clearing" crossorigin="anonymous">
+                <img class="frame front" id="frameFront" src="/film/images/oregon-01.jpg" alt="" aria-hidden="true">
+                <div class="grain" id="grain"></div>
+                <div class="badge">
+                    <span id="badgeAp">f/5.6</span>
+                    <span id="badgeSh">1/125</span>
+                    <span id="badgeIso">ISO 200</span>
+                </div>
+            </div>
+
+            <div class="meter">
+                <div class="meter-bar"><div class="meter-needle" id="needle"></div></div>
+                <div class="meter-verdict ok" id="verdict">Balanced exposure</div>
+            </div>
+
+            <div class="dials">
+                <div class="dial">
+                    <div class="dial-head"><span class="dial-name">Aperture</span><span class="dial-val" id="valAp">f/5.6</span></div>
+                    <input type="range" id="ap" min="0" max="7" step="1" value="4" aria-label="Aperture">
+                    <div class="dial-sub" id="subAp">Wider opening &rarr; more light, shallower depth of field.</div>
+                </div>
+                <div class="dial">
+                    <div class="dial-head"><span class="dial-name">Shutter</span><span class="dial-val" id="valSh">1/125</span></div>
+                    <input type="range" id="sh" min="0" max="10" step="1" value="3" aria-label="Shutter speed">
+                    <div class="dial-sub" id="subSh">Slower &rarr; more light, but motion smears.</div>
+                </div>
+                <div class="dial">
+                    <div class="dial-head"><span class="dial-name">ISO</span><span class="dial-val" id="valIso">200</span></div>
+                    <input type="range" id="iso" min="0" max="5" step="1" value="1" aria-label="ISO">
+                    <div class="dial-sub" id="subIso">Higher &rarr; more sensitivity, more grain.</div>
+                </div>
+            </div>
+            <button class="reset" id="reset">Reset to a balanced exposure</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="section-label">Dial one</p>
+        <h2>Aperture &mdash; depth</h2>
+        <div class="prose">
+            <p>Aperture is the size of the hole the light comes through, written as an f-number. The confusing part: <em>smaller</em> numbers mean <em>wider</em> openings. f/1.4 is a bucket; f/16 is a pinhole. Open it up and you let in a flood of light &mdash; but you also shrink the slice of the scene that&rsquo;s in focus. That&rsquo;s why a portrait at f/1.4 melts the background into a creamy blur, and why a landscape shooter stops down to f/11 to keep the whole valley sharp. On the road above, watch the redwoods at the edges soften as you open up, while the center holds.</p>
+        </div>
+
+        <p class="section-label">Dial two</p>
+        <h2>Shutter &mdash; time</h2>
+        <div class="prose">
+            <p>Shutter speed is how long the window stays open. A fast shutter (1/1000s) freezes a hummingbird mid-beat; a slow one (1/15s) lets light pile up but turns anything moving &mdash; or any shake in your hands &mdash; into a smear. It&rsquo;s the most physical of the three: you can feel the trade between gathering light and holding still. Slow this dial down and the frame starts to drag.</p>
+        </div>
+
+        <p class="section-label">Dial three</p>
+        <h2>ISO &mdash; sensitivity</h2>
+        <div class="prose">
+            <p>ISO is how hungry the film or sensor is for light. Crank it and you can shoot in near-darkness without touching the other two dials &mdash; the cost is grain (on film) or noise (on a sensor), that gritty texture that creeps into the shadows. ISO 100 is glassy and clean; ISO 3200 is a snowstorm. Sometimes that grain is the look you want. Often it&rsquo;s the tax you pay for shooting after sunset.</p>
+        </div>
+
+        <p class="section-label">The triangle</p>
+        <h2>Reciprocity</h2>
+        <div class="prose">
+            <p>Here&rsquo;s the trick that ties it together: the three dials are <strong>interchangeable units of light</strong>. Open the aperture one stop and you can speed the shutter one stop to match &mdash; same brightness, but now with shallower focus and frozen motion. Every exposure is one of infinitely many that hit the same total. That&rsquo;s the meter above: it doesn&rsquo;t care <em>how</em> you spend the light, only that the budget balances.</p>
+            <p>So a photograph isn&rsquo;t really a picture of a place. It&rsquo;s a record of three decisions about light &mdash; how deep, how fast, how clean &mdash; made in the half-second before the shutter fell. Try to land the meter back on <em>balanced</em> using a completely different set of dials than the default. There&rsquo;s no single right answer. That&rsquo;s the whole point.</p>
+        </div>
+
+        <footer>
+            <p>A frame from <a href="/film/">the film work</a> &middot; more letters at <a href="/newsletter/">Dispatch</a> &middot; <a href="/">klee.page</a></p>
+        </footer>
+    </div>
+
+    <script src="/js/theme.js"></script>
+    <script>
+    (function () {
+        var APERTURES = [
+            { f: '1.4', dof: 11.5 }, { f: '2', dof: 9.5 }, { f: '2.8', dof: 7.5 },
+            { f: '4', dof: 5.5 }, { f: '5.6', dof: 4 }, { f: '8', dof: 2.4 },
+            { f: '11', dof: 1.1 }, { f: '16', dof: 0 }
+        ];
+        // index 4 = f/5.6 is the aperture reference (0 stops)
+        var AP_REF = 4;
+        var SHUTTERS = [
+            { label: '1/1000', stops: -3 }, { label: '1/500', stops: -2 }, { label: '1/250', stops: -1 },
+            { label: '1/125', stops: 0 }, { label: '1/60', stops: 1 }, { label: '1/30', stops: 2 },
+            { label: '1/15', stops: 3 }, { label: '1/8', stops: 4 }, { label: '1/4', stops: 5 },
+            { label: '1/2', stops: 6 }, { label: '1s', stops: 7 }
+        ];
+        var ISOS = [100, 200, 400, 800, 1600, 3200]; // index 1 = 200 reference
+
+        var els = {
+            back: document.getElementById('frameBack'),
+            front: document.getElementById('frameFront'),
+            grain: document.getElementById('grain'),
+            mb: document.getElementById('mb'),
+            ap: document.getElementById('ap'), sh: document.getElementById('sh'), iso: document.getElementById('iso'),
+            valAp: document.getElementById('valAp'), valSh: document.getElementById('valSh'), valIso: document.getElementById('valIso'),
+            badgeAp: document.getElementById('badgeAp'), badgeSh: document.getElementById('badgeSh'), badgeIso: document.getElementById('badgeIso'),
+            needle: document.getElementById('needle'), verdict: document.getElementById('verdict'),
+            reset: document.getElementById('reset')
+        };
+
+        // Build a film-grain tile once and reuse it.
+        (function makeGrain() {
+            var n = 150, c = document.createElement('canvas');
+            c.width = n; c.height = n;
+            var ctx = c.getContext('2d'), img = ctx.createImageData(n, n);
+            for (var i = 0; i < img.data.length; i += 4) {
+                var v = (Math.random() * 255) | 0;
+                img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+                img.data[i + 3] = 255;
+            }
+            ctx.putImageData(img, 0, 0);
+            els.grain.style.backgroundImage = 'url(' + c.toDataURL() + ')';
+        })();
+
+        function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+        function render() {
+            var a = +els.ap.value, s = +els.sh.value, i = +els.iso.value;
+            var ap = APERTURES[a], sh = SHUTTERS[s], iso = ISOS[i];
+
+            // light contribution, in stops, relative to the balanced default (f5.6, 1/125, ISO200)
+            var apStops = AP_REF - a;            // wider (lower index) => +light
+            var shStops = sh.stops;              // slower => +light
+            var isoStops = Math.log2(iso / 200); // faster ISO => +light
+            var total = apStops + shStops + isoStops;
+
+            // exposure -> brightness (clamped so it stays legible at the extremes)
+            var brightness = clamp(Math.pow(2, total * 0.62), 0.32, 2.9);
+
+            // depth of field: wider aperture blurs the surrounding frame
+            var dof = ap.dof;
+            // motion blur: anything slower than ~1/250 starts to smear
+            var motion = clamp((s - 2) * 1.9, 0, 18);
+            // grain from ISO
+            var grain = clamp(0.05 + i * 0.085, 0.05, 0.5);
+
+            els.mb.setAttribute('stdDeviation', motion.toFixed(2) + ' 0');
+            els.back.style.filter = 'blur(' + dof.toFixed(1) + 'px) url(#motionblur) brightness(' + brightness.toFixed(3) + ')';
+            els.front.style.filter = 'url(#motionblur) brightness(' + brightness.toFixed(3) + ')';
+            els.grain.style.opacity = grain.toFixed(3);
+
+            els.valAp.textContent = 'f/' + ap.f;
+            els.valSh.textContent = sh.label;
+            els.valIso.textContent = iso;
+            els.badgeAp.textContent = 'f/' + ap.f;
+            els.badgeSh.textContent = sh.label;
+            els.badgeIso.textContent = 'ISO ' + iso;
+
+            // meter: clamp the displayed needle to +/-3 stops
+            var shown = clamp(total, -3, 3);
+            els.needle.style.left = ((shown + 3) / 6 * 100) + '%';
+            var ok = Math.abs(total) < 0.34;
+            els.verdict.textContent = ok ? 'Balanced exposure'
+                : (total > 0 ? 'Overexposed +' + total.toFixed(1) + ' stops'
+                             : 'Underexposed ' + total.toFixed(1) + ' stops');
+            els.verdict.classList.toggle('ok', ok);
+        }
+
+        ['ap', 'sh', 'iso'].forEach(function (k) { els[k].addEventListener('input', render); });
+        els.reset.addEventListener('click', function () {
+            els.ap.value = 4; els.sh.value = 3; els.iso.value = 1; render();
+        });
+        render();
+    })();
+    </script>
+</body>
+</html>
