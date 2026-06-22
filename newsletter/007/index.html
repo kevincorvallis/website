@@ -380,6 +380,45 @@
         .morph.is-morph .morph-ghibli { position: absolute; inset: 0; margin: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; will-change: opacity; }
         .morph.is-morph .morph-pair { overflow: hidden; border-radius: 3px; }
 
+        /* ========== BEFORE/AFTER SLIDER (drag: photo ↔ Ghibli) ========== */
+        .ba { max-width: 620px; margin: 0 auto; padding: 1rem 1.5rem; }
+        .ba-stage {
+            --ba-pos: 50%;
+            position: relative; max-width: 560px; margin: 0 auto;
+            border-radius: 3px; overflow: hidden; touch-action: pan-y;
+            cursor: ew-resize; -webkit-user-select: none; user-select: none;
+            box-shadow: 0 18px 60px -22px rgba(31,30,29,0.45), 0 4px 12px -4px rgba(31,30,29,0.15);
+        }
+        [data-theme="dark"] .ba-stage { box-shadow: 0 18px 60px -22px rgba(0,0,0,0.6); }
+        .ba-img { width: 100%; height: auto; display: block; -webkit-user-drag: none; user-select: none; pointer-events: none; }
+        .ba-over { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--ba-pos)) 0 0); }
+        .ba-over .ba-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .ba-tag {
+            position: absolute; top: 0.6rem; z-index: 3; font-family: var(--mono); font-size: 9px;
+            letter-spacing: 0.16em; text-transform: uppercase; color: #fff;
+            background: rgba(0,0,0,0.42); padding: 3px 9px; border-radius: 100px;
+            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); pointer-events: none;
+        }
+        .ba-tag.left { left: 0.6rem; } .ba-tag.right { right: 0.6rem; }
+        .ba-handle {
+            position: absolute; top: 0; bottom: 0; left: var(--ba-pos); width: 46px;
+            transform: translateX(-50%); background: none; border: 0; padding: 0; margin: 0;
+            cursor: ew-resize; display: grid; place-items: center; z-index: 4;
+        }
+        .ba-handle::before {
+            content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px;
+            transform: translateX(-50%); background: rgba(255,255,255,0.92); box-shadow: 0 0 0 1px rgba(0,0,0,0.18);
+        }
+        .ba-knob {
+            position: relative; width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(255,255,255,0.96); color: #1f1e1d; display: grid; place-items: center;
+            font-size: 15px; line-height: 1; box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+        }
+        .ba-handle:focus-visible { outline: none; }
+        .ba-handle:focus-visible .ba-knob { box-shadow: 0 0 0 3px var(--accent), 0 2px 12px rgba(0,0,0,0.35); }
+        .ba-cap { margin-top: 0.75rem; text-align: center; color: var(--caption); font-size: 14px; line-height: 1.5; transition: color 0.3s ease; }
+        .ba-cap .ba-hint { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+
         /* ========== CHAPTERS ========== */
         .chapter { position: relative; padding: 4rem 0 3rem; }
         .chapter > * { width: 100%; }
@@ -1270,20 +1309,24 @@
             </div>
         </div>
 
-        <figure class="morph reveal-fade">
-            <div class="morph-pair">
-                <img class="morph-img morph-real" src="/newsletter/007/images/family-selfie.jpg" loading="lazy"
+        <figure class="ba reveal-fade">
+            <div class="ba-stage">
+                <img class="ba-img ba-base" src="/newsletter/007/images/family-selfie.jpg" loading="lazy"
                     data-alt-en="Selfie of Kevin, his dad, and Justin in stadium seats with giant Korea and Mexico flags spread on the pitch below"
                     data-alt-ko="아래 잔디에 펼쳐진 거대한 한국·멕시코 국기 위, 관중석에 앉은 케빈, 아버지, 저스틴의 셀카"
                     alt="Selfie of Kevin, his dad, and Justin in stadium seats with giant Korea and Mexico flags spread on the pitch below">
-                <img class="morph-img morph-ghibli" src="/newsletter/007/images/family-selfie-ghibli.jpg" loading="lazy"
-                    data-alt-en="The three-generation selfie redrawn as a Studio Ghibli-style illustration"
-                    data-alt-ko="3대 셀카를 지브리풍 일러스트로 다시 그린 모습"
-                    alt="The three-generation selfie redrawn as a Studio Ghibli-style illustration">
+                <div class="ba-over">
+                    <img class="ba-img" src="/newsletter/007/images/family-selfie-ghibli.jpg" loading="lazy" aria-hidden="true" alt="">
+                </div>
+                <span class="ba-tag left" aria-hidden="true">Ghibli</span>
+                <span class="ba-tag right" aria-hidden="true">Photo</span>
+                <button class="ba-handle" type="button" role="slider" aria-label="Slide between the photo and its Studio Ghibli version" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+                    <span class="ba-knob" aria-hidden="true">&#8703;</span>
+                </button>
             </div>
-            <figcaption class="morph-cap">
-                <span data-l="en">three generations, two flags, one afternoon we won't forget (score notwithstanding)</span>
-                <span data-l="ko">3대, 두 깃발, 스코어와 무관하게 잊지 못할 한 오후</span>
+            <figcaption class="ba-cap">
+                <span data-l="en">three generations, two flags &mdash; <span class="ba-hint">drag</span> between the photo and the Ghibli of it.</span>
+                <span data-l="ko">3대, 두 깃발 &mdash; 사진과 지브리 버전 사이를 <span class="ba-hint">드래그</span>해 보세요.</span>
             </figcaption>
         </figure>
 
@@ -2375,6 +2418,41 @@
         }
     </script>
 
+    <script>
+        // Before/after slider — drag (or arrow-key) to wipe between the photo and its Ghibli.
+        (function () {
+            document.querySelectorAll('.ba').forEach(function (ba) {
+                var stage = ba.querySelector('.ba-stage');
+                var handle = ba.querySelector('.ba-handle');
+                if (!stage || !handle) return;
+                var pos = 50, dragging = false;
+                function set(p) {
+                    pos = Math.max(0, Math.min(100, p));
+                    stage.style.setProperty('--ba-pos', pos + '%');
+                    handle.setAttribute('aria-valuenow', Math.round(pos));
+                }
+                function fromX(clientX) {
+                    var r = stage.getBoundingClientRect();
+                    set(((clientX - r.left) / r.width) * 100);
+                }
+                stage.addEventListener('pointerdown', function (e) {
+                    dragging = true;
+                    try { stage.setPointerCapture(e.pointerId); } catch (x) {}
+                    fromX(e.clientX); e.preventDefault();
+                });
+                stage.addEventListener('pointermove', function (e) { if (dragging) fromX(e.clientX); });
+                stage.addEventListener('pointerup', function () { dragging = false; });
+                stage.addEventListener('pointercancel', function () { dragging = false; });
+                handle.addEventListener('keydown', function (e) {
+                    if (e.key === 'ArrowLeft') { set(pos - 4); e.preventDefault(); }
+                    else if (e.key === 'ArrowRight') { set(pos + 4); e.preventDefault(); }
+                    else if (e.key === 'Home') { set(0); e.preventDefault(); }
+                    else if (e.key === 'End') { set(100); e.preventDefault(); }
+                });
+                set(50);
+            });
+        })();
+    </script>
     <script src="/js/microfeatures.js" defer></script>
 </body>
 </html>
