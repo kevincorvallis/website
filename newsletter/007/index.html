@@ -326,6 +326,59 @@
         }
         [data-lang="ko"] .issue-lede { font-size: clamp(1.45rem, 5vw, 2.25rem); line-height: 1.45; }
 
+        /* ========== MASTHEAD (dispatch cold open — replaces the splash + video hero) ========== */
+        .masthead { max-width: 620px; margin: 0 auto; padding: 7rem 1.5rem 2.5rem; }
+        @media (max-width: 768px) { .masthead { padding: 5.5rem 1.5rem 2rem; } }
+        .mast-kicker {
+            display: flex; align-items: center; gap: 0.7em;
+            font-family: var(--mono); font-size: 11px; font-weight: 600;
+            letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent);
+            margin-bottom: 1.5rem; transition: color 0.3s ease;
+        }
+        .mast-kicker .mast-no { color: var(--caption); letter-spacing: 0.18em; }
+        .mast-dateline {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 0.55em;
+            font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em;
+            text-transform: uppercase; color: var(--caption);
+            margin-bottom: 1.7rem; transition: color 0.3s ease;
+        }
+        .mast-dateline .mast-prompt { color: var(--accent); font-weight: 600; }
+        .mast-title {
+            font-family: var(--font-display); font-style: italic; font-weight: 700;
+            font-size: clamp(3.5rem, 16vw, 7rem); letter-spacing: -0.03em; line-height: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        .mast-lede {
+            font-size: 19px; line-height: 1.6; color: var(--text);
+            max-width: 32em; transition: color 0.3s ease;
+        }
+        [data-lang="ko"] .mast-lede { font-size: 18px; line-height: 1.7; }
+        .mast-rule { width: 48px; height: 2px; background: var(--accent); opacity: 0.7; margin-top: 2.3rem; transition: background-color 0.3s ease; }
+        @media (prefers-reduced-motion: no-preference) {
+            .masthead { animation: mast-in 1s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+            @keyframes mast-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        }
+
+        /* ========== REAL → GHIBLI MORPH (scroll cross-dissolve) ========== */
+        .morph { max-width: 620px; margin: 0 auto; padding: 1rem 1.5rem; }
+        .morph-pair { position: relative; max-width: 560px; margin: 0 auto; }
+        .morph-img {
+            width: 100%; height: auto; display: block; border-radius: 3px;
+            background: #fff; padding: 6px;
+            box-shadow: 0 18px 60px -22px rgba(31,30,29,0.45), 0 4px 12px -4px rgba(31,30,29,0.15);
+        }
+        [data-theme="dark"] .morph-img { background: #2a2826; box-shadow: 0 18px 60px -22px rgba(0,0,0,0.6); }
+        /* default (reduced-motion / no enhancement): the two photos simply stack */
+        .morph-ghibli { margin-top: 1rem; }
+        .morph-cap { margin-top: 0.75rem; text-align: center; color: var(--caption); font-size: 14px; line-height: 1.5; transition: color 0.3s ease; }
+        .morph-hint {
+            font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--accent); margin-left: 0.4em; opacity: 0.8;
+        }
+        .morph:not(.is-morph) .morph-hint { display: none; }
+        /* enhanced: ghibli lifts over the real photo and cross-dissolves on scroll */
+        .morph.is-morph .morph-ghibli { position: absolute; inset: 0; margin: 0; opacity: 0; will-change: opacity; }
+
         /* ========== CHAPTERS ========== */
         .chapter { position: relative; padding: 4rem 0 3rem; }
         .chapter > * { width: 100%; }
@@ -939,44 +992,6 @@
 
     <div class="gate-light" id="gateLight"></div>
 
-    <!-- ==================== WELCOME INTERSTITIAL — gol (Estadio) ==================== -->
-    <div class="estadio" id="estadio">
-        <div class="estadio-floods" id="estadioFloods" aria-hidden="true"></div>
-        <div class="estadio-stars" id="estadioStars" aria-hidden="true"></div>
-        <canvas class="estadio-fx" id="estadioFx" aria-hidden="true"></canvas>
-        <div class="estadio-content">
-            <p class="estadio-word" id="estadioWord">gol</p>
-            <p class="estadio-romaji" id="estadioRomaji">goal</p>
-            <p class="estadio-noun" id="estadioNoun">noun &middot; Spanish</p>
-            <p class="estadio-meaning" id="estadioMeaning">
-                <span data-l="en">What fifty thousand people scream when the ball finally does what you came for. Also what your dad yells when the parking lot opens before kickoff.</span>
-                <span data-l="ko">공이 드디어 당신이 온 이유대로 움직일 때 오만 명이 외치는 말. 킥오프 전 주차장이 열릴 때 아버지가 외치는 말이기도 하다.</span>
-            </p>
-            <div class="estadio-divider" id="estadioDivider"></div>
-            <p class="estadio-tagline" id="estadioTagline">
-                <span data-l="en">A letter for friends and family.</span>
-                <span data-l="ko">친구와 가족에게 보내는 편지.</span>
-            </p>
-            <div class="estadio-play" id="estadioPlay">
-                <div class="estadio-modes" role="group" aria-label="Crowd colors">
-                    <button type="button" class="efx-mode active" data-mode="korea" aria-pressed="true">
-                        <span class="efx-dot kr" aria-hidden="true"></span><span data-l="en">Korea</span><span data-l="ko">한국</span>
-                    </button>
-                    <button type="button" class="efx-mode" data-mode="mexico" aria-pressed="false">
-                        <span class="efx-dot mx" aria-hidden="true"></span><span data-l="en">M&eacute;xico</span><span data-l="ko">멕시코</span>
-                    </button>
-                </div>
-                <span class="efx-hint">
-                    <span data-l="en">drag to sweep the lights</span><span data-l="ko">드래그해서 조명 비추기</span>
-                </span>
-            </div>
-            <button class="estadio-dismiss" id="estadioDismiss">
-                <span data-l="en">Continue &rarr;</span>
-                <span data-l="ko">계속 &rarr;</span>
-            </button>
-        </div>
-    </div>
-
     <!-- Progress Bar -->
     <div class="progress-bar" id="progressBar"></div>
 
@@ -994,44 +1009,24 @@
         </div>
     </div>
 
-    <!-- ==================== HERO ==================== -->
-    <section class="hero" id="heroSection">
-        <video class="hero-video" id="heroVideo" autoplay muted loop playsinline preload="auto" poster="/newsletter/007/images/flag-ceremony.jpg" aria-hidden="true">
-            <source src="/newsletter/007/images/flight-clouds.mp4" type="video/mp4">
-        </video>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-label">
-                <span data-l="en">Dispatch 007 &middot; June 2026</span>
-                <span data-l="ko">디스패치 007 &middot; 2026년 6월</span>
-            </div>
-            <h1 class="hero-title" style="font-style: italic;">
-                <span data-l="en">Leave</span>
-                <span data-l="ko">휴가</span>
-            </h1>
-            <p class="hero-description">
-                <span data-l="en">first PTO from Paramount, three generations in Guadalajara, and a World Cup that rewired my nervous system</span>
-                <span data-l="ko">파라마운트 첫 PTO, 과달라하라 3대, 그리고 신경계를 다시 배선한 월드컵</span>
-            </p>
-        </div>
-        <div class="scroll-hint">
-            <span data-l="en">Scroll</span>
-            <span data-l="ko">스크롤</span>
-            <div class="scroll-line"></div>
-        </div>
-    </section>
-
-    <!-- ==================== ISSUE 007 — dateline + lede ==================== -->
-    <div class="issue-intro reveal">
-        <p class="issue-dateline">
-            <span data-l="en">Guadalajara, M&eacute;xico &middot; June 20, 2026</span>
-            <span data-l="ko">멕시코 과달라하라 &middot; 2026년 6월 20일</span>
+    <!-- ==================== MASTHEAD — dispatch cold open (no splash) ==================== -->
+    <header class="masthead">
+        <p class="mast-kicker">
+            <span data-l="en">Dispatch</span><span data-l="ko">디스패치</span>
+            <span class="mast-no">No. 007</span>
         </p>
-        <p class="issue-lede">
-            <span data-l="en">last month I teased Korea&ndash;Mexico. we went. we lost 0&ndash;1. still insane.</span>
-            <span data-l="ko">지난달 한&ndash;멕 경기를 예고했다. 갔다. 0&ndash;1로 졌다. 그래도 미쳤다.</span>
+        <p class="mast-dateline">
+            <span data-l="en">Guadalajara, Jalisco</span><span data-l="ko">할리스코주 과달라하라</span>
+            <span class="mast-prompt" aria-hidden="true">&#10095;</span>
+            <span data-l="en">June 2026</span><span data-l="ko">2026년 6월</span>
         </p>
-    </div>
+        <h1 class="mast-title"><span data-l="en">Leave</span><span data-l="ko">휴가</span></h1>
+        <p class="mast-lede">
+            <span data-l="en">First PTO from Paramount &mdash; four days, no laptop, three generations at a World Cup in Guadalajara. I came home rewired, and still not over a 0&ndash;1.</span>
+            <span data-l="ko">파라마운트 첫 PTO &mdash; 나흘, 노트북 없이, 과달라하라 월드컵의 3대. 신경계가 다시 배선된 채 돌아왔고, 0&ndash;1은 아직도 못 잊는다.</span>
+        </p>
+        <div class="mast-rule" aria-hidden="true"></div>
+    </header>
 
     <div class="divider reveal-fade"></div>
 
@@ -1207,26 +1202,24 @@
                 <p>이게 과달라하라에서 시작된 건 아니다. 나는 동그란 안경 쓰고 초등학교 정문 앞에 서 있던 꼬마 때부터 대한민국 팀이었다 &mdash; 같은 눈매, 훨씬 작은 유니폼.</p>
             </div>
         </div>
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/young-me-ghibli.jpg" loading="lazy"
-                data-alt-en="Studio-Ghibli-style illustration of young Kevin in oval glasses and a denim jacket standing in front of his Korean elementary school under a banner reading 밝은 미래를 꿈꾸는 목원어린이"
-                data-alt-ko="동그란 안경에 데님 재킷을 입고 '밝은 미래를 꿈꾸는 목원어린이' 현수막이 걸린 한국 초등학교 앞에 선 어린 케빈의 지브리풍 일러스트"
-                alt="Studio-Ghibli-style illustration of young Kevin in oval glasses and a denim jacket standing in front of his Korean elementary school under a banner reading 밝은 미래를 꿈꾸는 목원어린이">
-            <div class="photo-caption">
-                <span data-l="en">team Korea since I was about this tall</span>
-                <span data-l="ko">이만할 때부터 대한민국</span>
+        <figure class="morph reveal-fade" id="youngMeMorph">
+            <div class="morph-pair">
+                <img class="morph-img morph-real" src="/newsletter/007/images/young-me-real.jpg" loading="lazy"
+                    width="2048" height="1536"
+                    data-alt-en="The original photo: young Kevin in oval glasses and a denim jacket in front of Mokwon Elementary School in Korea"
+                    data-alt-ko="원본 사진: 동그란 안경에 데님 재킷을 입고 한국 목원초등학교 앞에 선 어린 케빈"
+                    alt="The original photo: young Kevin in oval glasses and a denim jacket in front of Mokwon Elementary School in Korea">
+                <img class="morph-img morph-ghibli" src="/newsletter/007/images/young-me-ghibli.jpg" loading="lazy"
+                    width="2622" height="1968"
+                    data-alt-en="The same scene re-imagined as a Studio-Ghibli-style illustration, under a banner reading 밝은 미래를 꿈꾸는 목원어린이"
+                    data-alt-ko="같은 장면을 '밝은 미래를 꿈꾸는 목원어린이' 현수막 아래 지브리풍 일러스트로 다시 그린 모습"
+                    alt="The same scene re-imagined as a Studio-Ghibli-style illustration, under a banner reading 밝은 미래를 꿈꾸는 목원어린이">
             </div>
-        </div>
-        <div class="photo-inset reveal">
-            <img src="/newsletter/007/images/young-me-real.jpg" loading="lazy"
-                data-alt-en="The original photo: young Kevin in oval glasses and a denim jacket in front of Mokwon Elementary School in Korea"
-                data-alt-ko="원본 사진: 동그란 안경에 데님 재킷을 입고 한국 목원초등학교 앞에 선 어린 케빈"
-                alt="The original photo: young Kevin in oval glasses and a denim jacket in front of Mokwon Elementary School in Korea">
-            <div class="photo-caption">
-                <span data-l="en">the original. Mokwon Elementary &mdash; same squint, same flag.</span>
-                <span data-l="ko">원본. 목원초등학교 &mdash; 같은 눈매, 같은 태극기.</span>
-            </div>
-        </div>
+            <figcaption class="morph-cap">
+                <span data-l="en">same kid, same squint &mdash; the photo, then the way I remember it. <span class="morph-hint">scroll</span></span>
+                <span data-l="ko">같은 꼬마, 같은 눈매 &mdash; 사진, 그리고 내 기억 속 모습. <span class="morph-hint">스크롤</span></span>
+            </figcaption>
+        </figure>
     </div>
 
     <div class="divider reveal-fade"></div>
@@ -1689,18 +1682,10 @@
                 }, 800);
             }
 
-            function unlock() {
-                sessionStorage.setItem(issueKey, '1');
-                animateEstadio(function() { estadio.style.display = 'none'; });
-            }
-
-            if (sessionStorage.getItem(issueKey) === '1') {
-                gate.classList.add('unlocked');
-                document.body.classList.add('gate-open');
-                if (estadio) estadio.style.display = 'none';
-                return;
-            }
-            unlock();
+            // No interstitial anymore — the issue opens straight into the masthead
+            // (dateline cold open). Just clear any gate state so content is visible.
+            gate.classList.add('unlocked');
+            document.body.classList.add('gate-open');
         })();
     </script>
     <script>
@@ -2074,27 +2059,21 @@
                 var p = audio.play();
                 if (p && p.catch) p.catch(function () { player.classList.add('needs-tap'); });
             }
-            var dismiss = document.getElementById('estadioDismiss');
-            if (dismiss) dismiss.addEventListener('click', tryAutoplay);
-
-            // Returning visitor (interstitial skipped) — nudge, then autoplay on first interaction.
-            // Guard on the splash actually being gone: on a first visit unlock() writes this
-            // flag immediately while the interstitial is still on screen, so the flag alone
-            // can't distinguish a returning visitor from a first-timer. Without this check the
-            // listener arms during the intro and the "drag to play" playground triggers the song.
-            var path = window.location.pathname.replace(/\/$/, '') || '/';
-            var splash = document.getElementById('estadio');
-            var splashGone = !splash || window.getComputedStyle(splash).display === 'none';
-            if (sessionStorage.getItem('dispatch-auth-' + path) === '1' && splashGone) {
-                setTimeout(function () { showPlayer(); player.classList.add('needs-tap'); }, 1200);
-                function onFirstInteract() {
-                    document.removeEventListener('pointerdown', onFirstInteract, true);
-                    document.removeEventListener('keydown', onFirstInteract, true);
-                    tryAutoplay();
-                }
-                document.addEventListener('pointerdown', onFirstInteract, true);
-                document.addEventListener('keydown', onFirstInteract, true);
+            // No splash anymore: nudge the player in shortly after load, then start
+            // "Home" on the first user gesture (scroll / tap / key) — browsers require
+            // a gesture for audio anyway, so the first interaction is the natural cue.
+            setTimeout(function () { showPlayer(); player.classList.add('needs-tap'); }, 1200);
+            function onFirstInteract() {
+                document.removeEventListener('pointerdown', onFirstInteract, true);
+                document.removeEventListener('keydown', onFirstInteract, true);
+                document.removeEventListener('wheel', onFirstInteract, true);
+                document.removeEventListener('touchstart', onFirstInteract, true);
+                tryAutoplay();
             }
+            document.addEventListener('pointerdown', onFirstInteract, true);
+            document.addEventListener('keydown', onFirstInteract, true);
+            document.addEventListener('wheel', onFirstInteract, true);
+            document.addEventListener('touchstart', onFirstInteract, true);
         })();
 
         // ==================== API VIZ: WEATHER + FX ====================
@@ -2277,26 +2256,6 @@
                 scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
             });
 
-            var heroTl = gsap.timeline({ delay: 0.3 });
-            heroTl
-                .to('.hero-label', { opacity: 1, duration: 0.8, ease: 'power2.out' })
-                .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
-                .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
-                .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
-
-            gsap.to('#heroVideo', {
-                yPercent: 12, ease: 'none',
-                scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
-            });
-            gsap.to('.hero-title', {
-                yPercent: -20, ease: 'none',
-                scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
-            });
-            gsap.to('.scroll-hint', {
-                opacity: 0,
-                scrollTrigger: { trigger: '.hero', start: '15% top', end: '30% top', scrub: true }
-            });
-
             gsap.utils.toArray('.reveal').forEach(function(el) {
                 gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out',
                     scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
@@ -2311,6 +2270,18 @@
             });
 
             var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            // Real → Ghibli cross-dissolve on the young-me photos. Reduced motion skips
+            // this and the two images simply stack as normal stills.
+            var morph = document.getElementById('youngMeMorph');
+            if (morph && window.ScrollTrigger && !reduceMotion) {
+                morph.classList.add('is-morph');
+                gsap.fromTo(morph.querySelector('.morph-ghibli'),
+                    { opacity: 0 },
+                    { opacity: 1, ease: 'none',
+                      scrollTrigger: { trigger: morph, start: 'top 72%', end: 'center 42%', scrub: 0.4 } });
+            }
+
             if (!reduceMotion) {
                 var crowdFill = document.getElementById('crowdFill');
                 var crowdValue = document.getElementById('crowdValue');
