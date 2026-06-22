@@ -1,0 +1,7 @@
+{
+  "github.com": { "title": "GitHub", "note": "Source for this site and my open-source projects." },
+  "https://www.science.org/doi/10.1126/science.aaa6090": { "title": "Chen et al. 2015 · Science", "note": "The original MERFISH paper — multiplexed error-robust FISH." },
+  "https://www.science.org/doi/10.1126/science.aau5324": { "title": "Moffitt et al. 2018 · Science", "note": "Hypothalamic MERFISH atlas — the hold-out data I validate against." },
+  "https://alleninstitute.github.io/abc_atlas_access/": { "title": "Allen ABC Atlas", "note": "The Allen CCFv3 reference brain I register sections into." },
+  "en.wikipedia.org": { "title": "Wikipedia", "note": "" }
+}
