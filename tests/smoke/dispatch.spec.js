@@ -15,9 +15,15 @@ test.describe('Dispatch product landing', () => {
         expect(href).toMatch(/\/dispatch\/sign-in\/\?template=field-notes/);
     });
 
-    test('read nav goes to newsletter', async ({ page }) => {
+    test('read nav goes to newsletter', async ({ page }, testInfo) => {
         await page.goto('/dispatch/');
-        await expect(page.locator('a.nav-link[href="/newsletter/"]')).toBeVisible();
+        const link = page.locator('a.nav-link[href="/newsletter/"]');
+        if (testInfo.project.name === 'mobile') {
+            // Nav links are hidden in the compact mobile header; the link must still be in the DOM.
+            await expect(link).toBeAttached();
+        } else {
+            await expect(link).toBeVisible();
+        }
     });
 });
 
@@ -29,9 +35,13 @@ test.describe('Dispatch sign-in', () => {
         await expect(page.locator('.back-link')).toHaveAttribute('href', '/dispatch/');
     });
 
-    test('template query shows template name', async ({ page }) => {
+    test('template query is stored for post-auth handoff', async ({ page }) => {
+        // The sign-in page doesn't display the template name; it stashes it in
+        // localStorage so the editor can pick it up after auth completes.
         await page.goto('/dispatch/sign-in/?template=receipt');
-        await expect(page.locator('body')).toContainText(/receipt/i);
+        await expect.poll(() =>
+            page.evaluate(() => localStorage.getItem('dispatch.pending-template'))
+        ).toBe('receipt');
     });
 });
 

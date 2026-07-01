@@ -1,10 +1,14 @@
 const { test, expect } = require('@playwright/test');
 const { openIssue, expectAssetOk } = require('./helpers');
 
-// Published issues under test. 007 is an unlinked draft on the index, so it's excluded.
+// Published issues under test. Issue headers vary by design: 005 uses the
+// classic hero (.issue-number "No. 005"), 006 uses a hero-label kicker
+// ("Dispatch 006 · …"). numSel/numText capture each issue's own pattern.
+// 007 uses the newer masthead cold-open (no hero/interstitial) and is
+// covered by the index "latest" test below.
 const ISSUES = [
-    { num: '006', path: '/newsletter/006/', titleEn: 'Us',     cover: '/newsletter/006/images/korea-relay-poster.jpg' },
-    { num: '005', path: '/newsletter/005/', titleEn: 'Margin', cover: '/newsletter/005/images/camp-setup.jpg' },
+    { num: '006', path: '/newsletter/006/', titleEn: 'Us',     numSel: '.hero-label',   numText: 'Dispatch 006', cover: '/newsletter/006/images/korea-relay-poster.jpg' },
+    { num: '005', path: '/newsletter/005/', titleEn: 'Margin', numSel: '.issue-number', numText: 'No. 005',      cover: '/newsletter/005/images/camp-setup.jpg' },
 ];
 
 test.describe('Newsletter index', () => {
@@ -13,12 +17,12 @@ test.describe('Newsletter index', () => {
         await expect(page).toHaveTitle(/Dispatch/i);
         await expect(page.locator('.page-title')).toHaveText('Dispatch');
 
-        // Latest published issue is 006 ("Us"), badged "Latest". (007 is an unlinked draft.)
-        const latest = page.locator('a.issue-link[href="/newsletter/006/"]');
+        // Latest published issue is 007 ("Leave"), tagged "Latest" on the almanac.
+        const latest = page.locator('a.entry[href="/newsletter/007/"]');
         await expect(latest).toBeVisible();
-        await expect(latest.locator('.issue-badge')).toBeVisible();
-        // Match the EN span exactly so a title like "August" couldn't satisfy "Us".
-        await expect(latest.locator('.issue-title [data-l="en"]')).toHaveText('Us');
+        await expect(latest.locator('.entry-tag [data-l="en"]')).toHaveText('Latest');
+        // Match the EN span exactly so a title like "Leaves" couldn't satisfy "Leave".
+        await expect(latest.locator('.entry-title [data-l="en"]')).toHaveText('Leave');
     });
 
     test('language toggle switches visible copy', async ({ page }) => {
@@ -46,7 +50,7 @@ test.describe('Newsletter issues', () => {
             await expect(page.locator('.hero-title')).toBeVisible();
             // Match the EN span exactly to avoid loose substring matches (e.g. "Us").
             await expect(page.locator('.hero-title [data-l="en"]')).toHaveText(issue.titleEn);
-            await expect(page.locator('.issue-number')).toContainText('No. ' + issue.num);
+            await expect(page.locator(issue.numSel)).toContainText(issue.numText);
             await expect(page.locator('.back-link')).toBeVisible();
         });
 

@@ -31,7 +31,8 @@ test.describe('Editor — /dispatch/editor/', () => {
         expect(beforeContent).toBe('none');
     });
 
-    test('rail button appends a block', async ({ page }) => {
+    test('rail button appends a block', async ({ page }, testInfo) => {
+        test.skip(testInfo.project.name === 'mobile', 'rail is desktop-only chrome (display:none ≤820px)');
         await page.goto('/dispatch/editor/?template=blank');
         await page.waitForTimeout(400);
         const before = await page.locator('[data-block-id]').count();
