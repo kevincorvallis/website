@@ -61,7 +61,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&family=Archivo:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -74,6 +74,7 @@
             --rule: rgba(31, 30, 29, 0.1);
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
             --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            --font-sans: 'Archivo', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             --mono: ui-monospace, 'SF Mono', Menlo, monospace;
             color-scheme: light dark;
         }
@@ -270,8 +271,8 @@
         }
         .hero-content { position: relative; z-index: 2; text-align: center; padding-bottom: 3rem; }
         .hero-label {
-            font-size: 12px; font-weight: 600; letter-spacing: 0.2em;
-            text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+            font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
+            text-transform: uppercase; color: var(--caption); margin-bottom: 1rem;
             opacity: 0; transition: color 0.3s ease;
         }
         .hero-title {
@@ -1330,6 +1331,32 @@
     <div class="divider reveal-fade"></div>
 
     <!-- ——— Subscribe ——— -->
+    <nav class="mfx-more-letters reveal-fade" aria-label="More letters">
+        <p class="mfx-more-letters-label">
+            <span data-l="en">More letters</span><span data-l="ko">다른 편지</span>
+        </p>
+        <div class="mfx-more-letters-grid">
+            <a href="/newsletter/005/" class="mfx-more-letter">
+                <span class="mfx-more-letter-num">No. 005</span>
+                <span class="mfx-more-letter-title"><span data-l="en">Margin</span><span data-l="ko">여백</span></span>
+                <span class="mfx-more-letter-desc">
+                    <span data-l="en">A long weekend &mdash; a Friday screening on the Paramount lot, a Sunday that started in a church courtyard and ended on a sandy ridge above Big Bear, and a Monday that refused to put on real pants.</span>
+                    <span data-l="ko">긴 주말 &mdash; 금요일 파라마운트 부지의 시사회, 교회 안마당에서 시작해 빅베어 위 능선에서 끝난 일요일, 그리고 진짜 바지를 거부한 월요일.</span>
+                </span>
+            </a>
+            <a href="/newsletter/007/" class="mfx-more-letter">
+                <span class="mfx-more-letter-num">No. 007</span>
+                <span class="mfx-more-letter-title"><span data-l="en">Leave</span><span data-l="ko">휴가</span></span>
+                <span class="mfx-more-letter-desc">
+                    <span data-l="en">First PTO from Paramount. Dad, Justin, and me at Korea&ndash;Mexico in Guadalajara &mdash; Estadio Akron, split jerseys, whole octopus, one very good group chat.</span>
+                    <span data-l="ko">파라마운트 첫 PTO. 과달라하라에서 아빠, 저스틴, 나 &mdash; 에스타디오 아크론, 갈라진 유니폼, 통문어, 아주 좋은 단톡방.</span>
+                </span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="divider reveal-fade"></div>
+
     <div class="subscribe reveal" id="subscribe">
         <p class="subscribe-label">
             <span data-l="en">Stay in the Loop</span>
