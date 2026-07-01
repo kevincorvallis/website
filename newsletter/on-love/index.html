@@ -13,11 +13,15 @@
     <meta property="og:url" content="https://klee.page/newsletter/on-love/">
     <meta property="og:title" content="An Interlude: Clean Pain — Kevin Lee">
     <meta property="og:description" content="On agape, Beef Season 2, and learning the difference between the pain you stay for and the pain you leave.">
+    <meta property="og:image" content="https://klee.page/newsletter/on-love/images/og-on-love.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="An Interlude: Clean Pain — Kevin Lee">
     <meta name="twitter:description" content="On agape, Beef Season 2, and learning the difference between the pain you stay for and the pain you leave.">
+    <meta name="twitter:image" content="https://klee.page/newsletter/on-love/images/og-on-love.jpg">
 
     <!-- Smart App Banner -->
     <meta name="apple-itunes-app" content="app-id=6761163892">
@@ -48,7 +52,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
         *, *::before, *::after {
@@ -65,6 +69,7 @@
             --rule: rgba(31, 30, 29, 0.1);
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
             --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            --mono: ui-monospace, 'SF Mono', Menlo, monospace;
             color-scheme: light dark;
         }
 
@@ -250,41 +255,6 @@
             overflow: hidden;
         }
 
-        .hero-image {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-        }
-
-        .hero-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            will-change: transform;
-        }
-
-        .hero-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            background: linear-gradient(
-                to top,
-                rgba(240, 238, 230, 0.95) 0%,
-                rgba(240, 238, 230, 0.5) 35%,
-                rgba(240, 238, 230, 0.05) 100%
-            );
-            transition: background 0.3s ease;
-        }
-
-        [data-theme="dark"] .hero-overlay {
-            background: linear-gradient(
-                to top,
-                rgba(31, 30, 29, 0.95) 0%,
-                rgba(31, 30, 29, 0.4) 35%,
-                rgba(31, 30, 29, 0.05) 100%
-            );
-        }
-
         .hero-content {
             position: relative;
             z-index: 2;
@@ -356,93 +326,6 @@
         @keyframes scrollPulse {
             0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
             50% { opacity: 1; transform: scaleY(1); }
-        }
-
-        /* ========== TABLE OF CONTENTS ========== */
-        .toc {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 2.5rem 1.5rem 1rem;
-            text-align: center;
-        }
-
-        .toc-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            transition: color 0.3s ease;
-        }
-
-        .toc-list {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.25rem 1.25rem;
-        }
-
-        .toc-list a {
-            font-size: 14px;
-            color: var(--caption);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .toc-list a:hover {
-            color: var(--accent);
-            opacity: 1;
-        }
-
-        /* ========== ISSUE HEADER ========== */
-        .issue-intro {
-            min-height: 40vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 4rem 1.5rem;
-        }
-
-        .issue-number {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            transition: color 0.3s ease;
-        }
-
-        .issue-date {
-            font-family: var(--font-display);
-            font-size: clamp(2rem, 8vw, 3.5rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            line-height: 1;
-            margin-bottom: 1rem;
-        }
-
-        .issue-opener {
-            font-size: 18px;
-            color: var(--caption);
-            line-height: 1.6;
-            max-width: 440px;
-            transition: color 0.3s ease;
-        }
-
-        .reading-time {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--caption);
-            margin-top: 1rem;
-            opacity: 0.6;
-            transition: color 0.3s ease;
         }
 
         /* ========== SECTION HEADERS ========== */
@@ -933,6 +816,52 @@
             .comments-btn { align-self: stretch; padding: 14px 24px; }
         }
 
+        /* ===== Song of the week — bottom-left mini player ===== */
+        .mini-player {
+            position: fixed; bottom: max(1.1rem, env(safe-area-inset-bottom, 0)); left: 1.1rem; z-index: 90;
+            display: flex; align-items: center; gap: 0.7rem;
+            padding: 0.4rem 0.9rem 0.4rem 0.4rem;
+            background: var(--bg);
+            background: color-mix(in srgb, var(--bg) 74%, transparent);
+            -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+            border: 1px solid var(--rule); border-radius: 100px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 6px 16px -6px rgba(0,0,0,0.18), 0 20px 50px -24px rgba(0,0,0,0.30);
+            max-width: calc(100vw - 2.2rem);
+            opacity: 0; transform: translateY(12px) scale(0.98);
+            transition: opacity 0.5s cubic-bezier(0.22,0.61,0.36,1), transform 0.5s cubic-bezier(0.22,0.61,0.36,1), background-color 0.3s ease, border-color 0.3s ease;
+        }
+        [data-theme="dark"] .mini-player { box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 6px 16px -6px rgba(0,0,0,0.6), 0 20px 50px -24px rgba(0,0,0,0.7); }
+        .mini-player.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .mini-player[hidden] { display: none; }
+        .mini-player-btn {
+            position: relative; width: 42px; height: 42px; flex: 0 0 auto;
+            border-radius: 50%; background: var(--text); color: var(--bg); border: none;
+            display: grid; place-items: center; cursor: pointer; padding: 0; overflow: visible;
+            transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background-color 0.3s ease, color 0.3s ease;
+        }
+        .mini-player-btn:hover { transform: scale(1.06); }
+        .mini-player-btn:active { transform: scale(0.93); }
+        .mini-player-ring { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); transform: rotate(-90deg); pointer-events: none; fill: none; }
+        .ring-track { stroke: var(--rule); stroke-width: 1.5; transition: stroke 0.3s ease; }
+        .ring-progress { stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 100.531; stroke-dashoffset: 100.531; transition: stroke-dashoffset 0.15s linear, stroke 0.3s ease; }
+        .mini-player-icon { position: relative; width: 15px; height: 15px; fill: currentColor; display: block; overflow: visible; }
+        .mini-player-icon path { transition: opacity 0.22s ease, transform 0.32s cubic-bezier(0.34,1.56,0.64,1); transform-origin: 12px 12px; transform-box: fill-box; }
+        .mini-player-icon .icon-play { opacity: 1; transform: scale(1); }
+        .mini-player-icon .icon-pause { opacity: 0; transform: scale(0.6); }
+        .mini-player-btn[data-state="playing"] .icon-play { opacity: 0; transform: scale(0.6); }
+        .mini-player-btn[data-state="playing"] .icon-pause { opacity: 1; transform: scale(1); }
+        @keyframes mp-buffer { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .mini-player-btn[data-state="buffering"] .ring-track { animation: mp-buffer 1s ease-in-out infinite; }
+        .mini-player-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; line-height: 1.25; }
+        .mini-player-title { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 15px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; transition: color 0.3s ease; }
+        .mini-player-artist { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--caption); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; transition: color 0.3s ease; }
+        .mini-player-close { background: none; border: none; color: var(--caption); font-size: 17px; line-height: 1; cursor: pointer; padding: 0 2px 0 4px; opacity: 0.55; align-self: flex-start; transition: opacity 0.2s ease, color 0.3s ease; flex: 0 0 auto; }
+        .mini-player-close:hover { opacity: 1; }
+        @keyframes mp-nudge { 0%,100% { box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 6px 16px -6px rgba(0,0,0,0.18), 0 20px 50px -24px rgba(0,0,0,0.30), 0 0 0 0 rgba(160,130,109,0); } 50% { box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 6px 16px -6px rgba(0,0,0,0.18), 0 20px 50px -24px rgba(0,0,0,0.30), 0 0 0 7px rgba(160,130,109,0.16); } }
+        .mini-player.needs-tap { animation: mp-nudge 1.9s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .mini-player.needs-tap { animation: none; } }
+        @media print { .mini-player { display: none !important; } }
+
         /* ========== REVEAL ANIMATIONS ========== */
         .reveal {
             opacity: 0;
@@ -953,7 +882,6 @@
             .text-block p { font-size: 18px; }
             .section-header { padding: 5rem 1.5rem 2.5rem; }
             .photo-full .photo-caption { bottom: 0.75rem; left: 1rem; right: 1rem; }
-            .toc-list { gap: 0.25rem 1rem; }
         }
 
         @media (min-width: 768px) {
@@ -1000,8 +928,8 @@
             position: relative;
         }
 
-        .komorebi-kanji {
-            font-family: 'Noto Serif JP', serif;
+        .komorebi-word {
+            font-family: var(--font-display);
             font-size: clamp(3.5rem, 14vw, 7rem);
             font-weight: 300;
             letter-spacing: 0.08em;
@@ -1199,7 +1127,7 @@
             <div class="komorebi-spot"></div>
         </div>
         <div class="komorebi-content">
-            <p class="komorebi-kanji" id="komorebiKanji" style="font-family: var(--font-display); letter-spacing: 0.02em;">ἀγάπη</p>
+            <p class="komorebi-word" id="komorebiWord" style="letter-spacing: 0.02em;">ἀγάπη</p>
             <p class="komorebi-romaji" id="komorebiRomaji">agápe</p>
             <p class="komorebi-noun" id="komorebiNoun">noun &middot; Greek</p>
             <p class="komorebi-meaning" id="komorebiMeaning">
@@ -1289,11 +1217,28 @@
     </div>
     <div class="text-block reveal">
         <div data-l="en">
-            <p>I know. I&rsquo;m just some 27 year old. I don&rsquo;t know shit about love or life, really. I&rsquo;ve only had my first real relationship. But the LOVE was real. That&rsquo;s why I want to share these two cents, my brothers.</p>
+            <p>Group A is not always shallow. Sometimes it&rsquo;s wisdom. Sometimes it&rsquo;s survival. Sometimes loving life with someone matters because love, without a livable life, can become a cage.</p>
+            <p>Group B is not always noble either. Sometimes devotion becomes self-erasure. Sometimes &ldquo;I&rsquo;ll stay no matter what&rdquo; is just fear wearing the costume of love.</p>
+        </div>
+        <div data-l="ko">
+            <p>그룹 A가 항상 얕은 건 아니야. 때로는 지혜고, 때로는 생존이지. 살아갈 수 없는 삶 속의 사랑은 그 자체로 감옥이 될 수 있으니까, 누군가와 함께하는 삶을 사랑하는 게 중요할 때도 있어.</p>
+            <p>그룹 B도 항상 고귀한 건 아니야. 헌신이 자기 소멸이 되기도 하고, &ldquo;무슨 일이 있어도 곁에 있을게&rdquo;라는 말이 사실은 사랑의 옷을 입은 두려움일 때도 있어.</p>
+        </div>
+    </div>
+    <div class="text-block reveal">
+        <div data-l="en">
+            <p>I know. I&rsquo;m just some 27-year-old. I don&rsquo;t know shit about love or life, really. I&rsquo;ve only had my first real relationship. But the LOVE was real. That&rsquo;s why I want to share these two cents, my brothers.</p>
         </div>
         <div data-l="ko">
             <p>알아, 나 이제 겨우 스물일곱 살이야. 사랑이나 인생에 대해 진짜 쥐뿔도 모르지. 이제 막 제대로 된 첫 연애를 겪어본 게 다니까. 하지만 그 사랑만큼은 진짜였어. 그래서 이렇게 내 짧은 생각이라도 나눠보고 싶었어, 얘들아.</p>
         </div>
+    </div>
+    <div class="divider reveal-fade"></div>
+    <div class="pull-quote-side reveal">
+        <blockquote>
+            <span data-l="en">I used to think love meant staying through pain. Now I think the harder lesson is knowing which pain is sacred and which pain is poison. Clean pain is the cost of connection. Dirty pain is the cost of destruction.</span>
+            <span data-l="ko">예전엔 사랑이란 아픔을 견디며 곁에 남는 거라고 생각했어. 이제는 더 어려운 숙제가, 어떤 아픔이 성스럽고 어떤 아픔이 독인지 구별하는 거라고 생각해. 깨끗한 아픔은 연결의 대가야. 더러운 아픔은 파괴의 대가고.</span>
+        </blockquote>
     </div>
     <div class="divider reveal-fade"></div>
     <div class="section-header reveal">
@@ -1325,21 +1270,19 @@
     </div>
     <div class="text-block reveal">
         <div data-l="en">
-            <p>The end of Season 2 of <em>Beef</em> puts this concept into practice. Josh is Group B, choosing to go to prison with nothing to gain so that Lindsey can survive. Austin is Group A, driven by fear and uncertainty about what is real and what love even is. He&rsquo;s scared to take a chance on the unknown.</p>
-            <p>At the end, Austin is unhappy, and Josh is released from prison happy that everyone he loves is happy. So you get the predictable misery that Austin calculated and chose anyway, knowing his girl doesn&rsquo;t love him, versus the uncertainty of Josh choosing to sacrifice for Lindsey. And Lindsey doesn&rsquo;t even stay with him. She finds someone else.</p>
+            <p>By the end of Season 2, Josh chooses clean pain: sacrifice without guarantee, going to prison with nothing to gain so that Lindsey can survive. Austin chooses dirty safety: control, suspicion, and the predictable misery of protecting himself from uncertainty &mdash; and he ends up alone anyway.</p>
         </div>
         <div data-l="ko">
-            <p><em>성난 사람들</em> 시즌 2의 결말은 이 개념을 그대로 실행에 옮겨 보여줘. 조시는 그룹 B야. 린지가 살아남을 수 있도록 자신에겐 아무런 이득도 없는 감옥행을 택하니까. 오스틴은 그룹 A야. 무엇이 진짜인지, 사랑이란 게 대체 뭔지 두려움과 불확실성에 사로잡혀 있어. 그는 알 수 없는 무언가에 모험을 거는 걸 무서워하지.</p>
-            <p>결국 오스틴은 불행해지고, 조시는 자기가 사랑하는 사람들이 모두 행복하다는 사실에 기뻐하며 감옥에서 출소해. 자기 여자가 자기를 사랑하지 않는다는 걸 알면서도 오스틴이 계산해 내고 결국 선택한 '예견된 불행'과, 린지를 위해 기꺼이 희생을 선택한 조시의 '불확실함'이 대비되는 거야. 게다가 린지는 조시의 곁에 남지도 않아. 다른 사람을 찾아 가버리지.</p>
+            <p>시즌 2 결말에서, 조시는 깨끗한 아픔을 선택해. 아무런 보장도 없이, 린지가 살아남을 수 있도록 얻는 것 하나 없는 감옥행을 택하지. 오스틴은 더러운 안전을 선택해. 통제, 의심, 그리고 불확실함으로부터 자신을 지키려다 맞이하는 예견된 불행 말이야 &mdash; 그리고 결국 혼자 남게 되지.</p>
         </div>
     </div>
     <div class="divider reveal-fade"></div>
     <div class="text-block reveal">
         <div data-l="en">
-            <p>Dr. Kim, my favorite Korean actor, sums it up pretty well in one quote:</p>
+            <p>Dr. Kim, played by <a href="https://en.wikipedia.org/wiki/Song_Kang-ho" target="_blank">Song Kang-ho</a> (my favorite Korean actor), sums it up pretty well in one quote:</p>
         </div>
         <div data-l="ko">
-            <p>내가 가장 좋아하는 한국 배우인 닥터 김이 이걸 한 대사로 아주 기막히게 요약해 줘.</p>
+            <p>내가 가장 좋아하는 한국 배우인 <a href="https://en.wikipedia.org/wiki/Song_Kang-ho" target="_blank">송강호</a>가 연기한 닥터 김이 이걸 한 대사로 아주 기막히게 요약해 줘.</p>
         </div>
     </div>
     <div class="pull-quote reveal">
@@ -1364,16 +1307,10 @@
     </div>
     <div class="text-block reveal">
         <div data-l="en">
-            <p><a href="https://www.poetryfoundation.org/poems/46569/do-not-go-gentle-into-that-good-night" target="_blank"><em>Interstellar</em></a>. Cooper voluntarily goes into the black hole to save Brand, knowing he&rsquo;ll never see his daughter again.</p>
-            <p><a href="https://nofilmschool.com/la-la-land-opening-decoded" target="_blank"><em>La La Land</em></a>. The final flashback, the alternate reality of what their lives would have looked like if they hadn&rsquo;t chosen the utility of their careers over each other.</p>
-            <p><a href="https://www.youtube.com/watch?v=4noaE0CdZUw" target="_blank"><em>Whiplash</em></a>. Miles Teller&rsquo;s character giving his absolute raw self to the one thing he loves: drumming, and middle-fingering JK Simmons.</p>
-            <p><a href="https://www.bfi.org.uk/features/before-sunrise-richard-linklater-vienna-locations" target="_blank"><em>Before Sunrise</em></a>. Stripped of all societal expectations, believing you only have one night, you&rsquo;re forced to calculate long-term compatibility and decide whether to go all in.</p>
+            <p><a href="https://nofilmschool.com/la-la-land-opening-decoded" target="_blank"><em>La La Land</em></a> asks what happens when two people choose the utility of their futures over the purity of the feeling. <a href="https://www.bfi.org.uk/features/before-sunrise-richard-linklater-vienna-locations" target="_blank"><em>Before Sunrise</em></a> asks the opposite question: what if, stripped of all future planning, one night of connection is enough to justify going all in?</p>
         </div>
         <div data-l="ko">
-            <p><a href="https://www.poetryfoundation.org/poems/46569/do-not-go-gentle-into-that-good-night" target="_blank"><em>인터스텔라</em></a>. 쿠퍼는 딸을 다시는 보지 못할 것을 알면서도 브랜드를 구하기 위해 스스로 블랙홀 속으로 뛰어들지.</p>
-            <p><a href="https://nofilmschool.com/la-la-land-opening-decoded" target="_blank"><em>라라랜드</em></a>. 서로보다 커리어라는 실용적인 선택을 내리지 않았더라면 펼쳐졌을 그들의 삶을 보여주는 마지막 회상 장면 속의 대체 현실.</p>
-            <p><a href="https://www.youtube.com/watch?v=4noaE0CdZUw" target="_blank"><em>위플래쉬</em></a>. 마일스 텔러가 연기한 주인공이 자기가 사랑하는 단 한 가지인 드럼에 날것 그대로의 자신을 온전히 던지며, JK 시먼스에게 가운뎃손가락을 날리는 장면.</p>
-            <p><a href="https://www.bfi.org.uk/features/before-sunrise-richard-linklater-vienna-locations" target="_blank"><em>비포 선라이즈</em></a>. 모든 사회적 기대치를 벗어던지고 오직 단 하룻밤뿐이라 믿는 상황에서, 장기적인 미래까지 따져보며 올인할지 말지를 치열하게 저울질하게 되는 순간.</p>
+            <p><a href="https://nofilmschool.com/la-la-land-opening-decoded" target="_blank"><em>라라랜드</em></a>는 두 사람이 순수한 감정 대신 각자의 미래를 위한 실용적 선택을 할 때 무슨 일이 일어나는지를 묻고, <a href="https://www.bfi.org.uk/features/before-sunrise-richard-linklater-vienna-locations" target="_blank"><em>비포 선라이즈</em></a>는 그 반대의 질문을 던지지. 미래에 대한 계산 없이, 단 하룻밤의 연결만으로도 올인할 이유가 되는가?</p>
         </div>
     </div>
     <div class="divider reveal-fade"></div>
@@ -1390,20 +1327,21 @@
     <div class="divider reveal-fade"></div>
     <div class="text-block reveal" style="text-align: center;">
         <div data-l="en">
+            <p>Some love makes your heart race. Some love lets your nervous system rest. The danger is mistaking chaos for chemistry, or mistaking peace for boredom. The love that lasts usually has both: fire, but held inside a house that will not burn down.</p>
+        </div>
+        <div data-l="ko">
+            <p>어떤 사랑은 심장을 뛰게 해. 어떤 사랑은 신경계를 편히 쉬게 해줘. 위험한 건 혼란을 설렘으로 착각하거나, 평온을 지루함으로 착각하는 거야. 오래가는 사랑은 대체로 둘 다를 가지고 있어 &mdash; 불꽃이지만, 타서 무너지지 않는 집 안에 담긴 불꽃.</p>
+        </div>
+    </div>
+    <div class="divider reveal-fade"></div>
+    <div class="text-block reveal" style="text-align: center;">
+        <div data-l="en">
             <p style="margin-bottom: 0.6rem;"><strong>Clean pain:</strong> the cost of connection.</p>
             <p style="margin-bottom: 0;"><strong>Dirty pain:</strong> the cost of destruction.</p>
         </div>
         <div data-l="ko">
             <p style="margin-bottom: 0.6rem;"><strong>깨끗한 아픔:</strong> 연결의 대가.</p>
             <p style="margin-bottom: 0;"><strong>더러운 아픔:</strong> 파괴의 대가.</p>
-        </div>
-    </div>
-    <div class="text-block reveal">
-        <div data-l="en">
-            <p>Group A is transactional, contractual thinking. I entered this relationship to have you elevate my enjoyment of life. You are now causing me emotional pain, which means you&rsquo;re violating the contract. So they retaliate, and they draw back. Group B already expects pain, because it knows that humans are flawed, broken, and living in a harsh world.</p>
-        </div>
-        <div data-l="ko">
-            <p>그룹 A는 거래적이고 계약적인 사고방식이야. '내가 이 관계를 맺은 건 네가 내 삶을 더 즐겁게 만들어주길 바라서였어. 그런데 네가 나한테 감정적 고통을 주다니, 이건 계약 위반이야.' 그래서 이들은 보복하거나 마음의 거리를 두지. 반면에 그룹 B는 이미 아픔을 예견하고 있어. 인간은 원래 결함 많고 부서지기 쉬운 존재며, 이 험난한 세상에 살아가고 있다는 걸 잘 알고 있으니까.</p>
         </div>
     </div>
     <div class="section-header reveal">
@@ -1440,10 +1378,12 @@
         <div data-l="en">
             <p>Dirty pain is inflicted when a partner uses manipulation, betrayal, cruelty, or emotional abuse. This isn&rsquo;t the pain of human weakness. It&rsquo;s the pain of human malice, or of unchecked toxicity.</p>
             <p>Here is the ultimate distinction: true agape never requires you to tolerate dirty pain, because enabling someone&rsquo;s destructive behavior is actually the opposite of love.</p>
+            <p>Unconditional love does not mean unconditional access. You can love someone and still leave. You can forgive someone and still create distance. You can want someone&rsquo;s healing and still refuse to be their casualty.</p>
         </div>
         <div data-l="ko">
             <p>더러운 아픔은 상대방이 통제, 가스라이팅, 배신, 잔인한 짓, 혹은 정서적인 학대를 가할 때 생기는 아픔이야. 이건 인간의 나약함 때문에 생기는 고통이 아니야. 인간의 악의, 혹은 고삐 풀린 독성에서 비롯되는 아픔이지.</p>
             <p>여기에서 결정적인 차이가 생겨. 진정한 아가페는 결코 네가 더러운 아픔을 감내하라고 요구하지 않아. 상대의 파괴적인 행동을 방조하는 건 사실 사랑의 완벽한 반대말이니까.</p>
+            <p>무조건적인 사랑이 무조건적인 접근을 뜻하는 건 아니야. 누군가를 사랑하면서도 떠날 수 있어. 누군가를 용서하면서도 거리를 둘 수 있어. 그 사람의 치유를 바라면서도, 그 대가로 내가 희생되는 건 거부할 수 있어.</p>
         </div>
     </div>
     <div class="divider reveal-fade"></div>
@@ -1459,8 +1399,8 @@
     <!-- ——— Sign Off ——— -->
     <div class="sign-off reveal">
         <p class="sign-off-text">
-            <span data-l="en">That&rsquo;s my two cents. Go finish <em>Beef</em>.</span>
-            <span data-l="ko">이게 내 짧은 생각이야. 어서 가서 <em>성난 사람들</em> 마저 끝내고 와.</span>
+            <span data-l="en">I still believe in staying. I still believe love should not depreciate the second someone becomes inconvenient. But I no longer think all pain is proof of devotion. Some pain is the price of intimacy. Some pain is the warning sign that intimacy has become harm. The work is learning the difference. Stay for clean pain. Leave dirty pain. Anyway. Go finish <em>Beef</em>.</span>
+            <span data-l="ko">그래도 난 여전히 곁에 남는 걸 믿어. 누군가가 불편해지는 순간 사랑이 깎여나가서는 안 된다고 여전히 믿어. 하지만 이제는 모든 아픔이 헌신의 증거라고 생각하지 않아. 어떤 아픔은 친밀함의 대가고, 어떤 아픔은 그 친밀함이 이미 해악으로 변했다는 경고야. 그 차이를 배우는 게 숙제겠지. 깨끗한 아픔엔 남고, 더러운 아픔은 떠나. 아무튼. 가서 <em>성난 사람들</em> 마저 봐.</span>
         </p>
         <p class="sign-off-name">&mdash; Kevin</p>
     </div>
@@ -1495,7 +1435,7 @@
         </p>
         <p class="subscribe-error" id="subscribeError">
             <span data-l="en">Hmm, that didn't go through. Mind trying again?</span>
-            <span data-l="ko">앗, 등록이 안 됐어요. 다시 시도해줄래요?</span>
+            <span data-l="ko">앗, 등록이 안 됐어. 다시 시도해줄래?</span>
         </p>
         <p class="subscribe-note">
             <span data-l="en">Just between us — no third parties, ever.</span>
@@ -1518,8 +1458,8 @@
             </h2>
         </div>
         <form class="comments-form" id="commentsForm">
-            <input type="text" class="comments-input" id="commentName" placeholder="Your name" maxlength="100" required>
-            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." maxlength="2000" required></textarea>
+            <input type="text" class="comments-input" id="commentName" placeholder="Your name" data-ph-en="Your name" data-ph-ko="이름" maxlength="100" required>
+            <textarea class="comments-input comments-textarea" id="commentText" placeholder="Write a comment..." data-ph-en="Write a comment..." data-ph-ko="댓글을 남겨줘..." maxlength="2000" required></textarea>
             <button type="submit" class="comments-btn" id="commentBtn">
                 <span data-l="en">Post</span>
                 <span data-l="ko">게시</span>
@@ -1528,7 +1468,7 @@
         <div class="comments-list" id="commentsList"></div>
         <p class="comments-empty" id="commentsEmpty" style="display:none;">
             <span data-l="en">No comments yet. Be the first.</span>
-            <span data-l="ko">아직 댓글이 없어요. 첫 번째로 남겨 주세요.</span>
+            <span data-l="ko">아직 댓글이 없어. 첫 번째로 남겨줘.</span>
         </p>
     </div>
 
@@ -1569,7 +1509,7 @@
             var leaves = document.getElementById('komorebiLeaves');
             var sun = document.getElementById('komorebiSun');
             var spots = document.getElementById('komorebiSpots');
-            var kanji = document.getElementById('komorebiKanji');
+            var word = document.getElementById('komorebiWord');
             var romaji = document.getElementById('komorebiRomaji');
             var noun = document.getElementById('komorebiNoun');
             var meaning = document.getElementById('komorebiMeaning');
@@ -1591,7 +1531,7 @@
             setTimeout(function() { leaves.style.transition = 'opacity 2s ease'; leaves.style.opacity = '0.6'; }, 300);
             setTimeout(function() { spots.style.transition = 'opacity 2s ease'; spots.style.opacity = '1'; }, 500);
 
-            animate(kanji, 800, 1.4);
+            animate(word, 800, 1.4);
             animate(romaji, 1800, 1);
             animate(noun, 2200, 0.8);
             animate(meaning, 2800, 1.1);
@@ -1620,17 +1560,26 @@
             var pill = document.getElementById('langPill');
             var current = document.documentElement.getAttribute('data-lang') || 'en';
 
+            function updatePlaceholders() {
+                document.querySelectorAll('[data-ph-en]').forEach(function(el) {
+                    el.placeholder = current === 'ko' ? el.getAttribute('data-ph-ko') : el.getAttribute('data-ph-en');
+                });
+            }
+
             function toggle() {
                 current = current === 'en' ? 'ko' : 'en';
                 document.documentElement.setAttribute('data-lang', current);
                 document.documentElement.setAttribute('lang', current);
                 localStorage.setItem('dispatch-lang', current);
+                updatePlaceholders();
             }
 
             pill.addEventListener('click', toggle);
             pill.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
             });
+
+            updatePlaceholders();
         })();
 
 
@@ -1694,9 +1643,9 @@
 
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                var name = nameInput.value.trim();
+                var name = nameInput.value.trim() || 'Anonymous';
                 var comment = textInput.value.trim();
-                if (!name || !comment) return;
+                if (!comment) return;
 
                 btn.disabled = true;
                 btn.style.opacity = '0.4';
@@ -1763,18 +1712,6 @@
                 .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
                 .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
                 .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
-
-            // Hero Ken Burns
-            gsap.to('#heroImg', {
-                scale: 1.15,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: '.hero',
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: true,
-                }
-            });
 
             // Hero title parallax
             gsap.to('.hero-title', {
@@ -1861,16 +1798,6 @@
                 );
             });
 
-            // Smooth anchor scrolling for TOC links
-            document.querySelectorAll('.toc-list a').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    var target = document.querySelector(link.getAttribute('href'));
-                    if (target) {
-                        e.preventDefault();
-                        lenis.scrollTo(target, { offset: -40, duration: 1.2 });
-                    }
-                });
-            });
         }
     </script>
     <script src="/js/microfeatures.js" defer></script>
