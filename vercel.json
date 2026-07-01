@@ -3,7 +3,9 @@
   "outputDirectory": ".",
   "redirects": [
     { "source": "/@:user/", "destination": "/@:user", "permanent": true },
-    { "source": "/@:user/:slug/", "destination": "/@:user/:slug", "permanent": true }
+    { "source": "/@:user/:slug/", "destination": "/@:user/:slug", "permanent": true },
+    { "source": "/newsletter/on-love", "destination": "/newsletter/wounds-of-a-friend", "permanent": true },
+    { "source": "/newsletter/on-love/", "destination": "/newsletter/wounds-of-a-friend/", "permanent": true }
   ],
   "rewrites": [
     { "source": "/@:user/:slug", "destination": "/api/render?u=:user&s=:slug" },
