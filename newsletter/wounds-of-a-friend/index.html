@@ -1870,10 +1870,15 @@
             if (window._dispatchInit) return;
             window._dispatchInit = true;
 
-            // Smooth scroll
-            var lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
-            lenis.on('scroll', ScrollTrigger.update);
-            gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+            // Smooth scroll — skip on touch devices, let iOS/Android handle native momentum scroll
+            var isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+            if (!isTouchDevice) {
+                var lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+                lenis.on('scroll', ScrollTrigger.update);
+                gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+            } else {
+                window.addEventListener('scroll', function() { ScrollTrigger.update(); }, { passive: true });
+            }
             gsap.ticker.lagSmoothing(0);
 
             // Progress bar
@@ -1896,9 +1901,9 @@
                 .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
                 .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
 
-            // Hero title parallax
+            // Hero title parallax — subtler on touch devices to avoid competing with native scroll physics
             gsap.to('.hero-title', {
-                yPercent: -20,
+                yPercent: isTouchDevice ? -6 : -20,
                 ease: 'none',
                 scrollTrigger: {
                     trigger: '.hero',
