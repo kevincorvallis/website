@@ -1483,6 +1483,30 @@
         </p>
     </footer>
 
+    <!-- ==================== SONG OF THE WEEK — bottom-left mini player ==================== -->
+    <audio id="songOfTheWeek" src="/newsletter/on-love/images/beanie-chezile-piano-cover.mp3" preload="metadata" loop></audio>
+    <div class="mini-player" id="miniPlayer" hidden aria-label="Song of the week mini player">
+        <button class="mini-player-btn" id="miniPlayerBtn" type="button" aria-label="Play or pause the song of the week" data-state="paused">
+            <svg class="mini-player-ring" viewBox="0 0 36 36" aria-hidden="true">
+                <circle class="ring-track" cx="18" cy="18" r="16"></circle>
+                <circle class="ring-progress" cx="18" cy="18" r="16" id="miniPlayerRing"></circle>
+            </svg>
+            <svg class="mini-player-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="icon-play" d="M7 5 L7 19 L19 12 Z"></path>
+                <path class="icon-pause" d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z"></path>
+            </svg>
+        </button>
+        <div class="mini-player-meta">
+            <div class="mini-player-title"><a href="https://www.youtube.com/watch?v=mNDpCIJXpvs" target="_blank" rel="noopener" style="color:inherit;text-decoration:none" title="Beanie — Chezile (Piano Cover)">Beanie</a></div>
+            <div class="mini-player-artist">
+                <span data-l="en">Chezile &middot; piano cover</span>
+                <span data-l="ko">체자일 &middot; 피아노 커버</span>
+            </div>
+        </div>
+        <button class="mini-player-close" id="miniPlayerClose" type="button"
+            data-aria-en="Close mini player" data-aria-ko="미니 플레이어 닫기" aria-label="Close mini player">&times;</button>
+    </div>
+
     <!-- Analytics -->
     <script defer src="/_vercel/insights/script.js"></script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
@@ -1582,6 +1606,84 @@
             updatePlaceholders();
         })();
 
+        // ==================== SONG OF THE WEEK (bottom-left mini player) ====================
+        (function () {
+            var audio = document.getElementById('songOfTheWeek');
+            var player = document.getElementById('miniPlayer');
+            var miniBtn = document.getElementById('miniPlayerBtn');
+            var ring = document.getElementById('miniPlayerRing');
+            var closeBtn = document.getElementById('miniPlayerClose');
+            if (!audio || !player) return;
+
+            var RING_C = 2 * Math.PI * 16;
+            if (ring) { ring.style.strokeDasharray = RING_C; ring.style.strokeDashoffset = RING_C; }
+            var triedAutoplay = false, dismissed = false, rafId = null;
+
+            function setState(s) { if (miniBtn) miniBtn.setAttribute('data-state', s); if (s === 'playing') player.classList.remove('needs-tap'); }
+            function showPlayer() { if (dismissed) return; player.hidden = false; requestAnimationFrame(function () { player.classList.add('visible'); }); }
+            function updateRing() {
+                if (!audio.duration || !isFinite(audio.duration)) { rafId = requestAnimationFrame(updateRing); return; }
+                var pct = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
+                if (ring) ring.style.strokeDashoffset = RING_C * (1 - pct);
+                if (!audio.paused) rafId = requestAnimationFrame(updateRing);
+            }
+            function startRingLoop() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(updateRing); }
+            function stopRingLoop() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } updateRing(); }
+
+            audio.addEventListener('play', function () { setState('playing'); startRingLoop(); });
+            audio.addEventListener('playing', function () { setState('playing'); startRingLoop(); });
+            audio.addEventListener('pause', function () { setState('paused'); stopRingLoop(); });
+            audio.addEventListener('ended', function () { setState('paused'); stopRingLoop(); });
+            audio.addEventListener('waiting', function () { setState('buffering'); });
+
+            function toggle() {
+                showPlayer();
+                if (audio.paused) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
+                else { audio.pause(); }
+            }
+            if (miniBtn) miniBtn.addEventListener('click', toggle);
+            document.addEventListener('keydown', function (e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (player.hidden) return;
+                if (e.key === 'k' || (e.key === ' ' && document.activeElement === miniBtn)) { e.preventDefault(); toggle(); }
+            });
+            if (closeBtn) closeBtn.addEventListener('click', function () {
+                audio.pause(); dismissed = true; player.classList.remove('visible');
+                setTimeout(function () { player.hidden = true; }, 450);
+            });
+
+            // Duck the song while a video plays with sound; resume it once nothing's playing.
+            var duckedByVideo = false;
+            var soundVids = document.querySelectorAll('.photo-inset video');
+            function anyVideoPlaying() { return Array.prototype.some.call(soundVids, function (v) { return !v.paused && !v.ended; }); }
+            function maybeResume() {
+                if (duckedByVideo && !anyVideoPlaying() && !dismissed) {
+                    duckedByVideo = false;
+                    var p = audio.play(); if (p && p.catch) p.catch(function () {});
+                }
+            }
+            Array.prototype.forEach.call(soundVids, function (v) {
+                v.addEventListener('play', function () { if (!audio.paused) { audio.pause(); duckedByVideo = true; } });
+                v.addEventListener('pause', maybeResume);
+                v.addEventListener('ended', maybeResume);
+            });
+
+            function tryAutoplay() {
+                if (triedAutoplay) return; triedAutoplay = true;
+                showPlayer();
+                audio.volume = 0.35; // gentle — sit under the reading, don't compete
+                var p = audio.play();
+                if (p && p.catch) p.catch(function () { player.classList.add('needs-tap'); });
+            }
+            var dismiss = document.getElementById('komorebiDismiss');
+            if (dismiss) dismiss.addEventListener('click', tryAutoplay);
+
+            // Returning visitor (interstitial skipped) — surface the player with a soft nudge.
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            if (sessionStorage.getItem('dispatch-seen-' + path) === '1') {
+                setTimeout(function () { showPlayer(); player.classList.add('needs-tap'); }, 1200);
+            }
+        })();
 
         // ==================== COMMENTS ====================
         (function() {
