@@ -49,7 +49,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Archivo:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.typekit.net/vpx6nbc.css">
 
     <style>
@@ -67,6 +67,7 @@
             --rule: rgba(31, 30, 29, 0.1);
             --font: 'adobe-jenson-pro', Georgia, 'Times New Roman', serif;
             --font-display: 'rl-horizon', 'adobe-jenson-pro', Georgia, serif;
+            --font-sans: 'Archivo', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             color-scheme: light dark;
         }
 
@@ -313,11 +314,12 @@
         }
 
         .hero-label {
+            font-family: var(--font-sans);
             font-size: 12px;
             font-weight: 600;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: var(--accent);
+            color: var(--caption);
             margin-bottom: 1rem;
             opacity: 0;
             transition: color 0.3s ease;
@@ -1318,6 +1320,27 @@
     <div class="divider reveal-fade"></div>
 
     <!-- ——— Subscribe ——— -->
+    <nav class="mfx-more-letters reveal-fade" aria-label="More letters">
+        <p class="mfx-more-letters-label">
+            <span data-l="en">More letters</span><span data-l="ko">다른 편지</span>
+        </p>
+        <div class="mfx-more-letters-grid">
+            <a href="/newsletter/" class="mfx-more-letter mfx-more-letter-all">
+                <span class="mfx-more-letter-title"><span data-l="en">All letters &rarr;</span><span data-l="ko">모든 편지 &rarr;</span></span>
+            </a>
+            <a href="/newsletter/002/" class="mfx-more-letter">
+                <span class="mfx-more-letter-num">No. 002</span>
+                <span class="mfx-more-letter-title"><span data-l="en">Spring on the Mountain</span><span data-l="ko">산 위의 봄</span></span>
+                <span class="mfx-more-letter-desc">
+                    <span data-l="en">Closing out ski season at Mammoth, producing at Paramount, free furniture from London, and Dylan's first visit.</span>
+                    <span data-l="ko">매머드에서 시즌 마무리, 파라마운트에서 프로듀싱, 런던 사람한테 공짜 가구, Dylan 첫 방문.</span>
+                </span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="divider reveal-fade"></div>
+
     <div class="subscribe reveal" id="subscribe">
         <p class="subscribe-label">
             <span data-l="en">Stay in the Loop</span>
