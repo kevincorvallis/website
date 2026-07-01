@@ -255,6 +255,41 @@
             overflow: hidden;
         }
 
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            transition: background 0.3s ease;
+            background: linear-gradient(
+                to top,
+                rgba(240, 238, 230, 0.95) 0%,
+                rgba(240, 238, 230, 0.5) 35%,
+                rgba(240, 238, 230, 0.05) 100%
+            );
+        }
+
+        [data-theme="dark"] .hero-overlay {
+            background: linear-gradient(
+                to top,
+                rgba(31, 30, 29, 0.95) 0%,
+                rgba(31, 30, 29, 0.4) 35%,
+                rgba(31, 30, 29, 0.05) 100%
+            );
+        }
+
         .hero-content {
             position: relative;
             z-index: 2;
@@ -465,6 +500,7 @@
         }
 
         .photo-inset img,
+        .photo-inset video,
         .photo-inset .gif-wrap img {
             width: 100%;
             border-radius: 3px;
@@ -1165,6 +1201,10 @@
 
     <!-- ==================== HERO ==================== -->
     <section class="hero" style="align-items: center;">
+        <div class="hero-image">
+            <img src="/newsletter/on-love/images/beef-s2-cast.jpg" alt="Carey Mulligan, Oscar Isaac, Cailee Spaeny, and Charles Melton, the cast of Beef Season 2" id="heroImg">
+        </div>
+        <div class="hero-overlay"></div>
         <div class="hero-content" style="padding-bottom: 0;">
             <div class="hero-label">
                 <span data-l="en">Dispatch &middot; An Interlude</span>
@@ -1214,6 +1254,14 @@
             <p>종교를 믿으면서 자란 사람들에게는 신의 사랑이라는 개념이 늘 익숙할 거야. 그리스어로 이걸 뜻하는 단어가 있는데, 바로 <a href="https://www.etymonline.com/word/agape" target="_blank"><em>아가페</em></a>야. 가장 숭고하고 이타적이며, 조건 없는 형태의 사랑이지. 사랑을 받는 사람의 가치나 지위, 혹은 자격 따위와는 전혀 상관없는 사랑이야.</p>
             <aside class="mfx-sn">그리스인들은 사랑을 여러 단어로 나눴어. <em>에로스</em>(욕망), <em>필리아</em>(우정), <em>스토르게</em>(가족애), 그리고 무조건적인 사랑 <em>아가페</em>. 이게 제일 어려운 거야.</aside>
             <p>내 삶을 돌아보고, 또 난생처음 이별이라는 걸 겪으면서, 사람들이 이 사랑이라는 개념을 대하는 방식에 따라 크게 두 부류로 나눌 수 있겠다는 생각이 들었어.</p>
+        </div>
+    </div>
+    <div class="photo-full reveal-scale" id="chairwoman-park">
+        <img src="/newsletter/on-love/images/beef-s2-chairwoman-park.jpg" alt="Chairwoman Park stepping out of a car, flanked by two aides, in Beef Season 2">
+        <div class="photo-caption">
+            <span class="caption-location">Beef S2</span>
+            <span data-l="en">Chairwoman Park, arriving like the verdict's already in.</span>
+            <span data-l="ko">회장 박, 이미 판결이 끝난 사람처럼 등장.</span>
         </div>
     </div>
     <div class="text-block reveal" style="text-align: center;">
@@ -1288,6 +1336,14 @@
         </div>
     </div>
     <div class="divider reveal-fade"></div>
+    <div class="photo-inset reveal">
+        <img src="/newsletter/on-love/images/beef-s2-dinner.jpg" alt="Chairwoman Park and Dr. Kim seated at an outdoor dinner table at night, Beef Season 2">
+        <div class="photo-caption">
+            <span data-l="en">Chairwoman Park and Dr. Kim, right before he drops the second-marriage line.</span>
+            <span data-l="ko">회장 박과 닥터 김, 두 번째 결혼 얘기가 나오기 직전.</span>
+        </div>
+    </div>
+    <div class="spacer-sm"></div>
     <div class="text-block reveal">
         <div data-l="en">
             <p>Dr. Kim, played by <a href="https://en.wikipedia.org/wiki/Song_Kang-ho" target="_blank">Song Kang-ho</a> (my favorite Korean actor), sums it up pretty well in one quote:</p>
@@ -1322,6 +1378,15 @@
         </div>
         <div data-l="ko">
             <p><a href="https://nofilmschool.com/la-la-land-opening-decoded" target="_blank"><em>라라랜드</em></a>는 두 사람이 순수한 감정 대신 각자의 미래를 위한 실용적 선택을 할 때 무슨 일이 일어나는지를 묻고, <a href="https://www.bfi.org.uk/features/before-sunrise-richard-linklater-vienna-locations" target="_blank"><em>비포 선라이즈</em></a>는 그 반대의 질문을 던지지. 미래에 대한 계산 없이, 단 하룻밤의 연결만으로도 올인할 이유가 되는가?</p>
+        </div>
+    </div>
+    <div class="photo-inset reveal">
+        <video controls playsinline preload="metadata" poster="/newsletter/on-love/images/movie-clip-poster.jpg">
+            <source src="/newsletter/on-love/images/movie-clip.mp4" type="video/mp4">
+        </video>
+        <div class="photo-caption">
+            <span data-l="en">&ldquo;I was up here, yeah?&rdquo;</span>
+            <span data-l="ko">&ldquo;나 여기 있었잖아, 그렇지?&rdquo;</span>
         </div>
     </div>
     <div class="divider reveal-fade"></div>
@@ -1496,6 +1561,30 @@
         </p>
     </footer>
 
+    <!-- ==================== SONG OF THE WEEK — bottom-left mini player ==================== -->
+    <audio id="songOfTheWeek" src="/newsletter/on-love/images/beanie-chezile-piano-cover.mp3" preload="metadata" loop></audio>
+    <div class="mini-player" id="miniPlayer" hidden aria-label="Song of the week mini player">
+        <button class="mini-player-btn" id="miniPlayerBtn" type="button" aria-label="Play or pause the song of the week" data-state="paused">
+            <svg class="mini-player-ring" viewBox="0 0 36 36" aria-hidden="true">
+                <circle class="ring-track" cx="18" cy="18" r="16"></circle>
+                <circle class="ring-progress" cx="18" cy="18" r="16" id="miniPlayerRing"></circle>
+            </svg>
+            <svg class="mini-player-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path class="icon-play" d="M7 5 L7 19 L19 12 Z"></path>
+                <path class="icon-pause" d="M7 5 H10 V19 H7 Z M14 5 H17 V19 H14 Z"></path>
+            </svg>
+        </button>
+        <div class="mini-player-meta">
+            <div class="mini-player-title"><a href="https://www.youtube.com/watch?v=mNDpCIJXpvs" target="_blank" rel="noopener" style="color:inherit;text-decoration:none" title="Beanie — Chezile (Piano Cover)">Beanie</a></div>
+            <div class="mini-player-artist">
+                <span data-l="en">Chezile &middot; piano cover</span>
+                <span data-l="ko">체자일 &middot; 피아노 커버</span>
+            </div>
+        </div>
+        <button class="mini-player-close" id="miniPlayerClose" type="button"
+            data-aria-en="Close mini player" data-aria-ko="미니 플레이어 닫기" aria-label="Close mini player">&times;</button>
+    </div>
+
     <!-- Analytics -->
     <script defer src="/_vercel/insights/script.js"></script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
@@ -1595,6 +1684,84 @@
             updatePlaceholders();
         })();
 
+        // ==================== SONG OF THE WEEK (bottom-left mini player) ====================
+        (function () {
+            var audio = document.getElementById('songOfTheWeek');
+            var player = document.getElementById('miniPlayer');
+            var miniBtn = document.getElementById('miniPlayerBtn');
+            var ring = document.getElementById('miniPlayerRing');
+            var closeBtn = document.getElementById('miniPlayerClose');
+            if (!audio || !player) return;
+
+            var RING_C = 2 * Math.PI * 16;
+            if (ring) { ring.style.strokeDasharray = RING_C; ring.style.strokeDashoffset = RING_C; }
+            var triedAutoplay = false, dismissed = false, rafId = null;
+
+            function setState(s) { if (miniBtn) miniBtn.setAttribute('data-state', s); if (s === 'playing') player.classList.remove('needs-tap'); }
+            function showPlayer() { if (dismissed) return; player.hidden = false; requestAnimationFrame(function () { player.classList.add('visible'); }); }
+            function updateRing() {
+                if (!audio.duration || !isFinite(audio.duration)) { rafId = requestAnimationFrame(updateRing); return; }
+                var pct = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
+                if (ring) ring.style.strokeDashoffset = RING_C * (1 - pct);
+                if (!audio.paused) rafId = requestAnimationFrame(updateRing);
+            }
+            function startRingLoop() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(updateRing); }
+            function stopRingLoop() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } updateRing(); }
+
+            audio.addEventListener('play', function () { setState('playing'); startRingLoop(); });
+            audio.addEventListener('playing', function () { setState('playing'); startRingLoop(); });
+            audio.addEventListener('pause', function () { setState('paused'); stopRingLoop(); });
+            audio.addEventListener('ended', function () { setState('paused'); stopRingLoop(); });
+            audio.addEventListener('waiting', function () { setState('buffering'); });
+
+            function toggle() {
+                showPlayer();
+                if (audio.paused) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
+                else { audio.pause(); }
+            }
+            if (miniBtn) miniBtn.addEventListener('click', toggle);
+            document.addEventListener('keydown', function (e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (player.hidden) return;
+                if (e.key === 'k' || (e.key === ' ' && document.activeElement === miniBtn)) { e.preventDefault(); toggle(); }
+            });
+            if (closeBtn) closeBtn.addEventListener('click', function () {
+                audio.pause(); dismissed = true; player.classList.remove('visible');
+                setTimeout(function () { player.hidden = true; }, 450);
+            });
+
+            // Duck the song while a video plays with sound; resume it once nothing's playing.
+            var duckedByVideo = false;
+            var soundVids = document.querySelectorAll('.photo-inset video');
+            function anyVideoPlaying() { return Array.prototype.some.call(soundVids, function (v) { return !v.paused && !v.ended; }); }
+            function maybeResume() {
+                if (duckedByVideo && !anyVideoPlaying() && !dismissed) {
+                    duckedByVideo = false;
+                    var p = audio.play(); if (p && p.catch) p.catch(function () {});
+                }
+            }
+            Array.prototype.forEach.call(soundVids, function (v) {
+                v.addEventListener('play', function () { if (!audio.paused) { audio.pause(); duckedByVideo = true; } });
+                v.addEventListener('pause', maybeResume);
+                v.addEventListener('ended', maybeResume);
+            });
+
+            function tryAutoplay() {
+                if (triedAutoplay) return; triedAutoplay = true;
+                showPlayer();
+                audio.volume = 0.35; // gentle — sit under the reading, don't compete
+                var p = audio.play();
+                if (p && p.catch) p.catch(function () { player.classList.add('needs-tap'); });
+            }
+            var dismiss = document.getElementById('komorebiDismiss');
+            if (dismiss) dismiss.addEventListener('click', tryAutoplay);
+
+            // Returning visitor (interstitial skipped) — surface the player with a soft nudge.
+            var path = window.location.pathname.replace(/\/$/, '') || '/';
+            if (sessionStorage.getItem('dispatch-seen-' + path) === '1') {
+                setTimeout(function () { showPlayer(); player.classList.add('needs-tap'); }, 1200);
+            }
+        })();
 
         // ==================== COMMENTS ====================
         (function() {
@@ -1725,6 +1892,18 @@
                 .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
                 .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
                 .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+
+            // Hero Ken Burns
+            gsap.to('#heroImg', {
+                scale: 1.15,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                }
+            });
 
             // Hero title parallax
             gsap.to('.hero-title', {
