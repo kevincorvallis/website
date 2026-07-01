@@ -1201,10 +1201,6 @@
 
     <!-- ==================== HERO ==================== -->
     <section class="hero" style="align-items: center;">
-        <div class="hero-image">
-            <img src="/newsletter/wounds-of-a-friend/images/beef-s2-cast.jpg" alt="Carey Mulligan, Oscar Isaac, Cailee Spaeny, and Charles Melton, the cast of Beef Season 2" id="heroImg">
-        </div>
-        <div class="hero-overlay"></div>
         <div class="hero-content" style="padding-bottom: 0;">
             <div class="hero-label">
                 <span data-l="en">Dispatch &middot; An Interlude</span>
@@ -1256,14 +1252,6 @@
             <aside class="mfx-sn">그리스인들은 사랑을 여러 단어로 나눴어. <em>에로스</em>(욕망), <em>필리아</em>(우정), <em>스토르게</em>(가족애), 그리고 무조건적인 사랑 <em>아가페</em>. 이게 제일 어려운 거야.</aside>
             <p>내 삶을 돌아보고, 또 난생처음 이별이라는 걸 겪으면서, 사람들이 이 사랑이라는 개념을 대하는 방식에 따라 크게 두 부류로 나눌 수 있겠다는 생각이 들었어.</p>
             <p>크게 한 번 싸운 게 아니라, 그냥 내가 되고 싶었던 내 모습을 점점 잃어가는 느낌이었지. LA로 해안도로 따라 내려오는 내내 혼자서, 원래의 내가 어떤 놈이었는지 되찾으려고 했던 거야.</p>
-        </div>
-    </div>
-    <div class="photo-full reveal-scale" id="chairwoman-park">
-        <img src="/newsletter/wounds-of-a-friend/images/beef-s2-chairwoman-park.jpg" alt="Chairwoman Park stepping out of a car, flanked by two aides, in Beef Season 2">
-        <div class="photo-caption">
-            <span class="caption-location">Beef S2</span>
-            <span data-l="en">Chairwoman Park, arriving like the verdict's already in.</span>
-            <span data-l="ko">회장 박, 이미 판결이 끝난 사람처럼 등장.</span>
         </div>
     </div>
     <div class="text-block reveal" style="text-align: center;">
@@ -1885,18 +1873,6 @@
                 .to('.hero-title', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.4')
                 .to('.hero-description', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
                 .to('.scroll-hint', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3');
-
-            // Hero Ken Burns
-            gsap.to('#heroImg', {
-                scale: 1.15,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: '.hero',
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: true,
-                }
-            });
 
             // Hero title parallax
             gsap.to('.hero-title', {
