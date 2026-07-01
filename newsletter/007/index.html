@@ -63,7 +63,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+JP:wght@300;400;600&family=Noto+Serif+KR:wght@400;600&family=Archivo:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -76,6 +76,7 @@
             --rule: rgba(31, 30, 29, 0.1);
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
             --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            --font-sans: 'Archivo', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             --mono: ui-monospace, 'SF Mono', Menlo, monospace;
             color-scheme: light dark;
         }
@@ -333,14 +334,14 @@
         @media (max-width: 768px) { .masthead { padding: 5.5rem 1.5rem 2rem; } }
         .mast-kicker {
             display: flex; align-items: center; gap: 0.7em;
-            font-family: var(--mono); font-size: 11px; font-weight: 600;
-            letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent);
+            font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+            letter-spacing: 0.16em; text-transform: uppercase; color: var(--caption);
             margin-bottom: 1.5rem; transition: color 0.3s ease;
         }
-        .mast-kicker .mast-no { color: var(--caption); letter-spacing: 0.18em; }
+        .mast-kicker .mast-no { color: var(--caption); letter-spacing: 0.1em; }
         .mast-dateline {
             display: flex; align-items: center; flex-wrap: wrap; gap: 0.55em;
-            font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em;
+            font-family: var(--font-sans); font-size: 12px; letter-spacing: 0.1em;
             text-transform: uppercase; color: var(--caption);
             margin-bottom: 1.7rem; transition: color 0.3s ease;
         }
@@ -1606,6 +1607,27 @@
     <div class="divider reveal-fade"></div>
 
     <!-- ——— Subscribe ——— -->
+    <nav class="mfx-more-letters reveal-fade" aria-label="More letters">
+        <p class="mfx-more-letters-label">
+            <span data-l="en">More letters</span><span data-l="ko">다른 편지</span>
+        </p>
+        <div class="mfx-more-letters-grid">
+            <a href="/newsletter/006/" class="mfx-more-letter">
+                <span class="mfx-more-letter-num">No. 006</span>
+                <span class="mfx-more-letter-title"><span data-l="en">Us</span><span data-l="ko">우리</span></span>
+                <span class="mfx-more-letter-desc">
+                    <span data-l="en">A $111-billion merger, a manager title I&rsquo;m too tired to celebrate, Pride with Justin and the Jackass crew, the World Cup, and a Korean short-track relay I can&rsquo;t stop crying over. On us &mdash; the people and the country that held the line.</span>
+                    <span data-l="ko">1,110억 달러짜리 합병, 축하할 기운도 없는 매니저 승진, 저스틴과 함께한 프라이드와 잭애스 크루, 월드컵, 그리고 자꾸 울게 만드는 한국 쇼트트랙 계주. 우리 &mdash; 끝내 자리를 지킨 사람들과 나라에 대하여.</span>
+                </span>
+            </a>
+            <a href="/newsletter/" class="mfx-more-letter mfx-more-letter-all">
+                <span class="mfx-more-letter-title"><span data-l="en">All letters &rarr;</span><span data-l="ko">모든 편지 &rarr;</span></span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="divider reveal-fade"></div>
+
     <div class="subscribe reveal" id="subscribe">
         <p class="subscribe-label">
             <span data-l="en">Stay in the Loop</span>
