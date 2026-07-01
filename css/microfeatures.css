@@ -11,6 +11,8 @@
     --mfx-rule: color-mix(in srgb, var(--text, #1f1e1d) 14%, transparent);
     --mfx-surface: color-mix(in srgb, var(--bg, #f0eee6) 92%, var(--text, #1f1e1d));
     --mfx-shadow: 0 8px 30px color-mix(in srgb, var(--text, #1f1e1d) 22%, transparent);
+    --mfx-font-sans: var(--font-sans, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif);
+    --mfx-caption: var(--caption, color-mix(in srgb, var(--text, #1f1e1d) 55%, transparent));
 }
 
 /* ─── Self-linking headings ─────────────────────────────────────────────── */
@@ -212,4 +214,74 @@ a[data-mfx-noicon]::after { content: none; }
     .mfx-progress__fill,
     .mfx-preview,
     .mfx-toast { transition: none; }
+}
+
+/* ─── "More letters" related-entries module (Dispatch issue/interlude pages) ───────────── */
+.mfx-more-letters {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+.mfx-more-letters-label {
+    font-family: var(--mfx-font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mfx-accent);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.mfx-more-letters-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem;
+}
+.mfx-more-letter {
+    display: block;
+    text-decoration: none;
+    color: var(--text, #1f1e1d);
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--mfx-rule);
+    transition: opacity 0.2s ease, border-color 0.3s ease;
+}
+.mfx-more-letter:hover { opacity: 0.62; }
+.mfx-more-letter-num {
+    display: block;
+    font-family: var(--mfx-font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--mfx-accent);
+    margin-bottom: 0.4rem;
+}
+.mfx-more-letter-title {
+    display: block;
+    font-family: var(--mfx-font-sans);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 0.4rem;
+}
+.mfx-more-letter-desc {
+    display: -webkit-box;
+    font-family: var(--font, inherit);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--mfx-caption);
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.mfx-more-letter-all {
+    display: flex;
+    align-items: center;
+    min-height: 3.2rem;
+}
+.mfx-more-letter-all .mfx-more-letter-title { margin-bottom: 0; }
+@media (max-width: 640px) {
+    .mfx-more-letters-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .mfx-more-letter { transition: none; }
 }
