@@ -14,6 +14,7 @@
     "bio2": "<a href=\"https://github.com/kevincorvallis\" target=\"_blank\" rel=\"noopener\">PookieB</a>という小さなソフトウェア会社も運営しています。Web、iOS、AI/ML分野で10以上のプロダクトを展開中。本当に役立つものを作るのが好きです。",
     "bio3": "コーディングしていないときは、大抵飛んでいます。Angel Flight Westのボランティアパイロットとして、太平洋岸北西部で医療搬送飛行を行っています。サーフィン、写真撮影、旅行も楽しんでいます。",
     "resumeLink": "履歴書",
+    "aiLink": "AIに聞く",
     "projectsHeading": "プロジェクト",
     "projectsLink": "すべてのプロジェクトを見る",
     "photographyHeading": "写真",
@@ -67,6 +68,7 @@
     "interestsHeading": "興味",
     "interestsList": "人道支援 · 持続可能エネルギー · サーフィン · 飛行 · 旅行",
     "chatHeading": "何でも聞いてください",
+    "aiCta": "気になることがあれば<a href=\"/ai\">私のAIに聞いてください</a> — 私として答えます。",
     "chatSubtitle": "私の経歴に興味がありますか？下からお気軽にどうぞ。",
     "chatPlaceholder": "私のスキルについて聞いてみてください...",
     "chatDisclaimer": "AI を活用 · 回答は Kevin の履歴書に基づいています",
@@ -484,5 +486,29 @@
     "changesP": "We may update this policy from time to time. Significant changes will be communicated via email or in-app notification. The \"Last updated\" date at the top reflects the most recent revision.",
     "contactHeading": "お問い合わせ",
     "contactP": "お問い合わせ: <a href=\"mailto:kevin@klee.page\">kevin@klee.page</a>"
+  },
+  "ai": {
+    "heading": "ケビンに聞く",
+    "subtitle": "私として答えるAI — エンジニアリング、プロジェクト、写真、飛行。何でも聞いてください。",
+    "empty": "たとえばこんな質問:",
+    "inputLabel": "ケビンのAIに質問する",
+    "placeholder": "何でも聞いてください…",
+    "disclaimer": "このサイトの内容をもとにAIが私の声で答えます。間違うこともあります。",
+    "share": "共有",
+    "copied": "コピー済み",
+    "clear": "クリア",
+    "roleUser": "あなた",
+    "roleAssistant": "Kevin",
+    "errorRate": "メッセージの送信が速すぎます。1分ほどお待ちください。",
+    "errorNetwork": "今は返答できません。もう一度お試しください。",
+    "errorEmpty": "問題が発生しました。",
+    "chips": [
+      "パラマウントで何を作っていますか？",
+      "サイドプロジェクトを10個も出せる理由は？",
+      "エンジェル・フライトについて教えてください",
+      "なぜ今もフィルムで撮るのですか？",
+      "パラマウントとマイクロソフトの違いは？",
+      "軍隊はエンジニアリングにどう影響しましたか？"
+    ]
   }
 }

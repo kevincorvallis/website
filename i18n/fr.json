@@ -14,6 +14,7 @@
     "bio2": "En parallèle, je dirige une petite entreprise de logiciels appelée <a href=\"https://github.com/kevincorvallis\" target=\"_blank\" rel=\"noopener\">PookieB</a> — 10 produits et plus, couvrant le web, iOS et l'IA/ML. J'aime créer des choses vraiment utiles.",
     "bio3": "Quand je ne code pas, je vole. Je suis bénévole chez Angel Flight West pour des transports médicaux dans le nord-ouest du Pacifique. Je fais aussi du surf, de la photo et je voyage dès que possible.",
     "resumeLink": "CV",
+    "aiLink": "Mon IA",
     "projectsHeading": "Projets",
     "projectsLink": "Voir tous les projets",
     "photographyHeading": "Photographie",
@@ -67,6 +68,7 @@
     "interestsHeading": "Centres d'intérêt",
     "interestsList": "Aide humanitaire · énergie durable · surf · pilotage · voyages",
     "chatHeading": "Posez-moi vos questions",
+    "aiCta": "Une question sur tout ça ? <a href=\"/ai\">Demandez à mon IA</a> — elle répond comme moi.",
     "chatSubtitle": "Curieux d'en savoir plus sur mon parcours ? Demandez ci-dessous.",
     "chatPlaceholder": "Posez une question sur mes compétences...",
     "chatDisclaimer": "Propulsé par l'IA · Réponses fondées sur le CV de Kevin",
@@ -484,5 +486,29 @@
     "changesP": "Mises à jour possibles ; changements significatifs notifiés par email ou in-app.",
     "contactHeading": "Contact",
     "contactP": "Questions vie privée ? <a href=\"mailto:kevin@klee.page\">kevin@klee.page</a>"
+  },
+  "ai": {
+    "heading": "Demandez à Kevin",
+    "subtitle": "Une IA qui répond comme moi — ingénierie, projets, photo, aviation. Posez-lui ce que vous voulez.",
+    "empty": "Quelques idées pour commencer :",
+    "inputLabel": "Posez une question à l'IA de Kevin",
+    "placeholder": "Demandez-moi ce que vous voulez…",
+    "disclaimer": "Une IA répond avec ma voix, à partir du contenu de ce site. Elle peut se tromper.",
+    "share": "Partager",
+    "copied": "Copié",
+    "clear": "Effacer",
+    "roleUser": "Vous",
+    "roleAssistant": "Kevin",
+    "errorRate": "Vous envoyez des messages trop vite. Attendez une minute.",
+    "errorNetwork": "Désolé, je ne peux pas répondre pour le moment. Réessayez.",
+    "errorEmpty": "Désolé, une erreur s'est produite.",
+    "chips": [
+      "Que construisez-vous chez Paramount ?",
+      "Comment livrez-vous 10 projets personnels ?",
+      "Parlez-moi d'Angel Flight",
+      "Pourquoi photographier encore en argentique ?",
+      "Paramount vs Microsoft — quelle différence ?",
+      "Que vous a appris l'armée sur l'ingénierie ?"
+    ]
   }
 }

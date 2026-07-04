@@ -14,6 +14,7 @@
     "bio2": "On the side I run a small software company called <a href=\"https://github.com/kevincorvallis\" target=\"_blank\" rel=\"noopener\">PookieB</a> — 10 products and counting across web, iOS, and AI/ML. I like building things that are genuinely useful.",
     "bio3": "When I'm not coding, I'm usually flying. I volunteer with Angel Flight West doing medical transport flights around the Pacific Northwest. I also surf, take photos, and travel whenever I can.",
     "resumeLink": "Resume",
+    "aiLink": "Ask my AI",
     "projectsHeading": "Projects",
     "projectsLink": "View all projects",
     "photographyHeading": "Photography",
@@ -67,6 +68,7 @@
     "interestsHeading": "Interests",
     "interestsList": "Humanitarian aid · sustainable energy · surfing · flying · traveling",
     "chatHeading": "Ask me anything",
+    "aiCta": "Want to ask about any of this? <a href=\"/ai\">Ask my AI</a> — it answers as me.",
     "chatSubtitle": "Curious about my experience? Ask below.",
     "chatPlaceholder": "Ask about my skills...",
     "chatDisclaimer": "Powered by AI · Responses based on Kevin's resume",
@@ -482,5 +484,29 @@
     "changesP": "We may update this policy from time to time. Significant changes will be communicated via email or in-app notification. The \"Last updated\" date at the top reflects the most recent revision.",
     "contactHeading": "Contact",
     "contactP": "Questions about privacy? Contact <a href=\"mailto:kevin@klee.page\">kevin@klee.page</a>"
+  },
+  "ai": {
+    "heading": "Ask Kevin",
+    "subtitle": "An AI that answers as me — engineering, projects, photography, flying. Ask it anything.",
+    "empty": "A few places to start:",
+    "inputLabel": "Ask Kevin's AI a question",
+    "placeholder": "Ask me anything…",
+    "disclaimer": "AI answers in my voice, from what's on this site. It can be wrong.",
+    "share": "Share",
+    "copied": "Copied",
+    "clear": "Clear",
+    "roleUser": "You",
+    "roleAssistant": "Kevin",
+    "errorRate": "You're sending messages too fast. Please wait a minute before trying again.",
+    "errorNetwork": "Sorry, I couldn't respond right now. Please try again.",
+    "errorEmpty": "Sorry, something went wrong.",
+    "chips": [
+      "What are you building at Paramount?",
+      "How do you ship 10 side projects?",
+      "Tell me about Angel Flight",
+      "Why do you still shoot film?",
+      "Paramount vs Microsoft — what's different?",
+      "What did the Army teach you about engineering?"
+    ]
   }
 }

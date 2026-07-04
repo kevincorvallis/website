@@ -14,6 +14,7 @@
     "bio2": "사이드로 <a href=\"https://github.com/kevincorvallis\" target=\"_blank\" rel=\"noopener\">PookieB</a>라는 소규모 소프트웨어 회사를 운영하고 있습니다. 웹, iOS, AI/ML 분야에서 10개 이상의 제품을 만들고 있습니다. 진정으로 유용한 것을 만드는 걸 좋아합니다.",
     "bio3": "코딩을 하지 않을 때는 보통 비행을 합니다. Angel Flight West에서 자원봉사 파일럿으로 태평양 북서부 지역 의료 수송 비행을 하고 있습니다. 서핑, 사진 촬영, 여행도 즐깁니다.",
     "resumeLink": "이력서",
+    "aiLink": "AI에게 묻기",
     "projectsHeading": "프로젝트",
     "projectsLink": "모든 프로젝트 보기",
     "photographyHeading": "사진",
@@ -67,6 +68,7 @@
     "interestsHeading": "관심사",
     "interestsList": "인도주의 지원 · 지속 가능한 에너지 · 서핑 · 비행 · 여행",
     "chatHeading": "무엇이든 물어보세요",
+    "aiCta": "궁금한 게 있나요? <a href=\"/ai\">제 AI에게 물어보세요</a> — 저처럼 대답합니다.",
     "chatSubtitle": "제 경험이 궁금하신가요? 아래에서 물어보세요.",
     "chatPlaceholder": "제 역량에 대해 물어보세요...",
     "chatDisclaimer": "AI 기반 · 답변은 Kevin의 이력서를 바탕으로 합니다",
@@ -484,5 +486,29 @@
     "changesP": "We may update this policy from time to time. Significant changes will be communicated via email or in-app notification. The \"Last updated\" date at the top reflects the most recent revision.",
     "contactHeading": "문의",
     "contactP": "문의: <a href=\"mailto:kevin@klee.page\">kevin@klee.page</a>"
+  },
+  "ai": {
+    "heading": "케빈에게 물어보세요",
+    "subtitle": "저처럼 대답하는 AI — 엔지니어링, 프로젝트, 사진, 비행. 무엇이든 물어보세요.",
+    "empty": "이런 질문은 어때요:",
+    "inputLabel": "케빈의 AI에게 질문하기",
+    "placeholder": "무엇이든 물어보세요…",
+    "disclaimer": "이 사이트의 내용을 바탕으로 AI가 제 목소리로 답합니다. 틀릴 수 있어요.",
+    "share": "공유",
+    "copied": "복사됨",
+    "clear": "지우기",
+    "roleUser": "나",
+    "roleAssistant": "Kevin",
+    "errorRate": "메시지를 너무 빠르게 보내고 있습니다. 잠시 후 다시 시도하세요.",
+    "errorNetwork": "지금은 응답할 수 없습니다. 다시 시도해 주세요.",
+    "errorEmpty": "문제가 발생했습니다.",
+    "chips": [
+      "파라마운트에서 무엇을 만들고 있나요?",
+      "사이드 프로젝트 10개를 어떻게 다 만들었나요?",
+      "엔젤 플라이트 이야기를 들려주세요",
+      "왜 아직도 필름으로 찍나요?",
+      "파라마운트와 마이크로소프트의 차이는?",
+      "군대가 엔지니어링에 어떤 영향을 줬나요?"
+    ]
   }
 }

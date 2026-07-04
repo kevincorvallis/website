@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en" data-i18n-page="ai">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Ask Kevin — Kevin Lee</title>
+    <meta name="description" content="Ask Kevin's AI anything — engineering, side projects, film photography, or flying medical transport in the PNW.">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://klee.page/ai">
+    <meta property="og:title" content="Ask Kevin — Kevin Lee">
+    <meta property="og:description" content="An AI that answers as Kevin — engineering, projects, photography, flying. Ask it anything.">
+    <meta property="og:image" content="https://klee.page/images/kevi394-053.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ask Kevin — Kevin Lee">
+    <meta name="twitter:description" content="An AI that answers as Kevin — engineering, projects, photography, flying. Ask it anything.">
+    <meta name="twitter:image" content="https://klee.page/images/kevi394-053.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+
+    <!-- Prevent flash of wrong theme -->
+    <script>
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || systemPreference);
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ——— Reset ——— */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ——— Theme ——— */
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 17px;
+            line-height: 1.65;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: var(--text);
+        }
+
+        /* ——— Chrome ——— */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 620px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .back-link {
+            text-decoration: none;
+            font-size: 15px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        /* Theme toggle (site standard) */
+        .toggle-wrap input {
+            display: none;
+        }
+
+        .toggle-wrap label {
+            display: block;
+            width: 40px;
+            height: 20px;
+            background: var(--text);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle-wrap label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            background: var(--bg);
+            border-radius: 50%;
+        }
+
+        .toggle-wrap.has-transition label::after {
+            transition: transform 0.25s ease;
+        }
+
+        .toggle-wrap input:checked + label::after {
+            transform: translateX(20px);
+        }
+
+        /* ——— Layout ——— */
+        main {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            max-width: 620px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .ai-head {
+            flex-shrink: 0;
+            padding-bottom: 1rem;
+        }
+
+        .ai-head h1 {
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .ai-head .ai-subtitle {
+            opacity: 0.6;
+            font-size: 17px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 0.5rem 2px 1rem;
+            overscroll-behavior: contain;
+        }
+
+        /* ——— Messages (site chat language) ——— */
+        .chat-message {
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-message.user-msg {
+            align-items: flex-end;
+        }
+
+        .chat-message .chat-role {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.55;
+            margin-bottom: 0.35rem;
+        }
+
+        .chat-message .chat-body {
+            font-size: 17px;
+            line-height: 1.65;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 90%;
+        }
+
+        .chat-body ul, .chat-body ol {
+            margin: 0.4rem 0 0.4rem 1.2rem;
+        }
+
+        .chat-body code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.88em;
+            background: color-mix(in oklch, var(--text) 10%, var(--bg));
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+
+        .chat-message.user-msg .chat-body {
+            background: var(--text);
+            color: var(--bg);
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.assistant-msg .chat-body {
+            background: rgba(31, 30, 29, 0.08);
+            background: color-mix(in oklch, var(--text) 8%, var(--bg));
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Thinking indicator */
+        .chat-message .chat-body.thinking {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 14px 20px;
+        }
+
+        .thinking-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text);
+            opacity: 0.35;
+            animation: thinking-pulse 1.4s ease-in-out infinite;
+        }
+
+        .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes thinking-pulse {
+            0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 0.7; transform: scale(1); }
+        }
+
+        /* Streaming cursor */
+        .chat-message .chat-body.streaming::after {
+            content: '\25B8';
+            animation: pulse-cursor 2.4s ease-in-out infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes pulse-cursor {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.7; }
+        }
+
+        /* ——— Empty state / suggestions ——— */
+        .chat-empty {
+            opacity: 0.6;
+            font-size: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .chat-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .chat-suggestions button {
+            background: none;
+            border: 1px solid color-mix(in oklch, var(--text) 25%, var(--bg));
+            border-radius: 16px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 15px;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .chat-suggestions button:hover {
+            border-color: var(--text);
+        }
+
+        /* ——— Composer ——— */
+        .chat-composer {
+            flex-shrink: 0;
+            padding: 0.5rem 0 calc(12px + env(safe-area-inset-bottom));
+        }
+
+        .chat-input-wrap {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input-wrap input {
+            flex: 1;
+            background: color-mix(in oklch, var(--text) 5%, var(--bg));
+            border: 1px solid color-mix(in oklch, var(--text) 15%, var(--bg));
+            border-radius: 22px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 16px;
+            padding: 12px 18px;
+            outline: none;
+            transition: border-color 0.2s ease, color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .chat-input-wrap input:focus {
+            border-color: color-mix(in oklch, var(--text) 40%, var(--bg));
+        }
+
+        .chat-input-wrap input::placeholder {
+            color: var(--text);
+            opacity: 0.35;
+        }
+
+        .chat-input-wrap button {
+            background: var(--text);
+            border: none;
+            border-radius: 50%;
+            color: var(--bg);
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .chat-input-wrap button:hover {
+            opacity: 0.7;
+        }
+
+        .chat-input-wrap button:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .chat-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-top: 0.6rem;
+        }
+
+        .chat-disclaimer {
+            font-size: 13px;
+            opacity: 0.55;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .chat-actions button {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 13px;
+            opacity: 0.55;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            padding: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .chat-actions button:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .ai-head h1 {
+                font-size: 24px;
+            }
+
+            .ai-head .ai-subtitle {
+                font-size: 15px;
+            }
+
+            .chat-message .chat-body {
+                font-size: 15px;
+                padding: 10px 14px;
+            }
+
+            .chat-suggestions button {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* ——— Accessibility ——— */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            padding: 8px 16px;
+            background: var(--text);
+            color: var(--bg);
+            z-index: 100;
+            font-size: 14px;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* ——— Reduced Motion ——— */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main" class="skip-link" data-i18n="common.skipLink">Skip to content</a>
+
+    <header>
+        <a href="/" class="back-link" data-i18n-html="common.backHome">&larr; Kevin Lee</a>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
+        </div>
+    </header>
+
+    <main id="main">
+        <div class="ai-head">
+            <h1 data-i18n="ai.heading">Ask Kevin</h1>
+            <p class="ai-subtitle" data-i18n="ai.subtitle">An AI that answers as me — engineering, projects, photography, flying. Ask it anything.</p>
+        </div>
+
+        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite">
+            <div class="chat-empty" id="chat-empty" data-i18n="ai.empty">A few places to start:</div>
+            <div class="chat-suggestions" id="chat-suggestions"></div>
+        </div>
+
+        <div class="chat-composer">
+            <div class="chat-input-wrap">
+                <label for="chat-input" class="sr-only" data-i18n="ai.inputLabel">Ask Kevin's AI a question</label>
+                <input type="text" id="chat-input" data-i18n-placeholder="ai.placeholder" placeholder="Ask me anything…" maxlength="500" autocomplete="off">
+                <button type="button" id="chat-send" aria-label="Send" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+            </div>
+            <div class="chat-meta">
+                <p class="chat-disclaimer" data-i18n="ai.disclaimer">AI answers in my voice, from what's on this site. It can be wrong.</p>
+                <div class="chat-actions">
+                    <button type="button" id="chat-share" data-i18n="ai.share" hidden>Share</button>
+                    <button type="button" id="chat-clear" data-i18n="ai.clear" hidden>Clear</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/theme.js"></script>
+    <script src="/js/ai-chat.js"></script>
+</body>
+</html>
