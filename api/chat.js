@@ -144,10 +144,13 @@ function logChat(question, response, req) {
     }).catch(err => console.error('Supabase log error:', err.message));
 }
 
-// Resolve provider config: cliproxy (primary) or OpenAI (fallback)
-function getProviderConfig() {
+// Provider chain: cliproxy (colette Mac Mini) first when configured, then
+// OpenAI. Tried IN ORDER at request time — if the primary is down the request
+// still succeeds instead of 502ing.
+function getProviderChain() {
+    const chain = [];
     if (CLIPROXY_URL && CLIPROXY_SECRET) {
-        return {
+        chain.push({
             url: CLIPROXY_URL,
             headers: {
                 'Content-Type': 'application/json',
@@ -155,17 +158,22 @@ function getProviderConfig() {
             },
             model: 'claude-sonnet-4',
             name: 'cliproxy',
-        };
+            timeoutMs: 8000, // fail over quickly if colette is unreachable
+        });
     }
-    return {
-        url: 'https://api.openai.com/v1/chat/completions',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-        model: 'gpt-4o-mini',
-        name: 'openai',
-    };
+    if (process.env.OPENAI_API_KEY) {
+        chain.push({
+            url: 'https://api.openai.com/v1/chat/completions',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            },
+            model: 'gpt-4o-mini',
+            name: 'openai',
+            timeoutMs: 30000,
+        });
+    }
+    return chain;
 }
 
 module.exports = async function handler(req, res) {
@@ -192,8 +200,8 @@ module.exports = async function handler(req, res) {
         return res.status(429).json({ error: 'Too many requests. Try again in a minute.' });
     }
 
-    const provider = getProviderConfig();
-    if (provider.name === 'openai' && !process.env.OPENAI_API_KEY) {
+    const providers = getProviderChain();
+    if (providers.length === 0) {
         return res.status(500).json({ error: 'Server configuration error' });
     }
 
@@ -230,22 +238,32 @@ module.exports = async function handler(req, res) {
     messages.push({ role: 'user', content: wrapUserInput(cleanMessage) });
 
     try {
-        const upstream = await fetch(provider.url, {
-            method: 'POST',
-            headers: provider.headers,
-            body: JSON.stringify({
-                model: provider.model,
-                messages,
-                max_tokens: 500,
-                temperature: 0.7,
-                stream: true,
-            }),
-            signal: AbortSignal.timeout(30000),
-        });
+        let upstream = null;
+        for (const provider of providers) {
+            try {
+                const attempt = await fetch(provider.url, {
+                    method: 'POST',
+                    headers: provider.headers,
+                    body: JSON.stringify({
+                        model: provider.model,
+                        messages,
+                        max_tokens: 500,
+                        temperature: 0.7,
+                        stream: true,
+                    }),
+                    signal: AbortSignal.timeout(provider.timeoutMs),
+                });
+                if (attempt.ok) {
+                    upstream = attempt;
+                    break;
+                }
+                console.error(`${provider.name} error:`, (await attempt.text()).slice(0, 300));
+            } catch (attemptErr) {
+                console.error(`${provider.name} unreachable:`, attemptErr.message);
+            }
+        }
 
-        if (!upstream.ok) {
-            const err = await upstream.text();
-            console.error(`${provider.name} error:`, err);
+        if (!upstream) {
             return res.status(502).json({ error: 'AI service error' });
         }
 
