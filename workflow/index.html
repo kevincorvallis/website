@@ -1,242 +1,537 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Agent Graph — Kevin Lee</title>
-<meta name="description" content="A living map of my AI tooling: seven agents, typed edges, and the text-expansion and review layers underneath. Values redacted by design.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper:#FAF7F2; --ink:#1C1917; --muted:#6B645B;
-    --route:#B4552D;   /* terracotta — routing / context-feed */
-    --verify:#4A6B4F;  /* moss — verify-claim edges */
-    --depth:#5B6B7A;   /* slate — paper↔code depth edges */
-    --hair:#E2DCD2; --card:#FFFFFF;
-    --mono:'IBM Plex Mono',ui-monospace,monospace;
-    --serif:'Newsreader',Georgia,serif;
-  }
-  [data-theme="dark"]{
-    --paper:#14120F; --ink:#E9E4DB; --muted:#9A9288;
-    --route:#D0704A; --verify:#7FA184; --depth:#8FA0AF;
-    --hair:#2A261F; --card:#1D1A16;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --paper:#14120F; --ink:#E9E4DB; --muted:#9A9288;
-      --route:#D0704A; --verify:#7FA184; --depth:#8FA0AF;
-      --hair:#2A261F; --card:#1D1A16;
-    }
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.55;transition:background .3s,color .3s}
-  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
-  header.site{display:flex;justify-content:space-between;align-items:baseline;padding:28px 0 0}
-  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-  #themeToggle{background:none;border:1px solid var(--hair);border-radius:20px;color:var(--ink);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer}
-  #themeToggle:focus-visible,a:focus-visible,.node:focus-visible{outline:2px solid var(--route);outline-offset:3px}
-  h1{font-size:clamp(2.6rem,7vw,4.4rem);font-weight:500;line-height:1.02;margin:.6em 0 .2em;letter-spacing:-.01em}
-  .thesis{font-size:clamp(1.05rem,2.4vw,1.3rem);font-style:italic;color:var(--muted);max-width:34em;margin:0 0 8px}
-  h2{font-size:1.5rem;font-weight:600;margin:2.6em 0 .4em}
-  h2 .tag{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;color:var(--route);display:block;text-transform:uppercase;margin-bottom:6px}
-  p.note{color:var(--muted);font-size:.95rem;max-width:40em}
-  /* ---- graph stage (signature) ---- */
-  .stage{border:1px solid var(--hair);border-radius:14px;background:var(--card);margin-top:26px;padding:10px 6px 0;overflow:hidden}
-  svg{width:100%;height:auto;display:block}
-  .node rect{fill:var(--paper);stroke:var(--hair);stroke-width:1.2;rx:8;transition:stroke .2s}
-  .node text{font-family:var(--mono);font-size:13px;font-weight:600;fill:var(--ink)}
-  .node .role{font-size:9.5px;font-weight:400;fill:var(--muted)}
-  .node{cursor:pointer}
-  .edge path{fill:none;stroke-width:1.6;opacity:.85;transition:opacity .25s}
-  .edge text{font-family:var(--mono);font-size:9.5px;fill:var(--muted)}
-  .edge.route path{stroke:var(--route)} .edge.verify path{stroke:var(--verify)} .edge.depth path{stroke:var(--depth)}
-  .edge.util path{stroke:var(--muted);stroke-dasharray:4 5}
-  svg.focused .edge:not(.lit){opacity:.12} svg.focused .node:not(.lit){opacity:.25}
-  .edge .pkt{opacity:0;fill:var(--route)}
-  svg.focused .edge.lit .pkt{opacity:1}
-  @media (prefers-reduced-motion: no-preference){
-    svg.focused .edge.lit .pkt{animation:none} /* motion handled by SMIL, gated below */
-  }
-  .nextline{font-family:var(--mono);font-size:13px;border-top:1px solid var(--hair);margin-top:8px;padding:13px 16px;color:var(--muted);min-height:1.4em}
-  .nextline b{color:var(--verify);font-weight:600}
-  .legend{display:flex;gap:22px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);margin:14px 2px 0}
-  .legend i{display:inline-block;width:22px;height:0;border-top:2px solid;vertical-align:middle;margin-right:7px}
-  /* ---- roster ---- */
-  .roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-top:22px}
-  .card{border:1px solid var(--hair);border-radius:10px;background:var(--card);padding:16px 18px}
-  .card h3{font-family:var(--mono);font-size:14px;margin:0 0 6px;font-weight:600}
-  .card p{font-size:.92rem;margin:0 0 10px;color:var(--muted)}
-  .card .to{font-family:var(--mono);font-size:10.5px;color:var(--verify)}
-  /* ---- bars ---- */
-  .bars{margin-top:20px;display:grid;gap:9px}
-  .bar{display:grid;grid-template-columns:110px 1fr 44px;gap:12px;align-items:center;font-family:var(--mono);font-size:12px}
-  .bar .track{height:10px;border-radius:5px;background:var(--hair);overflow:hidden}
-  .bar .fill{height:100%;border-radius:5px;background:var(--route)}
-  .bar.work .fill{background:var(--verify)}
-  .bar .n{text-align:right;color:var(--muted)}
-  /* ---- cadence + gauntlet ---- */
-  .cadence{display:flex;justify-content:space-between;border-top:2px solid var(--hair);margin-top:34px;padding-top:14px;flex-wrap:wrap;gap:18px}
-  .tick{font-family:var(--mono);font-size:12px}
-  .tick b{display:block;color:var(--route);font-size:13px;font-weight:600}
-  .pipe{display:flex;gap:0;align-items:stretch;margin-top:22px;flex-wrap:wrap}
-  .step{flex:1 1 150px;border:1px solid var(--hair);background:var(--card);padding:14px 16px;position:relative}
-  .step:first-child{border-radius:10px 0 0 10px}.step:last-child{border-radius:0 10px 10px 0}
-  .step+.step{border-left:none}
-  .step b{font-family:var(--mono);font-size:12px;display:block;margin-bottom:5px}
-  .step span{font-size:.85rem;color:var(--muted)}
-  footer{margin:70px 0 46px;border-top:1px solid var(--hair);padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted)}
-  footer a{color:var(--route);text-decoration:none}
-  .stat{font-family:var(--mono)} .stat b{color:var(--route);font-size:15px}
-  @media (max-width:640px){ .bar{grid-template-columns:84px 1fr 38px} body{font-size:17px} }
-  @media (prefers-reduced-motion: reduce){ .pkt animateMotion{display:none} }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Agent Graph — Kevin Lee</title>
+    <meta name="description" content="How I work now: seven AI helpers, one rule — every job ends by naming who should check it next.">
+    <meta name="author" content="Kevin Lee">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://klee.page/workflow/">
+    <meta property="og:title" content="The Agent Graph — Kevin Lee">
+    <meta property="og:description" content="How I work now: seven AI helpers, one rule — every job ends by naming who should check it next.">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="The Agent Graph — Kevin Lee">
+    <meta name="twitter:description" content="Seven AI helpers, one rule — every job ends by naming who should check it next.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕸️</text></svg>">
+
+    <!-- Detect theme + language before first paint -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('theme');
+            var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || sys);
+
+            var params = new URLSearchParams(window.location.search);
+            var urlLang = params.get('lang');
+            var storedLang = localStorage.getItem('dispatch-lang');
+            var navLang = (navigator.language || '').slice(0, 2);
+            var lang = (urlLang === 'ko' || urlLang === 'en') ? urlLang
+                     : (storedLang === 'ko' || storedLang === 'en') ? storedLang
+                     : navLang === 'ko' ? 'ko'
+                     : 'en';
+            document.documentElement.setAttribute('data-lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Noto+Serif+KR:wght@400;600&family=Archivo:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --caption: #8a8880;
+            --accent: #a0826d;
+            --rule: rgba(31, 30, 29, 0.1);
+            --card: rgba(255, 255, 255, 0.5);
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
+            --font-sans: 'Archivo', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --caption: #7a7a75;
+            --accent: #c4a882;
+            --rule: rgba(240, 238, 230, 0.08);
+            --card: rgba(240, 238, 230, 0.04);
+        }
+
+        [data-lang="ko"] {
+            --font: 'Noto Serif KR', 'Newsreader', Georgia, serif;
+            --font-display: 'Cormorant Garamond', 'Noto Serif KR', Georgia, serif;
+        }
+
+        [data-lang="en"] [data-l="ko"],
+        [data-lang="ko"] [data-l="en"] { display: none !important; }
+
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; transition: opacity 0.2s ease; }
+        a:hover { opacity: 0.6; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+        /* ========== NAVIGATION (Dispatch chrome) ========== */
+        .back-link {
+            position: fixed; top: 1.25rem; left: 1.25rem; z-index: 50;
+            font-size: 15px; text-decoration: none; opacity: 0.4; transition: opacity 0.2s ease;
+        }
+        .back-link:hover { opacity: 0.75; }
+
+        .top-controls { position: fixed; top: 1.15rem; right: 1.25rem; z-index: 50; display: flex; align-items: center; gap: 14px; }
+
+        .lang-pill {
+            position: relative; display: flex; align-items: center;
+            width: 56px; height: 24px; background: var(--text); border-radius: 12px;
+            cursor: pointer; user-select: none; transition: background-color 0.5s ease;
+        }
+        .lang-pill:hover { opacity: 0.75; }
+        .lang-pill-label {
+            flex: 1; text-align: center; font-size: 9px; font-weight: 600; letter-spacing: 0.03em;
+            line-height: 22px; color: var(--bg); position: relative; z-index: 1; font-family: var(--font-sans);
+        }
+        .lang-pill-dot {
+            position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+            background: var(--bg); border-radius: 50%;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+        }
+        [data-lang="ko"] .lang-pill-dot { transform: translateX(32px); }
+        [data-lang="en"] .lang-pill-ko { opacity: 0.4; }
+        [data-lang="ko"] .lang-pill-en { opacity: 0.4; }
+
+        .toggle-wrap { display: flex; align-items: center; }
+        .toggle-wrap input { display: none; }
+        .toggle-wrap label {
+            position: relative; display: block; width: 44px; height: 24px;
+            background: var(--text); border-radius: 12px; cursor: pointer; transition: background-color 0.5s ease;
+        }
+        .toggle-wrap label::after {
+            content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+            background: var(--bg); border-radius: 50%; transition: transform 0s, background-color 0.5s ease;
+        }
+        .toggle-wrap label.has-transition::after { transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease; }
+        .toggle-wrap input:checked + label::after { transform: translateX(20px); }
+
+        /* ========== INTRO ========== */
+        .issue-intro {
+            min-height: 46vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center; padding: 6rem 1.5rem 3rem;
+        }
+        .issue-number {
+            font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.2em;
+            text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+        }
+        .issue-title {
+            font-family: var(--font-display); font-size: clamp(2.5rem, 9vw, 4.5rem);
+            font-weight: 700; letter-spacing: -0.02em; line-height: 1; margin-bottom: 1rem;
+        }
+        .issue-opener { font-size: 18px; color: var(--caption); line-height: 1.6; max-width: 440px; }
+
+        /* ========== SECTIONS (Dispatch conventions) ========== */
+        .section-header { padding: 5rem 1.5rem 2.5rem; text-align: center; }
+        .section-label {
+            font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.2em;
+            text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem;
+        }
+        .section-title {
+            font-family: var(--font-display); font-size: clamp(1.9rem, 7vw, 3.2rem);
+            font-weight: 700; letter-spacing: -0.02em; line-height: 1;
+        }
+        .text-block { padding: 1.5rem 1.5rem; max-width: 620px; margin: 0 auto; }
+        .text-block p { font-size: 20px; line-height: 1.7; margin-bottom: 1.25rem; }
+        .text-block p:last-child { margin-bottom: 0; }
+        .divider { width: 40px; height: 1px; background: var(--accent); margin: 3rem auto; opacity: 0.5; }
+
+        /* ========== THE MAP ========== */
+        .stage { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+        .stage-frame { border: 1px solid var(--rule); border-radius: 12px; background: var(--card); overflow: hidden; }
+        svg#graph { width: 100%; height: auto; display: block; }
+        .node rect { fill: var(--bg); stroke: var(--rule); stroke-width: 1.2; transition: stroke 0.2s; }
+        .node text { font-family: var(--font-sans); font-size: 13.5px; font-weight: 600; fill: var(--text); }
+        .node .sub { font-size: 9px; font-weight: 500; fill: var(--caption); letter-spacing: 0.04em; }
+        .node { cursor: pointer; }
+        .edge path { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0.8; transition: opacity 0.25s; }
+        .edge.check path { stroke-dasharray: none; }
+        .edge.util path { stroke: var(--caption); stroke-dasharray: 4 5; }
+        .edge text { font-family: var(--font-sans); font-size: 9.5px; font-weight: 500; fill: var(--caption); }
+        svg.focused .edge:not(.lit) { opacity: 0.12; }
+        svg.focused .node:not(.lit) { opacity: 0.25; }
+        .edge .pkt { opacity: 0; fill: var(--accent); }
+        svg.focused .edge.lit .pkt { opacity: 1; }
+        @media (prefers-reduced-motion: reduce) { .edge .pkt { display: none; } }
+        .nextline {
+            font-family: var(--font-sans); font-size: 13px; border-top: 1px solid var(--rule);
+            padding: 13px 16px; color: var(--caption); min-height: 1.4em;
+        }
+        .nextline b { color: var(--accent); font-weight: 600; }
+        .stage-hint { text-align: center; font-size: 14px; color: var(--caption); margin-top: 0.9rem; }
+
+        /* ========== ROSTER ========== */
+        .roster {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px; max-width: 900px; margin: 0 auto; padding: 0 1.5rem;
+        }
+        .card { border: 1px solid var(--rule); border-radius: 10px; background: var(--card); padding: 16px 18px; }
+        .card h3 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin-bottom: 2px; }
+        .card .sysname { font-family: var(--font-sans); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: var(--accent); display: block; margin-bottom: 8px; }
+        .card p { font-size: 0.92rem; color: var(--caption); line-height: 1.55; }
+
+        /* ========== BARS ========== */
+        .bars { max-width: 620px; margin: 0 auto; padding: 0 1.5rem; display: grid; gap: 9px; }
+        .bar { display: grid; grid-template-columns: 120px 1fr 40px; gap: 12px; align-items: center; font-family: var(--font-sans); font-size: 12px; font-weight: 500; }
+        .bar .track { height: 9px; border-radius: 5px; background: var(--rule); overflow: hidden; }
+        .bar .fill { height: 100%; border-radius: 5px; background: var(--accent); opacity: 0.85; }
+        .bar .n { text-align: right; color: var(--caption); }
+
+        /* ========== CADENCE + GAUNTLET ========== */
+        .cadence { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 18px; max-width: 620px; margin: 0 auto; padding: 0.5rem 1.5rem 0; border-top: 2px solid var(--rule); padding-top: 16px; }
+        .tick { font-family: var(--font-sans); font-size: 12.5px; color: var(--caption); }
+        .tick b { display: block; color: var(--accent); font-size: 13.5px; font-weight: 700; }
+        .pipe { display: flex; flex-wrap: wrap; max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+        .step { flex: 1 1 170px; border: 1px solid var(--rule); background: var(--card); padding: 14px 16px; }
+        .step:first-child { border-radius: 10px 0 0 10px; } .step:last-child { border-radius: 0 10px 10px 0; }
+        .step + .step { border-left: none; }
+        .step b { font-family: var(--font-sans); font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 5px; }
+        .step span { font-size: 0.87rem; color: var(--caption); line-height: 1.5; }
+
+        /* ========== FOOTER ========== */
+        .story-footer { padding: 4rem 1.5rem; text-align: center; border-top: 1px solid var(--rule); margin-top: 5rem; }
+        .story-footer p { font-size: 13px; color: var(--caption); }
+        .story-footer a { color: var(--accent); text-decoration: none; }
+
+        .spacer { height: 4rem; } .spacer-sm { height: 2rem; }
+
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .text-block p { font-size: 18px; }
+            .bar { grid-template-columns: 92px 1fr 36px; }
+            .step { flex-basis: 100%; border-radius: 0 !important; border-left: 1px solid var(--rule); }
+            .step:first-child { border-radius: 10px 10px 0 0 !important; }
+            .step:last-child { border-radius: 0 0 10px 10px !important; }
+            .step + .step { border-top: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="site">
-    <span class="eyebrow">system map · klee.page</span>
-    <button id="themeToggle" aria-label="Toggle color theme">theme</button>
-  </header>
 
-  <h1>The Agent Graph</h1>
-  <p class="thesis">Seven agents, typed edges, and one rule: every report ends by naming who should look next.</p>
-  <p class="note">I audited my AI tooling and cut 162 agent definitions down to the seven that had actually earned usage. What survived became a graph — each handoff is a typed edge, and every agent closes its report with a machine-readable <span style="font-family:var(--mono);font-size:.85em">next:</span> line. Hover or tab through the nodes.</p>
+    <!-- Navigation -->
+    <a href="/" class="back-link">&larr; klee.page</a>
+    <div class="top-controls">
+        <div class="lang-pill" id="langPill" role="button" aria-label="Switch language" tabindex="0">
+            <span class="lang-pill-label lang-pill-en">EN</span>
+            <span class="lang-pill-label lang-pill-ko">한</span>
+            <span class="lang-pill-dot"></span>
+        </div>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+    </div>
 
-  <div class="stage">
-    <svg id="graph" viewBox="0 0 900 470" role="img" aria-label="Directed graph of seven agents. Vault navigator feeds shortform infra; code reviewer, accessibility auditor, shortform infra and researcher all hand claims to reality checker; librarian and researcher exchange code and paper depth.">
-      <!-- edges -->
-      <g class="edge route" data-e="vn-si"><path id="p-vnsi" d="M178,258 C240,225 260,205 296,182"/><text x="200" y="205">context-feed</text>
-        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-vnsi"/></animateMotion></circle></g>
-      <g class="edge verify" data-e="si-rc"><path id="p-sirc" d="M420,158 C520,175 560,205 622,247"/><text x="470" y="180">verify-claim</text>
-        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-sirc"/></animateMotion></circle></g>
-      <g class="edge verify" data-e="cr-rc"><path id="p-crrc" d="M420,352 C520,340 570,310 630,281"/><text x="480" y="345">verify-claim</text>
-        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-crrc"/></animateMotion></circle></g>
-      <g class="edge route" data-e="cr-aa"><path id="p-craa" d="M355,382 C370,410 400,428 448,432"/><text x="345" y="425">a11y-pass</text>
-        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-craa"/></animateMotion></circle></g>
-      <g class="edge verify" data-e="aa-rc"><path id="p-aarc" d="M610,420 C660,395 690,340 700,292"/><text x="668" y="375">verify-claim</text>
-        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-aarc"/></animateMotion></circle></g>
-      <g class="edge depth" data-e="lb-rs"><path id="p-lbrs" d="M622,62 C660,52 690,52 726,62"/><text x="640" y="42">academic-depth</text>
-        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-lbrs"/></animateMotion></circle></g>
-      <g class="edge depth" data-e="rs-lb"><path id="p-rslb" d="M726,92 C690,102 660,102 622,92"/><text x="648" y="118">code-depth</text>
-        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-rslb"/></animateMotion></circle></g>
-      <g class="edge verify" data-e="rs-rc"><path id="p-rsrc" d="M790,105 C780,160 755,205 728,240"/><text x="778" y="180">cite-check</text>
-        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-rsrc"/></animateMotion></circle></g>
-      <g class="edge util" data-e="any-vn"><path id="p-anyvn" d="M95,395 C85,360 85,330 100,296"/><text x="16" y="352">locate-note ·1 hop</text></g>
-      <!-- nodes: rect centered on label -->
-      <g class="node" data-n="vn" tabindex="0"><rect x="55" y="235" width="130" height="52"/><text x="120" y="257" text-anchor="middle">vault-navigator</text><text class="role" x="120" y="274" text-anchor="middle">finds the notes</text></g>
-      <g class="node" data-n="si" tabindex="0"><rect x="295" y="130" width="130" height="52"/><text x="360" y="152" text-anchor="middle">shortform-infra</text><text class="role" x="360" y="169" text-anchor="middle">reasons over infra</text></g>
-      <g class="node" data-n="cr" tabindex="0"><rect x="295" y="330" width="130" height="52"/><text x="360" y="352" text-anchor="middle">Code Reviewer</text><text class="role" x="360" y="369" text-anchor="middle">finds real defects</text></g>
-      <g class="node" data-n="aa" tabindex="0"><rect x="450" y="408" width="160" height="52"/><text x="530" y="430" text-anchor="middle">Accessibility Auditor</text><text class="role" x="530" y="447" text-anchor="middle">barrier-first WCAG</text></g>
-      <g class="node" data-n="rc" tabindex="0"><rect x="625" y="242" width="140" height="52"/><text x="695" y="264" text-anchor="middle">Reality Checker</text><text class="role" x="695" y="281" text-anchor="middle">refutes or verifies</text></g>
-      <g class="node" data-n="lb" tabindex="0"><rect x="510" y="52" width="112" height="52"/><text x="566" y="74" text-anchor="middle">librarian</text><text class="role" x="566" y="91" text-anchor="middle">code evidence</text></g>
-      <g class="node" data-n="rs" tabindex="0"><rect x="726" y="52" width="118" height="52"/><text x="785" y="74" text-anchor="middle">researcher</text><text class="role" x="785" y="91" text-anchor="middle">papers, citations</text></g>
-      <g class="node" data-n="any" tabindex="0"><rect x="40" y="395" width="110" height="44"/><text x="95" y="416" text-anchor="middle">any task</text><text class="role" x="95" y="431" text-anchor="middle">vault scope</text></g>
-    </svg>
-    <div class="nextline" id="nextline">hover a node — its report ends with a routing line, like <b>next: none</b></div>
-  </div>
-  <div class="legend">
-    <span><i style="border-color:var(--route)"></i>routing</span>
-    <span><i style="border-color:var(--verify)"></i>verification</span>
-    <span><i style="border-color:var(--depth)"></i>paper ↔ code</span>
-    <span><i style="border-color:var(--muted);border-top-style:dashed"></i>utility, max 1 hop</span>
-  </div>
+    <!-- ==================== INTRO ==================== -->
+    <div class="issue-intro">
+        <p class="issue-number">
+            <span data-l="en">How I work</span>
+            <span data-l="ko">일하는 방식</span>
+        </p>
+        <h1 class="issue-title">
+            <span data-l="en">The Agent Graph</span>
+            <span data-l="ko">에이전트 그래프</span>
+        </h1>
+        <p class="issue-opener">
+            <span data-l="en">Seven AI helpers, one rule: every job ends by naming who should look at it next.</span>
+            <span data-l="ko">일곱 명의 AI 도우미, 규칙은 하나 — 모든 일은 다음 담당자를 지목하며 끝난다.</span>
+        </p>
+    </div>
 
-  <h2><span class="tag">the roster</span>What each node is for</h2>
-  <div class="roster">
-    <div class="card"><h3>vault-navigator</h3><p>Finds the right notes in my knowledge vault for any question, and reports paths — not walls of text.</p><div class="to">→ shortform-infra</div></div>
-    <div class="card"><h3>shortform-infra</h3><p>Reasons about my team's pipeline and infrastructure using what the navigator found.</p><div class="to">→ Reality Checker</div></div>
-    <div class="card"><h3>Code Reviewer</h3><p>Reviews diffs for real defects with file-and-line citations; skips style nitpicks a formatter would catch.</p><div class="to">→ Reality Checker · Accessibility Auditor</div></div>
-    <div class="card"><h3>Accessibility Auditor</h3><p>Audits UI against WCAG, barrier-first: if a keyboard can't reach it, it isn't done.</p><div class="to">→ Reality Checker</div></div>
-    <div class="card"><h3>Reality Checker</h3><p>Tries to refute every claim handed to it. Verdicts are VERIFIED, REFUTED, or UNPROVEN — with the evidence quoted.</p><div class="to">→ terminal node, mostly</div></div>
-    <div class="card"><h3>librarian</h3><p>Answers "how does this library actually work" with permalinks to the real source.</p><div class="to">→ researcher</div></div>
-    <div class="card"><h3>researcher</h3><p>Finds and synthesizes academic papers with proper citations.</p><div class="to">→ librarian · Reality Checker</div></div>
-  </div>
+    <div class="text-block">
+        <div data-l="en">
+            <p>I used to have a hundred and sixty-two AI "specialists" installed. I was using seven of them. So I kept the seven, gave each one a clear job, and taught them to end every piece of work the same way: with a single line saying who should check it next — like a small newsroom where every draft gets handed to an editor.</p>
+            <p>This page is the map. Tap or hover any box below to see how work moves.</p>
+        </div>
+        <div data-l="ko">
+            <p>한때 AI "전문가"를 162개나 깔아놓고 살았는데, 실제로 쓰는 건 일곱뿐이더라. 그래서 그 일곱만 남기고 각자 역할을 분명히 정한 다음, 모든 작업을 똑같은 방식으로 끝내게 했다 — 다음 확인자를 한 줄로 지목하기. 초고가 늘 편집자 손으로 넘어가는 작은 신문사처럼.</p>
+            <p>이 페이지가 그 지도다. 아래 상자를 탭하거나 마우스를 올려보면 일이 어떻게 흐르는지 보인다.</p>
+        </div>
+    </div>
 
-  <h2><span class="tag">the layer below</span>Text expansion, counted</h2>
-  <p class="note">Under the agents sits a text-expansion layer: 205 triggers across nine files. A scripted audit found 50 shadowing bugs — short triggers silently killing longer ones — now fixed. Work-specific expansions and identifiers are redacted by design; this page shows the shape of the system, not its contents.</p>
-  <div class="bars" id="bars"></div>
+    <!-- ==================== THE MAP ==================== -->
+    <div class="section-header">
+        <p class="section-label"><span data-l="en">The Map</span><span data-l="ko">지도</span></p>
+        <h2 class="section-title"><span data-l="en">Who hands work to whom</span><span data-l="ko">일이 흐르는 길</span></h2>
+    </div>
 
-  <h2><span class="tag">the clock</span>What runs without me</h2>
-  <div class="cadence">
-    <div class="tick"><b>6:00 am</b>morning sweep</div>
-    <div class="tick"><b>7:00 am</b>daily brief</div>
-    <div class="tick"><b>5:30 pm</b>evening sweep</div>
-    <div class="tick"><b>6:00 pm</b>vault auto-sync</div>
-  </div>
+    <div class="stage">
+      <div class="stage-frame">
+        <svg id="graph" viewBox="0 0 900 470" role="img" aria-label="A map of seven helpers. The Archivist hands notes to the Engineer. The Engineer, the Reviewer, the Access Checker and the Scholar all send their conclusions to the Skeptic for checking. The Librarian and the Scholar trade questions about code and papers.">
+          <g class="edge" data-e="vn-si"><path id="p1" d="M178,258 C240,225 260,205 296,182"/>
+            <text x="196" y="205"><tspan data-l="en">hands over notes</tspan><tspan data-l="ko">메모 전달</tspan></text>
+            <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p1"/></animateMotion></circle></g>
+          <g class="edge check" data-e="si-rc"><path id="p2" d="M420,158 C520,175 560,205 622,247"/>
+            <text x="468" y="180"><tspan data-l="en">gets fact-checked</tspan><tspan data-l="ko">사실 검증</tspan></text>
+            <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p2"/></animateMotion></circle></g>
+          <g class="edge check" data-e="cr-rc"><path id="p3" d="M420,352 C520,340 570,310 630,281"/>
+            <text x="478" y="345"><tspan data-l="en">gets fact-checked</tspan><tspan data-l="ko">사실 검증</tspan></text>
+            <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p3"/></animateMotion></circle></g>
+          <g class="edge" data-e="cr-aa"><path id="p4" d="M355,382 C370,410 400,428 448,432"/>
+            <text x="338" y="424"><tspan data-l="en">if it's a screen</tspan><tspan data-l="ko">화면이면</tspan></text>
+            <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p4"/></animateMotion></circle></g>
+          <g class="edge check" data-e="aa-rc"><path id="p5" d="M610,420 C660,395 690,340 700,292"/>
+            <text x="664" y="375"><tspan data-l="en">gets fact-checked</tspan><tspan data-l="ko">사실 검증</tspan></text>
+            <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p5"/></animateMotion></circle></g>
+          <g class="edge" data-e="lb-rs"><path id="p6" d="M622,62 C660,52 690,52 726,62"/>
+            <text x="636" y="42"><tspan data-l="en">if it's a paper</tspan><tspan data-l="ko">논문이면</tspan></text>
+            <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p6"/></animateMotion></circle></g>
+          <g class="edge" data-e="rs-lb"><path id="p7" d="M726,92 C690,102 660,102 622,92"/>
+            <text x="644" y="118"><tspan data-l="en">if it's code</tspan><tspan data-l="ko">코드면</tspan></text>
+            <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p7"/></animateMotion></circle></g>
+          <g class="edge check" data-e="rs-rc"><path id="p8" d="M790,105 C780,160 755,205 728,240"/>
+            <text x="775" y="180"><tspan data-l="en">gets fact-checked</tspan><tspan data-l="ko">사실 검증</tspan></text>
+            <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p8"/></animateMotion></circle></g>
+          <g class="edge util" data-e="any-vn"><path d="M95,395 C85,360 85,330 100,296"/>
+            <text x="10" y="352"><tspan data-l="en">find the note first</tspan><tspan data-l="ko">메모부터 찾기</tspan></text></g>
 
-  <h2><span class="tag">the gauntlet</span>How designs earn the right to ship</h2>
-  <p class="note">Big changes — including this graph — go through an adversarial review pipeline before implementation: two different vendors' models attack the design blind, then attack each other's critiques, and the surviving findings get judged against the artifact.</p>
-  <div class="pipe">
-    <div class="step"><b>0 · sealed take</b><span>my own findings, written down first so the panel can't anchor me</span></div>
-    <div class="step"><b>1 · blind takes</b><span>two models attack the design independently</span></div>
-    <div class="step"><b>2 · crossfire</b><span>each refutes or concedes the other's findings</span></div>
-    <div class="step"><b>3 · verdict</b><span>hallucinations die, confirmed fixes fold into v2</span></div>
-  </div>
-  <p class="note" style="margin-top:14px">This graph's own verdict: pass-with-fixes. One reviewer's only BLOCKER turned out to be hallucinated; the other's twelve findings included six that changed the design.</p>
+          <g class="node" data-n="vn" tabindex="0"><rect x="50" y="233" width="140" height="54" rx="8"/>
+            <text x="120" y="256" text-anchor="middle"><tspan data-l="en">The Archivist</tspan><tspan data-l="ko">기록 담당</tspan></text>
+            <text class="sub" x="120" y="274" text-anchor="middle">vault-navigator</text></g>
+          <g class="node" data-n="si" tabindex="0"><rect x="290" y="128" width="140" height="54" rx="8"/>
+            <text x="360" y="151" text-anchor="middle"><tspan data-l="en">The Engineer</tspan><tspan data-l="ko">엔지니어</tspan></text>
+            <text class="sub" x="360" y="169" text-anchor="middle">shortform-infra</text></g>
+          <g class="node" data-n="cr" tabindex="0"><rect x="290" y="328" width="140" height="54" rx="8"/>
+            <text x="360" y="351" text-anchor="middle"><tspan data-l="en">The Reviewer</tspan><tspan data-l="ko">리뷰어</tspan></text>
+            <text class="sub" x="360" y="369" text-anchor="middle">code reviewer</text></g>
+          <g class="node" data-n="aa" tabindex="0"><rect x="448" y="406" width="164" height="54" rx="8"/>
+            <text x="530" y="429" text-anchor="middle"><tspan data-l="en">The Access Checker</tspan><tspan data-l="ko">접근성 검사관</tspan></text>
+            <text class="sub" x="530" y="447" text-anchor="middle">accessibility auditor</text></g>
+          <g class="node" data-n="rc" tabindex="0"><rect x="623" y="240" width="144" height="54" rx="8"/>
+            <text x="695" y="263" text-anchor="middle"><tspan data-l="en">The Skeptic</tspan><tspan data-l="ko">의심꾼</tspan></text>
+            <text class="sub" x="695" y="281" text-anchor="middle">reality checker</text></g>
+          <g class="node" data-n="lb" tabindex="0"><rect x="504" y="50" width="118" height="54" rx="8"/>
+            <text x="563" y="73" text-anchor="middle"><tspan data-l="en">The Librarian</tspan><tspan data-l="ko">사서</tspan></text>
+            <text class="sub" x="563" y="91" text-anchor="middle">librarian</text></g>
+          <g class="node" data-n="rs" tabindex="0"><rect x="726" y="50" width="118" height="54" rx="8"/>
+            <text x="785" y="73" text-anchor="middle"><tspan data-l="en">The Scholar</tspan><tspan data-l="ko">학자</tspan></text>
+            <text class="sub" x="785" y="91" text-anchor="middle">researcher</text></g>
+          <g class="node" data-n="any" tabindex="0"><rect x="38" y="393" width="114" height="46" rx="8"/>
+            <text x="95" y="413" text-anchor="middle"><tspan data-l="en">any question</tspan><tspan data-l="ko">어떤 질문이든</tspan></text>
+            <text class="sub" x="95" y="430" text-anchor="middle">start here</text></g>
+        </svg>
+        <div class="nextline" id="nextline" aria-live="polite">
+            <span data-l="en">tap or hover a box — every report ends with a line like <b>next: none</b></span>
+            <span data-l="ko">상자를 탭하거나 마우스를 올려보세요 — 모든 보고는 <b>next: none</b> 같은 한 줄로 끝나요</span>
+        </div>
+      </div>
+      <p class="stage-hint">
+        <span data-l="en">Solid lines are handoffs. Dashed means "look up my notes first." Almost every path ends at the Skeptic.</span>
+        <span data-l="ko">실선은 업무 전달, 점선은 "메모부터 확인". 거의 모든 길이 의심꾼에게로 모인다.</span>
+      </p>
+    </div>
 
-  <footer>
-    <span class="stat"><b>162 → 7</b> agents kept</span>
-    <span class="stat"><b>205</b> triggers · <b>50</b> shadow bugs fixed</span>
-    <span>audited 2026-07-03 · <a href="/">← klee.page</a></span>
-  </footer>
-</div>
+    <div class="divider"></div>
 
-<script>
-(function(){
-  // theme
-  var root=document.documentElement, btn=document.getElementById('themeToggle');
-  var saved=localStorage.getItem('kp-theme'); if(saved) root.setAttribute('data-theme',saved);
-  btn.addEventListener('click',function(){
-    var cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-    var next=cur==='dark'?'light':'dark';
-    root.setAttribute('data-theme',next); localStorage.setItem('kp-theme',next);
-  });
+    <!-- ==================== ROSTER ==================== -->
+    <div class="section-header">
+        <p class="section-label"><span data-l="en">The Roster</span><span data-l="ko">구성원</span></p>
+        <h2 class="section-title"><span data-l="en">Who does what</span><span data-l="ko">각자 하는 일</span></h2>
+    </div>
 
-  // espanso bars (counts only — expansions stay private)
-  var files=[["paramount",42,1],["ai",36,0],["base",35,0],["dev",20,0],["emoji",18,0],["symbols",15,0],["markdown",15,0],["git",13,0],["comms",11,0]];
-  var bars=document.getElementById('bars');
-  files.forEach(function(f){
-    var row=document.createElement('div'); row.className='bar'+(f[2]?' work':'');
-    row.innerHTML='<span>'+f[0]+'</span><span class="track"><span class="fill" style="width:'+(f[1]/42*100)+'%"></span></span><span class="n">'+f[1]+'</span>';
-    bars.appendChild(row);
-  });
+    <div class="roster">
+        <div class="card"><h3><span data-l="en">The Archivist</span><span data-l="ko">기록 담당</span></h3><span class="sysname">vault-navigator</span>
+            <p><span data-l="en">Knows where everything is written down. Finds the right notes and hands them over — never dumps the whole notebook.</span><span data-l="ko">모든 게 어디에 적혀 있는지 안다. 딱 맞는 메모만 찾아서 건네준다 — 공책을 통째로 던지지 않는다.</span></p></div>
+        <div class="card"><h3><span data-l="en">The Engineer</span><span data-l="ko">엔지니어</span></h3><span class="sysname">shortform-infra</span>
+            <p><span data-l="en">Reasons about the systems I run at work, using what the Archivist found.</span><span data-l="ko">기록 담당이 찾아준 자료를 바탕으로 회사 시스템을 분석한다.</span></p></div>
+        <div class="card"><h3><span data-l="en">The Reviewer</span><span data-l="ko">리뷰어</span></h3><span class="sysname">code reviewer</span>
+            <p><span data-l="en">Reads code changes looking for real mistakes, and points to the exact line — no nitpicking about style.</span><span data-l="ko">코드 변경에서 진짜 실수를 찾아 정확한 줄을 짚어준다 — 스타일 트집은 안 잡는다.</span></p></div>
+        <div class="card"><h3><span data-l="en">The Access Checker</span><span data-l="ko">접근성 검사관</span></h3><span class="sysname">accessibility auditor</span>
+            <p><span data-l="en">Makes sure anything on a screen works for everyone — keyboard only, screen reader, low vision.</span><span data-l="ko">화면에 올라가는 건 누구에게나 작동해야 한다 — 키보드만으로도, 화면 낭독기로도.</span></p></div>
+        <div class="card"><h3><span data-l="en">The Skeptic</span><span data-l="ko">의심꾼</span></h3><span class="sysname">reality checker</span>
+            <p><span data-l="en">Trusts nothing. Re-runs the test, re-reads the file, and only three verdicts exist: verified, refuted, or unproven.</span><span data-l="ko">아무것도 믿지 않는다. 테스트를 다시 돌리고 파일을 다시 읽는다. 판정은 셋뿐 — 검증됨, 반박됨, 불충분.</span></p></div>
+        <div class="card"><h3><span data-l="en">The Librarian</span><span data-l="ko">사서</span></h3><span class="sysname">librarian</span>
+            <p><span data-l="en">Answers "how does this software actually work inside?" with links to the real source code.</span><span data-l="ko">"이 소프트웨어는 속이 어떻게 생겼지?"라는 질문에 실제 소스 코드 링크로 답한다.</span></p></div>
+        <div class="card"><h3><span data-l="en">The Scholar</span><span data-l="ko">학자</span></h3><span class="sysname">researcher</span>
+            <p><span data-l="en">Finds and summarizes academic papers, with proper citations.</span><span data-l="ko">학술 논문을 찾아 요약한다. 출처는 꼬박꼬박 단다.</span></p></div>
+    </div>
 
-  // graph focus + next: caption
-  var svg=document.getElementById('graph'), cap=document.getElementById('nextline');
-  var out={vn:['vn-si'],si:['si-rc'],cr:['cr-rc','cr-aa'],aa:['aa-rc'],lb:['lb-rs'],rs:['rs-lb','rs-rc'],rc:[],any:['any-vn']};
-  var next={
-    vn:'next: <b>shortform-infra</b> — reason over the notes I found',
-    si:'next: <b>Reality Checker</b> — my conclusions cite live state',
-    cr:'next: <b>Reality Checker</b> — findings rest on unverified claims',
-    aa:'next: <b>Reality Checker</b> — the claimed fix needs evidence',
-    rc:'next: <b>none</b> — verdicts are terminal; evidence is attached',
-    lb:'next: <b>researcher</b> — this turned out to be paper-shaped',
-    rs:'next: <b>librarian</b> — the question crossed into real code',
-    any:'next: <b>vault-navigator</b> — locate the note first (one hop max)'
-  };
-  var idle=cap.innerHTML;
-  function focus(n){
-    svg.classList.add('focused');
-    svg.querySelectorAll('.edge').forEach(function(e){e.classList.toggle('lit',(out[n]||[]).indexOf(e.dataset.e)>=0);});
-    svg.querySelectorAll('.node').forEach(function(g){
-      var lit=g.dataset.n===n||(out[n]||[]).some(function(id){return id.indexOf(g.dataset.n)>=0;});
-      g.classList.toggle('lit',lit);
-    });
-    cap.innerHTML=next[n]||idle;
-  }
-  function blur(){svg.classList.remove('focused');cap.innerHTML=idle;
-    svg.querySelectorAll('.lit').forEach(function(e){e.classList.remove('lit');});}
-  svg.querySelectorAll('.node').forEach(function(g){
-    ['mouseenter','focus'].forEach(function(ev){g.addEventListener(ev,function(){focus(g.dataset.n);});});
-    ['mouseleave','blur'].forEach(function(ev){g.addEventListener(ev,blur);});
-  });
-  // respect reduced motion: strip SMIL animations
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
-    svg.querySelectorAll('animateMotion').forEach(function(a){a.remove();});
-  }
-})();
-</script>
+    <div class="divider"></div>
+
+    <!-- ==================== SHORTCUTS ==================== -->
+    <div class="section-header">
+        <p class="section-label"><span data-l="en">The Layer Below</span><span data-l="ko">그 아래층</span></p>
+        <h2 class="section-title"><span data-l="en">Typing, mostly deleted</span><span data-l="ko">타이핑은 거의 지웠다</span></h2>
+    </div>
+
+    <div class="text-block">
+        <div data-l="en"><p>Under the helpers sits something humbler: 205 tiny abbreviations that expand into the things I type most — commands, links, dates, whole query templates. An audit found 50 of them could never fire because a shorter shortcut was swallowing them. Fixed the same day. The work-specific ones stay off this page on purpose; you're seeing the shape of the system, not its contents.</p></div>
+        <div data-l="ko"><p>도우미들 아래엔 더 소박한 층이 있다. 자주 치는 것들 — 명령어, 링크, 날짜, 쿼리 템플릿 — 로 펼쳐지는 짧은 약어 205개. 점검해 보니 그중 50개는 더 짧은 약어에 먹혀서 아예 발동될 수 없었다. 그날 바로 고쳤다. 회사 관련 내용은 일부러 이 페이지에 안 실었다 — 보이는 건 시스템의 모양이지, 내용물이 아니다.</p></div>
+    </div>
+
+    <div class="bars" id="bars" role="img" aria-label="Shortcut counts by category, from 42 for work down to 11 for chat."></div>
+
+    <div class="divider"></div>
+
+    <!-- ==================== THE CLOCK ==================== -->
+    <div class="section-header">
+        <p class="section-label"><span data-l="en">The Clock</span><span data-l="ko">시계</span></p>
+        <h2 class="section-title"><span data-l="en">What runs without me</span><span data-l="ko">내가 없어도 돌아가는 것</span></h2>
+    </div>
+
+    <div class="cadence">
+        <div class="tick"><b>6:00 am</b><span data-l="en">morning sweep</span><span data-l="ko">아침 정리</span></div>
+        <div class="tick"><b>7:00 am</b><span data-l="en">daily brief</span><span data-l="ko">데일리 브리핑</span></div>
+        <div class="tick"><b>5:30 pm</b><span data-l="en">evening sweep</span><span data-l="ko">저녁 정리</span></div>
+        <div class="tick"><b>6:00 pm</b><span data-l="en">notes backup</span><span data-l="ko">메모 백업</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ==================== THE GAUNTLET ==================== -->
+    <div class="section-header">
+        <p class="section-label"><span data-l="en">The Gauntlet</span><span data-l="ko">검증대</span></p>
+        <h2 class="section-title"><span data-l="en">How changes earn their place</span><span data-l="ko">변화가 자리를 얻는 법</span></h2>
+    </div>
+
+    <div class="text-block">
+        <div data-l="en"><p>Before anything big ships, two rival AIs from different companies each try to tear the plan apart — separately, so they can't copy each other. Then each one attacks the other's criticisms. Only complaints that survive both rounds, and a final check against the actual work, get acted on.</p></div>
+        <div data-l="ko"><p>큰 변화를 내보내기 전엔, 서로 다른 회사의 라이벌 AI 둘이 각자 계획을 물어뜯는다 — 따로따로, 서로 베끼지 못하게. 그다음엔 상대의 비판을 공격하게 한다. 두 라운드를 살아남고 실제 결과물 대조까지 통과한 지적만 반영된다.</p></div>
+    </div>
+
+    <div class="pipe">
+        <div class="step"><b><span data-l="en">0 · sealed take</span><span data-l="ko">0 · 봉인된 의견</span></b><span><span data-l="en">I write my own critique first, so theirs can't sway mine.</span><span data-l="ko">내 비평을 먼저 적어둔다. 남의 의견에 휘둘리지 않게.</span></span></div>
+        <div class="step"><b><span data-l="en">1 · blind takes</span><span data-l="ko">1 · 블라인드 공격</span></b><span><span data-l="en">Two rival AIs attack the plan independently.</span><span data-l="ko">라이벌 AI 둘이 각자 계획을 공격한다.</span></span></div>
+        <div class="step"><b><span data-l="en">2 · crossfire</span><span data-l="ko">2 · 교차 검증</span></b><span><span data-l="en">Each must refute or concede the other's points.</span><span data-l="ko">서로의 지적을 반박하거나 인정해야 한다.</span></span></div>
+        <div class="step"><b><span data-l="en">3 · verdict</span><span data-l="ko">3 · 판정</span></b><span><span data-l="en">Invented complaints die; real ones change the work.</span><span data-l="ko">지어낸 지적은 버려지고, 진짜 지적이 결과물을 바꾼다.</span></span></div>
+    </div>
+
+    <div class="text-block" style="text-align:center;">
+        <div data-l="en"><p style="font-size:16px;color:var(--caption);">This page went through it twice. The first version failed — nine findings rebuilt it into the one you're reading.</p></div>
+        <div data-l="ko"><p style="font-size:16px;color:var(--caption);">이 페이지도 두 번 거쳤다. 첫 버전은 탈락했고 — 아홉 개의 지적이 지금 읽고 있는 이 버전을 만들었다.</p></div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="story-footer">
+        <p>
+            <span data-l="en">162 &rarr; 7 helpers kept &middot; 205 shortcuts &middot; audited July 3, 2026 &middot;</span>
+            <span data-l="ko">162 &rarr; 7명만 남김 &middot; 단축키 205개 &middot; 2026년 7월 3일 점검 &middot;</span>
+            <a href="/">klee.page</a>
+        </p>
+    </footer>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <!-- Scripts -->
+    <script src="/js/theme.js"></script>
+    <script>
+        // Language toggle (Dispatch convention)
+        (function() {
+            var pill = document.getElementById('langPill');
+            var current = document.documentElement.getAttribute('data-lang') || 'en';
+            function toggle() {
+                current = current === 'en' ? 'ko' : 'en';
+                document.documentElement.setAttribute('data-lang', current);
+                document.documentElement.setAttribute('lang', current);
+                localStorage.setItem('dispatch-lang', current);
+            }
+            pill.addEventListener('click', toggle);
+            pill.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+            });
+        })();
+
+        // Shortcut bars (counts only — the expansions themselves stay private)
+        (function() {
+            var files = [
+                ['work','업무',42],['AI prompts','AI 프롬프트',36],['identity & dates','신상·날짜',35],
+                ['coding','코딩',20],['emoji','이모지',18],['symbols','기호',15],
+                ['notes','메모',15],['git','git',13],['chat','채팅',11]
+            ];
+            var bars = document.getElementById('bars');
+            files.forEach(function(f) {
+                var row = document.createElement('div');
+                row.className = 'bar';
+                row.innerHTML = '<span><span data-l="en">' + f[0] + '</span><span data-l="ko">' + f[1] + '</span></span>'
+                    + '<span class="track"><span class="fill" style="width:' + (f[2] / 42 * 100) + '%"></span></span>'
+                    + '<span class="n">' + f[2] + '</span>';
+                bars.appendChild(row);
+            });
+        })();
+
+        // Graph: hover, keyboard focus, AND tap all work
+        (function() {
+            var svg = document.getElementById('graph');
+            var cap = document.getElementById('nextline');
+            var out = { vn:['vn-si'], si:['si-rc'], cr:['cr-rc','cr-aa'], aa:['aa-rc'], lb:['lb-rs'], rs:['rs-lb','rs-rc'], rc:[], any:['any-vn'] };
+            var next = {
+                vn: { en:'next: <b>the Engineer</b> — reason over the notes I found', ko:'next: <b>엔지니어</b> — 내가 찾은 메모로 분석해줘' },
+                si: { en:'next: <b>the Skeptic</b> — my conclusions cite live systems', ko:'next: <b>의심꾼</b> — 내 결론은 실제 시스템을 인용했어' },
+                cr: { en:'next: <b>the Skeptic</b> — these findings need proof', ko:'next: <b>의심꾼</b> — 이 지적들은 증거가 필요해' },
+                aa: { en:'next: <b>the Skeptic</b> — the claimed fix needs evidence', ko:'next: <b>의심꾼</b> — 고쳤다는 주장, 증거 필요' },
+                rc: { en:'next: <b>none</b> — verdicts are final; the evidence is attached', ko:'next: <b>없음</b> — 판정은 최종. 증거 첨부됨' },
+                lb: { en:'next: <b>the Scholar</b> — this turned out to be about a paper', ko:'next: <b>학자</b> — 알고 보니 논문 얘기였어' },
+                rs: { en:'next: <b>the Librarian</b> — the question crossed into real code', ko:'next: <b>사서</b> — 질문이 실제 코드로 넘어갔어' },
+                any:{ en:'next: <b>the Archivist</b> — find the note first (one hop max)', ko:'next: <b>기록 담당</b> — 메모부터 찾기 (한 번만)' }
+            };
+            var idle = cap.innerHTML, focused = null;
+            function lang() { return document.documentElement.getAttribute('data-lang') || 'en'; }
+            function focus(n) {
+                focused = n;
+                svg.classList.add('focused');
+                svg.querySelectorAll('.edge').forEach(function(e) { e.classList.toggle('lit', (out[n] || []).indexOf(e.dataset.e) >= 0); });
+                svg.querySelectorAll('.node').forEach(function(g) {
+                    var lit = g.dataset.n === n || (out[n] || []).some(function(id) { return id.indexOf(g.dataset.n) >= 0; });
+                    g.classList.toggle('lit', lit);
+                });
+                cap.innerHTML = (next[n] || {})[lang()] || idle;
+            }
+            function blur() {
+                focused = null;
+                svg.classList.remove('focused');
+                cap.innerHTML = idle;
+                svg.querySelectorAll('.lit').forEach(function(e) { e.classList.remove('lit'); });
+            }
+            svg.querySelectorAll('.node').forEach(function(g) {
+                g.addEventListener('mouseenter', function() { focus(g.dataset.n); });
+                g.addEventListener('mouseleave', blur);
+                g.addEventListener('focus', function() { focus(g.dataset.n); });
+                g.addEventListener('blur', blur);
+                g.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    focused === g.dataset.n ? blur() : focus(g.dataset.n);
+                });
+            });
+            document.addEventListener('click', function(e) { if (focused && !svg.contains(e.target)) blur(); });
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                svg.querySelectorAll('animateMotion').forEach(function(a) { a.remove(); });
+            }
+        })();
+    </script>
 </body>
 </html>
