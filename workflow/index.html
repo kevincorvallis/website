@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Agent Graph — Kevin Lee</title>
+<meta name="description" content="A living map of my AI tooling: seven agents, typed edges, and the text-expansion and review layers underneath. Values redacted by design.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF7F2; --ink:#1C1917; --muted:#6B645B;
+    --route:#B4552D;   /* terracotta — routing / context-feed */
+    --verify:#4A6B4F;  /* moss — verify-claim edges */
+    --depth:#5B6B7A;   /* slate — paper↔code depth edges */
+    --hair:#E2DCD2; --card:#FFFFFF;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --serif:'Newsreader',Georgia,serif;
+  }
+  [data-theme="dark"]{
+    --paper:#14120F; --ink:#E9E4DB; --muted:#9A9288;
+    --route:#D0704A; --verify:#7FA184; --depth:#8FA0AF;
+    --hair:#2A261F; --card:#1D1A16;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14120F; --ink:#E9E4DB; --muted:#9A9288;
+      --route:#D0704A; --verify:#7FA184; --depth:#8FA0AF;
+      --hair:#2A261F; --card:#1D1A16;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.55;transition:background .3s,color .3s}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  header.site{display:flex;justify-content:space-between;align-items:baseline;padding:28px 0 0}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  #themeToggle{background:none;border:1px solid var(--hair);border-radius:20px;color:var(--ink);font-family:var(--mono);font-size:11px;padding:5px 12px;cursor:pointer}
+  #themeToggle:focus-visible,a:focus-visible,.node:focus-visible{outline:2px solid var(--route);outline-offset:3px}
+  h1{font-size:clamp(2.6rem,7vw,4.4rem);font-weight:500;line-height:1.02;margin:.6em 0 .2em;letter-spacing:-.01em}
+  .thesis{font-size:clamp(1.05rem,2.4vw,1.3rem);font-style:italic;color:var(--muted);max-width:34em;margin:0 0 8px}
+  h2{font-size:1.5rem;font-weight:600;margin:2.6em 0 .4em}
+  h2 .tag{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;color:var(--route);display:block;text-transform:uppercase;margin-bottom:6px}
+  p.note{color:var(--muted);font-size:.95rem;max-width:40em}
+  /* ---- graph stage (signature) ---- */
+  .stage{border:1px solid var(--hair);border-radius:14px;background:var(--card);margin-top:26px;padding:10px 6px 0;overflow:hidden}
+  svg{width:100%;height:auto;display:block}
+  .node rect{fill:var(--paper);stroke:var(--hair);stroke-width:1.2;rx:8;transition:stroke .2s}
+  .node text{font-family:var(--mono);font-size:13px;font-weight:600;fill:var(--ink)}
+  .node .role{font-size:9.5px;font-weight:400;fill:var(--muted)}
+  .node{cursor:pointer}
+  .edge path{fill:none;stroke-width:1.6;opacity:.85;transition:opacity .25s}
+  .edge text{font-family:var(--mono);font-size:9.5px;fill:var(--muted)}
+  .edge.route path{stroke:var(--route)} .edge.verify path{stroke:var(--verify)} .edge.depth path{stroke:var(--depth)}
+  .edge.util path{stroke:var(--muted);stroke-dasharray:4 5}
+  svg.focused .edge:not(.lit){opacity:.12} svg.focused .node:not(.lit){opacity:.25}
+  .edge .pkt{opacity:0;fill:var(--route)}
+  svg.focused .edge.lit .pkt{opacity:1}
+  @media (prefers-reduced-motion: no-preference){
+    svg.focused .edge.lit .pkt{animation:none} /* motion handled by SMIL, gated below */
+  }
+  .nextline{font-family:var(--mono);font-size:13px;border-top:1px solid var(--hair);margin-top:8px;padding:13px 16px;color:var(--muted);min-height:1.4em}
+  .nextline b{color:var(--verify);font-weight:600}
+  .legend{display:flex;gap:22px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);margin:14px 2px 0}
+  .legend i{display:inline-block;width:22px;height:0;border-top:2px solid;vertical-align:middle;margin-right:7px}
+  /* ---- roster ---- */
+  .roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-top:22px}
+  .card{border:1px solid var(--hair);border-radius:10px;background:var(--card);padding:16px 18px}
+  .card h3{font-family:var(--mono);font-size:14px;margin:0 0 6px;font-weight:600}
+  .card p{font-size:.92rem;margin:0 0 10px;color:var(--muted)}
+  .card .to{font-family:var(--mono);font-size:10.5px;color:var(--verify)}
+  /* ---- bars ---- */
+  .bars{margin-top:20px;display:grid;gap:9px}
+  .bar{display:grid;grid-template-columns:110px 1fr 44px;gap:12px;align-items:center;font-family:var(--mono);font-size:12px}
+  .bar .track{height:10px;border-radius:5px;background:var(--hair);overflow:hidden}
+  .bar .fill{height:100%;border-radius:5px;background:var(--route)}
+  .bar.work .fill{background:var(--verify)}
+  .bar .n{text-align:right;color:var(--muted)}
+  /* ---- cadence + gauntlet ---- */
+  .cadence{display:flex;justify-content:space-between;border-top:2px solid var(--hair);margin-top:34px;padding-top:14px;flex-wrap:wrap;gap:18px}
+  .tick{font-family:var(--mono);font-size:12px}
+  .tick b{display:block;color:var(--route);font-size:13px;font-weight:600}
+  .pipe{display:flex;gap:0;align-items:stretch;margin-top:22px;flex-wrap:wrap}
+  .step{flex:1 1 150px;border:1px solid var(--hair);background:var(--card);padding:14px 16px;position:relative}
+  .step:first-child{border-radius:10px 0 0 10px}.step:last-child{border-radius:0 10px 10px 0}
+  .step+.step{border-left:none}
+  .step b{font-family:var(--mono);font-size:12px;display:block;margin-bottom:5px}
+  .step span{font-size:.85rem;color:var(--muted)}
+  footer{margin:70px 0 46px;border-top:1px solid var(--hair);padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  footer a{color:var(--route);text-decoration:none}
+  .stat{font-family:var(--mono)} .stat b{color:var(--route);font-size:15px}
+  @media (max-width:640px){ .bar{grid-template-columns:84px 1fr 38px} body{font-size:17px} }
+  @media (prefers-reduced-motion: reduce){ .pkt animateMotion{display:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <span class="eyebrow">system map · klee.page</span>
+    <button id="themeToggle" aria-label="Toggle color theme">theme</button>
+  </header>
+
+  <h1>The Agent Graph</h1>
+  <p class="thesis">Seven agents, typed edges, and one rule: every report ends by naming who should look next.</p>
+  <p class="note">I audited my AI tooling and cut 162 agent definitions down to the seven that had actually earned usage. What survived became a graph — each handoff is a typed edge, and every agent closes its report with a machine-readable <span style="font-family:var(--mono);font-size:.85em">next:</span> line. Hover or tab through the nodes.</p>
+
+  <div class="stage">
+    <svg id="graph" viewBox="0 0 900 470" role="img" aria-label="Directed graph of seven agents. Vault navigator feeds shortform infra; code reviewer, accessibility auditor, shortform infra and researcher all hand claims to reality checker; librarian and researcher exchange code and paper depth.">
+      <!-- edges -->
+      <g class="edge route" data-e="vn-si"><path id="p-vnsi" d="M178,258 C240,225 260,205 296,182"/><text x="200" y="205">context-feed</text>
+        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-vnsi"/></animateMotion></circle></g>
+      <g class="edge verify" data-e="si-rc"><path id="p-sirc" d="M420,158 C520,175 560,205 622,247"/><text x="470" y="180">verify-claim</text>
+        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-sirc"/></animateMotion></circle></g>
+      <g class="edge verify" data-e="cr-rc"><path id="p-crrc" d="M420,352 C520,340 570,310 630,281"/><text x="480" y="345">verify-claim</text>
+        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-crrc"/></animateMotion></circle></g>
+      <g class="edge route" data-e="cr-aa"><path id="p-craa" d="M355,382 C370,410 400,428 448,432"/><text x="345" y="425">a11y-pass</text>
+        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-craa"/></animateMotion></circle></g>
+      <g class="edge verify" data-e="aa-rc"><path id="p-aarc" d="M610,420 C660,395 690,340 700,292"/><text x="668" y="375">verify-claim</text>
+        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-aarc"/></animateMotion></circle></g>
+      <g class="edge depth" data-e="lb-rs"><path id="p-lbrs" d="M622,62 C660,52 690,52 726,62"/><text x="640" y="42">academic-depth</text>
+        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-lbrs"/></animateMotion></circle></g>
+      <g class="edge depth" data-e="rs-lb"><path id="p-rslb" d="M726,92 C690,102 660,102 622,92"/><text x="648" y="118">code-depth</text>
+        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-rslb"/></animateMotion></circle></g>
+      <g class="edge verify" data-e="rs-rc"><path id="p-rsrc" d="M790,105 C780,160 755,205 728,240"/><text x="778" y="180">cite-check</text>
+        <circle class="pkt" r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#p-rsrc"/></animateMotion></circle></g>
+      <g class="edge util" data-e="any-vn"><path id="p-anyvn" d="M95,395 C85,360 85,330 100,296"/><text x="16" y="352">locate-note ·1 hop</text></g>
+      <!-- nodes: rect centered on label -->
+      <g class="node" data-n="vn" tabindex="0"><rect x="55" y="235" width="130" height="52"/><text x="120" y="257" text-anchor="middle">vault-navigator</text><text class="role" x="120" y="274" text-anchor="middle">finds the notes</text></g>
+      <g class="node" data-n="si" tabindex="0"><rect x="295" y="130" width="130" height="52"/><text x="360" y="152" text-anchor="middle">shortform-infra</text><text class="role" x="360" y="169" text-anchor="middle">reasons over infra</text></g>
+      <g class="node" data-n="cr" tabindex="0"><rect x="295" y="330" width="130" height="52"/><text x="360" y="352" text-anchor="middle">Code Reviewer</text><text class="role" x="360" y="369" text-anchor="middle">finds real defects</text></g>
+      <g class="node" data-n="aa" tabindex="0"><rect x="450" y="408" width="160" height="52"/><text x="530" y="430" text-anchor="middle">Accessibility Auditor</text><text class="role" x="530" y="447" text-anchor="middle">barrier-first WCAG</text></g>
+      <g class="node" data-n="rc" tabindex="0"><rect x="625" y="242" width="140" height="52"/><text x="695" y="264" text-anchor="middle">Reality Checker</text><text class="role" x="695" y="281" text-anchor="middle">refutes or verifies</text></g>
+      <g class="node" data-n="lb" tabindex="0"><rect x="510" y="52" width="112" height="52"/><text x="566" y="74" text-anchor="middle">librarian</text><text class="role" x="566" y="91" text-anchor="middle">code evidence</text></g>
+      <g class="node" data-n="rs" tabindex="0"><rect x="726" y="52" width="118" height="52"/><text x="785" y="74" text-anchor="middle">researcher</text><text class="role" x="785" y="91" text-anchor="middle">papers, citations</text></g>
+      <g class="node" data-n="any" tabindex="0"><rect x="40" y="395" width="110" height="44"/><text x="95" y="416" text-anchor="middle">any task</text><text class="role" x="95" y="431" text-anchor="middle">vault scope</text></g>
+    </svg>
+    <div class="nextline" id="nextline">hover a node — its report ends with a routing line, like <b>next: none</b></div>
+  </div>
+  <div class="legend">
+    <span><i style="border-color:var(--route)"></i>routing</span>
+    <span><i style="border-color:var(--verify)"></i>verification</span>
+    <span><i style="border-color:var(--depth)"></i>paper ↔ code</span>
+    <span><i style="border-color:var(--muted);border-top-style:dashed"></i>utility, max 1 hop</span>
+  </div>
+
+  <h2><span class="tag">the roster</span>What each node is for</h2>
+  <div class="roster">
+    <div class="card"><h3>vault-navigator</h3><p>Finds the right notes in my knowledge vault for any question, and reports paths — not walls of text.</p><div class="to">→ shortform-infra</div></div>
+    <div class="card"><h3>shortform-infra</h3><p>Reasons about my team's pipeline and infrastructure using what the navigator found.</p><div class="to">→ Reality Checker</div></div>
+    <div class="card"><h3>Code Reviewer</h3><p>Reviews diffs for real defects with file-and-line citations; skips style nitpicks a formatter would catch.</p><div class="to">→ Reality Checker · Accessibility Auditor</div></div>
+    <div class="card"><h3>Accessibility Auditor</h3><p>Audits UI against WCAG, barrier-first: if a keyboard can't reach it, it isn't done.</p><div class="to">→ Reality Checker</div></div>
+    <div class="card"><h3>Reality Checker</h3><p>Tries to refute every claim handed to it. Verdicts are VERIFIED, REFUTED, or UNPROVEN — with the evidence quoted.</p><div class="to">→ terminal node, mostly</div></div>
+    <div class="card"><h3>librarian</h3><p>Answers "how does this library actually work" with permalinks to the real source.</p><div class="to">→ researcher</div></div>
+    <div class="card"><h3>researcher</h3><p>Finds and synthesizes academic papers with proper citations.</p><div class="to">→ librarian · Reality Checker</div></div>
+  </div>
+
+  <h2><span class="tag">the layer below</span>Text expansion, counted</h2>
+  <p class="note">Under the agents sits a text-expansion layer: 205 triggers across nine files. A scripted audit found 50 shadowing bugs — short triggers silently killing longer ones — now fixed. Work-specific expansions and identifiers are redacted by design; this page shows the shape of the system, not its contents.</p>
+  <div class="bars" id="bars"></div>
+
+  <h2><span class="tag">the clock</span>What runs without me</h2>
+  <div class="cadence">
+    <div class="tick"><b>6:00 am</b>morning sweep</div>
+    <div class="tick"><b>7:00 am</b>daily brief</div>
+    <div class="tick"><b>5:30 pm</b>evening sweep</div>
+    <div class="tick"><b>6:00 pm</b>vault auto-sync</div>
+  </div>
+
+  <h2><span class="tag">the gauntlet</span>How designs earn the right to ship</h2>
+  <p class="note">Big changes — including this graph — go through an adversarial review pipeline before implementation: two different vendors' models attack the design blind, then attack each other's critiques, and the surviving findings get judged against the artifact.</p>
+  <div class="pipe">
+    <div class="step"><b>0 · sealed take</b><span>my own findings, written down first so the panel can't anchor me</span></div>
+    <div class="step"><b>1 · blind takes</b><span>two models attack the design independently</span></div>
+    <div class="step"><b>2 · crossfire</b><span>each refutes or concedes the other's findings</span></div>
+    <div class="step"><b>3 · verdict</b><span>hallucinations die, confirmed fixes fold into v2</span></div>
+  </div>
+  <p class="note" style="margin-top:14px">This graph's own verdict: pass-with-fixes. One reviewer's only BLOCKER turned out to be hallucinated; the other's twelve findings included six that changed the design.</p>
+
+  <footer>
+    <span class="stat"><b>162 → 7</b> agents kept</span>
+    <span class="stat"><b>205</b> triggers · <b>50</b> shadow bugs fixed</span>
+    <span>audited 2026-07-03 · <a href="/">← klee.page</a></span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  // theme
+  var root=document.documentElement, btn=document.getElementById('themeToggle');
+  var saved=localStorage.getItem('kp-theme'); if(saved) root.setAttribute('data-theme',saved);
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next); localStorage.setItem('kp-theme',next);
+  });
+
+  // espanso bars (counts only — expansions stay private)
+  var files=[["paramount",42,1],["ai",36,0],["base",35,0],["dev",20,0],["emoji",18,0],["symbols",15,0],["markdown",15,0],["git",13,0],["comms",11,0]];
+  var bars=document.getElementById('bars');
+  files.forEach(function(f){
+    var row=document.createElement('div'); row.className='bar'+(f[2]?' work':'');
+    row.innerHTML='<span>'+f[0]+'</span><span class="track"><span class="fill" style="width:'+(f[1]/42*100)+'%"></span></span><span class="n">'+f[1]+'</span>';
+    bars.appendChild(row);
+  });
+
+  // graph focus + next: caption
+  var svg=document.getElementById('graph'), cap=document.getElementById('nextline');
+  var out={vn:['vn-si'],si:['si-rc'],cr:['cr-rc','cr-aa'],aa:['aa-rc'],lb:['lb-rs'],rs:['rs-lb','rs-rc'],rc:[],any:['any-vn']};
+  var next={
+    vn:'next: <b>shortform-infra</b> — reason over the notes I found',
+    si:'next: <b>Reality Checker</b> — my conclusions cite live state',
+    cr:'next: <b>Reality Checker</b> — findings rest on unverified claims',
+    aa:'next: <b>Reality Checker</b> — the claimed fix needs evidence',
+    rc:'next: <b>none</b> — verdicts are terminal; evidence is attached',
+    lb:'next: <b>researcher</b> — this turned out to be paper-shaped',
+    rs:'next: <b>librarian</b> — the question crossed into real code',
+    any:'next: <b>vault-navigator</b> — locate the note first (one hop max)'
+  };
+  var idle=cap.innerHTML;
+  function focus(n){
+    svg.classList.add('focused');
+    svg.querySelectorAll('.edge').forEach(function(e){e.classList.toggle('lit',(out[n]||[]).indexOf(e.dataset.e)>=0);});
+    svg.querySelectorAll('.node').forEach(function(g){
+      var lit=g.dataset.n===n||(out[n]||[]).some(function(id){return id.indexOf(g.dataset.n)>=0;});
+      g.classList.toggle('lit',lit);
+    });
+    cap.innerHTML=next[n]||idle;
+  }
+  function blur(){svg.classList.remove('focused');cap.innerHTML=idle;
+    svg.querySelectorAll('.lit').forEach(function(e){e.classList.remove('lit');});}
+  svg.querySelectorAll('.node').forEach(function(g){
+    ['mouseenter','focus'].forEach(function(ev){g.addEventListener(ev,function(){focus(g.dataset.n);});});
+    ['mouseleave','blur'].forEach(function(ev){g.addEventListener(ev,blur);});
+  });
+  // respect reduced motion: strip SMIL animations
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+    svg.querySelectorAll('animateMotion').forEach(function(a){a.remove();});
+  }
+})();
+</script>
+</body>
+</html>
