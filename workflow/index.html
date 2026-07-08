@@ -403,10 +403,57 @@
     </div>
 
     <div class="cadence">
-        <div class="tick"><b>6:00 am</b><span data-l="en">morning sweep</span><span data-l="ko">아침 정리</span></div>
-        <div class="tick"><b>7:00 am</b><span data-l="en">daily brief</span><span data-l="ko">데일리 브리핑</span></div>
-        <div class="tick"><b>5:30 pm</b><span data-l="en">evening sweep</span><span data-l="ko">저녁 정리</span></div>
+        <div class="tick"><b>6:00 am</b><span data-l="en">morning brief</span><span data-l="ko">아침 브리핑</span></div>
+        <div class="tick"><b>7:30 am</b><span data-l="en">cloud backstop</span><span data-l="ko">클라우드 예비</span></div>
+        <div class="tick"><b>5:30 pm</b><span data-l="en">evening sweep + memory</span><span data-l="ko">저녁 정리 + 기억</span></div>
         <div class="tick"><b>6:00 pm</b><span data-l="en">notes backup</span><span data-l="ko">메모 백업</span></div>
+        <div class="tick"><b>6:30 pm</b><span data-l="en">meeting flush</span><span data-l="ko">회의 정리</span></div>
+    </div>
+
+    <div class="spacer-sm"></div>
+
+    <div class="text-block">
+        <div data-l="en">
+            <p>A confession that earned this section a redesign: during a folder cleanup I accidentally deleted two of these loops' scripts — and for three days, nothing told me. The operating system dutifully logged an error code where no human looks; the 6 a.m. brief just stopped. The fix wasn't a better loop. It was loops that check on each other: the evening run now verifies the morning run actually happened, and says so in the one place I read every day. The same audit found a zombie — a daily news digest running on the most expensive model tier whose two delivery paths had both quietly broken. Two weeks of paying top dollar for reports that went precisely nowhere. It's off.</p>
+            <p>The rule that came out of it: an automation whose failure you can't see isn't automation — it's assumed coverage.</p>
+        </div>
+        <div data-l="ko">
+            <p>이 섹션을 뜯어고치게 만든 고백 하나: 폴더 정리를 하다가 이 루프들의 스크립트 두 개를 실수로 지웠는데 — 사흘 동안 아무도, 아무것도 알려주지 않았다. 운영체제는 사람이 안 보는 곳에 에러 코드를 성실히 기록했고, 아침 6시 브리핑은 그냥 멈춰 있었다. 해결책은 더 좋은 루프가 아니었다. 서로를 확인하는 루프였다: 이제 저녁 루프가 아침 루프의 생존을 확인하고, 내가 매일 읽는 바로 그곳에 보고한다. 같은 점검에서 좀비도 하나 나왔다 — 가장 비싼 모델로 매일 돌아가던 뉴스 다이제스트인데, 전달 경로 두 개가 다 조용히 부서져 있었다. 2주 동안 최고가를 내고 아무 데도 도착하지 않는 보고서를 만든 셈. 껐다.</p>
+            <p>여기서 나온 규칙: 실패가 보이지 않는 자동화는 자동화가 아니라, 있다고 믿는 착각이다.</p>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ==================== THE NOTEBOOK ==================== -->
+    <div class="section-header">
+        <p class="section-label"><span data-l="en">The Notebook</span><span data-l="ko">공책</span></p>
+        <h2 class="section-title"><span data-l="en">Memory that rewrites itself</span><span data-l="ko">스스로 고쳐 쓰는 기억</span></h2>
+    </div>
+
+    <div class="text-block">
+        <div data-l="en">
+            <p>The AI's long-term memory used to be an append-only list: every lesson added, nothing ever leaving, the same 130-line index loading into every session regardless of what the day was about. Now it's a loop. The top of the file is a ten-line "Now" block — current focus, open threads, this week's hot lessons — stamped with its own refresh date, so a stale one confesses on sight. Every evening the sweep distills the day:</p>
+        </div>
+        <div data-l="ko">
+            <p>AI의 장기 기억은 원래 덧붙이기만 하는 목록이었다. 교훈은 쌓이기만 하고, 나가는 건 없고, 그날 무슨 일을 하든 똑같은 130줄짜리 색인이 매 세션에 실렸다. 이제는 루프다. 파일 맨 위에는 열 줄짜리 "지금" 블록이 있다 — 현재 집중하는 일, 열린 실타래, 이번 주의 뜨거운 교훈들 — 갱신 날짜가 찍혀 있어서, 낡은 블록은 보자마자 자백한다. 그리고 매일 저녁, 정리 루프가 하루를 증류한다:</p>
+        </div>
+    </div>
+
+    <div class="pipe">
+        <div class="step"><b><span data-l="en">capture</span><span data-l="ko">기록</span></b><span><span data-l="en">At most three new lessons a day — unbounded capture is how the list got bloated.</span><span data-l="ko">하루 최대 세 개 — 무한정 쌓는 게 목록을 비대하게 만든 원흉이다.</span></span></div>
+        <div class="step"><b><span data-l="en">correct</span><span data-l="ko">정정</span></b><span><span data-l="en">Anything today's reality contradicted gets fixed now, not at some quarterly review.</span><span data-l="ko">오늘의 현실과 어긋난 기억은 분기 리뷰가 아니라 지금 고친다.</span></span></div>
+        <div class="step"><b><span data-l="en">touch</span><span data-l="ko">표시</span></b><span><span data-l="en">Memories that changed a decision today get a date stamp — usage becomes visible.</span><span data-l="ko">오늘 결정을 바꾼 기억엔 날짜 도장 — 쓰임이 눈에 보이게 된다.</span></span></div>
+        <div class="step"><b><span data-l="en">refresh</span><span data-l="ko">갱신</span></b><span><span data-l="en">The "Now" block gets today's working set. Tomorrow opens oriented.</span><span data-l="ko">"지금" 블록에 오늘의 작업 묶음을 싣는다. 내일은 방향을 안 채로 시작한다.</span></span></div>
+    </div>
+
+    <div class="text-block">
+        <div data-l="en">
+            <p>Two guardrails, both earned in review: nothing gets demoted by algorithm — a safety rule that stayed quiet all quarter is <em>working</em>, not dead, so retirement is a quarterly judgment call with the safety rules pinned. And underneath it all runs a forty-line counter script checking the dumb invariants: every note reachable from the index, the index under its line cap. On its very first run it found four notes that had fallen out of every index — lessons that existed but could never be found. This design failed its own review panel first, twenty-six findings' worth. What you just read is the version that survived.</p>
+        </div>
+        <div data-l="ko">
+            <p>가드레일은 둘, 둘 다 검증대에서 얻었다. 알고리즘이 기억을 강등시키는 일은 없다 — 분기 내내 조용했던 안전 규칙은 죽은 게 아니라 <em>일하고 있는</em> 거라서, 은퇴는 안전 규칙을 고정해 둔 채 분기마다 사람이 판단한다. 그리고 그 밑에는 40줄짜리 계수기 스크립트가 우직한 불변식을 센다: 모든 메모는 색인에서 닿을 수 있어야 하고, 색인은 줄 수 상한을 지켜야 한다. 첫 실행에서 이 스크립트는 어느 색인에서도 떨어져 나간 메모 네 개를 찾아냈다 — 존재하지만 영영 찾을 수 없던 교훈들. 이 설계도 처음엔 자체 검증 패널에서 스물여섯 개 지적을 받고 탈락했다. 방금 읽은 건 살아남은 버전이다.</p>
+        </div>
     </div>
 
     <div class="divider"></div>
@@ -494,8 +541,8 @@
     <!-- ==================== FOOTER ==================== -->
     <footer class="story-footer">
         <p>
-            <span data-l="en">162 &rarr; 7 helpers kept &middot; 205 shortcuts &middot; audited July 3 &middot; review modes scored July 7, 2026 &middot;</span>
-            <span data-l="ko">162 &rarr; 7명만 남김 &middot; 단축키 205개 &middot; 7월 3일 점검 &middot; 7월 7일 검증법 채점 &middot;</span>
+            <span data-l="en">162 &rarr; 7 helpers kept &middot; 205 shortcuts &middot; audited July 3 &middot; review modes scored July 7 &middot; loops &amp; memory rebuilt July 8, 2026 &middot;</span>
+            <span data-l="ko">162 &rarr; 7명만 남김 &middot; 단축키 205개 &middot; 7월 3일 점검 &middot; 7월 7일 검증법 채점 &middot; 7월 8일 루프·기억 재설계 &middot;</span>
             <a href="/">klee.page</a>
         </p>
     </footer>
