@@ -50,10 +50,25 @@ module.exports = async function handler(req, res) {
         return res.status(429).json({ error: 'Too many requests' });
     }
 
-    const { email } = req.body || {};
+    const { email, source, website, elapsed } = req.body || {};
 
     if (!email || typeof email !== 'string' || !isValidEmail(email.trim())) {
         return res.status(400).json({ error: 'Valid email is required' });
+    }
+
+    // Bot gate: the honeypot field is invisible to humans, and no human submits
+    // within 1.5s of page load (kept below the ~3s mark so autofill users never
+    // trip it). Silent 200 — don't teach bots which check failed. Logged so a
+    // false positive is recoverable from function logs.
+    if (website || (typeof elapsed === 'number' && elapsed >= 0 && elapsed < 1500)) {
+        console.warn('SUBSCRIBE_BOT_DROP', email.trim().toLowerCase(), website ? 'honeypot' : 'elapsed', elapsed);
+        return res.status(200).json({ ok: true });
+    }
+
+    // source distinguishes the weekly newsletter from the tool-notify waitlist.
+    // Absent → newsletter (the column default); present-but-unknown → reject.
+    if (source !== undefined && source !== 'newsletter' && source !== 'tool-notify') {
+        return res.status(400).json({ error: 'Invalid source' });
     }
 
     const row = {
@@ -63,6 +78,11 @@ module.exports = async function handler(req, res) {
         city: req.headers['x-vercel-ip-city'] || null,
         user_agent: req.headers['user-agent'] || null,
     };
+    // Only send the column for the non-default list, so newsletter inserts stay
+    // byte-identical to the pre-migration shape.
+    if (source && source !== 'newsletter') {
+        row.source = source;
+    }
 
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/dispatch_subscribers`, {
@@ -89,10 +109,10 @@ module.exports = async function handler(req, res) {
 
         // Log the email so a failed signup (e.g. Supabase down) is recoverable from
         // the function logs. Email only — don't spill IP/UA into logging infra.
-        console.error('SUBSCRIBE_FAILED', response.status, row.email);
+        console.error('SUBSCRIBE_FAILED', response.status, row.email, row.source || 'newsletter');
         return res.status(502).json({ error: 'Failed to subscribe' });
     } catch (err) {
-        console.error('SUBSCRIBE_FAILED', 'exception', row.email, err && err.message);
+        console.error('SUBSCRIBE_FAILED', 'exception', row.email, row.source || 'newsletter', err && err.message);
         return res.status(500).json({ error: 'Internal server error' });
     }
 };

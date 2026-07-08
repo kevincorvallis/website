@@ -7,9 +7,19 @@
 // A non-transient failure (e.g. 400) shows an error but is not queued. Retries are
 // capped so a deterministic failure can't loop forever.
 (function () {
-    var SUBSCRIBED = 'dispatch-subscribed';
-    var PENDING = 'dispatch-pending';
     var MAX_RETRIES = 3;
+    var initTime = Date.now();
+
+    var section = document.getElementById('subscribe');
+
+    // Which list this page feeds — a page opts into the tool waitlist by setting
+    // data-source="tool-notify" on #subscribe; absent means the weekly newsletter.
+    // Storage keys are scoped per source so the waitlist doesn't inherit the
+    // newsletter's subscribed/pending state (and vice versa).
+    var source = (section && section.getAttribute('data-source')) || 'newsletter';
+    var keySuffix = source === 'newsletter' ? '' : '--' + source;
+    var SUBSCRIBED = 'dispatch-subscribed' + keySuffix;
+    var PENDING = 'dispatch-pending' + keySuffix;
 
     // localStorage access throws under blocked-cookies/strict-private modes; a storage
     // failure must degrade to "no persistence", never kill the submit handler below.
@@ -17,13 +27,19 @@
     function lsSet(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
     function lsRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
 
-    var section = document.getElementById('subscribe');
-
-    function post(email) {
+    function post(email, guard) {
+        // newsletter posts keep their legacy shape; only waitlist pages send source
+        var payload = source === 'newsletter' ? { email: email } : { email: email, source: source };
+        // guard (honeypot value + ms since page load) only accompanies live submits —
+        // queued retries fire right at page load and would look bot-fast to the server
+        if (guard) {
+            payload.website = guard.website;
+            payload.elapsed = guard.elapsed;
+        }
         return fetch('/api/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email })
+            body: JSON.stringify(payload)
         });
     }
 
@@ -70,13 +86,25 @@
     var btn = document.getElementById('subscribeBtn');
     var emailInput = document.getElementById('subscribeEmail');
 
+    // Honeypot: a visually hidden text field that autofilling bots tend to complete.
+    // Injected here (not in the HTML) so every page gets it without markup changes,
+    // and non-JS scrapers never even see it. Humans can't focus or see it.
+    var hp = document.createElement('input');
+    hp.type = 'text';
+    hp.name = 'website';
+    hp.autocomplete = 'off';
+    hp.tabIndex = -1;
+    hp.setAttribute('aria-hidden', 'true');
+    hp.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;';
+    form.appendChild(hp);
+
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         var email = emailInput.value.trim();
         if (!email) return;
         if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; }
 
-        post(email)
+        post(email, { website: hp.value, elapsed: Date.now() - initTime })
             .then(function (res) {
                 if (res.ok || res.status === 409) { markSubscribed(); return; }
                 var err = new Error('subscribe failed: ' + res.status);
