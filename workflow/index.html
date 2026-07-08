@@ -423,6 +423,23 @@
         </div>
     </div>
 
+    <div class="spacer-sm"></div>
+
+    <div class="roster">
+        <div class="card"><h3><span data-l="en">Morning Brief</span><span data-l="ko">아침 브리핑</span></h3><span class="sysname">6:00 am · local</span>
+            <p><span data-l="en">Reads the calendar, the ticket tracker, and yesterday's notes; writes today's standup with everything left unfinished carried forward; sends me one message with the day's flags. When this one dies, the whole day starts unoriented.</span><span data-l="ko">캘린더, 티켓 트래커, 어제의 메모를 읽고 — 못 끝낸 일을 전부 이월해 오늘의 스탠드업을 쓴 뒤, 그날의 깃발들을 메시지 하나로 보낸다. 이게 죽으면 하루가 방향 없이 시작된다.</span></p></div>
+        <div class="card"><h3><span data-l="en">Cloud Backstop</span><span data-l="ko">클라우드 예비</span></h3><span class="sysname">7:30 am · cloud</span>
+            <p><span data-l="en">Lives on someone else's computer, so my laptop being asleep can't kill the morning. Its first act is checking whether the local run already delivered — if so, it stops silently. Two runners, one baton.</span><span data-l="ko">남의 컴퓨터에 살아서, 내 노트북이 잠들어도 아침은 무사하다. 첫 동작은 로컬 실행이 이미 배달했는지 확인 — 했다면 조용히 멈춘다. 주자는 둘, 바통은 하나.</span></p></div>
+        <div class="card"><h3><span data-l="en">Evening Sweep</span><span data-l="ko">저녁 정리</span></h3><span class="sysname">5:30 pm · local</span>
+            <p><span data-l="en">The reconciler: compares the ticket tracker against what my notes say actually happened, triages pull requests and repo drift, catches chat threads I left hanging — and now verifies the morning loop ran at all. Everything it wants to send lands as a draft; nothing sends itself.</span><span data-l="ko">대조 담당: 티켓 트래커와 메모가 말하는 실제 하루를 맞춰보고, PR과 저장소 상태를 분류하고, 답 못 한 대화를 건져낸다 — 이제 아침 루프의 생존 확인까지. 보내고 싶은 건 전부 초안으로만 남긴다. 스스로 전송하는 건 없다.</span></p></div>
+        <div class="card"><h3><span data-l="en">Memory Pass</span><span data-l="ko">기억 정리</span></h3><span class="sysname">rides the sweep</span>
+            <p><span data-l="en">The Notebook's nightly leg: capture at most three lessons, correct what today contradicted, stamp what got used, refresh the "Now" block — then run the counter script and report its tally where I'll see it.</span><span data-l="ko">공책의 야간 담당: 교훈은 최대 셋만 기록, 오늘과 어긋난 기억은 정정, 쓰인 기억엔 도장, "지금" 블록 갱신 — 그리고 계수기를 돌려 결과를 내 눈에 띄는 곳에 보고한다.</span></p></div>
+        <div class="card"><h3><span data-l="en">Notes Backup</span><span data-l="ko">메모 백업</span></h3><span class="sysname">6:00 pm · local</span>
+            <p><span data-l="en">Commits and pushes the day's notes. Boring on purpose — and the proof that boring needs watching: this is one of the two scripts the cleanup deleted, and two days of notes sat unbacked-up before anyone noticed.</span><span data-l="ko">하루치 메모를 커밋하고 푸시한다. 일부러 지루하게 만들었다 — 그리고 지루한 것일수록 지켜봐야 한다는 증거이기도 하다. 정리하다 지운 스크립트 둘 중 하나가 이거였고, 이틀치 메모가 백업 없이 방치돼 있었다.</span></p></div>
+        <div class="card"><h3><span data-l="en">Meeting Flush</span><span data-l="ko">회의 정리</span></h3><span class="sysname">6:30 pm · local</span>
+            <p><span data-l="en">Sweeps the day's meeting notes for action items nobody carried into the standup, links the attendees, and flags what fell through. Idempotent by design — running it twice never duplicates a thing.</span><span data-l="ko">그날의 회의록에서 스탠드업으로 옮겨지지 않은 액션 아이템을 쓸어 담고, 참석자를 연결하고, 빠진 것을 표시한다. 설계부터 멱등 — 두 번 돌려도 중복은 없다.</span></p></div>
+    </div>
+
     <div class="divider"></div>
 
     <!-- ==================== THE NOTEBOOK ==================== -->
