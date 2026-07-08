@@ -11,6 +11,12 @@
     var PENDING = 'dispatch-pending';
     var MAX_RETRIES = 3;
 
+    // localStorage access throws under blocked-cookies/strict-private modes; a storage
+    // failure must degrade to "no persistence", never kill the submit handler below.
+    function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+    function lsSet(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+    function lsRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
+
     var section = document.getElementById('subscribe');
 
     function post(email) {
@@ -22,8 +28,8 @@
     }
 
     function markSubscribed() {
-        localStorage.removeItem(PENDING);
-        localStorage.setItem(SUBSCRIBED, 'true'); // state only — no PII in storage
+        lsRemove(PENDING);
+        lsSet(SUBSCRIBED, 'true'); // state only — no PII in storage
         if (section) {
             section.classList.remove('error');
             section.classList.add('submitted');
@@ -38,22 +44,22 @@
     // Retry a previously-failed signup FIRST — before the subscribed early-return —
     // so a queued email still flushes even on a page already in its subscribed state.
     (function retryPending() {
-        var raw = localStorage.getItem(PENDING);
+        var raw = lsGet(PENDING);
         if (!raw) return;
         var entry;
-        try { entry = JSON.parse(raw); } catch (e) { localStorage.removeItem(PENDING); return; }
+        try { entry = JSON.parse(raw); } catch (e) { lsRemove(PENDING); return; }
         if (!entry || !entry.email || entry.retries >= MAX_RETRIES) {
-            localStorage.removeItem(PENDING);
+            lsRemove(PENDING);
             return;
         }
         entry.retries++;
-        localStorage.setItem(PENDING, JSON.stringify(entry));
+        lsSet(PENDING, JSON.stringify(entry));
         post(entry.email)
             .then(function (res) { if (res.ok || res.status === 409) markSubscribed(); })
             .catch(function () {}); // still down — leave it for the next load (until the cap)
     })();
 
-    if (localStorage.getItem(SUBSCRIBED)) {
+    if (lsGet(SUBSCRIBED)) {
         if (section) section.classList.add('submitted');
         return;
     }
@@ -82,7 +88,7 @@
                 if (btn) { btn.disabled = false; btn.style.opacity = ''; }
                 section.classList.add('error');
                 if (isTransient(err)) {
-                    localStorage.setItem(PENDING, JSON.stringify({ email: email, retries: 0 }));
+                    lsSet(PENDING, JSON.stringify({ email: email, retries: 0 }));
                 }
             });
     });

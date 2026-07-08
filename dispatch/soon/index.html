@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dispatch — Coming soon</title>
-    <meta name="description" content="A quiet place to write letters to the few people you actually want to read them. Coming soon.">
+    <meta name="description" content="A place for you to write, too. Dispatch is becoming a quiet little tool for writing letters — to the few people you actually want to read them. Coming soon.">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://klee.page/dispatch/soon/">
     <meta property="og:title" content="Dispatch — Coming soon">
-    <meta property="og:description" content="A quiet place to write letters to the few people you actually want to read them. Coming soon.">
+    <meta property="og:description" content="A place for you to write, too. Dispatch is becoming a quiet little tool for writing letters — to the few people you actually want to read them. Coming soon.">
     <meta property="og:image" content="https://klee.page/images/kevi394-053.jpg">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Dispatch — Coming soon">
@@ -19,7 +19,9 @@
 
     <script>
         (function () {
-            var stored = localStorage.getItem('theme');
+            // storage access can throw under blocked-cookies/private modes — theme falls back to system
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (e) {}
             var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', stored || sys);
         })();
@@ -32,20 +34,21 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #f0eee6; --text: #1f1e1d; --caption: #8a8880; --accent: #a0826d;
+            /* --caption and --accent-ink hold ≥4.5:1 against --bg (WCAG AA); --accent stays decorative-only */
+            --bg: #f0eee6; --text: #1f1e1d; --caption: #6b6961; --accent: #a0826d; --accent-ink: #806451;
             --rule: rgba(31,30,29,0.1);
             --font: 'Newsreader', Georgia, serif;
             --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
         }
         [data-theme="dark"] {
-            --bg: #1f1e1d; --text: #f0eee6; --caption: #7a7a75; --accent: #c4a882;
+            --bg: #1f1e1d; --text: #f0eee6; --caption: #8a8880; --accent: #c4a882; --accent-ink: #c4a882;
             --rule: rgba(240,238,230,0.08);
         }
         html, body { min-height: 100%; }
         body {
             font-family: var(--font); background: var(--bg); color: var(--text);
             font-size: 20px; line-height: 1.6; -webkit-font-smoothing: antialiased;
-            display: flex; flex-direction: column; min-height: 100vh;
+            display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh;
             transition: background-color 0.6s ease, color 0.3s ease;
         }
         a { color: inherit; text-decoration: none; transition: opacity 0.2s ease; }
@@ -65,7 +68,7 @@
             max-width: 600px; margin: 0 auto; width: 100%;
             padding: 22px 28px; display: flex; justify-content: space-between; align-items: center;
         }
-        .back-link { font-size: 14px; opacity: 0.55; }
+        .back-link { font-size: 14px; color: var(--caption); }
         .header-right { display: flex; align-items: center; gap: 18px; }
         .nav-wordmark { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 18px; }
         .nav-wordmark::after { content: '✶'; margin-left: 4px; color: var(--accent); font-style: normal; font-size: 10px; vertical-align: super; }
@@ -73,6 +76,8 @@
         .theme-pill::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); transition: transform 0.2s ease, background-color 0.3s ease; }
         [data-theme="dark"] .theme-pill::after { transform: translateX(18px); }
         .theme-pill input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+        .theme-pill:has(input:focus-visible) { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+        .back-link:focus-visible, footer a:focus-visible, .subscribe-btn:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 
         main {
             position: relative; z-index: 1;
@@ -82,11 +87,12 @@
         }
         .eyebrow {
             font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
-            color: var(--accent); margin-bottom: 1.25rem;
+            color: var(--accent-ink); margin-bottom: 1.25rem;
         }
         .hero-title {
             font-family: var(--font-display); font-style: italic; font-weight: 600;
             font-size: clamp(40px, 8vw, 58px); line-height: 1.06; letter-spacing: -0.015em;
+            text-wrap: balance;
             margin-bottom: 1.5rem;
         }
         .lede {
@@ -104,20 +110,20 @@
             outline: none; transition: border-color 0.2s ease, color 0.3s ease;
         }
         .subscribe-input::placeholder { color: var(--caption); }
-        .subscribe-input:focus { border-color: var(--accent); }
+        .subscribe-input:focus { border-color: var(--accent-ink); }
         .subscribe-btn {
             background: var(--text); color: var(--bg); border: none; border-radius: 8px;
             font-family: var(--font); font-size: 15px; padding: 12px 22px; cursor: pointer;
             transition: opacity 0.2s ease, background-color 0.3s ease;
         }
         .subscribe-btn:hover { opacity: 0.8; }
-        .subscribe-success { font-size: 17px; font-weight: 600; color: var(--accent); display: none; margin-bottom: 0.6rem; }
+        .subscribe-success { font-size: 17px; font-weight: 600; color: var(--accent-ink); display: none; margin-bottom: 0.6rem; }
         .subscribe-error { font-size: 15px; color: #c0392b; display: none; margin-bottom: 0.6rem; }
         [data-theme="dark"] .subscribe-error { color: #e8857a; }
         .subscribe.submitted .subscribe-form { display: none; }
         .subscribe.submitted .subscribe-success { display: block; }
         .subscribe.error .subscribe-error { display: block; }
-        .subscribe-note { font-size: 13px; color: var(--caption); opacity: 0.7; }
+        .subscribe-note { font-size: 13px; color: var(--caption); }
 
         footer {
             position: relative; z-index: 1;
@@ -129,6 +135,7 @@
         @media (max-width: 600px) {
             body { font-size: 18px; }
             .subscribe-form { flex-direction: column; }
+            .subscribe-input, .subscribe-btn { min-height: 44px; }
         }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
     </style>
@@ -146,17 +153,20 @@
 
     <main>
         <p class="eyebrow">Coming soon</p>
-        <h1 class="hero-title">A quiet place to write to the few who matter.</h1>
-        <p class="lede">Dispatch is becoming a small tool for letters like the ones you've been reading &mdash; yours to write, at your own little address on the web. <span class="muted">No feeds, no metrics, no algorithm. Just a page and a URL.</span></p>
+        <h1 class="hero-title">A place for you to write, too.</h1>
+        <p class="lede">Dispatch is becoming a quiet little tool for writing letters like these &mdash; to the few people you actually want to read them. <span class="muted">No feeds, no metrics. Just a page and a URL.</span></p>
 
         <div class="subscribe" id="subscribe">
             <form class="subscribe-form" id="subscribeForm">
                 <input type="email" class="subscribe-input" id="subscribeEmail" placeholder="your@email.com" required autocomplete="email" aria-label="Email address">
                 <button type="submit" class="subscribe-btn" id="subscribeBtn">Notify me</button>
             </form>
-            <p class="subscribe-success" id="subscribeSuccess">You're on the list. I'll write when it opens.</p>
-            <p class="subscribe-error" id="subscribeError">Hmm, that didn't go through. Mind trying again?</p>
+            <div aria-live="polite">
+                <p class="subscribe-success" id="subscribeSuccess">You're on the list. I'll write when it opens.</p>
+                <p class="subscribe-error" id="subscribeError">Hmm, that didn't go through. Mind trying again?</p>
+            </div>
             <p class="subscribe-note">One note when Dispatch opens &mdash; nothing else.</p>
+            <noscript><p class="subscribe-note">This little form needs JavaScript to send &mdash; the letters themselves won't.</p></noscript>
         </div>
     </main>
 
@@ -173,8 +183,18 @@
             t.addEventListener('change', function () {
                 var v = t.checked ? 'dark' : 'light';
                 document.documentElement.setAttribute('data-theme', v);
-                localStorage.setItem('theme', v);
+                try { localStorage.setItem('theme', v); } catch (e) {}
             });
+            // follow system preference while open, unless the visitor chose a theme
+            var mq = window.matchMedia('(prefers-color-scheme: dark)');
+            function onSystemChange(e) {
+                var stored = null;
+                try { stored = localStorage.getItem('theme'); } catch (err) {}
+                if (stored) return;
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+                t.checked = e.matches;
+            }
+            if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
         })();
     </script>
 </body>
