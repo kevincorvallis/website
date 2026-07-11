@@ -149,6 +149,31 @@
 
         .separator { border: none; border-top: 1px solid var(--card-border); margin: 2.5rem 0; }
 
+        .route-map { margin: 2.5rem 0; }
+        .route-map svg { width: 100%; max-width: 240px; display: block; margin: 0 auto; }
+        /* Default state is the FINAL/revealed state (accent fill, full opacity) —
+           this is what a no-JS visitor or a prefers-reduced-motion visitor sees,
+           since the reveal script below refuses to run for either. JS is only
+           responsible for ADDING the temporary .pending (dimmed, not-yet-reached)
+           treatment for motion-OK visitors, then removing it per stop on scroll. */
+        .route-stop circle {
+            fill: var(--accent);
+            stroke: var(--text);
+            stroke-width: 2;
+            opacity: 1;
+            transition: opacity 0.4s ease, fill 0.4s ease;
+        }
+        .route-stop text {
+            fill: var(--text);
+            font-family: var(--mono);
+            font-size: 11px;
+            opacity: 0.9;
+            transition: opacity 0.4s ease;
+        }
+        .route-stop.pending circle { fill: var(--bg); opacity: 0.35; }
+        .route-stop.pending text { opacity: 0.5; }
+        .route-line { stroke: var(--card-border); stroke-width: 2; fill: none; }
+
         footer { max-width: 800px; margin: 0 auto; padding: 3rem 20px 2rem; }
         footer p { font-size: 14px; opacity: 0.6; }
 
@@ -206,6 +231,27 @@
         </section>
 
         <!-- ROUTE MAP -->
+        <section class="route-map" aria-hidden="true">
+            <svg viewBox="0 0 200 400" role="img" aria-label="Route: Kansai to Shirahama to Kushimoto and back">
+                <path class="route-line" d="M 100 40 L 100 140 L 100 240 L 100 340" />
+                <g class="route-stop" data-stop="1">
+                    <circle cx="100" cy="40" r="8" />
+                    <text x="118" y="45">Kansai</text>
+                </g>
+                <g class="route-stop" data-stop="2">
+                    <circle cx="100" cy="140" r="8" />
+                    <text x="118" y="145">Shirahama</text>
+                </g>
+                <g class="route-stop" data-stop="3">
+                    <circle cx="100" cy="240" r="8" />
+                    <text x="118" y="245">Kushimoto</text>
+                </g>
+                <g class="route-stop" data-stop="4">
+                    <circle cx="100" cy="340" r="8" />
+                    <text x="118" y="345">Kansai</text>
+                </g>
+            </svg>
+        </section>
 
         <!-- DAY-BY-DAY -->
 
@@ -224,6 +270,38 @@
 
     <script>
         document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+    </script>
+
+    <script>
+        (function() {
+            if (!('IntersectionObserver' in window)) return;
+            // Bail entirely under reduced motion — same convention as
+            // js/header-scroll.js. The CSS default (fully revealed) is already
+            // the correct static state for these visitors, so there is nothing
+            // for this script to do.
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            var stops = document.querySelectorAll('.route-stop');
+            if (!stops.length) return;
+
+            // Dim every stop first; the observer below un-dims each one as its
+            // paired day card scrolls into view. Doing this from JS (not CSS)
+            // means a visitor whose JS fails to run still sees every stop in
+            // its final, fully-revealed default state.
+            stops.forEach(function(s) { s.classList.add('pending'); });
+
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (!entry.isIntersecting) return;
+                    var stopNum = entry.target.getAttribute('data-day');
+                    var marker = document.querySelector('.route-stop[data-stop="' + stopNum + '"]');
+                    if (marker) marker.classList.remove('pending');
+                });
+            }, { threshold: 0.4 });
+
+            document.querySelectorAll('.day-card[data-day]').forEach(function(card) {
+                observer.observe(card);
+            });
+        })();
     </script>
 
     <script>
