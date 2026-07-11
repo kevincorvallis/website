@@ -73,7 +73,7 @@ module.exports = async function handler(req, res) {
             return res.status(429).json({ error: 'Too many requests' });
         }
 
-        const { issue, name, comment } = req.body || {};
+        const { issue, name, comment, website, elapsed } = req.body || {};
 
         if (!issue || typeof issue !== 'string' || !/^[a-zA-Z0-9-]+$/.test(issue) || issue.length > 20) {
             return res.status(400).json({ error: 'Valid issue required' });
@@ -83,6 +83,14 @@ module.exports = async function handler(req, res) {
         }
         if (!comment || typeof comment !== 'string' || comment.trim().length === 0 || comment.trim().length > 2000) {
             return res.status(400).json({ error: 'Valid comment required' });
+        }
+
+        // Bot gate: both fields are optional so existing callers (newsletter issue
+        // pages) that don't send them are unaffected. Only enforced when a caller
+        // does send them. Silent 200 — don't teach bots which check failed.
+        if (website || (typeof elapsed === 'number' && elapsed >= 0 && elapsed < 1500)) {
+            console.warn('COMMENTS_BOT_DROP', issue, website ? 'honeypot' : 'elapsed', elapsed);
+            return res.status(200).json({ ok: true });
         }
 
         const row = {
