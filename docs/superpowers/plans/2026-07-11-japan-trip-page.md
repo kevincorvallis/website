@@ -1056,11 +1056,32 @@ Insert above the route-map `IntersectionObserver` script added in Task 5:
     </script>
 ```
 
-- [ ] **Step 4: Verify in the browser**
+- [ ] **Step 4: Verify in the browser — WITHOUT submitting a real comment**
 
-Reload `http://localhost:8080/japan-trip/`. Post a test comment with a real name and
-message, confirm it appears in the list below the form immediately after submit, and
-confirm reloading the page still shows it (persisted via the real API).
+`npm run dev` serves static files only — it does not execute `api/*.js`, so a real
+submit attempt against `http://localhost:8080` will 404 (expected, not a bug). Do
+NOT work around this by pointing the page at production and submitting for real —
+this widget is hardcoded to `issue=trip-japan-oct`, the real thread friends will
+actually read, so a live test submission would permanently plant a fake comment
+there. Verify structurally instead:
+
+- Reload `http://localhost:8080/japan-trip/`. Open devtools Network tab, confirm a
+  `GET /api/comments?issue=trip-japan-oct` request fires on load (it will fail with
+  404 locally — that's expected) and that the failure is caught silently (the
+  `.catch(function() {})` in `loadComments()`) rather than throwing an unhandled
+  error into the console.
+- Confirm `#commentsEmpty` shows its "No comments yet" text when the fetch fails
+  (since `renderComments` is never called with real data, the empty state should be
+  whatever the initial HTML/CSS shows — verify it looks correct, not broken/blank).
+- Confirm the form renders (name field, textarea, Post button) and that a hidden
+  honeypot `<input name="website">` gets injected into the DOM (inspect via devtools
+  — it should be present but invisible, per the same pattern as `js/subscribe.js`).
+- Fill in the form and click Post; confirm the button disables during the (locally
+  failing) request and re-enables after, without a page crash or unhandled
+  exception — this proves the request path and error handling work even though the
+  actual persistence can't be verified locally.
+- The real end-to-end round trip (POST succeeds, comment renders, persists) is
+  verified safely in Task 11 via Playwright route interception — not here.
 
 - [ ] **Step 5: Commit**
 
