@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wakayama Hotfix — Kevin Lee</title>
+    <meta name="description" content="Kevin's October 2026 trip itinerary through Wakayama, Shirahama, and Kushimoto — leave a comment.">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://klee.page/japan-trip">
+    <meta property="og:title" content="The Wakayama Hotfix">
+    <meta property="og:description" content="Four days, three onsen soaks, one itinerary now open for peer review.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗾</text></svg>">
+
+    <!-- Prevent flash of wrong theme -->
+    <script>
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', stored || systemPreference);
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f0eee6;
+            --text: #1f1e1d;
+            --tag-bg: rgba(31, 30, 29, 0.08);
+            --card-border: rgba(31, 30, 29, 0.12);
+            --accent: #b5502f;
+            --font: 'Newsreader', Georgia, 'Times New Roman', serif;
+            --mono: 'SF Mono', 'Menlo', 'Consolas', monospace;
+            color-scheme: light dark;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f1e1d;
+            --text: #f0eee6;
+            --tag-bg: rgba(240, 238, 230, 0.1);
+            --card-border: rgba(240, 238, 230, 0.16);
+            --accent: #e08462;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 19px;
+            line-height: 1.6;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s ease; }
+        a:hover { opacity: 0.6; }
+        a:focus-visible, button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; border-radius: 2px; }
+
+        header {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link { font-size: 15px; text-decoration: none; opacity: 0.65; transition: opacity 0.2s ease; }
+        .back-link:hover { opacity: 0.85; }
+
+        .toggle-wrap { display: flex; align-items: center; }
+        .toggle-wrap input {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        }
+        .toggle-wrap input:focus-visible + label { outline: 2px solid var(--text); outline-offset: 3px; border-radius: 10px; }
+        .toggle-wrap label { position: relative; display: block; width: 40px; height: 20px; background: var(--text); border-radius: 10px; cursor: pointer; }
+        .toggle-wrap label::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+            background: var(--bg); border-radius: 50%; transition: transform 0s;
+        }
+        .toggle-wrap label.has-transition::after { transition: transform 0.2s; }
+        .toggle-wrap input:checked + label::after { transform: translateX(20px); }
+
+        main { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+        /* ——— Hero ——— */
+        .hero { margin-top: 2rem; margin-bottom: 3rem; }
+        .hero-title { font-size: 42px; font-weight: 600; line-height: 1.1; margin-bottom: 0.5rem; }
+        .hero-tagline { font-size: 19px; opacity: 0.7; margin-bottom: 1.5rem; }
+        .hero-blurb { font-size: 18px; line-height: 1.6; max-width: 640px; margin-bottom: 1.75rem; }
+
+        .stat-block {
+            font-family: var(--mono);
+            font-size: 14px;
+            opacity: 0.75;
+            padding: 0.85rem 1rem;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .countdown {
+            font-family: var(--mono);
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        h2 { font-size: 26px; font-weight: 600; line-height: 1.2; margin-bottom: 1.25rem; }
+
+        .card {
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-eyebrow {
+            font-family: var(--mono);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            margin-bottom: 0.4rem;
+        }
+
+        .card-title { font-size: 21px; font-weight: 600; margin-bottom: 0.5rem; }
+        .card-caption { font-size: 17px; opacity: 0.85; margin-bottom: 0.75rem; line-height: 1.5; }
+        .card-detail { font-size: 15px; opacity: 0.65; line-height: 1.55; }
+        .card-map-link { font-size: 14px; display: inline-block; margin-top: 0.6rem; }
+
+        .separator { border: none; border-top: 1px solid var(--card-border); margin: 2.5rem 0; }
+
+        footer { max-width: 800px; margin: 0 auto; padding: 3rem 20px 2rem; }
+        footer p { font-size: 14px; opacity: 0.6; }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        }
+        .skip-link {
+            position: absolute; top: -40px; left: 0; padding: 8px 16px;
+            background: var(--text); color: var(--bg); z-index: 100;
+            font-size: 14px; text-decoration: none; transition: top 0.2s ease;
+        }
+        .skip-link:focus { top: 0; }
+
+        @media (max-width: 768px) {
+            body { font-size: 17px; }
+            .hero-title { font-size: 30px; }
+            h2 { font-size: 22px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <header>
+        <a href="/" class="back-link">&larr; Kevin Lee</a>
+        <div class="toggle-wrap">
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+            <label for="theme-toggle"><span class="sr-only">Toggle dark mode</span></label>
+        </div>
+    </header>
+
+    <main id="main">
+        <section class="hero">
+            <h1 class="hero-title">The Wakayama Hotfix</h1>
+            <p class="hero-tagline">Four days, three onsen soaks, one itinerary now open for peer review.</p>
+            <p class="hero-blurb">
+                I planned a four-day run down the Wakayama coast in October, and because
+                I'm an engineer I built a webpage about it instead of just texting you.
+                Everything below is real and mostly booked. This page has a comments
+                section, which means the itinerary is now open source &mdash; tell me
+                what I got wrong, what I'm missing, or what snack you want smuggled back.
+                I will read all feedback from a bathtub facing the Pacific.
+            </p>
+            <p class="stat-block">4 days &middot; 3 onsen soaks &middot; 5 sights &middot; 2 flights &middot; &infin; opportunities to forget a towel</p>
+            <p class="countdown" id="countdown" aria-live="polite"></p>
+        </section>
+
+        <!-- ROUTE MAP -->
+
+        <!-- DAY-BY-DAY -->
+
+        <!-- HIGHLIGHTS -->
+
+        <!-- COMMENTS -->
+    </main>
+
+    <footer>
+        <p>&copy; <span id="copyrightYear"></span> Kevin Lee</p>
+    </footer>
+
+    <!-- Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <script>
+        document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+    </script>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/theme.js"></script>
+</body>
+</html>
