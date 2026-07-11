@@ -64,11 +64,15 @@ test.describe('Japan trip page', () => {
 
     test('route map markers reveal on scroll', async ({ page }) => {
         await page.goto('/japan-trip/');
+        // The hero (photo + stat block + countdown + full SVG map) pushes every day
+        // card below the fold on load — even Day 1 is not visible without scrolling,
+        // so both markers start pending; neither is revealed until scrolled to.
         const marker1 = page.locator('.route-stop[data-stop="1"]');
-        // Day 1's card sits right after the hero, so it should already be revealed on load.
-        await expect(marker1).not.toHaveClass(/pending/);
+        await expect(marker1).toHaveClass(/pending/);
         const marker4 = page.locator('.route-stop[data-stop="4"]');
         await expect(marker4).toHaveClass(/pending/);
+        await page.locator('.day-card[data-day="1"]').scrollIntoViewIfNeeded();
+        await expect(marker1).not.toHaveClass(/pending/);
         await page.locator('.day-card[data-day="4"]').scrollIntoViewIfNeeded();
         await expect(marker4).not.toHaveClass(/pending/);
     });
