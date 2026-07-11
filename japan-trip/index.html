@@ -226,6 +226,29 @@
         document.getElementById('copyrightYear').textContent = new Date().getFullYear();
     </script>
 
+    <script>
+        (function() {
+            // UPDATE: set to the actual booked Gimpo departure (OZ1165, 17:40 JST/KST).
+            var DEPARTURE_ISO = '2026-10-01T17:40:00+09:00';
+            var el = document.getElementById('countdown');
+            if (!el) return;
+
+            function render() {
+                var diffMs = new Date(DEPARTURE_ISO).getTime() - Date.now();
+                if (diffMs <= 0) {
+                    el.textContent = 'Status: wheels up. OZ1165 has departed.';
+                    return;
+                }
+                var days = Math.floor(diffMs / 86400000);
+                var hours = Math.floor((diffMs % 86400000) / 3600000);
+                el.textContent = 'T-minus ' + days + 'd ' + hours + 'h until OZ1165 (Gimpo 17:40 → Kansai 19:20)';
+            }
+
+            render();
+            setInterval(render, 60000);
+        })();
+    </script>
+
     <script src="/js/i18n.js"></script>
     <script src="/js/theme.js"></script>
 </body>
