@@ -556,5 +556,21 @@
 
     <script src="/js/i18n.js"></script>
     <script src="/js/theme.js"></script>
+
+    <script>
+        console.log(
+            '%cItinerary loaded.',
+            'font-weight:bold;font-size:14px;'
+        );
+        console.log(
+            // for the friends who were always going to open dev tools.
+            JSON.stringify({
+                flights: ['OZ1165 GMP-KIX 17:40', 'OZ1155 KIX-GMP 20:30'],
+                stays: ['Odysis Suite Osaka Kansai Airport Hotel', 'Shirahama Key Terrace Hotel Seamore', 'Mercure Wakayama Kushimoto Resort & Spa'],
+                sights: ['Engetsu Island', 'Shirasaki Marine Park', 'Nachi Falls', 'Wakayama Castle', 'Sandanbeki Cliffs'],
+                knownBugs: ['no equinox alignment in October', 'possible rain']
+            }, null, 2)
+        );
+    </script>
 </body>
 </html>
