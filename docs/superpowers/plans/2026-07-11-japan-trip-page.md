@@ -56,41 +56,58 @@ Supabase (Postgres via PostgREST, service-role key only), Playwright for smoke t
 
 - [ ] **Step 1: Write the failing test**
 
+**Important — read before writing this test:** `playwright.config.js` defaults
+`baseURL` to `https://klee.page` (production) unless `PW_BASE_URL` is set — there is
+no local server that executes `api/*.js` (the `npm run dev` static server can't run
+Vercel functions, and there's no separate test Supabase database). So these tests run
+as real HTTP calls against the real production API and real production database. All
+three tests below MUST use the single reserved issue slug `zz-smoke-test` (never a
+per-test slug) — it's a synthetic namespace no real page ever queries, so any row that
+does get written is inert, invisible junk rather than something a real visitor could
+ever see. Never use a real/shared issue slug (e.g. `trip-japan-oct`) in an automated
+test that might persist a row.
+
 Add to `tests/smoke/api.spec.js` (append inside the existing `test.describe('API
 routes', ...)` block, after the `subscribe API rejects invalid email` test):
 
 ```javascript
     test('comments API silently accepts a legacy POST with no honeypot fields', async ({ request }) => {
         const res = await request.post('/api/comments', {
-            data: { issue: 'zz-smoke-legacy', name: 'Smoke Test', comment: 'legacy client, no honeypot fields sent' },
+            data: { issue: 'zz-smoke-test', name: 'Smoke Test', comment: 'legacy client, no honeypot fields sent' },
             headers: { 'Content-Type': 'application/json' },
         });
         expect(res.status()).toBe(200);
     });
 
     test('comments API silently drops a submission with a filled honeypot', async ({ request }) => {
+        const before = await (await request.get('/api/comments?issue=zz-smoke-test')).json();
         const res = await request.post('/api/comments', {
-            data: { issue: 'zz-smoke-honeypot', name: 'Bot', comment: 'spam', website: 'http://spam.example', elapsed: 5000 },
+            data: { issue: 'zz-smoke-test', name: 'Bot', comment: 'spam via honeypot', website: 'http://spam.example', elapsed: 5000 },
             headers: { 'Content-Type': 'application/json' },
         });
         // Bot gate returns 200 (don't teach bots which check failed) but must not persist the row.
         expect(res.status()).toBe(200);
-        const list = await request.get('/api/comments?issue=zz-smoke-honeypot');
-        const body = await list.json();
-        expect(body.length).toBe(0);
+        const after = await (await request.get('/api/comments?issue=zz-smoke-test')).json();
+        expect(after.length).toBe(before.length);
     });
 
     test('comments API silently drops a submission that arrives too fast', async ({ request }) => {
+        const before = await (await request.get('/api/comments?issue=zz-smoke-test')).json();
         const res = await request.post('/api/comments', {
-            data: { issue: 'zz-smoke-fast', name: 'Bot', comment: 'spam', elapsed: 400 },
+            data: { issue: 'zz-smoke-test', name: 'Bot', comment: 'spam via elapsed', elapsed: 400 },
             headers: { 'Content-Type': 'application/json' },
         });
         expect(res.status()).toBe(200);
-        const list = await request.get('/api/comments?issue=zz-smoke-fast');
-        const body = await list.json();
-        expect(body.length).toBe(0);
+        const after = await (await request.get('/api/comments?issue=zz-smoke-test')).json();
+        expect(after.length).toBe(before.length);
     });
 ```
+
+Note: the first test intentionally does not assert on persistence (it only confirms
+the legacy shape doesn't get rejected) since `zz-smoke-test` accumulates rows across
+CI runs over time — that's expected and harmless (nothing renders it), not a bug to fix.
+The two bot-gate tests compare a before/after count instead of asserting `length === 0`
+for the same reason (earlier runs may have already left legitimate rows there).
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -1200,13 +1217,45 @@ test.describe('Japan trip page', () => {
         await expect(page.locator('.card-eyebrow')).toHaveCount(5);
     });
 
-    test('comments widget posts and displays a comment', async ({ page }) => {
+    // This page's widget is hardcoded to issue=trip-japan-oct — the real, shared
+    // comment thread friends will actually read. Playwright runs against production
+    // by default (see Task 1's note), so a real POST here would permanently plant a
+    // fake "Smoke Test ####" comment in that real thread. Route interception verifies
+    // the frontend↔API contract without ever touching the live backend.
+    test('comments widget renders comments returned by the API', async ({ page }) => {
+        // Single handler for the whole /api/comments* path (GET with query string
+        // included) — registering two overlapping page.route() patterns for the same
+        // request is ordering-sensitive in Playwright; one handler avoids that entirely.
+        await page.route('**/api/comments*', async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([{ id: 1, name: 'A Friend', comment: 'Looks fun!', created_at: new Date().toISOString() }]),
+            });
+        });
         await page.goto('/japan-trip/');
-        const uniqueName = 'Smoke Test ' + Date.now();
-        await page.fill('#commentName', uniqueName);
-        await page.fill('#commentText', 'Automated smoke test comment');
+        await expect(page.locator('.comment-name').filter({ hasText: 'A Friend' })).toBeVisible();
+        await expect(page.locator('#commentsEmpty')).toBeHidden();
+    });
+
+    test('comments widget submits the right payload without hitting the real API', async ({ page }) => {
+        let capturedBody = null;
+        await page.route('**/api/comments*', async (route) => {
+            if (route.request().method() === 'POST') {
+                capturedBody = route.request().postDataJSON();
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+            } else {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+            }
+        });
+        await page.goto('/japan-trip/');
+        await page.fill('#commentName', 'Test Friend');
+        await page.fill('#commentText', 'Automated smoke test — intercepted, never persisted.');
         await page.click('#commentBtn');
-        await expect(page.locator('.comment-name').filter({ hasText: uniqueName })).toBeVisible();
+        await expect.poll(() => capturedBody).not.toBeNull();
+        expect(capturedBody.issue).toBe('trip-japan-oct');
+        expect(capturedBody.name).toBe('Test Friend');
+        expect(typeof capturedBody.elapsed).toBe('number');
     });
 
     test('route map markers reveal on scroll', async ({ page }) => {
@@ -1225,12 +1274,12 @@ test.describe('Japan trip page', () => {
 - [ ] **Step 2: Run the test**
 
 Run: `npx playwright test tests/smoke/japan-trip.spec.js --project=chromium`
-Expected: PASS (all 5 tests).
+Expected: PASS (all 6 tests).
 
 - [ ] **Step 3: Run the full smoke suite to confirm no regressions**
 
 Run: `npm run test:smoke`
-Expected: PASS (every existing smoke test, plus the 5 new ones and Task 1's 3 new
+Expected: PASS (every existing smoke test, plus the 6 new ones and Task 1's 3 new
 `api.spec.js` tests).
 
 - [ ] **Step 4: Manual QA pass**
