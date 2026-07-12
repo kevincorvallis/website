@@ -290,11 +290,11 @@ async function rankPlaces(originalQuery, candidates) {
     return parsed.results.slice(0, 5);
 }
 
-function logSearch(query, results, placeIds, req) {
+function logSearch(query, results, placeIds, req, source) {
     if (!SUPABASE_URL || !SUPABASE_KEY) return;
     const row = {
         query,
-        response: results.map((r, i) => ({ place_id: placeIds[i] ?? null, name: r.name, rank: i + 1 })),
+        response: results.map((r, i) => ({ place_id: placeIds[i] ?? null, name: r.name, rank: i + 1, source })),
         ip: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || null,
         country: req.headers['x-vercel-ip-country'] || null,
         city: req.headers['x-vercel-ip-city'] || null,
@@ -346,10 +346,10 @@ async function handler(req, res) {
     if (!GOOGLE_PLACES_API_KEY) {
         const matched = findDemoMatch(cleanQuery);
         if (matched) {
-            logSearch(cleanQuery, [matched], [null], req);
+            logSearch(cleanQuery, [matched], [null], req, 'demo');
             return res.status(200).json({ source: 'demo', reason: 'key_missing', results: [matched] });
         }
-        logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req);
+        logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req, 'demo');
         return res.status(200).json({
             source: 'demo',
             reason: 'key_missing',
@@ -372,12 +372,12 @@ async function handler(req, res) {
         } else if (err.name === 'TimeoutError' || err.name === 'AbortError') {
             reason = 'timeout';
         }
-        logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req);
+        logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req, 'degraded');
         return res.status(200).json({ source: 'degraded', reason, results: DEMO_RESULTS });
     }
 
     if (places.length === 0) {
-        logSearch(cleanQuery, [], [], req);
+        logSearch(cleanQuery, [], [], req, 'live');
         return res.status(200).json({ source: 'live', reason: null, results: [] });
     }
 
@@ -409,7 +409,7 @@ async function handler(req, res) {
         finalPlaceIds = top.map((p) => p.id);
     }
 
-    logSearch(cleanQuery, finalResults, finalPlaceIds, req);
+    logSearch(cleanQuery, finalResults, finalPlaceIds, req, 'live');
     return res.status(200).json({ source: 'live', reason: null, results: finalResults });
 }
 
