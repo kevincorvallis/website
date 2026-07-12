@@ -29,18 +29,20 @@ checkable principles, applied to this work specifically:
 
 **Static/content pages** (one parameterized spec, not one file each): `/`,
 `/resume/`, `/ai/`, `/photos/`, `/exposure/`, `/film/`, `/now/`,
-`/privacy/`, `/terms/`, `/workflow/`, `/brock/`, `/projects/ai-workflow/`,
-`/projects/merfish/`, `/projects/shredders/`, `/projects/spacec/`. For each:
+`/privacy/`, `/terms/`, `/workflow/`, `/brock/`, `/projects/merfish/`,
+`/projects/shredders/`, `/projects/spacec/` — **14 pages** (see §2 for why
+`/projects/ai-workflow/` isn't among them, a fact discovered during
+implementation, not known when this section was first drafted). For each:
 loads with a 200, exact `<title>` text matches, an `<h1>` (or equivalent
 heading) is visible, and no uncaught console/page errors fire during load —
 a cheap, high-signal regression catcher this repo doesn't have anywhere
-today. The theme-toggle checkbox is asserted present for 14 of the 15 —
+today. The theme-toggle checkbox is asserted present for 13 of the 14 —
 verified directly (not assumed from CLAUDE.md's general claim) that
 `/brock/` has **no** `#theme-toggle` at all, since it's dark-only with its
 own palette (CLAUDE.md, confirmed via `grep -c 'id="theme-toggle"'` across
-all 15 pages before writing this spec). The parameterized test's data table
-carries a per-page `hasThemeToggle` flag rather than assuming it's
-universal.
+all candidate pages before writing this spec). The parameterized test's
+data table carries a per-page `hasThemeToggle` flag rather than assuming
+it's universal.
 
 **Cross-cutting persistence** (new dedicated spec, not per-page): theme
 choice (dark/light) survives a page reload; language choice (i18n) survives
@@ -58,6 +60,16 @@ the `iPhone 14` viewport.
 
 ## 2. Explicitly out of scope (named, not silently skipped)
 
+- **`/projects/ai-workflow/`** — discovered during implementation (Task 1)
+  to be an untracked, never-committed page (`git ls-files` returns nothing
+  for it) that 404s in production, despite being linked twice from the
+  already-committed, live `projects/index.html`. Excluded from the test
+  data rather than asserting against a page that could vanish or change at
+  any moment, and rather than treating an undeployed draft as if it were
+  shipped. This is a real, separate, pre-existing bug (a dead "Read the
+  case study →" link on the live site) surfaced to Kevin outside this
+  plan's scope — fixing it (either shipping the page or removing the link)
+  is not a testing task.
 - **`/admin/`** — Supabase-auth-gated internal tool, not part of the public
   design system (CLAUDE.md: "Not part of the main design system"). Testing
   it would require mocking a real auth provider disproportionate to its
