@@ -105,6 +105,14 @@ git commit -m "Add locus_searches migration"
 
 ### Task 2: LLM provider chain + query-parsing helpers
 
+**Note:** `playwright.config.js`'s `desktop`/`mobile` projects originally hardcoded
+`testMatch: /smoke\/.*\.spec\.js/`, which structurally excluded `tests/unit/`
+(and, as a pre-existing latent bug unrelated to this plan, `tests/cli/` too — its
+6 tests were silently never running under `npm run test:smoke`). This has already
+been fixed (commit `e3cec70`, `testMatch: /(smoke|cli|unit)\/.*\.spec\.js/` on both
+projects) — the test commands below now work as written. If you're re-deriving this
+plan from scratch, apply that config fix before Step 2 below.
+
 **Files:**
 - Create: `api/locus-search.js` (started in this task, extended by Tasks 3-4)
 - Test: `tests/unit/locus-parsing.spec.js`
