@@ -4,6 +4,9 @@ const { test, expect } = require('@playwright/test');
 // the time this test was written (2026-07-12) — re-verify if either
 // changes. hasThemeToggle is false only for /brock/ (dark-only palette,
 // no #theme-toggle checkbox at all — confirmed via grep, not assumed).
+// /projects/ai-workflow/ intentionally excluded: linked from the committed
+// projects/index.html but the page itself was never committed (404 in
+// production as of 2026-07-12) — not this repo's job to test an undeployed page.
 const PAGES = [
     { path: '/', title: 'Kevin Lee', hasThemeToggle: true },
     { path: '/resume/', title: 'Resume — Kevin Lee', hasThemeToggle: true },
@@ -16,7 +19,6 @@ const PAGES = [
     { path: '/terms/', title: 'Terms of Service — Kevin Lee', hasThemeToggle: true },
     { path: '/workflow/', title: 'The Agent Graph — Kevin Lee', hasThemeToggle: true },
     { path: '/brock/', title: 'Brock — A Year in the Life | Kevin Lee', hasThemeToggle: false },
-    { path: '/projects/ai-workflow/', title: 'AI Development Workflow — Kevin Lee', hasThemeToggle: true },
     { path: '/projects/merfish/', title: 'MERFISH — Kevin Lee', hasThemeToggle: true },
     { path: '/projects/shredders/', title: 'Shredders — Kevin Lee', hasThemeToggle: true },
     { path: '/projects/spacec/', title: 'SPACEc — Kevin Lee', hasThemeToggle: true },
