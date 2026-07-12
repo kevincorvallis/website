@@ -167,11 +167,18 @@ here to avoid drift between two documents.
   insensitivity, whitespace, and no-match cases.
 - Smoke tests (`tests/smoke/locus.spec.js`, extended): mock
   `/api/locus-search` to return each of the three `source` values and
-  assert the frontend renders the correct caption (or none) for each; a
-  real (unmocked) click-through of all four demo chips against the actual
-  deployed `key_missing` behavior, since demo mode has no real API cost —
-  this is the one place in this feature where hitting the real endpoint in
-  an automated test is fine, unlike the live-Places path.
+  assert the frontend renders the correct caption (or none) for each,
+  including a demo-chip click. All mocked, not unmocked against the real
+  endpoint — reconsidered from an earlier draft of this spec, which
+  reasoned that hitting the real endpoint was "free" while no key is
+  configured. That's true today but not durable: once Kevin provisions
+  `GOOGLE_PLACES_API_KEY`, the same automated test would silently start
+  making real LLM + Google Places calls on every CI run. Matches this
+  repo's own established convention (every existing Locus/comments smoke
+  test already mocks its endpoint) and Playwright's own documented
+  guidance to not test infrastructure you don't control the cost/
+  availability of. Real production behavior gets a one-time manual `curl`
+  check after shipping, not a permanent automated test.
 - No changes to the existing mocked-live-search or error-state tests.
 
 ## 6. Out of scope
