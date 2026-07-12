@@ -71,4 +71,103 @@ test.describe('Locus page', () => {
         const nameHtml = await page.locator('.result-name').innerHTML();
         expect(nameHtml).not.toContain('<img');
     });
+
+    test('renders the demo caption and results when source is demo', async ({ page }) => {
+        await page.route('**/api/locus-search', (route) => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    source: 'demo',
+                    reason: 'key_missing',
+                    results: [{
+                        name: 'Espresso Vivace Roasteria',
+                        address: '532 Broadway E, Seattle, WA 98102',
+                        rating: 4.5,
+                        userRatingCount: 1515,
+                        priceLevel: 'PRICE_LEVEL_INEXPENSIVE',
+                        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Espresso+Vivace',
+                        whyItFits: 'A quiet Capitol Hill fixture.',
+                    }],
+                }),
+            });
+        });
+        await page.goto('/projects/locus/');
+        await page.locator('#searchInput').fill('quiet coffee shop to work from near Capitol Hill');
+        await page.locator('#searchBtn').click();
+        await expect(page.locator('#sourceCaption')).toBeVisible();
+        await expect(page.locator('#sourceCaption')).toContainText('Demo data');
+        await expect(page.locator('.result-name')).toContainText('Espresso Vivace Roasteria');
+    });
+
+    test('renders the degraded caption when source is degraded', async ({ page }) => {
+        await page.route('**/api/locus-search', (route) => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    source: 'degraded',
+                    reason: 'key_invalid',
+                    results: [{
+                        name: 'Ooink', address: '3630 Stone Way N, Seattle, WA 98103',
+                        rating: 4.3, userRatingCount: 285, priceLevel: 'PRICE_LEVEL_MODERATE',
+                        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Ooink',
+                        whyItFits: 'A mid-priced ramen counter.',
+                    }],
+                }),
+            });
+        });
+        await page.goto('/projects/locus/');
+        await page.locator('#searchInput').fill('date night ramen spot in Fremont');
+        await page.locator('#searchBtn').click();
+        await expect(page.locator('#sourceCaption')).toBeVisible();
+        await expect(page.locator('#sourceCaption')).toContainText('Live search hit a snag');
+    });
+
+    test('hides the caption when source is live', async ({ page }) => {
+        await page.route('**/api/locus-search', (route) => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    source: 'live',
+                    reason: null,
+                    results: [{
+                        name: 'Real Live Place', address: '123 Main St, Seattle, WA',
+                        rating: 4.8, userRatingCount: 99, priceLevel: 'PRICE_LEVEL_MODERATE',
+                        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Real+Live+Place',
+                        whyItFits: 'Genuinely live.',
+                    }],
+                }),
+            });
+        });
+        await page.goto('/projects/locus/');
+        await page.locator('#searchInput').fill('anything');
+        await page.locator('#searchBtn').click();
+        await expect(page.locator('.result-name')).toContainText('Real Live Place');
+        await expect(page.locator('#sourceCaption')).toBeHidden();
+    });
+
+    test('clicking a demo chip populates the input and submits immediately', async ({ page }) => {
+        await page.route('**/api/locus-search', (route) => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    source: 'demo',
+                    reason: 'key_missing',
+                    results: [{
+                        name: 'The Ballard Smoke Shop', address: '5439 Ballard Ave NW, Seattle, WA 98107',
+                        rating: 4.4, userRatingCount: 452, priceLevel: 'PRICE_LEVEL_INEXPENSIVE',
+                        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Ballard+Smoke+Shop',
+                        whyItFits: 'A family-run dive bar since 1971.',
+                    }],
+                }),
+            });
+        });
+        await page.goto('/projects/locus/');
+        await page.locator('.demo-chip', { hasText: 'Ballard' }).click();
+        await expect(page.locator('#searchInput')).toHaveValue('a bar where you can actually hear people talk, in Ballard');
+        await expect(page.locator('.result-name')).toContainText('The Ballard Smoke Shop');
+    });
 });
