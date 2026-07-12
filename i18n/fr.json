@@ -113,6 +113,8 @@
     "sn2": "Un Battalion S-4 gère l'approvisionnement, la maintenance et les mouvements d'une unité de 500 soldats — de la logistique à une échelle qui s'est révélée un bon entraînement pour les systèmes distribués."
   },
   "projects": {
+    "locusDesc": "Décrivez l'endroit que vous cherchez en langage naturel ; obtenez cinq vrais résultats, chacun avec une explication. Un LLM analyse votre requête, Google Places l'ancre dans des lieux réels, et un second passage LLM explique pourquoi chacun convient.",
+    "tryIt": "Essayer &rarr;",
     "pageTitle": "Projets — Kevin Lee",
     "metaDescription": "Projets de Kevin Lee — ingénieur logiciel développant en web, iOS et IA/ML.",
     "heading": "Projets",
