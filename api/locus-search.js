@@ -190,15 +190,150 @@ async function parseQuery(query) {
     return normalizeParsedParams(parsed, query);
 }
 
-module.exports = {
-    // Attached now for Task 2's unit tests; Task 4 adds the default request
-    // handler (module.exports.handler) and wires these together.
-    callLLM,
-    extractJson,
-    normalizeParsedParams,
-    parseQuery,
-    sanitizeInput,
-    isRateLimited,
-    searchPlaces,
-    placeToResult,
-};
+const RANK_SYSTEM_PROMPT = `You are an objective local guide. Your task is to select and rank up to 10 raw place candidates based on how well they match the user's original query, choosing the top 5.
+
+Output strict JSON:
+{
+  "results": [
+    { "id": "string", "whyItFits": "string" }
+  ],
+  "noGoodMatches": boolean
+}
+
+Rules:
+1. Be critical — if the user asked for "quiet" and a candidate is a notoriously loud chain, say so or exclude it.
+2. If nothing is a reasonable fit, set noGoodMatches true and return an empty results array.
+3. Never invent facts — base whyItFits strictly on the place's name, type, rating, and metadata provided.
+4. Return ONLY raw JSON, no markdown.`;
+
+async function rankPlaces(originalQuery, candidates) {
+    const candidateSummary = candidates.map((p) => ({
+        id: p.id,
+        name: p.displayName?.text || 'Unknown',
+        address: p.formattedAddress || '',
+        rating: p.rating,
+        userRatingCount: p.userRatingCount,
+        priceLevel: p.priceLevel,
+        primaryType: p.primaryType,
+    }));
+    const userContent = JSON.stringify({ userQuery: originalQuery, candidates: candidateSummary });
+    const text = await callLLM(RANK_SYSTEM_PROMPT, userContent);
+    const parsed = extractJson(text);
+    if (!parsed || !Array.isArray(parsed.results)) return null;
+    return parsed.results.slice(0, 5);
+}
+
+function logSearch(query, results, req) {
+    if (!SUPABASE_URL || !SUPABASE_KEY) return;
+    const row = {
+        query,
+        response: results.map((r, i) => ({ name: r.name, rank: i + 1 })),
+        ip: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || null,
+        country: req.headers['x-vercel-ip-country'] || null,
+        city: req.headers['x-vercel-ip-city'] || null,
+        region: req.headers['x-vercel-ip-country-region'] || null,
+        user_agent: req.headers['user-agent'] || null,
+        referer: req.headers['referer'] || null,
+        language: req.headers['accept-language'] || null,
+    };
+    fetch(`${SUPABASE_URL}/rest/v1/locus_searches`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+        },
+        body: JSON.stringify(row),
+    }).catch((err) => console.error('LOCUS_LOG_ERROR', err.message));
+}
+
+async function handler(req, res) {
+    const origin = req.headers.origin;
+    if (ALLOWED_ORIGINS.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Vary', 'Origin');
+
+    if (req.method === 'OPTIONS') return res.status(204).end();
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+    const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
+    if (isRateLimited(ip)) {
+        return res.status(429).json({ error: 'Too many requests. Try again in a minute.' });
+    }
+
+    if (!GOOGLE_PLACES_API_KEY) {
+        return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    const { query } = req.body || {};
+    if (!query || typeof query !== 'string' || !query.trim()) {
+        return res.status(400).json({ error: 'Query is required' });
+    }
+    if (query.length > 300) {
+        return res.status(400).json({ error: 'Query too long (max 300 characters)' });
+    }
+    const cleanQuery = sanitizeInput(query);
+    if (!cleanQuery) {
+        return res.status(400).json({ error: 'Query is required' });
+    }
+
+    let places;
+    try {
+        const parsed = await parseQuery(cleanQuery);
+        places = await searchPlaces(parsed.searchText);
+    } catch (err) {
+        console.error('LOCUS_PLACES_ERROR', err.status || 'exception', err.message);
+        if (err.status === 401 || err.status === 403) {
+            return res.status(503).json({ error: 'Search temporarily unavailable' });
+        }
+        if (err.status === 429) {
+            res.setHeader('Retry-After', '30');
+            return res.status(503).json({ error: 'Search temporarily busy, try again shortly' });
+        }
+        return res.status(502).json({ error: 'Search failed' });
+    }
+
+    if (places.length === 0) {
+        logSearch(cleanQuery, [], req);
+        return res.status(200).json({ results: [] });
+    }
+
+    let ranked = null;
+    try {
+        ranked = await rankPlaces(cleanQuery, places);
+    } catch (err) {
+        console.error('LOCUS_RANK_ERROR', err.message);
+    }
+
+    let finalResults;
+    if (ranked) {
+        const byId = new Map(places.map((p) => [p.id, p]));
+        finalResults = ranked
+            .map((r) => {
+                const p = byId.get(r.id);
+                return p ? placeToResult(p, r.whyItFits) : null;
+            })
+            .filter(Boolean);
+    } else {
+        // LLM #2 failed — fall back to Google's own order, no explanations, but
+        // never discard the paid Places results.
+        finalResults = places.slice(0, 5).map((p) => placeToResult(p, null));
+    }
+
+    logSearch(cleanQuery, finalResults, req);
+    return res.status(200).json({ results: finalResults });
+}
+
+module.exports = handler;
+module.exports.callLLM = callLLM;
+module.exports.extractJson = extractJson;
+module.exports.normalizeParsedParams = normalizeParsedParams;
+module.exports.parseQuery = parseQuery;
+module.exports.sanitizeInput = sanitizeInput;
+module.exports.isRateLimited = isRateLimited;
+module.exports.searchPlaces = searchPlaces;
+module.exports.placeToResult = placeToResult;
+module.exports.rankPlaces = rankPlaces;
