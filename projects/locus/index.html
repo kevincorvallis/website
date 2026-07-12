@@ -109,6 +109,25 @@
         .search-btn:hover { opacity: 0.7; }
         .search-btn:disabled { opacity: 0.4; cursor: default; }
 
+        .demo-chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 2rem; }
+        .demo-chips-label { font-size: 13px; opacity: 0.5; margin-right: 2px; }
+        .demo-chip {
+            font-family: var(--font);
+            font-size: 13px;
+            padding: 6px 14px;
+            border: 1px solid var(--card-border);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            opacity: 0.75;
+            transition: opacity 0.2s ease, border-color 0.2s ease;
+        }
+        .demo-chip:hover { opacity: 1; border-color: var(--text); }
+        .demo-chip:disabled { opacity: 0.3; cursor: default; }
+
+        .source-caption { font-size: 14px; opacity: 0.55; font-style: italic; padding: 0 0 0.75rem; }
+
         .status-message { font-size: 15px; opacity: 0.6; padding: 1rem 0; }
 
         .result-card {
@@ -182,7 +201,16 @@
             <button type="submit" class="search-btn" id="searchBtn">Search</button>
         </form>
 
+        <div class="demo-chips" id="demoChips">
+            <span class="demo-chips-label">Try:</span>
+            <button type="button" class="demo-chip" data-query="quiet coffee shop to work from near Capitol Hill">quiet coffee shop to work from near Capitol Hill</button>
+            <button type="button" class="demo-chip" data-query="date night ramen spot in Fremont">date night ramen spot in Fremont</button>
+            <button type="button" class="demo-chip" data-query="a bar where you can actually hear people talk, in Ballard">a bar where you can actually hear people talk, in Ballard</button>
+            <button type="button" class="demo-chip" data-query="best view brunch spot in downtown Seattle">best view brunch spot in downtown Seattle</button>
+        </div>
+
         <div id="statusMessage" class="status-message" style="display:none;"></div>
+        <div id="sourceCaption" class="source-caption" style="display:none;"></div>
         <div id="resultsList"></div>
     </main>
 
@@ -200,7 +228,9 @@
             var input = document.getElementById('searchInput');
             var btn = document.getElementById('searchBtn');
             var statusEl = document.getElementById('statusMessage');
+            var captionEl = document.getElementById('sourceCaption');
             var resultsEl = document.getElementById('resultsList');
+            var chipsEl = document.getElementById('demoChips');
 
             function escapeHtml(str) {
                 var div = document.createElement('div');
@@ -221,13 +251,30 @@
             function showStatus(text) {
                 statusEl.textContent = text;
                 statusEl.style.display = '';
+                captionEl.style.display = 'none';
                 resultsEl.innerHTML = '';
+            }
+
+            function updateCaption(data) {
+                if (data.source === 'demo') {
+                    var text = "Demo data — live search isn't wired up yet. These four are real places with real ratings, frozen for now.";
+                    if (data.note) text = data.note + ' ' + text;
+                    captionEl.textContent = text;
+                    captionEl.style.display = '';
+                } else if (data.source === 'degraded') {
+                    captionEl.textContent = "Live search hit a snag — here's a saved example while it recovers.";
+                    captionEl.style.display = '';
+                } else {
+                    captionEl.textContent = '';
+                    captionEl.style.display = 'none';
+                }
             }
 
             function renderResults(results) {
                 statusEl.style.display = 'none';
                 resultsEl.innerHTML = '';
                 if (!results.length) {
+                    captionEl.style.display = 'none';
                     showStatus("Nothing matched. Either it doesn't exist or I parsed your query wrong — rephrasing usually helps.");
                     return;
                 }
@@ -250,10 +297,8 @@
                 });
             }
 
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var query = input.value.trim();
-                if (!query) return;
+            function runSearch(query) {
+                input.value = query;
                 btn.disabled = true;
                 showStatus('Asking around…');
                 fetch('/api/locus-search', {
@@ -266,13 +311,28 @@
                     return res.json();
                 })
                 .then(function(data) {
+                    updateCaption(data);
                     renderResults(data.results || []);
                 })
                 .catch(function() {
+                    captionEl.style.display = 'none';
                     showStatus('Something broke on my end — the model or the Places API. Give it a minute and try again.');
                 })
                 .finally(function() {
                     btn.disabled = false;
+                });
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var query = input.value.trim();
+                if (!query) return;
+                runSearch(query);
+            });
+
+            chipsEl.querySelectorAll('.demo-chip').forEach(function(chip) {
+                chip.addEventListener('click', function() {
+                    runSearch(chip.getAttribute('data-query'));
                 });
             });
         })();
