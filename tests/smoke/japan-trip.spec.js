@@ -76,4 +76,13 @@ test.describe('Japan trip page', () => {
         await page.locator('.day-card[data-day="4"]').scrollIntoViewIfNeeded();
         await expect(marker4).not.toHaveClass(/pending/);
     });
+
+    test('no horizontal scroll on mobile', async ({ page, isMobile }) => {
+        if (!isMobile) return;
+        await page.goto('/japan-trip/');
+        const overflow = await page.evaluate(() =>
+            document.documentElement.scrollWidth - window.innerWidth
+        );
+        expect(overflow).toBeLessThanOrEqual(0);
+    });
 });
