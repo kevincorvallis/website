@@ -27,12 +27,12 @@ module.exports = defineConfig({
     projects: [
         {
             name: 'desktop',
-            testMatch: /smoke\/.*\.spec\.js/,
+            testMatch: /(smoke|cli|unit)\/.*\.spec\.js/,
             use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
         },
         {
             name: 'mobile',
-            testMatch: /smoke\/.*\.spec\.js/,
+            testMatch: /(smoke|cli|unit)\/.*\.spec\.js/,
             use: { ...devices['iPhone 14'] },
         },
     ],
