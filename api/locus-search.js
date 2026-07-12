@@ -223,11 +223,11 @@ async function rankPlaces(originalQuery, candidates) {
     return parsed.results.slice(0, 5);
 }
 
-function logSearch(query, results, req) {
+function logSearch(query, results, placeIds, req) {
     if (!SUPABASE_URL || !SUPABASE_KEY) return;
     const row = {
         query,
-        response: results.map((r, i) => ({ name: r.name, rank: i + 1 })),
+        response: results.map((r, i) => ({ place_id: placeIds[i] ?? null, name: r.name, rank: i + 1 })),
         ip: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || null,
         country: req.headers['x-vercel-ip-country'] || null,
         city: req.headers['x-vercel-ip-city'] || null,
@@ -297,7 +297,7 @@ async function handler(req, res) {
     }
 
     if (places.length === 0) {
-        logSearch(cleanQuery, [], req);
+        logSearch(cleanQuery, [], [], req);
         return res.status(200).json({ results: [] });
     }
 
@@ -309,6 +309,7 @@ async function handler(req, res) {
     }
 
     let finalResults;
+    let finalPlaceIds;
     if (ranked) {
         const byId = new Map(places.map((p) => [p.id, p]));
         finalResults = ranked
@@ -317,13 +318,18 @@ async function handler(req, res) {
                 return p ? placeToResult(p, r.whyItFits) : null;
             })
             .filter(Boolean);
+        finalPlaceIds = ranked
+            .filter((r) => byId.has(r.id))
+            .map((r) => r.id);
     } else {
         // LLM #2 failed — fall back to Google's own order, no explanations, but
         // never discard the paid Places results.
-        finalResults = places.slice(0, 5).map((p) => placeToResult(p, null));
+        const top = places.slice(0, 5);
+        finalResults = top.map((p) => placeToResult(p, null));
+        finalPlaceIds = top.map((p) => p.id);
     }
 
-    logSearch(cleanQuery, finalResults, req);
+    logSearch(cleanQuery, finalResults, finalPlaceIds, req);
     return res.status(200).json({ results: finalResults });
 }
 
