@@ -170,6 +170,73 @@ function placeToResult(place, whyItFits) {
     };
 }
 
+// Real places, independently web-searched and sourced 2026-07-11 (see
+// docs/superpowers/specs/2026-07-11-locus-demo-mode-design.md §4). A frozen
+// snapshot, not a live feed — never fabricated, never auto-refreshed.
+const DEMO_PLACES = [
+    {
+        query: 'quiet coffee shop to work from near capitol hill',
+        name: 'Espresso Vivace Roasteria',
+        address: '532 Broadway E, Seattle, WA 98102',
+        rating: 4.5,
+        userRatingCount: 1515,
+        priceLevel: 'PRICE_LEVEL_INEXPENSIVE',
+        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Espresso%20Vivace%20Roasteria%2C%20532%20Broadway%20E%2C%20Seattle%2C%20WA%2098102',
+        whyItFits: 'A 38-year-old Capitol Hill fixture with a dedicated quiet room, rated 4.5 from over 1,500 reviews at coffee-shop prices.',
+    },
+    {
+        query: 'date night ramen spot in fremont',
+        name: 'Ooink',
+        address: '3630 Stone Way N, Seattle, WA 98103',
+        rating: 4.3,
+        userRatingCount: 285,
+        priceLevel: 'PRICE_LEVEL_MODERATE',
+        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Ooink%2C%203630%20Stone%20Way%20N%2C%20Seattle%2C%20WA%2098103',
+        whyItFits: 'A 4.3-rated, mid-priced ramen counter in the heart of Fremont\'s ramen row, small enough that the room stays intimate.',
+    },
+    {
+        query: 'a bar where you can actually hear people talk, in ballard',
+        name: 'The Ballard Smoke Shop',
+        address: '5439 Ballard Ave NW, Seattle, WA 98107',
+        rating: 4.4,
+        userRatingCount: 452,
+        priceLevel: 'PRICE_LEVEL_INEXPENSIVE',
+        mapsUri: 'https://www.google.com/maps/search/?api=1&query=The%20Ballard%20Smoke%20Shop%2C%205439%20Ballard%20Ave%20NW%2C%20Seattle%2C%20WA%2098107',
+        whyItFits: 'A family-run dive bar since 1971, rated 4.4 on Google, with a lounge-and-arcade layout that skews toward conversation over club noise.',
+    },
+    {
+        query: 'best view brunch spot in downtown seattle',
+        name: 'Goldfinch Tavern',
+        address: '99 Union St, Seattle, WA 98101',
+        rating: 4.3,
+        userRatingCount: 1011,
+        priceLevel: 'PRICE_LEVEL_EXPENSIVE',
+        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Goldfinch%20Tavern%2C%2099%20Union%20St%2C%20Seattle%2C%20WA%2098101',
+        whyItFits: 'An Elliott Bay-facing dining room with over 1,000 Google reviews at a 4.3 average, priced at the upper end for a Sunday brunch buffet.',
+    },
+];
+
+function demoResultShape(place) {
+    return {
+        name: place.name,
+        address: place.address,
+        rating: place.rating,
+        userRatingCount: place.userRatingCount,
+        priceLevel: place.priceLevel,
+        mapsUri: place.mapsUri,
+        whyItFits: place.whyItFits,
+    };
+}
+
+const DEMO_RESULTS = DEMO_PLACES.map(demoResultShape);
+
+function findDemoMatch(cleanQuery) {
+    if (!cleanQuery) return null;
+    const normalized = cleanQuery.trim().toLowerCase();
+    const match = DEMO_PLACES.find((p) => p.query === normalized);
+    return match ? demoResultShape(match) : null;
+}
+
 const PARSE_SYSTEM_PROMPT = `You are a precise search translation engine. Parse the user's natural language query into structured parameters for the Google Places API (New).
 
 You must output a strict JSON object with this schema:
@@ -343,3 +410,5 @@ module.exports.isRateLimited = isRateLimited;
 module.exports.searchPlaces = searchPlaces;
 module.exports.placeToResult = placeToResult;
 module.exports.rankPlaces = rankPlaces;
+module.exports.findDemoMatch = findDemoMatch;
+module.exports.DEMO_RESULTS = DEMO_RESULTS;
