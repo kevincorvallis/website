@@ -170,4 +170,13 @@ test.describe('Locus page', () => {
         await expect(page.locator('#searchInput')).toHaveValue('a bar where you can actually hear people talk, in Ballard');
         await expect(page.locator('.result-name')).toContainText('The Ballard Smoke Shop');
     });
+
+    test('no horizontal scroll on mobile', async ({ page, isMobile }) => {
+        if (!isMobile) return;
+        await page.goto('/projects/locus/');
+        const overflow = await page.evaluate(() =>
+            document.documentElement.scrollWidth - window.innerWidth
+        );
+        expect(overflow).toBeLessThanOrEqual(0);
+    });
 });
