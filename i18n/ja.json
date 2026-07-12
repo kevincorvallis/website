@@ -114,7 +114,7 @@
   },
   "projects": {
     "locusDesc": "探している場所を自然な言葉で説明すると、実在する5つの場所とその理由を教えてくれます。LLMがクエリを解析し、Google Placesが実在の場所で裏付け、2回目のLLMがそれぞれ適している理由を説明します。",
-    "tryIt": "試してみる &rarr;",
+    "tryIt": "試してみる →",
     "pageTitle": "プロジェクト — Kevin Lee",
     "metaDescription": "Kevin Leeのプロジェクト — Web、iOS、AI/ML分野のソフトウェアエンジニア。",
     "heading": "プロジェクト",

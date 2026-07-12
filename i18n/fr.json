@@ -114,7 +114,7 @@
   },
   "projects": {
     "locusDesc": "Décrivez l'endroit que vous cherchez en langage naturel ; obtenez cinq vrais résultats, chacun avec une explication. Un LLM analyse votre requête, Google Places l'ancre dans des lieux réels, et un second passage LLM explique pourquoi chacun convient.",
-    "tryIt": "Essayer &rarr;",
+    "tryIt": "Essayer →",
     "pageTitle": "Projets — Kevin Lee",
     "metaDescription": "Projets de Kevin Lee — ingénieur logiciel développant en web, iOS et IA/ML.",
     "heading": "Projets",
