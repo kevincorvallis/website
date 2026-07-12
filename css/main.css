@@ -9,6 +9,8 @@
     --text: #1f1e1d;
     --font: 'Newsreader', Georgia, 'Times New Roman', serif;
     color-scheme: light dark;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 [data-theme="dark"] {
@@ -103,7 +105,7 @@ header h1 a {
     overflow: hidden;
     max-width: 100px;
     opacity: 1;
-    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    transition: max-width 250ms var(--ease-out), opacity 200ms var(--ease-out);
 }
 
 .char-space {
@@ -134,7 +136,7 @@ header h1 a {
 .site-title.collapsed .char-collapse {
     max-width: 0;
     opacity: 0;
-    transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    transition: max-width 250ms var(--ease-out), opacity 200ms var(--ease-out);
 }
 
 /* ——— Theme Toggle (pill slider) ——— */
@@ -185,7 +187,7 @@ header h1 a {
 }
 
 .toggle-wrap label.has-transition::after {
-    transition: transform 0.2s;
+    transition: transform 160ms var(--ease-in-out);
 }
 
 .toggle-wrap input:checked + label::after {

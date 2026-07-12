@@ -45,6 +45,8 @@
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
             --mono: 'SF Mono', 'Menlo', 'Consolas', monospace;
             color-scheme: light dark;
+            --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
         }
 
         [data-theme="dark"] {
@@ -96,7 +98,7 @@
             content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
             background: var(--bg); border-radius: 50%; transition: transform 0s;
         }
-        .toggle-wrap label.has-transition::after { transition: transform 0.2s; }
+        .toggle-wrap label.has-transition::after { transition: transform 160ms var(--ease-in-out); }
         .toggle-wrap input:checked + label::after { transform: translateX(20px); }
 
         main { max-width: 800px; margin: 0 auto; padding: 0 20px; }

@@ -16,7 +16,8 @@ toggle.addEventListener('change', () => {
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('theme', next);
     };
-    if (document.startViewTransition) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !reduceMotion) {
         document.startViewTransition(apply);
     } else {
         apply();

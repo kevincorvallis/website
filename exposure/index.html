@@ -44,6 +44,8 @@
             --font: 'Newsreader', Georgia, 'Times New Roman', serif;
             --font-display: 'Cormorant Garamond', 'Newsreader', Georgia, serif;
             color-scheme: light dark;
+            --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
         }
         [data-theme="dark"] {
             --bg: #1f1e1d;
@@ -83,7 +85,7 @@
             content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px;
             background: var(--bg); border-radius: 50%; transition: transform 0s, background-color 0.5s ease;
         }
-        .toggle-wrap label.has-transition::after { transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), background-color 0.5s ease; }
+        .toggle-wrap label.has-transition::after { transition: transform 160ms var(--ease-in-out); }
         .toggle-wrap input:checked + label::after { transform: translateX(20px); }
 
         /* Masthead */

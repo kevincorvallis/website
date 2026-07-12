@@ -58,7 +58,6 @@
             }
         })();
     </script>
-    <noscript><style>.estadio { display: none !important; }</style></noscript>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -557,122 +556,6 @@
         .reveal-fade { opacity: 0; }
         .reveal-scale { opacity: 0; transform: scale(0.97); }
 
-        /* ========== WELCOME INTERSTITIAL — ESTADIO (night match) ========== */
-        /* Dark in BOTH themes — it's a night match. Covers from first paint so the
-           article never "leaks" before the intro mounts; html[data-seen] (set
-           pre-paint) hides it for return visitors. */
-        .estadio {
-            position: fixed; inset: 0; z-index: 150; background: #0a0d12; color: #f3efe6;
-            display: flex; align-items: center; justify-content: center;
-            text-align: center; padding: 2rem; overflow: hidden;
-            opacity: 1; visibility: visible; pointer-events: auto;
-        }
-        html[data-seen="1"] .estadio { display: none; }
-        .estadio.active { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 1s ease, visibility 0s; }
-        .estadio.exiting { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 1.2s ease, visibility 1.2s ease; }
-        /* cool pitch-glow rising from the touchline */
-        .estadio::before {
-            content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-            background: radial-gradient(125% 80% at 50% 120%, rgba(54,116,158,0.42) 0%, rgba(22,46,68,0.20) 38%, transparent 70%);
-        }
-        /* two floodlight banks blooming from above the rim */
-        .estadio-floods {
-            position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0;
-            background:
-                radial-gradient(58% 44% at 22% -14%, rgba(255,244,214,0.32) 0%, rgba(255,238,196,0.10) 34%, transparent 66%),
-                radial-gradient(58% 44% at 78% -14%, rgba(255,244,214,0.32) 0%, rgba(255,238,196,0.10) 34%, transparent 66%);
-            transition: opacity 3s ease; animation: floodPulse 7s ease-in-out infinite;
-        }
-        @keyframes floodPulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.16); } }
-        /* static crowd-lights (fallback + reduced-motion); the canvas draws over these */
-        .estadio-stars {
-            position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0;
-            background-image: radial-gradient(circle, rgba(255,238,198,0.55) 1px, transparent 1.6px);
-            background-size: 40px 40px;
-            -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.55) 42%, transparent 72%);
-            mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.55) 42%, transparent 72%);
-            transition: opacity 2s ease;
-        }
-        /* interactive crowd shimmer — drag to sweep the floodlight */
-        .estadio-fx {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            z-index: 1; pointer-events: none; opacity: 0;
-            transition: opacity 1.4s ease; touch-action: none;
-        }
-        .estadio.fx-ready .estadio-fx { opacity: 1; }
-        .estadio.fx-ready .estadio-stars { opacity: 0 !important; }   /* canvas supersedes the static dots */
-        .estadio.fx-ready { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-
-        .estadio-content { max-width: 480px; position: relative; z-index: 2; }
-        .estadio-word {
-            font-family: var(--font-display); font-weight: 700; font-size: clamp(4rem, 16vw, 8rem);
-            letter-spacing: 0.04em; line-height: 1; color: #fff6e0;
-            opacity: 0; transform: translateY(20px) scale(0.96);
-            text-shadow: 0 0 18px rgba(255,224,150,0.5), 0 0 48px rgba(255,200,110,0.32), 0 0 96px rgba(255,180,90,0.18);
-            animation: jumboGlow 4.5s ease-in-out infinite;
-        }
-        @keyframes jumboGlow {
-            0%, 100% { text-shadow: 0 0 16px rgba(255,224,150,0.45), 0 0 46px rgba(255,200,110,0.28), 0 0 92px rgba(255,180,90,0.16); }
-            50%      { text-shadow: 0 0 24px rgba(255,234,176,0.7),  0 0 64px rgba(255,214,134,0.46), 0 0 120px rgba(255,190,100,0.26); }
-        }
-        .estadio-romaji {
-            font-family: var(--font-display); font-size: clamp(1.4rem, 5vw, 1.9rem);
-            font-weight: 400; font-style: italic; color: #ffd27a; margin-top: 0.8rem;
-            letter-spacing: 0.06em; opacity: 0; transform: translateY(15px);
-        }
-        .estadio-noun {
-            font-family: var(--font); font-size: 12px; font-style: italic; color: rgba(243,239,230,0.58);
-            letter-spacing: 0.14em; margin-top: 0.5rem; opacity: 0; transform: translateY(10px);
-        }
-        .estadio-meaning {
-            font-family: var(--font); font-size: 17px; color: rgba(243,239,230,0.8); line-height: 1.8;
-            margin-top: 2.3rem; max-width: 400px; margin-left: auto; margin-right: auto;
-            opacity: 0; transform: translateY(15px);
-        }
-        .estadio-meaning em { font-style: italic; color: #fff6e0; }
-        .estadio-divider { width: 44px; height: 1px; background: rgba(255,224,150,0.5); margin: 2rem auto; opacity: 0; }
-        .estadio-tagline { font-size: 14px; color: rgba(243,239,230,0.55); opacity: 0; transform: translateY(10px); }
-        .estadio-dismiss {
-            background: none; border: 1px solid rgba(255,224,150,0.34); border-radius: 100px;
-            font-family: var(--font); font-size: 15px; color: #ffe9b8; cursor: pointer;
-            margin-top: 2.4rem; padding: 10px 30px; letter-spacing: 0.03em;
-            opacity: 0; transform: translateY(10px);
-            transition: opacity 0.3s ease, color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.8s cubic-bezier(0.22,0.61,0.36,1);
-        }
-        .estadio-dismiss:hover { background: rgba(255,224,150,0.12); border-color: rgba(255,224,150,0.6); opacity: 1 !important; }
-
-        .estadio-play {
-            display: flex; flex-direction: column; align-items: center; gap: 0.7rem;
-            margin-top: 2rem; opacity: 0; transform: translateY(10px);
-            transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,0.61,0.36,1);
-        }
-        .estadio-modes {
-            display: inline-flex; padding: 3px; border: 1px solid rgba(243,239,230,0.18);
-            border-radius: 100px; background: rgba(255,255,255,0.05);
-            -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-        }
-        .efx-mode {
-            -webkit-appearance: none; appearance: none; border: none; background: none; cursor: pointer;
-            font-family: var(--font); font-size: 12px; letter-spacing: 0.05em;
-            color: rgba(243,239,230,0.62); padding: 6px 15px; border-radius: 100px;
-            display: inline-flex; align-items: center; gap: 0.45em;
-            transition: color 0.3s ease, background-color 0.3s ease;
-        }
-        .efx-mode:hover { color: #fff6e0; }
-        .efx-mode.active { color: #0a0d12; background: #f3efe6; }
-        .efx-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
-        .efx-dot.kr { background: linear-gradient(135deg, #e23b4e 0 50%, #3a7bd5 50% 100%); }
-        .efx-dot.mx { background: linear-gradient(135deg, #2aa05c 0 50%, #ce1126 50% 100%); }
-        .efx-hint {
-            font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
-            text-transform: uppercase; color: rgba(243,239,230,0.5);
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .estadio-fx, .estadio-play { display: none !important; }
-            .estadio-floods, .estadio-stars { opacity: 1 !important; }
-            .estadio-floods, .estadio-word { animation: none !important; }
-        }
-
         /* shared REC pulse used by deal-wire + featured video */
         @keyframes recPulse {
             0%, 100% { opacity: 0.55; transform: scale(1); }
@@ -985,7 +868,6 @@
         @media (prefers-reduced-motion: reduce) {
             .reveal, .reveal-fade, .reveal-scale { opacity: 1 !important; transform: none !important; }
             .scroll-line { animation: none; }
-            .estadio-floods, .estadio-word { animation: none; }
             .dw-marquee .track { animation: none; }
             .dw-tag .dot, .fv-flag .dot { animation: none; opacity: 0.85; transform: none; }
             .relay-rink .rink-lane { stroke-dashoffset: 0 !important; }
@@ -1746,227 +1628,15 @@
         // ==================== WELCOME INTERSTITIAL ====================
         (function() {
             var gate = document.getElementById('gate');
-            var estadio = document.getElementById('estadio');
             if (!gate) return;
 
             var path = window.location.pathname.replace(/\/$/, '') || '/';
             var issueKey = 'dispatch-auth-' + path;
 
-            function animateEstadio(callback) {
-                var gateLight = document.getElementById('gateLight');
-                gateLight.classList.add('awakening');
-                estadio.classList.add('active');
-                document.body.style.overflow = 'hidden';
-
-                setTimeout(function() {
-                    gate.classList.add('unlocked');
-                    gateLight.style.display = 'none';
-
-                    var floods = document.getElementById('estadioFloods');
-                    var stars = document.getElementById('estadioStars');
-                    var word = document.getElementById('estadioWord');
-                    var romaji = document.getElementById('estadioRomaji');
-                    var noun = document.getElementById('estadioNoun');
-                    var meaning = document.getElementById('estadioMeaning');
-                    var divider = document.getElementById('estadioDivider');
-                    var tagline = document.getElementById('estadioTagline');
-                    var ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
-
-                    function animate(el, d, dur) {
-                        dur = dur || 1;
-                        setTimeout(function() {
-                            el.style.transition = 'opacity ' + dur + 's ' + ease + ', transform ' + dur + 's ' + ease;
-                            el.style.opacity = '1';
-                            el.style.transform = 'translateY(0) scale(1)';
-                        }, d);
-                    }
-
-                    setTimeout(function() { floods.style.opacity = '1'; }, 100);   // floodlights bloom up
-                    setTimeout(function() { stars.style.opacity = '1'; }, 500);    // crowd lights rise
-
-                    animate(word, 800, 1.4);
-                    animate(romaji, 1800, 1);
-                    animate(noun, 2200, 0.8);
-                    animate(meaning, 2800, 1.1);
-                    setTimeout(function() { divider.style.transition = 'opacity 1s ease'; divider.style.opacity = '0.5'; }, 3500);
-                    animate(tagline, 3800, 0.9);
-
-                    var dismiss = document.getElementById('estadioDismiss');
-                    setTimeout(function() {
-                        dismiss.style.transition = 'opacity 0.9s cubic-bezier(0.22,0.61,0.36,1), transform 0.9s cubic-bezier(0.22,0.61,0.36,1)';
-                        dismiss.style.opacity = '0.85';
-                        dismiss.style.transform = 'translateY(0)';
-                    }, 4200);
-
-                    dismiss.addEventListener('click', function() {
-                        estadio.classList.add('exiting');
-                        document.body.style.overflow = '';
-                        document.body.classList.add('gate-open');
-                        setTimeout(callback, 1200);
-                    });
-                }, 800);
-            }
-
             // No interstitial anymore — the issue opens straight into the masthead
             // (dateline cold open). Just clear any gate state so content is visible.
             gate.classList.add('unlocked');
             document.body.classList.add('gate-open');
-        })();
-    </script>
-    <script>
-        // ============ INTERACTIVE CROWD SHIMMER — Estadio (night match) ============
-        // A 2D-canvas field of phone/camera lights in the stands. Idle: they twinkle.
-        // Drag to sweep a floodlight beam across the crowd; lights flare, then decay.
-        // The Korea / México toggle tints the flares. Self-contained: bails gracefully
-        // (static crowd-lights stay) for returning visitors, reduced-motion, or no-canvas.
-        (function () {
-            var stage = document.getElementById('estadio');
-            var canvas = document.getElementById('estadioFx');
-            var play = document.getElementById('estadioPlay');
-            if (!stage || !canvas) return;
-
-            // Only run while the splash is actually on screen. The gate IIFE runs first
-            // and, for returning visitors, sets the splash to display:none — so we check
-            // the rendered splash, not the session flag (which it sets for everyone).
-            if (window.getComputedStyle(stage).display === 'none') return;
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-            var ctx = canvas.getContext('2d');
-            if (!ctx) return;
-
-            var DPR = Math.min(window.devicePixelRatio || 1, 2);
-            var W = 1, H = 1;
-
-            // Soft radial light sprite, tinted per team. Pre-rendered once, then blitted
-            // additively per particle — far cheaper than a gradient per draw.
-            function sprite(r, g, b) {
-                var s = 48, c = document.createElement('canvas'); c.width = c.height = s;
-                var x = c.getContext('2d'), m = s / 2;
-                var rg = x.createRadialGradient(m, m, 0, m, m, m);
-                rg.addColorStop(0,   'rgba(' + r + ',' + g + ',' + b + ',1)');
-                rg.addColorStop(0.3, 'rgba(' + r + ',' + g + ',' + b + ',0.45)');
-                rg.addColorStop(1,   'rgba(' + r + ',' + g + ',' + b + ',0)');
-                x.fillStyle = rg; x.fillRect(0, 0, s, s);
-                return c;
-            }
-            var SP = {
-                warm: sprite(255, 242, 210),
-                beam: sprite(255, 236, 184),
-                korea:  [sprite(226, 59, 78), sprite(58, 123, 213)],   // red, blue
-                mexico: [sprite(46, 168, 96), sprite(206, 30, 50)]     // green, red
-            };
-
-            var parts = [], N = 0;
-            function build() {
-                var area = (W * H) / (DPR * DPR);
-                N = Math.max(90, Math.min(260, Math.round(area / 2600)));
-                parts = [];
-                for (var i = 0; i < N; i++) {
-                    parts.push({
-                        x: Math.random(),
-                        y: 0.34 + Math.pow(Math.random(), 0.6) * 0.64,  // denser toward the bottom
-                        r: 0.6 + Math.random() * 1.6,
-                        base: 0.16 + Math.random() * 0.32,
-                        tw: 0.6 + Math.random() * 1.9,                  // twinkle speed
-                        ph: Math.random() * 6.28,
-                        team: Math.random() < 0.5 ? 0 : 1,
-                        ex: 0                                           // excitement (beam flare)
-                    });
-                }
-            }
-            function resize() {
-                var r = stage.getBoundingClientRect();
-                W = Math.max(1, Math.round(r.width * DPR));
-                H = Math.max(1, Math.round(r.height * DPR));
-                canvas.width = W; canvas.height = H;
-                build();
-            }
-            resize();
-            if ('ResizeObserver' in window) { new ResizeObserver(function () { resize(); }).observe(stage); }
-            else { window.addEventListener('resize', resize); }
-
-            var ptr = { x: 0.5, y: 0.55, life: 0, down: 0 };
-            function setPos(e) {
-                var r = stage.getBoundingClientRect();
-                ptr.x = (e.clientX - r.left) / r.width;
-                ptr.y = (e.clientY - r.top) / r.height;
-            }
-            stage.addEventListener('pointerdown', function (e) {
-                if (e.target.closest && e.target.closest('button')) return;  // don't sweep on the controls
-                setPos(e); ptr.down = 1; ptr.life = 1;
-            });
-            stage.addEventListener('pointermove', function (e) { setPos(e); ptr.life = 1; });
-            window.addEventListener('pointerup', function () { ptr.down = 0; });
-            stage.addEventListener('pointerleave', function () { ptr.down = 0; });
-
-            var mode = 'korea';   // matches the default-active toggle in the markup
-            var modeBtns = play ? play.querySelectorAll('.efx-mode') : [];
-            Array.prototype.forEach.call(modeBtns, function (btn) {
-                btn.addEventListener('click', function () {
-                    mode = btn.getAttribute('data-mode');
-                    Array.prototype.forEach.call(modeBtns, function (b) {
-                        var on = b === btn; b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
-                    });
-                    ptr.life = 1;
-                });
-            });
-
-            function drawSprite(sp, x, y, size) { ctx.drawImage(sp, x - size / 2, y - size / 2, size, size); }
-
-            var t = 0, running = true, raf = 0;
-            function step() {
-                if (!running) return;
-                t += 0.016;
-                ctx.clearRect(0, 0, W, H);
-                ctx.globalCompositeOperation = 'lighter';
-
-                ptr.life *= 0.96;
-                var auto = ptr.life < 0.05;                                  // idle → the beam drifts on its own
-                var bx = auto ? (0.5 + 0.34 * Math.sin(t * 0.5)) : ptr.x;
-                var by = auto ? 0.6 : ptr.y;
-                var power = auto ? 0.5 : (0.7 + 0.5 * ptr.down);
-                var team = SP[mode] || SP.korea;
-                var aspect = W / H;
-
-                for (var i = 0; i < N; i++) {
-                    var p = parts[i];
-                    var tw = 0.6 + 0.4 * Math.sin(t * p.tw + p.ph);
-                    var dxs = (p.x - bx) * aspect, dys = (p.y - by);
-                    var col = Math.exp(-(p.x - bx) * (p.x - bx) * 17.0);     // vertical beam column (the sweep)
-                    var loc = Math.exp(-(dxs * dxs + dys * dys) * 9.0);      // local flare around the cursor
-                    p.ex += (col * 0.5 + loc) * power * 0.12;
-                    if (p.ex > 1.2) p.ex = 1.2;
-                    p.ex *= 0.94;
-
-                    var bright = p.base * tw + p.ex * 1.4;
-                    if (bright <= 0.02) continue;
-                    var px = p.x * W, py = p.y * H;
-                    var size = (8 + p.r * 10 + p.ex * 22) * DPR;
-                    var warmA = Math.min(1, bright) * (1 - Math.min(1, p.ex));
-                    var teamA = Math.min(1, p.ex * 1.1);
-                    if (warmA > 0.01) { ctx.globalAlpha = warmA * 0.9; drawSprite(SP.warm, px, py, size); }
-                    if (teamA > 0.01) { ctx.globalAlpha = teamA; drawSprite(team[p.team], px, py, size * 1.15); }
-                }
-
-                if (power > 0.05) {                                          // the floodlight bloom following the beam
-                    ctx.globalAlpha = 0.10 * power;
-                    drawSprite(SP.beam, bx * W, by * H, Math.max(W, H) * 0.5);
-                }
-
-                ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-                raf = requestAnimationFrame(step);
-            }
-
-            stage.classList.add('fx-ready');                                // fade the canvas in (over the static dots)
-            raf = requestAnimationFrame(step);
-            setTimeout(function () {                                         // reveal controls with the entrance
-                if (play) { play.style.opacity = '1'; play.style.transform = 'translateY(0)'; }
-            }, 3900);
-
-            function stop() { running = false; if (raf) cancelAnimationFrame(raf); }
-            var dismiss = document.getElementById('estadioDismiss');
-            if (dismiss) dismiss.addEventListener('click', function () { setTimeout(stop, 1300); });
-            canvas.addEventListener('contextlost', function (e) { e.preventDefault(); stop(); });
         })();
     </script>
     <script>
