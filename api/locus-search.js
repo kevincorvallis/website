@@ -364,14 +364,16 @@ async function handler(req, res) {
         places = await searchPlaces(parsed.searchText);
     } catch (err) {
         console.error('LOCUS_PLACES_ERROR', err.status || 'exception', err.message);
+        let reason = 'upstream_error';
         if (err.status === 401 || err.status === 403) {
-            return res.status(503).json({ error: 'Search temporarily unavailable' });
+            reason = 'key_invalid';
+        } else if (err.status === 429) {
+            reason = 'places_rate_limited';
+        } else if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+            reason = 'timeout';
         }
-        if (err.status === 429) {
-            res.setHeader('Retry-After', '30');
-            return res.status(503).json({ error: 'Search temporarily busy, try again shortly' });
-        }
-        return res.status(502).json({ error: 'Search failed' });
+        logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req);
+        return res.status(200).json({ source: 'degraded', reason, results: DEMO_RESULTS });
     }
 
     if (places.length === 0) {
