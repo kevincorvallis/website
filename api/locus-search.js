@@ -331,10 +331,6 @@ async function handler(req, res) {
         return res.status(429).json({ error: 'Too many requests. Try again in a minute.' });
     }
 
-    if (!GOOGLE_PLACES_API_KEY) {
-        return res.status(500).json({ error: 'Server configuration error' });
-    }
-
     const { query } = req.body || {};
     if (!query || typeof query !== 'string' || !query.trim()) {
         return res.status(400).json({ error: 'Query is required' });
@@ -345,6 +341,21 @@ async function handler(req, res) {
     const cleanQuery = sanitizeInput(query);
     if (!cleanQuery) {
         return res.status(400).json({ error: 'Query is required' });
+    }
+
+    if (!GOOGLE_PLACES_API_KEY) {
+        const matched = findDemoMatch(cleanQuery);
+        if (matched) {
+            logSearch(cleanQuery, [matched], [null], req);
+            return res.status(200).json({ source: 'demo', reason: 'key_missing', results: [matched] });
+        }
+        logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req);
+        return res.status(200).json({
+            source: 'demo',
+            reason: 'key_missing',
+            note: "Live search isn't configured yet — here are four real examples.",
+            results: DEMO_RESULTS,
+        });
     }
 
     let places;
@@ -365,7 +376,7 @@ async function handler(req, res) {
 
     if (places.length === 0) {
         logSearch(cleanQuery, [], [], req);
-        return res.status(200).json({ results: [] });
+        return res.status(200).json({ source: 'live', reason: null, results: [] });
     }
 
     let ranked = null;
@@ -397,7 +408,7 @@ async function handler(req, res) {
     }
 
     logSearch(cleanQuery, finalResults, finalPlaceIds, req);
-    return res.status(200).json({ results: finalResults });
+    return res.status(200).json({ source: 'live', reason: null, results: finalResults });
 }
 
 module.exports = handler;
