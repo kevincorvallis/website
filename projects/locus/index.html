@@ -300,6 +300,9 @@
             function runSearch(query) {
                 input.value = query;
                 btn.disabled = true;
+                chipsEl.querySelectorAll('.demo-chip').forEach(function(chip) {
+                    chip.disabled = true;
+                });
                 showStatus('Asking around…');
                 fetch('/api/locus-search', {
                     method: 'POST',
@@ -320,6 +323,9 @@
                 })
                 .finally(function() {
                     btn.disabled = false;
+                    chipsEl.querySelectorAll('.demo-chip').forEach(function(chip) {
+                        chip.disabled = false;
+                    });
                 });
             }
 
