@@ -131,6 +131,45 @@ function normalizeParsedParams(parsed, fallbackQuery) {
     return result;
 }
 
+// Basic-tier fields only — deliberately excludes currentOpeningHours to avoid the
+// pricier "Places Details (Advanced)" SKU. openNow filtering is out of scope for v1.
+const PLACES_FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.primaryType,places.googleMapsUri';
+
+async function searchPlaces(searchText) {
+    const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+            'X-Goog-FieldMask': PLACES_FIELD_MASK,
+        },
+        body: JSON.stringify({ textQuery: searchText, pageSize: 10 }),
+        signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) {
+        const errBody = await res.text();
+        const err = new Error('Places API error');
+        err.status = res.status;
+        err.body = errBody.slice(0, 300);
+        throw err;
+    }
+    const data = await res.json();
+    // Google returns `{}` (not `{places: []}`) on a zero-match search.
+    return data.places || [];
+}
+
+function placeToResult(place, whyItFits) {
+    return {
+        name: place.displayName?.text || 'Unknown',
+        address: place.formattedAddress || '',
+        rating: place.rating ?? null,
+        userRatingCount: place.userRatingCount ?? null,
+        priceLevel: place.priceLevel || null,
+        mapsUri: place.googleMapsUri || null,
+        whyItFits: whyItFits || null,
+    };
+}
+
 const PARSE_SYSTEM_PROMPT = `You are a precise search translation engine. Parse the user's natural language query into structured parameters for the Google Places API (New).
 
 You must output a strict JSON object with this schema:
@@ -160,4 +199,6 @@ module.exports = {
     parseQuery,
     sanitizeInput,
     isRateLimited,
+    searchPlaces,
+    placeToResult,
 };
