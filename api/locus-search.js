@@ -170,6 +170,41 @@ function placeToResult(place, whyItFits) {
     };
 }
 
+const CITIES = ['seattle', 'la', 'ny'];
+const CATEGORIES = ['coffee', 'ramen', 'bars', 'brunch'];
+
+async function queryTrendingPlaces(city, category) {
+    const url = `${SUPABASE_URL}/rest/v1/trending_places?city=eq.${encodeURIComponent(city)}&category=eq.${encodeURIComponent(category)}&order=last_confirmed_at.desc&limit=10`;
+    const res = await fetch(url, {
+        headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+        },
+        signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) {
+        const body = await res.text();
+        const err = new Error('Trending places query failed');
+        err.status = res.status;
+        err.body = body.slice(0, 300);
+        throw err;
+    }
+    return res.json();
+}
+
+function trendingRowToResult(row, whyItFits) {
+    return {
+        name: row.name,
+        address: row.address || '',
+        rating: row.rating ?? null,
+        userRatingCount: row.review_count ?? null,
+        priceLevel: row.price_level || null,
+        mapsUri: row.maps_uri || null,
+        whyItFits: whyItFits || null,
+        lastConfirmedAt: row.last_confirmed_at,
+    };
+}
+
 // Real places, independently web-searched and sourced 2026-07-11 (see
 // docs/superpowers/specs/2026-07-11-locus-demo-mode-design.md §4). A frozen
 // snapshot, not a live feed — never fabricated, never auto-refreshed.
@@ -425,3 +460,5 @@ module.exports.placeToResult = placeToResult;
 module.exports.rankPlaces = rankPlaces;
 module.exports.findDemoMatch = findDemoMatch;
 module.exports.DEMO_RESULTS = DEMO_RESULTS;
+module.exports.queryTrendingPlaces = queryTrendingPlaces;
+module.exports.trendingRowToResult = trendingRowToResult;
