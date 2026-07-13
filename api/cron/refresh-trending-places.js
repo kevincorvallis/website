@@ -107,3 +107,91 @@ module.exports.extractJsonArray = extractJsonArray;
 module.exports.normalizeTrendingPlace = normalizeTrendingPlace;
 module.exports.CITIES = CITIES;
 module.exports.CATEGORIES = CATEGORIES;
+
+const CRON_SECRET = process.env.CRON_SECRET;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+async function upsertTrendingPlace(place) {
+    const existingRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/trending_places?city=eq.${encodeURIComponent(place.city)}&name=eq.${encodeURIComponent(place.name)}&select=id`,
+        { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+    );
+    const existingRows = existingRes.ok ? await existingRes.json() : [];
+    const isNew = existingRows.length === 0;
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/trending_places?on_conflict=city,name`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            Prefer: 'resolution=merge-duplicates',
+        },
+        body: JSON.stringify({ ...place, last_confirmed_at: new Date().toISOString() }),
+    });
+    if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`Supabase upsert failed: ${res.status} ${body.slice(0, 200)}`);
+    }
+    return isNew;
+}
+
+function logRun(summary) {
+    if (!SUPABASE_URL || !SUPABASE_KEY) return Promise.resolve();
+    return fetch(`${SUPABASE_URL}/rest/v1/trending_places_runs`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+        },
+        body: JSON.stringify(summary),
+    }).catch((err) => console.error('TRENDING_RUN_LOG_ERROR', err.message));
+}
+
+async function handler(req, res) {
+    const authHeader = req.headers['authorization'];
+    if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const startTime = Date.now();
+    let placesFound = 0;
+    let placesUpdated = 0;
+    const errors = [];
+
+    for (const city of CITIES) {
+        for (const category of CATEGORIES) {
+            try {
+                const places = await researchTrendingPlaces(city, category);
+                placesFound += places.length;
+                for (const place of places) {
+                    try {
+                        await upsertTrendingPlace(place);
+                        placesUpdated++;
+                    } catch (err) {
+                        errors.push({ city, category, place: place.name, error: err.message });
+                    }
+                }
+            } catch (err) {
+                console.error('TRENDING_RESEARCH_ERROR', city, category, err.message);
+                errors.push({ city, category, error: err.message });
+            }
+        }
+    }
+
+    await logRun({
+        places_found: placesFound,
+        places_updated: placesUpdated,
+        errors: errors.length ? errors : null,
+        duration_ms: Date.now() - startTime,
+    });
+
+    return res.status(200).json({ placesFound, placesUpdated, errors: errors.length });
+}
+
+module.exports.upsertTrendingPlace = upsertTrendingPlace;
+module.exports.logRun = logRun;
+module.exports.handler = handler;
+module.exports.default = handler;
