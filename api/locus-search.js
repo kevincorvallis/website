@@ -351,11 +351,14 @@ async function handler(req, res) {
             logSearch(cleanQuery, [matched], [null], req, 'demo');
             return res.status(200).json({ source: 'demo', reason, results: [matched] });
         }
+        const note = reason === 'no_trending_data'
+            ? "Nothing trending found for that yet — here are four real examples instead."
+            : "That's outside what I track yet (Seattle, LA, and New York; coffee, ramen, bars, and brunch) — here are four real examples instead.";
         logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req, 'demo');
         return res.status(200).json({
             source: 'demo',
             reason,
-            note: "That's outside what I track yet (Seattle, LA, and New York; coffee, ramen, bars, and brunch) — here are four real examples instead.",
+            note,
             results: DEMO_RESULTS,
         });
     }
