@@ -84,6 +84,49 @@ test.describe('normalizeTrendingPlace', () => {
         );
         expect(result.price_level).toBeNull();
     });
+
+    test('drops a rating provided as a string rather than passing it through', () => {
+        const mod = freshModule({});
+        const result = mod.normalizeTrendingPlace(
+            { name: 'Test', rating: '4.5', sourceUrl: 'https://example.com/x' },
+            'ny', 'ramen'
+        );
+        expect(result.rating).toBeNull();
+    });
+
+    test('drops a priceLevel provided as a number rather than passing it through', () => {
+        const mod = freshModule({});
+        const result = mod.normalizeTrendingPlace(
+            { name: 'Test', priceLevel: 2, sourceUrl: 'https://example.com/x' },
+            'ny', 'ramen'
+        );
+        expect(result.price_level).toBeNull();
+    });
+
+    test('drops a reviewCount provided as a string rather than passing it through', () => {
+        const mod = freshModule({});
+        const result = mod.normalizeTrendingPlace(
+            { name: 'Test', reviewCount: '200', sourceUrl: 'https://example.com/x' },
+            'ny', 'ramen'
+        );
+        expect(result.review_count).toBeNull();
+    });
+
+    test('ignores a model-supplied mapsUri/maps_uri, always builds its own link', () => {
+        const mod = freshModule({});
+        const result = mod.normalizeTrendingPlace(
+            {
+                name: 'Test',
+                address: '123 Main St',
+                mapsUri: 'https://evil.example.com',
+                maps_uri: 'https://evil.example.com',
+                sourceUrl: 'https://example.com/x',
+            },
+            'ny', 'ramen'
+        );
+        expect(result.maps_uri).toBe('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Test, 123 Main St'));
+        expect(result.maps_uri).not.toContain('evil.example.com');
+    });
 });
 
 test.describe('researchTrendingPlaces', () => {
