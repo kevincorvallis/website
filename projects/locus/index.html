@@ -187,13 +187,15 @@
             <p class="hero-tagline">Describe the place you want in plain English; get five real ones back, each with a reason.</p>
             <p class="about-blurb">
                 Locus does one thing: you describe a place in plain English, and it
-                finds real ones. One LLM call turns your sentence into a structured
-                search, Google Places returns actual candidates &mdash; so the places
-                exist; nothing here is hallucinated &mdash; and a second pass ranks
-                the top five and writes a line on why each fits. It's not perfect.
-                The parser occasionally latches onto the wrong word, and "why this
-                fits" is an educated guess from ratings and metadata, not lived
-                experience. But it beats panning around a map, most of the time.
+                finds real ones. A weekly research pass &mdash; grounded in live
+                search, not guesswork &mdash; builds a running list of trending spots
+                across Seattle, LA, and New York; your query gets matched against
+                whatever it's found, then a second pass ranks the top five and
+                writes a line on why each fits. It's not perfect. Coverage is only
+                as good as last week's research run, and a rating or price
+                sometimes goes missing rather than get guessed &mdash; better an
+                honest gap than a made-up number. But it beats panning around a
+                map, most of the time.
             </p>
         </section>
 
@@ -256,6 +258,12 @@
                 resultsEl.innerHTML = '';
             }
 
+            function formatShortDate(isoString) {
+                var d = new Date(isoString);
+                if (isNaN(d.getTime())) return null;
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }
+
             function updateCaption(data) {
                 if (data.source === 'demo') {
                     var text = "Demo data — live search isn't wired up yet. These four are real places with real ratings, frozen for now.";
@@ -263,6 +271,13 @@
                     captionEl.textContent = text;
                 } else if (data.source === 'degraded') {
                     captionEl.textContent = "Live search hit a snag — here's a saved example while it recovers.";
+                } else if (data.source === 'live' && data.results && data.results.length) {
+                    var dates = data.results.map(function(r) { return r.lastConfirmedAt; }).filter(Boolean);
+                    var oldest = dates.length ? dates.reduce(function(a, b) { return a < b ? a : b; }) : null;
+                    var formatted = oldest ? formatShortDate(oldest) : null;
+                    captionEl.textContent = formatted
+                        ? 'Trending as of ' + formatted + ' — refreshed weekly, not real-time.'
+                        : 'Trending pick — refreshed weekly, not real-time.';
                 } else {
                     captionEl.textContent = '';
                 }

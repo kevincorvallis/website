@@ -13,6 +13,9 @@
     { "source": "/@:user/:slug", "destination": "/api/render?u=:user&s=:slug" },
     { "source": "/@:user", "destination": "/api/render?u=:user" }
   ],
+  "crons": [
+    { "path": "/api/cron/refresh-trending-places", "schedule": "0 8 * * 1" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
