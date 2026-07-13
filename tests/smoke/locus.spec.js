@@ -79,7 +79,7 @@ test.describe('Locus page', () => {
                 contentType: 'application/json',
                 body: JSON.stringify({
                     source: 'demo',
-                    reason: 'key_missing',
+                    reason: 'out_of_scope',
                     results: [{
                         name: 'Espresso Vivace Roasteria',
                         address: '532 Broadway E, Seattle, WA 98102',
@@ -107,7 +107,7 @@ test.describe('Locus page', () => {
                 contentType: 'application/json',
                 body: JSON.stringify({
                     source: 'degraded',
-                    reason: 'key_invalid',
+                    reason: 'upstream_error',
                     results: [{
                         name: 'Ooink', address: '3630 Stone Way N, Seattle, WA 98103',
                         rating: 4.3, userRatingCount: 285, priceLevel: 'PRICE_LEVEL_MODERATE',
@@ -132,20 +132,43 @@ test.describe('Locus page', () => {
                 body: JSON.stringify({
                     source: 'live',
                     reason: null,
-                    results: [{
-                        name: 'Real Live Place', address: '123 Main St, Seattle, WA',
-                        rating: 4.8, userRatingCount: 99, priceLevel: 'PRICE_LEVEL_MODERATE',
-                        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Real+Live+Place',
-                        whyItFits: 'Genuinely live.',
-                    }],
+                    results: [],
                 }),
             });
         });
         await page.goto('/projects/locus/');
         await page.locator('#searchInput').fill('anything');
         await page.locator('#searchBtn').click();
-        await expect(page.locator('.result-name')).toContainText('Real Live Place');
         await expect(page.locator('#sourceCaption')).toBeHidden();
+    });
+
+    test('renders the trending caption with a formatted date when source is live', async ({ page }) => {
+        await page.route('**/api/locus-search', (route) => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    source: 'live',
+                    reason: null,
+                    results: [{
+                        name: 'Real Trending Cafe',
+                        address: '1 Pine St, Seattle, WA',
+                        rating: 4.7,
+                        userRatingCount: 500,
+                        priceLevel: 'PRICE_LEVEL_MODERATE',
+                        mapsUri: 'https://www.google.com/maps/search/?api=1&query=Real+Trending+Cafe',
+                        whyItFits: 'Consistently mentioned in this week\'s coverage.',
+                        lastConfirmedAt: '2026-07-06T08:00:00Z',
+                    }],
+                }),
+            });
+        });
+        await page.goto('/projects/locus');
+        await page.locator('#searchInput').fill('quiet coffee shop to work from near Capitol Hill');
+        await page.locator('#searchBtn').click();
+        await expect(page.locator('.result-name')).toContainText('Real Trending Cafe');
+        await expect(page.locator('#sourceCaption')).toContainText('Trending as of');
+        await expect(page.locator('#sourceCaption')).toContainText('refreshed weekly, not real-time');
     });
 
     test('clicking a demo chip populates the input and submits immediately', async ({ page }) => {
@@ -155,7 +178,7 @@ test.describe('Locus page', () => {
                 contentType: 'application/json',
                 body: JSON.stringify({
                     source: 'demo',
-                    reason: 'key_missing',
+                    reason: 'out_of_scope',
                     results: [{
                         name: 'The Ballard Smoke Shop', address: '5439 Ballard Ave NW, Seattle, WA 98107',
                         rating: 4.4, userRatingCount: 452, priceLevel: 'PRICE_LEVEL_INEXPENSIVE',
