@@ -1,6 +1,5 @@
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
 const ALLOWED_ORIGINS = ['https://klee.page', 'https://www.klee.page'];
 
@@ -113,13 +112,16 @@ const VALID_PRICE_LEVELS = [
     'PRICE_LEVEL_VERY_EXPENSIVE',
 ];
 
-// Allowlist filter: only these three fields ever leave this function, regardless
+const VALID_CITIES = ['seattle', 'la', 'ny'];
+const VALID_CATEGORIES = ['coffee', 'ramen', 'bars', 'brunch'];
+
+// Allowlist filter: only these fields ever leave this function, regardless
 // of what other keys the LLM's JSON output contains — this is the
 // prompt-injection defense described in the design spec (the model's output
 // becomes API parameters, never raw instructions).
 function normalizeParsedParams(parsed, fallbackQuery) {
     if (!parsed || typeof parsed.searchText !== 'string' || !parsed.searchText.trim()) {
-        return { searchText: fallbackQuery };
+        return { searchText: fallbackQuery, city: 'seattle', category: null };
     }
     const result = { searchText: parsed.searchText.trim().slice(0, 200) };
     if (typeof parsed.minRating === 'number' && parsed.minRating >= 1 && parsed.minRating <= 5) {
@@ -128,46 +130,9 @@ function normalizeParsedParams(parsed, fallbackQuery) {
     if (VALID_PRICE_LEVELS.includes(parsed.priceLevel)) {
         result.priceLevel = parsed.priceLevel;
     }
+    result.city = VALID_CITIES.includes(parsed.city) ? parsed.city : 'seattle';
+    result.category = VALID_CATEGORIES.includes(parsed.category) ? parsed.category : null;
     return result;
-}
-
-// Basic-tier fields only — deliberately excludes currentOpeningHours to avoid the
-// pricier "Places Details (Advanced)" SKU. openNow filtering is out of scope for v1.
-const PLACES_FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.primaryType,places.googleMapsUri';
-
-async function searchPlaces(searchText) {
-    const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
-            'X-Goog-FieldMask': PLACES_FIELD_MASK,
-        },
-        body: JSON.stringify({ textQuery: searchText, pageSize: 10 }),
-        signal: AbortSignal.timeout(10000),
-    });
-    if (!res.ok) {
-        const errBody = await res.text();
-        const err = new Error('Places API error');
-        err.status = res.status;
-        err.body = errBody.slice(0, 300);
-        throw err;
-    }
-    const data = await res.json();
-    // Google returns `{}` (not `{places: []}`) on a zero-match search.
-    return data.places || [];
-}
-
-function placeToResult(place, whyItFits) {
-    return {
-        name: place.displayName?.text || 'Unknown',
-        address: place.formattedAddress || '',
-        rating: place.rating ?? null,
-        userRatingCount: place.userRatingCount ?? null,
-        priceLevel: place.priceLevel || null,
-        mapsUri: place.googleMapsUri || null,
-        whyItFits: whyItFits || null,
-    };
 }
 
 const CITIES = ['seattle', 'la', 'ny'];
@@ -272,19 +237,22 @@ function findDemoMatch(cleanQuery) {
     return match ? demoResultShape(match) : null;
 }
 
-const PARSE_SYSTEM_PROMPT = `You are a precise search translation engine. Parse the user's natural language query into structured parameters for the Google Places API (New).
+const PARSE_SYSTEM_PROMPT = `You are a precise search translation engine. Parse the user's natural language query into structured search parameters.
 
 You must output a strict JSON object with this schema:
 {
   "searchText": string, // A clean, optimized search string combining the core intent and location
   "minRating": number,  // Optional. Minimum rating (1.0 to 5.0) if implied (e.g., "highly rated").
-  "priceLevel": string  // Optional. One of: "PRICE_LEVEL_INEXPENSIVE", "PRICE_LEVEL_MODERATE", "PRICE_LEVEL_EXPENSIVE", "PRICE_LEVEL_VERY_EXPENSIVE"
+  "priceLevel": string, // Optional. One of: "PRICE_LEVEL_INEXPENSIVE", "PRICE_LEVEL_MODERATE", "PRICE_LEVEL_EXPENSIVE", "PRICE_LEVEL_VERY_EXPENSIVE"
+  "city": string,        // One of: "seattle", "la", "ny" — infer from the query, defaulting to "seattle" if no location is implied.
+  "category": string     // One of: "coffee", "ramen", "bars", "brunch" — pick whichever is the closest match to the query's intent. If truly none fit (e.g. a query about parks, hotels, or shopping), output "none".
 }
 
 Rules:
-1. If no location is provided or implied, append "Seattle" to the searchText as a default (the site owner is Seattle-based).
-2. If the query is ambiguous, focus the searchText on the primary nouns and location.
-3. Do not include markdown formatting or explanation. Return ONLY the raw JSON.`;
+1. If no location is provided or implied, default city to "seattle" (the site owner is Seattle-based).
+2. "la" means Los Angeles; "ny" means New York City — infer from neighborhood/landmark names too (e.g. "Silver Lake" implies la, "Williamsburg" implies ny).
+3. category must be exactly one of "coffee", "ramen", "bars", "brunch", "none" — pick the closest fit, don't invent a new category.
+4. Do not include markdown formatting or explanation. Return ONLY the raw JSON.`;
 
 async function parseQuery(query) {
     const text = await callLLM(PARSE_SYSTEM_PROMPT, query);
@@ -311,12 +279,11 @@ Rules:
 async function rankPlaces(originalQuery, candidates) {
     const candidateSummary = candidates.map((p) => ({
         id: p.id,
-        name: p.displayName?.text || 'Unknown',
-        address: p.formattedAddress || '',
+        name: p.name,
+        address: p.address,
         rating: p.rating,
-        userRatingCount: p.userRatingCount,
-        priceLevel: p.priceLevel,
-        primaryType: p.primaryType,
+        userRatingCount: p.review_count,
+        priceLevel: p.price_level,
     }));
     const userContent = JSON.stringify({ userQuery: originalQuery, candidates: candidateSummary });
     const text = await callLLM(RANK_SYSTEM_PROMPT, userContent);
@@ -378,42 +345,39 @@ async function handler(req, res) {
         return res.status(400).json({ error: 'Query is required' });
     }
 
-    if (!GOOGLE_PLACES_API_KEY) {
+    function fallbackToDemo(reason) {
         const matched = findDemoMatch(cleanQuery);
         if (matched) {
             logSearch(cleanQuery, [matched], [null], req, 'demo');
-            return res.status(200).json({ source: 'demo', reason: 'key_missing', results: [matched] });
+            return res.status(200).json({ source: 'demo', reason, results: [matched] });
         }
         logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req, 'demo');
         return res.status(200).json({
             source: 'demo',
-            reason: 'key_missing',
-            note: "Live search isn't configured yet — here are four real examples.",
+            reason,
+            note: "That's outside what I track yet (Seattle, LA, and New York; coffee, ramen, bars, and brunch) — here are four real examples instead.",
             results: DEMO_RESULTS,
         });
     }
 
+    const parsed = await parseQuery(cleanQuery);
+    const inScope = CITIES.includes(parsed.city) && CATEGORIES.includes(parsed.category);
+
+    if (!inScope) {
+        return fallbackToDemo('out_of_scope');
+    }
+
     let places;
     try {
-        const parsed = await parseQuery(cleanQuery);
-        places = await searchPlaces(parsed.searchText);
+        places = await queryTrendingPlaces(parsed.city, parsed.category);
     } catch (err) {
-        console.error('LOCUS_PLACES_ERROR', err.status || 'exception', err.message);
-        let reason = 'upstream_error';
-        if (err.status === 401 || err.status === 403) {
-            reason = 'key_invalid';
-        } else if (err.status === 429) {
-            reason = 'places_rate_limited';
-        } else if (err.name === 'TimeoutError' || err.name === 'AbortError') {
-            reason = 'timeout';
-        }
+        console.error('TRENDING_QUERY_ERROR', err.status || 'exception', err.message);
         logSearch(cleanQuery, DEMO_RESULTS, DEMO_RESULTS.map(() => null), req, 'degraded');
-        return res.status(200).json({ source: 'degraded', reason, results: DEMO_RESULTS });
+        return res.status(200).json({ source: 'degraded', reason: 'upstream_error', results: DEMO_RESULTS });
     }
 
     if (places.length === 0) {
-        logSearch(cleanQuery, [], [], req, 'live');
-        return res.status(200).json({ source: 'live', reason: null, results: [] });
+        return fallbackToDemo('no_trending_data');
     }
 
     let ranked = null;
@@ -426,22 +390,25 @@ async function handler(req, res) {
     let finalResults;
     let finalPlaceIds;
     if (ranked) {
-        const byId = new Map(places.map((p) => [p.id, p]));
+        // String-coerce both sides of this map — see this task's brief for
+        // why: trending_places ids are numeric, but the rank LLM's declared
+        // schema is string ids, and a JS Map does no type coercion.
+        const byId = new Map(places.map((p) => [String(p.id), p]));
         finalResults = ranked
             .map((r) => {
-                const p = byId.get(r.id);
-                return p ? placeToResult(p, r.whyItFits) : null;
+                const p = byId.get(String(r.id));
+                return p ? trendingRowToResult(p, r.whyItFits) : null;
             })
             .filter(Boolean);
         finalPlaceIds = ranked
-            .filter((r) => byId.has(r.id))
-            .map((r) => r.id);
+            .filter((r) => byId.has(String(r.id)))
+            .map((r) => String(r.id));
     } else {
-        // LLM #2 failed — fall back to Google's own order, no explanations, but
-        // never discard the paid Places results.
+        // Rank LLM failed — fall back to the DB's own order, no explanations,
+        // but never discard the real trending-data results.
         const top = places.slice(0, 5);
-        finalResults = top.map((p) => placeToResult(p, null));
-        finalPlaceIds = top.map((p) => p.id);
+        finalResults = top.map((p) => trendingRowToResult(p, null));
+        finalPlaceIds = top.map((p) => String(p.id));
     }
 
     logSearch(cleanQuery, finalResults, finalPlaceIds, req, 'live');
@@ -455,8 +422,6 @@ module.exports.normalizeParsedParams = normalizeParsedParams;
 module.exports.parseQuery = parseQuery;
 module.exports.sanitizeInput = sanitizeInput;
 module.exports.isRateLimited = isRateLimited;
-module.exports.searchPlaces = searchPlaces;
-module.exports.placeToResult = placeToResult;
 module.exports.rankPlaces = rankPlaces;
 module.exports.findDemoMatch = findDemoMatch;
 module.exports.DEMO_RESULTS = DEMO_RESULTS;
