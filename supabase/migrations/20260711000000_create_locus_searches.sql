@@ -1,4 +1,4 @@
-CREATE TABLE locus_searches (
+CREATE TABLE IF NOT EXISTS locus_searches (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   query text NOT NULL,
   response jsonb,
@@ -14,6 +14,8 @@ CREATE TABLE locus_searches (
 
 ALTER TABLE locus_searches ENABLE ROW LEVEL SECURITY;
 
+ALTER TABLE locus_searches DROP CONSTRAINT IF EXISTS locus_searches_query_length;
+ALTER TABLE locus_searches DROP CONSTRAINT IF EXISTS locus_searches_ip_length;
 ALTER TABLE locus_searches
   ADD CONSTRAINT locus_searches_query_length CHECK (length(query) <= 300),
   ADD CONSTRAINT locus_searches_ip_length CHECK (length(ip) <= 100);

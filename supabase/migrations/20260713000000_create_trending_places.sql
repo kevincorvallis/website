@@ -1,4 +1,4 @@
-CREATE TABLE trending_places (
+CREATE TABLE IF NOT EXISTS trending_places (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   city text NOT NULL,              -- 'seattle' | 'la' | 'ny'
   category text NOT NULL,          -- 'coffee' | 'ramen' | 'bars' | 'brunch'
@@ -21,7 +21,7 @@ CREATE TABLE trending_places (
 
 ALTER TABLE trending_places ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE trending_places_runs (
+CREATE TABLE IF NOT EXISTS trending_places_runs (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   run_at timestamptz NOT NULL DEFAULT now(),
   places_found integer,
