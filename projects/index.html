@@ -312,13 +312,29 @@
            once a stage is injected. */
 
         .demo { position: relative; }
-        .demo.demo-on > img { display: none; }
+        /* Fallback image stays in the accessibility tree (alt text) but out of view. */
+        .demo.demo-on > img {
+            position: absolute; width: 1px; height: 1px; margin: -1px;
+            clip-path: inset(50%); overflow: hidden; border: 0; padding: 0;
+        }
 
         .demo-stage {
             background: var(--bg);
             padding: 1.5rem 1.6rem;
             min-height: 280px;
             box-sizing: border-box;
+            contain: layout style;
+        }
+
+        /* Freeze all stage animation while the card is off-screen. */
+        .demo.d-idle .demo-stage,
+        .demo.d-idle .demo-stage * { animation-play-state: paused; }
+
+        @media (max-width: 540px) {
+            .demo-stage { padding: 1rem 1.1rem; min-height: 220px; }
+            .d-search { font-size: .88rem; }
+            .d-field { font-size: .95rem; }
+            .d-term { font-size: .68rem; }
         }
 
         .d-caret {
@@ -998,44 +1014,115 @@
     <script src="/js/theme.js"></script>
 
     <!-- Animated card demos: auto-play on scroll, loop while visible.
-         Static images remain for no-JS and prefers-reduced-motion. -->
+         Static images remain for no-JS and prefers-reduced-motion; stages are
+         aria-hidden so assistive tech reads the image alt text instead. -->
     <script>
     (function () {
         'use strict';
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (motionQuery.matches) return;
 
-        var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+        var stopped = false;
+        var frames = [];
+        var ABORT = { demo: 'aborted' };
 
-        async function typeText(el, text, speed) {
-            el.textContent = '';
-            for (var i = 0; i < text.length; i++) {
-                el.textContent += text[i];
-                await sleep(speed + Math.random() * 36);
+        // Runtime reduced-motion switch: tear demos down, restore the images.
+        motionQuery.addEventListener('change', function (e) {
+            if (!e.matches) return;
+            stopped = true;
+            frames.forEach(function (f) {
+                f.classList.remove('demo-on');
+                var stage = f.querySelector('.demo-stage');
+                if (stage) stage.remove();
+                f.querySelectorAll('img.d-x').forEach(function (im) { im.classList.remove('d-show'); });
+            });
+        });
+
+        // Cancellation-aware timing: every wait aborts promptly when the card
+        // leaves the viewport or the tab is hidden — a run never continues
+        // animating off-screen.
+        function makeStep(isVisible) {
+            function alive() { return isVisible() && !stopped && !document.hidden; }
+            async function step(ms) {
+                var end = Date.now() + ms;
+                do {
+                    if (!alive()) throw ABORT;
+                    await new Promise(function (r) { setTimeout(r, Math.max(16, Math.min(140, end - Date.now()))); });
+                } while (Date.now() < end);
+                if (!alive()) throw ABORT;
             }
-        }
-
-        async function countUp(el, target, ms, suffix) {
-            var steps = 30;
-            for (var i = 1; i <= steps; i++) {
-                el.textContent = Math.round(target * (1 - Math.pow(1 - i / steps, 3))) + (suffix || '');
-                await sleep(ms / steps);
-            }
+            step.type = async function (el, text, speed) {
+                el.textContent = '';
+                for (var i = 0; i < text.length; i++) {
+                    el.textContent += text[i];
+                    await step(speed + Math.random() * 36);
+                }
+            };
+            step.count = async function (el, target, ms, suffix) {
+                var n = 30;
+                for (var i = 1; i <= n; i++) {
+                    el.textContent = Math.round(target * (1 - Math.pow(1 - i / n, 3))) + (suffix || '');
+                    await step(ms / n);
+                }
+            };
+            step.alive = alive;
+            return step;
         }
 
         function loopDemo(frame, buildStage, run) {
+            if (frame.hasAttribute('data-demo-ready')) return;
+            frame.setAttribute('data-demo-ready', '');
+            frames.push(frame);
+
             var visible = false;
             new IntersectionObserver(function (entries) {
                 visible = entries[0].isIntersecting;
-            }, { threshold: 0.3 }).observe(frame);
-            var stage = buildStage ? buildStage(frame) : frame;
-            if (buildStage) frame.classList.add('demo-on');
+                frame.classList.toggle('d-idle', !visible);
+            }, { threshold: 0.15 }).observe(frame);
+
+            var stage = frame;
+            if (buildStage) {
+                stage = buildStage(frame);
+                stage.setAttribute('aria-hidden', 'true');
+                frame.classList.add('demo-on');
+                sizeStageToImage(frame, stage);
+            }
+            var step = makeStep(function () { return visible; });
+
             (async function cycle() {
+                var rest = 700; // first play starts promptly once visible
                 for (;;) {
-                    while (!visible) await sleep(300);
-                    try { await run(stage); } catch (e) { return; }
-                    await sleep(2800);
+                    if (stopped) return;
+                    while (!step.alive()) {
+                        if (stopped) return;
+                        await new Promise(function (r) { setTimeout(r, 350); });
+                    }
+                    try {
+                        await step(rest);
+                        await run(stage, step);
+                        // Rest in the completed state: replays should not
+                        // constantly reclaim attention from nearby text.
+                        rest = 9000;
+                    } catch (e) {
+                        if (e !== ABORT) return;
+                        rest = 700;
+                    }
                 }
             })();
+        }
+
+        // Match the stage to the fallback image's aspect so the swap does not
+        // shift layout.
+        function sizeStageToImage(frame, stage) {
+            var img = frame.querySelector('img');
+            if (!img) return;
+            var apply = function () {
+                if (!img.naturalWidth) return;
+                var h = Math.round(frame.clientWidth * img.naturalHeight / img.naturalWidth);
+                if (h > 140) stage.style.minHeight = Math.min(h, 430) + 'px';
+            };
+            if (img.complete) apply();
+            else img.addEventListener('load', apply, { once: true });
         }
 
         // ——— Locus: typed query → skeleton → result card ———
@@ -1047,25 +1134,25 @@
                     '<div class="d-results"></div>' +
                     '</div>');
                 return frame.lastElementChild;
-            }, async function (stage) {
+            }, async function (stage, s) {
                 var q = stage.querySelector('.d-q'), caret = stage.querySelector('.d-caret'),
                     btn = stage.querySelector('.d-btn'), results = stage.querySelector('.d-results');
                 q.textContent = ''; results.innerHTML = ''; caret.style.display = '';
-                await sleep(700);
-                await typeText(q, 'quiet coffee shop to work from near Capitol Hill', 34);
+                await s(400);
+                await s.type(q, 'quiet coffee shop to work from near Capitol Hill', 34);
                 caret.style.display = 'none';
                 btn.classList.add('d-press');
-                await sleep(180);
+                await s(180);
                 btn.classList.remove('d-press');
                 results.innerHTML = '<div class="d-skel" style="width:88%"></div><div class="d-skel" style="width:70%"></div><div class="d-skel" style="width:79%"></div>';
-                await sleep(1300);
+                await s(1300);
                 results.innerHTML =
                     '<div class="d-card d-fade"><h4>Espresso Vivace Roasteria</h4>' +
                     '<div class="d-meta">4.5 (1515) &middot; $ &middot; 532 Broadway E</div>' +
                     '<p>A 38-year-old Capitol Hill fixture with a dedicated quiet room, rated 4.5 from over 1,500 reviews at coffee-shop prices.</p></div>';
-                await sleep(40);
+                await s(40);
                 results.firstElementChild.classList.add('d-in');
-                await sleep(2200);
+                await s(900);
             });
         }
 
@@ -1086,13 +1173,13 @@
             loopDemo(frame, function () {
                 frame.insertAdjacentHTML('beforeend', '<div class="demo-stage d-term"></div>');
                 return frame.lastElementChild;
-            }, async function (stage) {
+            }, async function (stage, s) {
                 stage.innerHTML = '<div class="d-row"><span class="accent">❯</span> <span class="white d-cmd"></span><span class="d-caret"></span></div>';
                 var cmd = stage.querySelector('.d-cmd');
-                await sleep(600);
-                await typeText(cmd, '/gauntlet review the paste-reliability diff', 40);
+                await s(400);
+                await s.type(cmd, '/gauntlet review the paste-reliability diff', 40);
                 stage.querySelector('.d-caret').style.display = 'none';
-                await sleep(500);
+                await s(500);
                 for (var i = 0; i < LINES.length; i++) {
                     var div = document.createElement('div');
                     div.className = 'd-row d-fade';
@@ -1100,9 +1187,9 @@
                     stage.appendChild(div);
                     void div.offsetWidth;
                     div.classList.add('d-in');
-                    await sleep(LINES[i][1]);
+                    await s(LINES[i][1]);
                 }
-                await sleep(2400);
+                await s(1200);
             });
         }
 
@@ -1116,24 +1203,27 @@
                     '<div class="d-enh d-fade">✦ enhanced with your voice profile</div>' +
                     '</div>');
                 return frame.lastElementChild;
-            }, async function (stage) {
+            }, async function (stage, s) {
                 var pill = stage.querySelector('.d-pill'), time = stage.querySelector('.d-time'),
                     txt = stage.querySelector('.d-txt'), caret = stage.querySelector('.d-caret'),
                     enh = stage.querySelector('.d-enh');
                 txt.textContent = ''; caret.style.display = 'none'; enh.classList.remove('d-in');
-                pill.classList.add('d-rec');
-                for (var s = 0; s <= 3; s++) { time.textContent = '0:0' + s; await sleep(560); }
-                pill.classList.remove('d-rec');
+                try {
+                    pill.classList.add('d-rec');
+                    for (var sec = 0; sec <= 3; sec++) { time.textContent = '0:0' + sec; await s(560); }
+                } finally {
+                    pill.classList.remove('d-rec');
+                }
                 time.textContent = 'transcribing…';
-                await sleep(900);
+                await s(900);
                 time.textContent = 'done';
                 caret.style.display = '';
-                await typeText(txt, 'um so i want to do the four and a half hour tour on tuesday', 26);
-                await sleep(650);
+                await s.type(txt, 'um so i want to do the four and a half hour tour on tuesday', 26);
+                await s(650);
                 txt.textContent = 'I want to do the four-and-a-half-hour tour on Tuesday.';
                 caret.style.display = 'none';
                 enh.classList.add('d-in');
-                await sleep(2300);
+                await s(1200);
             });
         }
 
@@ -1141,9 +1231,9 @@
         function initCrossfade(frame) {
             var layers = Array.prototype.slice.call(frame.querySelectorAll('img'));
             if (layers.length < 2) return;
-            frame.insertAdjacentHTML('beforeend', '<div class="d-cap"></div>');
+            frame.insertAdjacentHTML('beforeend', '<div class="d-cap" aria-hidden="true"></div>');
             var cap = frame.lastElementChild;
-            loopDemo(frame, null, async function () {
+            loopDemo(frame, null, async function (stage, s) {
                 for (var i = 0; i < layers.length; i++) {
                     layers.forEach(function (im, k) {
                         if (k > 0) im.classList.toggle('d-show', k === i);
@@ -1151,11 +1241,11 @@
                     var text = layers[i].getAttribute('data-caption');
                     cap.classList.remove('d-in');
                     if (text) {
-                        await sleep(260);
+                        await s(260);
                         cap.textContent = text;
                         cap.classList.add('d-in');
                     }
-                    await sleep(2500);
+                    await s(2500);
                 }
             });
         }
@@ -1177,18 +1267,18 @@
                     '<div class="d-sub d-fade">12 km off — nice drop</div>' +
                     '</div>');
                 return frame.lastElementChild;
-            }, async function (stage) {
+            }, async function (stage, s) {
                 var pin = stage.querySelector('.d-pin'), ring = stage.querySelector('.d-ring'),
                     score = stage.querySelector('.d-score'), sub = stage.querySelector('.d-sub');
                 pin.classList.remove('d-drop'); ring.classList.remove('d-go');
                 score.innerHTML = '&nbsp;'; sub.classList.remove('d-in');
-                await sleep(900);
+                await s(600);
                 pin.classList.add('d-drop');
-                await sleep(480);
+                await s(480);
                 ring.classList.add('d-go');
-                await countUp(score, 947, 900, ' / 1000');
+                await s.count(score, 947, 900, ' / 1000');
                 sub.classList.add('d-in');
-                await sleep(2300);
+                await s(1200);
             });
         }
 
@@ -1209,20 +1299,20 @@
                     '<div class="d-coach"><span class="d-ctext"></span><span class="d-caret" style="display:none"></span></div>' +
                     '</div>');
                 return frame.lastElementChild;
-            }, async function (stage) {
+            }, async function (stage, s) {
                 var reps = stage.querySelector('.d-r'), next = stage.querySelector('.d-next'),
                     nextRow = stage.querySelector('.d-set.d-fade'), coach = stage.querySelector('.d-ctext'),
                     caret = stage.querySelector('.d-coach .d-caret');
                 reps.textContent = '0'; coach.textContent = ''; nextRow.classList.remove('d-in'); next.textContent = '185 lb';
-                await sleep(700);
-                await countUp(reps, 8, 1100, '');
-                await sleep(500);
+                await s(500);
+                await s.count(reps, 8, 1100, '');
+                await s(500);
                 next.textContent = '190 lb';
                 nextRow.classList.add('d-in');
                 caret.style.display = '';
-                await typeText(coach, '+5 lb next time — you hit 8 reps on every set.', 30);
+                await s.type(coach, '+5 lb next time — you hit 8 reps on every set.', 30);
                 caret.style.display = 'none';
-                await sleep(2200);
+                await s(1200);
             });
         }
 
