@@ -347,9 +347,28 @@
             animation: d-blink 1.05s steps(1) infinite;
         }
         @keyframes d-blink { 50% { opacity: 0; } }
+        /* Solid while actively typing; blinking means idle. */
+        .d-caret.d-solid { animation: none; opacity: 1; }
+
+        .d-replay {
+            position: absolute; right: .6rem; top: 36px; z-index: 3;
+            font-family: ui-monospace, Menlo, monospace; font-size: .7rem;
+            color: var(--text); background: var(--bg);
+            border: 1px solid var(--frame-dot); border-radius: 999px;
+            padding: .18rem .6rem; cursor: pointer;
+            opacity: 0; pointer-events: none; transition: opacity .35s;
+        }
+        .d-replay.d-show { opacity: .75; pointer-events: auto; }
+        .d-replay:hover { opacity: 1; }
 
         .d-fade { opacity: 0; transform: translateY(6px); transition: opacity .55s var(--ease-out), transform .55s var(--ease-out); }
         .d-fade.d-in { opacity: 1; transform: none; }
+        /* Spring entrance: slight overshoot-settle for payoff moments. */
+        .d-spring {
+            opacity: 0; transform: translateY(14px) scale(.985);
+            transition: opacity .45s var(--ease-out), transform .6s cubic-bezier(0.175, 0.885, 0.32, 1.12);
+        }
+        .d-spring.d-in { opacity: 1; transform: none; }
 
         /* Locus */
         .d-search {
@@ -387,6 +406,8 @@
         }
         .d-term .d-row { white-space: pre-wrap; min-height: 1.8em; }
         .d-term .dim { color: #6d6b63; } .d-term .accent { color: #d4a25a; }
+        .d-term .d-row.d-flash { animation: d-flashbg .5s var(--ease-out) 1; }
+        @keyframes d-flashbg { 0% { background: rgba(212, 162, 90, .16); } 100% { background: transparent; } }
         .d-term .ok { color: #79b473; } .d-term .bad { color: #c96f5f; }
         .d-term .cyan { color: #6fa8b5; } .d-term .white { color: #eceae2; }
         .d-term .d-caret { background: #c9c7bf; }
@@ -408,6 +429,15 @@
         .d-bars i:nth-child(4) { animation-delay: .07s; } .d-bars i:nth-child(5) { animation-delay: .2s; }
         @keyframes d-bar { from { height: 4px; } to { height: 15px; } }
         .d-field { font-size: 1.05rem; line-height: 1.6; min-height: 5.2em; }
+        .d-wipe { position: relative; }
+        .d-wipe .d-new {
+            position: absolute; inset: 0; background: var(--bg);
+            clip-path: inset(0 100% 0 0);
+        }
+        .d-wipe.d-go .d-new {
+            clip-path: inset(0 0 0 0);
+            transition: clip-path .65s var(--ease-in-out);
+        }
         .d-enh {
             display: inline-block; font-family: ui-monospace, Menlo, monospace;
             font-size: .72rem; border: 1px solid var(--frame-dot); border-radius: 999px;
@@ -424,6 +454,10 @@
         .d-set b { font-size: 1.05rem; }
         .d-set .d-num { font-family: ui-monospace, Menlo, monospace; font-size: 1rem; }
         .d-coach { font-size: .98rem; font-style: italic; opacity: .9; min-height: 3em; margin-top: 1rem; }
+        .d-roll { display: inline-block; height: 1.3em; overflow: hidden; vertical-align: bottom; }
+        .d-roll .d-rollin { display: block; transition: transform .5s var(--ease-out); }
+        .d-roll .d-rollin > span { display: block; height: 1.3em; }
+        .d-roll.d-rolled .d-rollin { transform: translateY(-1.3em); }
 
         /* Pindrop — dark stage in both themes */
         .d-space {
@@ -441,7 +475,9 @@
             width: 10px; height: 10px; border-radius: 50%; background: #ff8a3d;
             transform: translateY(-56px); opacity: 0;
         }
-        .d-pin.d-drop { transition: transform .5s cubic-bezier(.34, 1.56, .64, 1), opacity .18s; transform: translateY(0); opacity: 1; }
+        .d-pin.d-drop { transition: transform .45s cubic-bezier(.3, 1.45, .55, 1), opacity .15s; transform: translateY(0); opacity: 1; }
+        .d-pin.d-squash { animation: d-squash .3s var(--ease-out) 1; }
+        @keyframes d-squash { 0% { transform: scale(1); } 45% { transform: scale(1.3, .7); } 100% { transform: scale(1); } }
         .d-ring {
             position: absolute; left: 62%; top: 34%; width: 10px; height: 10px;
             border-radius: 50%; border: 1.5px solid #ff8a3d; opacity: 0; margin: 0;
@@ -1051,11 +1087,24 @@
                 } while (Date.now() < end);
                 if (!alive()) throw ABORT;
             }
-            step.type = async function (el, text, speed) {
+            // Human cadence: pauses stretch at word boundaries and after
+            // punctuation; ordinary keystrokes come in quick uneven bursts.
+            // Uniform per-character intervals are the tell of a fake.
+            function charDelay(ch, base) {
+                if (ch === ' ') return base * 2 + Math.random() * 70;
+                if (',.?!;:—'.indexOf(ch) !== -1) return 230 + Math.random() * 170;
+                return base * 0.6 + Math.random() * base;
+            }
+            step.type = async function (el, text, speed, caret) {
                 el.textContent = '';
-                for (var i = 0; i < text.length; i++) {
-                    el.textContent += text[i];
-                    await step(speed + Math.random() * 36);
+                if (caret) caret.classList.add('d-solid');
+                try {
+                    for (var i = 0; i < text.length; i++) {
+                        el.textContent += text[i];
+                        await step(charDelay(text[i], speed));
+                    }
+                } finally {
+                    if (caret) caret.classList.remove('d-solid');
                 }
             };
             step.count = async function (el, target, ms, suffix) {
@@ -1089,8 +1138,35 @@
             }
             var step = makeStep(function () { return visible; });
 
+            // Replay affordance: appears only while the demo rests in its
+            // completed state; clicking cuts the rest short. Lives on the
+            // frame (not the aria-hidden stage) so it stays reachable.
+            var skipRest = false;
+            var chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'd-replay';
+            chip.textContent = '↻ replay';
+            chip.setAttribute('aria-label', 'Replay demo');
+            chip.addEventListener('click', function () { skipRest = true; });
+            frame.appendChild(chip);
+
+            async function restWithReplay(ms) {
+                chip.classList.add('d-show');
+                try {
+                    var end = Date.now() + ms;
+                    while (Date.now() < end && !skipRest) {
+                        if (!step.alive()) throw ABORT;
+                        await new Promise(function (r) { setTimeout(r, 120); });
+                    }
+                } finally {
+                    skipRest = false;
+                    chip.classList.remove('d-show');
+                }
+                if (!step.alive()) throw ABORT;
+            }
+
             (async function cycle() {
-                var rest = 700; // first play starts promptly once visible
+                var first = true;
                 for (;;) {
                     if (stopped) return;
                     while (!step.alive()) {
@@ -1098,14 +1174,17 @@
                         await new Promise(function (r) { setTimeout(r, 350); });
                     }
                     try {
-                        await step(rest);
+                        if (first) {
+                            await step(700); // first play starts promptly
+                        } else {
+                            // Rest in the completed state: replays should not
+                            // constantly reclaim attention from nearby text.
+                            await restWithReplay(9000);
+                        }
+                        first = false;
                         await run(stage, step);
-                        // Rest in the completed state: replays should not
-                        // constantly reclaim attention from nearby text.
-                        rest = 9000;
                     } catch (e) {
                         if (e !== ABORT) return;
-                        rest = 700;
                     }
                 }
             })();
@@ -1139,15 +1218,15 @@
                     btn = stage.querySelector('.d-btn'), results = stage.querySelector('.d-results');
                 q.textContent = ''; results.innerHTML = ''; caret.style.display = '';
                 await s(400);
-                await s.type(q, 'quiet coffee shop to work from near Capitol Hill', 34);
+                await s.type(q, 'quiet coffee shop to work from near Capitol Hill', 34, caret);
                 caret.style.display = 'none';
                 btn.classList.add('d-press');
                 await s(180);
                 btn.classList.remove('d-press');
                 results.innerHTML = '<div class="d-skel" style="width:88%"></div><div class="d-skel" style="width:70%"></div><div class="d-skel" style="width:79%"></div>';
-                await s(1300);
+                await s(800);
                 results.innerHTML =
-                    '<div class="d-card d-fade"><h4>Espresso Vivace Roasteria</h4>' +
+                    '<div class="d-card d-spring"><h4>Espresso Vivace Roasteria</h4>' +
                     '<div class="d-meta">4.5 (1515) &middot; $ &middot; 532 Broadway E</div>' +
                     '<p>A 38-year-old Capitol Hill fixture with a dedicated quiet room, rated 4.5 from over 1,500 reviews at coffee-shop prices.</p></div>';
                 await s(40);
@@ -1164,9 +1243,9 @@
                 ['         ├─ <span class="cyan">Gemini 3.1 Pro</span>   4 findings <span class="dim">·</span> <span class="bad">2 blocking</span>', 420],
                 ['         └─ <span class="cyan">GPT-5.6</span>          3 findings <span class="dim">·</span> <span class="bad">1 blocking</span>', 420],
                 ['<span class="dim">Round 2</span>  crossfire rebuttal — each model attacks the others’ claims', 200],
-                ['         ├─ clipboard restore races slow apps  <span class="ok">CONFIRMED</span>', 500],
-                ['         ├─ retry loop starves the main actor  <span class="bad">REFUTED</span> <span class="dim">measured 0.3 ms</span>', 500],
-                ['         └─ paste failure silent when AX drops  <span class="ok">CONFIRMED</span>', 500],
+                ['         ├─ clipboard restore races slow apps  <span class="ok">CONFIRMED</span>', 500, true],
+                ['         ├─ retry loop starves the main actor  <span class="bad">REFUTED</span> <span class="dim">measured 0.3 ms</span>', 500, true],
+                ['         └─ paste failure silent when AX drops  <span class="ok">CONFIRMED</span>', 500, true],
                 ['&nbsp;', 60],
                 ['<span class="white">Verdict</span>  2 confirmed defects → fix before merge  <span class="dim">3 models · 12.4k tokens · 96 s</span>', 300]
             ];
@@ -1177,12 +1256,12 @@
                 stage.innerHTML = '<div class="d-row"><span class="accent">❯</span> <span class="white d-cmd"></span><span class="d-caret"></span></div>';
                 var cmd = stage.querySelector('.d-cmd');
                 await s(400);
-                await s.type(cmd, '/gauntlet review the paste-reliability diff', 40);
+                await s.type(cmd, '/gauntlet review the paste-reliability diff', 40, stage.querySelector('.d-caret'));
                 stage.querySelector('.d-caret').style.display = 'none';
                 await s(500);
                 for (var i = 0; i < LINES.length; i++) {
                     var div = document.createElement('div');
-                    div.className = 'd-row d-fade';
+                    div.className = 'd-row d-fade' + (LINES[i][2] ? ' d-flash' : '');
                     div.innerHTML = LINES[i][0];
                     stage.appendChild(div);
                     void div.offsetWidth;
@@ -1199,15 +1278,17 @@
                 frame.insertAdjacentHTML('beforeend',
                     '<div class="demo-stage">' +
                     '<div class="d-pill"><span class="d-mic"></span><span class="d-bars"><i></i><i></i><i></i><i></i><i></i></span><span class="d-time">0:00</span></div>' +
-                    '<div class="d-field"><span class="d-txt"></span><span class="d-caret"></span></div>' +
+                    '<div class="d-field d-wipe"><span class="d-old"><span class="d-txt"></span><span class="d-caret"></span></span>' +
+                    '<span class="d-new">I want to do the four-and-a-half-hour tour on Tuesday.</span></div>' +
                     '<div class="d-enh d-fade">✦ enhanced with your voice profile</div>' +
                     '</div>');
                 return frame.lastElementChild;
             }, async function (stage, s) {
                 var pill = stage.querySelector('.d-pill'), time = stage.querySelector('.d-time'),
                     txt = stage.querySelector('.d-txt'), caret = stage.querySelector('.d-caret'),
-                    enh = stage.querySelector('.d-enh');
+                    enh = stage.querySelector('.d-enh'), field = stage.querySelector('.d-field');
                 txt.textContent = ''; caret.style.display = 'none'; enh.classList.remove('d-in');
+                field.classList.remove('d-go');
                 try {
                     pill.classList.add('d-rec');
                     for (var sec = 0; sec <= 3; sec++) { time.textContent = '0:0' + sec; await s(560); }
@@ -1218,10 +1299,13 @@
                 await s(900);
                 time.textContent = 'done';
                 caret.style.display = '';
-                await s.type(txt, 'um so i want to do the four and a half hour tour on tuesday', 26);
-                await s(650);
-                txt.textContent = 'I want to do the four-and-a-half-hour tour on Tuesday.';
+                await s.type(txt, 'um so i want to do the four and a half hour tour on tuesday', 26, caret);
                 caret.style.display = 'none';
+                await s(650);
+                // The transformation IS the product: sweep the enhanced
+                // sentence across the raw dictation instead of blinking it in.
+                field.classList.add('d-go');
+                await s(700);
                 enh.classList.add('d-in');
                 await s(1200);
             });
@@ -1270,13 +1354,14 @@
             }, async function (stage, s) {
                 var pin = stage.querySelector('.d-pin'), ring = stage.querySelector('.d-ring'),
                     score = stage.querySelector('.d-score'), sub = stage.querySelector('.d-sub');
-                pin.classList.remove('d-drop'); ring.classList.remove('d-go');
+                pin.classList.remove('d-drop', 'd-squash'); ring.classList.remove('d-go');
                 score.innerHTML = '&nbsp;'; sub.classList.remove('d-in');
                 await s(600);
                 pin.classList.add('d-drop');
-                await s(480);
+                await s(430);
+                pin.classList.add('d-squash');
                 ring.classList.add('d-go');
-                await s.count(score, 947, 900, ' / 1000');
+                await s.count(score, 947, 1400, ' / 1000');
                 sub.classList.add('d-in');
                 await s(1200);
             });
@@ -1307,10 +1392,12 @@
                 await s(500);
                 await s.count(reps, 8, 1100, '');
                 await s(500);
-                next.textContent = '190 lb';
                 nextRow.classList.add('d-in');
+                next.innerHTML = '<span class="d-roll"><span class="d-rollin"><span>185 lb</span><span>190 lb</span></span></span>';
+                await s(60);
+                next.querySelector('.d-roll').classList.add('d-rolled');
                 caret.style.display = '';
-                await s.type(coach, '+5 lb next time — you hit 8 reps on every set.', 30);
+                await s.type(coach, '+5 lb next time — you hit 8 reps on every set.', 30, caret);
                 caret.style.display = 'none';
                 await s(1200);
             });
