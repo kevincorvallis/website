@@ -306,6 +306,153 @@
             width: 120px;
         }
 
+        /* ——— Animated Demos ———
+           JS-driven, auto-playing on scroll. The static <img> in each frame
+           is the no-JS / prefers-reduced-motion fallback; .demo-on hides it
+           once a stage is injected. */
+
+        .demo { position: relative; }
+        .demo.demo-on > img { display: none; }
+
+        .demo-stage {
+            background: var(--bg);
+            padding: 1.5rem 1.6rem;
+            min-height: 280px;
+            box-sizing: border-box;
+        }
+
+        .d-caret {
+            display: inline-block;
+            width: 2px;
+            height: 1.05em;
+            background: var(--text);
+            vertical-align: text-bottom;
+            margin-left: 1px;
+            animation: d-blink 1.05s steps(1) infinite;
+        }
+        @keyframes d-blink { 50% { opacity: 0; } }
+
+        .d-fade { opacity: 0; transform: translateY(6px); transition: opacity .55s var(--ease-out), transform .55s var(--ease-out); }
+        .d-fade.d-in { opacity: 1; transform: none; }
+
+        /* Locus */
+        .d-search {
+            display: flex; align-items: center; gap: .7rem;
+            border: 1px solid var(--frame-dot); border-radius: 8px;
+            padding: .65rem .9rem; font-size: 1.02rem; margin-bottom: 1.1rem;
+        }
+        .d-search .d-q { flex: 1; white-space: nowrap; overflow: hidden; }
+        .d-btn {
+            background: var(--text); color: var(--bg); border-radius: 6px;
+            padding: .3rem .85rem; font-size: .9rem; transition: opacity .2s;
+        }
+        .d-btn.d-press { opacity: .55; }
+        .d-skel { height: 12px; border-radius: 6px; background: var(--tag-bg); margin: .6rem 0; overflow: hidden; position: relative; }
+        .d-skel::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, var(--frame-bar), transparent);
+            animation: d-shimmer 1.1s infinite;
+        }
+        @keyframes d-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+        .d-card {
+            border: 1px solid var(--frame-dot); border-radius: 10px;
+            padding: 1rem 1.15rem; margin-top: .9rem;
+        }
+        .d-card h4 { margin: 0 0 .3rem; font-size: 1.12rem; font-weight: 600; }
+        .d-meta { font-family: ui-monospace, Menlo, monospace; font-size: .78rem; opacity: .65; margin-bottom: .45rem; }
+        .d-card p { margin: 0; font-size: .95rem; line-height: 1.5; opacity: .9; }
+
+        /* Terminal (AI workflow) — dark in both themes */
+        .d-term {
+            background: #191a1e; color: #c9c7bf; min-height: 300px;
+            font-family: "SF Mono", ui-monospace, Menlo, monospace;
+            font-size: .82rem; line-height: 1.8; padding: 1.2rem 1.4rem;
+            box-sizing: border-box;
+        }
+        .d-term .d-row { white-space: pre-wrap; min-height: 1.8em; }
+        .d-term .dim { color: #6d6b63; } .d-term .accent { color: #d4a25a; }
+        .d-term .ok { color: #79b473; } .d-term .bad { color: #c96f5f; }
+        .d-term .cyan { color: #6fa8b5; } .d-term .white { color: #eceae2; }
+        .d-term .d-caret { background: #c9c7bf; }
+
+        /* VoiceInk */
+        .d-pill {
+            display: inline-flex; align-items: center; gap: .6rem;
+            background: var(--text); color: var(--bg);
+            border-radius: 999px; padding: .55rem 1.1rem; margin-bottom: 1.4rem;
+            font-family: ui-monospace, Menlo, monospace; font-size: .82rem;
+        }
+        .d-mic { width: 9px; height: 9px; border-radius: 50%; background: #e0574f; }
+        .d-pill.d-rec .d-mic { animation: d-pulse 1.2s infinite; }
+        @keyframes d-pulse { 50% { opacity: .35; } }
+        .d-bars { display: inline-flex; align-items: center; gap: 2.5px; height: 16px; }
+        .d-bars i { width: 3px; height: 4px; border-radius: 2px; background: var(--bg); }
+        .d-pill.d-rec .d-bars i { animation: d-bar .72s ease-in-out infinite alternate; }
+        .d-bars i:nth-child(2) { animation-delay: .12s; } .d-bars i:nth-child(3) { animation-delay: .28s; }
+        .d-bars i:nth-child(4) { animation-delay: .07s; } .d-bars i:nth-child(5) { animation-delay: .2s; }
+        @keyframes d-bar { from { height: 4px; } to { height: 15px; } }
+        .d-field { font-size: 1.05rem; line-height: 1.6; min-height: 5.2em; }
+        .d-enh {
+            display: inline-block; font-family: ui-monospace, Menlo, monospace;
+            font-size: .72rem; border: 1px solid var(--frame-dot); border-radius: 999px;
+            padding: .1rem .6rem; margin-top: .8rem;
+        }
+        .d-enh.d-in { opacity: .7; }
+
+        /* Apogee */
+        .d-set {
+            display: flex; align-items: baseline; justify-content: space-between;
+            border: 1px solid var(--frame-dot); border-radius: 10px;
+            padding: .85rem 1.1rem; margin-bottom: .7rem;
+        }
+        .d-set b { font-size: 1.05rem; }
+        .d-set .d-num { font-family: ui-monospace, Menlo, monospace; font-size: 1rem; }
+        .d-coach { font-size: .98rem; font-style: italic; opacity: .9; min-height: 3em; margin-top: 1rem; }
+
+        /* Pindrop — dark stage in both themes */
+        .d-space {
+            background: #0d1117; color: #e8e6df; min-height: 300px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 1.1rem; padding: 1.4rem; box-sizing: border-box;
+        }
+        .d-globe {
+            width: 150px; height: 150px; border-radius: 50%; position: relative;
+            background: radial-gradient(circle at 34% 30%, #2b4d68 0%, #17293c 55%, #0c1622 100%);
+            box-shadow: inset -14px -12px 34px rgba(0,0,0,.55), 0 0 26px rgba(80,130,180,.18);
+        }
+        .d-pin {
+            position: absolute; left: 62%; top: 34%;
+            width: 10px; height: 10px; border-radius: 50%; background: #ff8a3d;
+            transform: translateY(-56px); opacity: 0;
+        }
+        .d-pin.d-drop { transition: transform .5s cubic-bezier(.34, 1.56, .64, 1), opacity .18s; transform: translateY(0); opacity: 1; }
+        .d-ring {
+            position: absolute; left: 62%; top: 34%; width: 10px; height: 10px;
+            border-radius: 50%; border: 1.5px solid #ff8a3d; opacity: 0; margin: 0;
+        }
+        .d-ring.d-go { animation: d-ripple 1s var(--ease-out) 1; }
+        @keyframes d-ripple { from { transform: scale(1); opacity: .9; } to { transform: scale(4.5); opacity: 0; } }
+        .d-score { font-family: ui-monospace, Menlo, monospace; font-size: 1.5rem; letter-spacing: .04em; }
+        .d-sub { font-size: .88rem; }
+        .d-sub.d-in { opacity: .65; }
+
+        /* Screenshot crossfade */
+        .demo-xfade { position: relative; }
+        .demo-xfade img.d-x {
+            position: absolute; left: 0; right: 0; top: 28px; bottom: 0;
+            width: 100%; height: calc(100% - 28px); object-fit: cover;
+            opacity: 0; transition: opacity .85s var(--ease-in-out); display: block;
+        }
+        .demo-xfade img.d-x.d-show { opacity: 1; }
+        .d-cap {
+            position: absolute; left: .8rem; bottom: .8rem; z-index: 2;
+            background: rgba(15, 15, 14, .78); color: #f0eee6;
+            font-family: ui-monospace, Menlo, monospace; font-size: .72rem;
+            border-radius: 6px; padding: .25rem .6rem;
+            opacity: 0; transition: opacity .5s;
+        }
+        .d-cap.d-in { opacity: 1; }
+
         /* ——— Tags ——— */
 
         .tags {
@@ -601,7 +748,7 @@
                 <a href="/projects/locus" class="case-study-link">
                     <h2 class="featured-name">Locus</h2>
                 </a>
-                <div class="browser-frame">
+                <div class="browser-frame demo" data-demo="locus">
                     <img src="/projects/images/locus-hero.png" alt="Locus — plain-English place search with a ranked result card explaining why it fits" onerror="this.closest('.browser-frame').style.display='none'">
                 </div>
                 <p class="featured-desc" data-i18n="projects.locusDesc">Describe the place you want in plain English; get five real ones back, each with a reason. An LLM parses your query, a weekly research pass grounds it in real places, and a second LLM pass explains why each one fits.</p>
@@ -619,7 +766,7 @@
                 <a href="/projects/ai-workflow" class="case-study-link">
                     <h2 class="featured-name">AI Development Workflow</h2>
                 </a>
-                <div class="browser-frame">
+                <div class="browser-frame demo" data-demo="workflow">
                     <img src="/projects/images/ai-workflow-hero.png" alt="Terminal view of a Gauntlet run — blind critique from Gemini and GPT, crossfire rebuttal, verified verdict" onerror="this.closest('.browser-frame').style.display='none'">
                 </div>
                 <p class="featured-desc">Treating LLMs as unreliable tools instead of oracles. Custom MCP servers expose Gemini and GPT as tools inside Claude Code; a cross-vendor "Gauntlet" runs code and designs through an adversarial review panel (blind critique &rarr; crossfire rebuttal &rarr; verified verdict); fallback chains degrade instead of failing; and nightly launchd agents maintain my notes idempotently.</p>
@@ -639,7 +786,7 @@
                 <a href="https://github.com/Beingpax/VoiceInk" target="_blank" rel="noopener" class="case-study-link">
                     <h2 class="featured-name">VoiceInk Fork</h2>
                 </a>
-                <div class="browser-frame">
+                <div class="browser-frame demo" data-demo="voiceink">
                     <img src="/projects/images/voiceink-hero.jpg" alt="VoiceInk dashboard — dictation time saved, words captured, and 30-day trend" onerror="this.closest('.browser-frame').style.display='none'">
                 </div>
                 <p class="featured-desc">A personal fork of VoiceInk, the open-source macOS dictation app &mdash; push-to-talk anywhere, transcribed on-device by Whisper or Parakeet, cleaned up by an LLM before it lands at your cursor. The fork adds a voice engine: a weekly pipeline that distills my writing voice from my own dictation corpus into eval-gated style profiles (champion/challenger promotion, versioned rollback) and injects them into the enhancement prompt, plus nightly vocabulary mining from my Obsidian vault so transcription stops mangling domain terms. Recently hardened with a 31-finding multi-agent audit: anti-aliased resampling, real RIFF parsing, actor-isolated model lifecycle, and failure paths that speak instead of silently dropping dictations.</p>
@@ -704,8 +851,10 @@
                     <h2 class="featured-name">Shredders</h2>
                 </a>
                 <div class="screenshot-pair">
-                    <div class="browser-frame">
-                        <img src="/projects/images/shredders.jpg" alt="Shredders web app" onerror="this.closest('.browser-frame').style.display='none'">
+                    <div class="browser-frame demo demo-xfade" data-demo="xfade">
+                        <img src="/projects/images/shredders.jpg" alt="Shredders web app" data-caption="Powder dashboard — 53 resorts" onerror="this.closest('.browser-frame').style.display='none'">
+                        <img src="/projects/images/shredders-today.jpg" alt="" class="d-x" loading="lazy" data-caption="Today — conditions score">
+                        <img src="/projects/images/shredders-mountains.jpg" alt="" class="d-x" loading="lazy" data-caption="Mountains — snowpack &amp; webcams">
                     </div>
                     <div class="phone-frame">
                         <img src="/projects/images/shredders-ios.jpg" alt="Shredders iOS app" onerror="this.closest('.phone-frame').style.display='none'">
@@ -728,8 +877,10 @@
                 <a href="/projects/merfish" class="case-study-link">
                     <h2 class="featured-name">MERFISH</h2>
                 </a>
-                <div class="browser-frame">
-                    <img src="/projects/images/merfish-hero.png" alt="MERFISH coronal mouse-brain section reconstructed from spatial transcript positions" onerror="this.closest('.browser-frame').style.display='none'">
+                <div class="browser-frame demo demo-xfade" data-demo="xfade">
+                    <img src="/projects/images/merfish-hero.png" alt="MERFISH coronal mouse-brain section reconstructed from spatial transcript positions" data-caption="Coronal section — transcript positions" onerror="this.closest('.browser-frame').style.display='none'">
+                    <img src="/projects/images/merfish-celltype-demo.jpg" alt="" class="d-x" loading="lazy" data-caption="Cell-type mapping — per-cell confidence">
+                    <img src="/projects/images/merfish-ccfv3-demo.jpg" alt="" class="d-x" loading="lazy" data-caption="Registration to the Allen CCFv3 atlas">
                 </div>
                 <p class="featured-desc" data-i18n="projects.merfishDesc">A spatial-transcriptomics pipeline for Vizgen MERSCOPE mouse brain. QC against bulk RNAseq, Scanpy clustering, cell-type mapping with a per-cell confidence score, and registration of each section to the Allen CCFv3 atlas with STalign. Covered by an offline pytest suite and CI.</p>
                 <div class="tags">
@@ -845,5 +996,244 @@
 
     <script src="/js/i18n.js"></script>
     <script src="/js/theme.js"></script>
+
+    <!-- Animated card demos: auto-play on scroll, loop while visible.
+         Static images remain for no-JS and prefers-reduced-motion. -->
+    <script>
+    (function () {
+        'use strict';
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+
+        async function typeText(el, text, speed) {
+            el.textContent = '';
+            for (var i = 0; i < text.length; i++) {
+                el.textContent += text[i];
+                await sleep(speed + Math.random() * 36);
+            }
+        }
+
+        async function countUp(el, target, ms, suffix) {
+            var steps = 30;
+            for (var i = 1; i <= steps; i++) {
+                el.textContent = Math.round(target * (1 - Math.pow(1 - i / steps, 3))) + (suffix || '');
+                await sleep(ms / steps);
+            }
+        }
+
+        function loopDemo(frame, buildStage, run) {
+            var visible = false;
+            new IntersectionObserver(function (entries) {
+                visible = entries[0].isIntersecting;
+            }, { threshold: 0.3 }).observe(frame);
+            var stage = buildStage ? buildStage(frame) : frame;
+            if (buildStage) frame.classList.add('demo-on');
+            (async function cycle() {
+                for (;;) {
+                    while (!visible) await sleep(300);
+                    try { await run(stage); } catch (e) { return; }
+                    await sleep(2800);
+                }
+            })();
+        }
+
+        // ——— Locus: typed query → skeleton → result card ———
+        function initLocus(frame) {
+            loopDemo(frame, function () {
+                frame.insertAdjacentHTML('beforeend',
+                    '<div class="demo-stage">' +
+                    '<div class="d-search"><span class="d-q"></span><span class="d-caret"></span><span class="d-btn">Search</span></div>' +
+                    '<div class="d-results"></div>' +
+                    '</div>');
+                return frame.lastElementChild;
+            }, async function (stage) {
+                var q = stage.querySelector('.d-q'), caret = stage.querySelector('.d-caret'),
+                    btn = stage.querySelector('.d-btn'), results = stage.querySelector('.d-results');
+                q.textContent = ''; results.innerHTML = ''; caret.style.display = '';
+                await sleep(700);
+                await typeText(q, 'quiet coffee shop to work from near Capitol Hill', 34);
+                caret.style.display = 'none';
+                btn.classList.add('d-press');
+                await sleep(180);
+                btn.classList.remove('d-press');
+                results.innerHTML = '<div class="d-skel" style="width:88%"></div><div class="d-skel" style="width:70%"></div><div class="d-skel" style="width:79%"></div>';
+                await sleep(1300);
+                results.innerHTML =
+                    '<div class="d-card d-fade"><h4>Espresso Vivace Roasteria</h4>' +
+                    '<div class="d-meta">4.5 (1515) &middot; $ &middot; 532 Broadway E</div>' +
+                    '<p>A 38-year-old Capitol Hill fixture with a dedicated quiet room, rated 4.5 from over 1,500 reviews at coffee-shop prices.</p></div>';
+                await sleep(40);
+                results.firstElementChild.classList.add('d-in');
+                await sleep(2200);
+            });
+        }
+
+        // ——— AI workflow: terminal gauntlet run ———
+        function initWorkflow(frame) {
+            var LINES = [
+                ['<span class="dim">Round 0</span>  sealed take written <span class="dim">(Claude, before seeing the panel)</span>', 60],
+                ['<span class="dim">Round 1</span>  blind critique — full context, no cross-talk', 60],
+                ['         ├─ <span class="cyan">Gemini 3.1 Pro</span>   4 findings <span class="dim">·</span> <span class="bad">2 blocking</span>', 420],
+                ['         └─ <span class="cyan">GPT-5.6</span>          3 findings <span class="dim">·</span> <span class="bad">1 blocking</span>', 420],
+                ['<span class="dim">Round 2</span>  crossfire rebuttal — each model attacks the others’ claims', 200],
+                ['         ├─ clipboard restore races slow apps  <span class="ok">CONFIRMED</span>', 500],
+                ['         ├─ retry loop starves the main actor  <span class="bad">REFUTED</span> <span class="dim">measured 0.3 ms</span>', 500],
+                ['         └─ paste failure silent when AX drops  <span class="ok">CONFIRMED</span>', 500],
+                ['&nbsp;', 60],
+                ['<span class="white">Verdict</span>  2 confirmed defects → fix before merge  <span class="dim">3 models · 12.4k tokens · 96 s</span>', 300]
+            ];
+            loopDemo(frame, function () {
+                frame.insertAdjacentHTML('beforeend', '<div class="demo-stage d-term"></div>');
+                return frame.lastElementChild;
+            }, async function (stage) {
+                stage.innerHTML = '<div class="d-row"><span class="accent">❯</span> <span class="white d-cmd"></span><span class="d-caret"></span></div>';
+                var cmd = stage.querySelector('.d-cmd');
+                await sleep(600);
+                await typeText(cmd, '/gauntlet review the paste-reliability diff', 40);
+                stage.querySelector('.d-caret').style.display = 'none';
+                await sleep(500);
+                for (var i = 0; i < LINES.length; i++) {
+                    var div = document.createElement('div');
+                    div.className = 'd-row d-fade';
+                    div.innerHTML = LINES[i][0];
+                    stage.appendChild(div);
+                    void div.offsetWidth;
+                    div.classList.add('d-in');
+                    await sleep(LINES[i][1]);
+                }
+                await sleep(2400);
+            });
+        }
+
+        // ——— VoiceInk: record → transcribe → enhanced text ———
+        function initVoiceInk(frame) {
+            loopDemo(frame, function () {
+                frame.insertAdjacentHTML('beforeend',
+                    '<div class="demo-stage">' +
+                    '<div class="d-pill"><span class="d-mic"></span><span class="d-bars"><i></i><i></i><i></i><i></i><i></i></span><span class="d-time">0:00</span></div>' +
+                    '<div class="d-field"><span class="d-txt"></span><span class="d-caret"></span></div>' +
+                    '<div class="d-enh d-fade">✦ enhanced with your voice profile</div>' +
+                    '</div>');
+                return frame.lastElementChild;
+            }, async function (stage) {
+                var pill = stage.querySelector('.d-pill'), time = stage.querySelector('.d-time'),
+                    txt = stage.querySelector('.d-txt'), caret = stage.querySelector('.d-caret'),
+                    enh = stage.querySelector('.d-enh');
+                txt.textContent = ''; caret.style.display = 'none'; enh.classList.remove('d-in');
+                pill.classList.add('d-rec');
+                for (var s = 0; s <= 3; s++) { time.textContent = '0:0' + s; await sleep(560); }
+                pill.classList.remove('d-rec');
+                time.textContent = 'transcribing…';
+                await sleep(900);
+                time.textContent = 'done';
+                caret.style.display = '';
+                await typeText(txt, 'um so i want to do the four and a half hour tour on tuesday', 26);
+                await sleep(650);
+                txt.textContent = 'I want to do the four-and-a-half-hour tour on Tuesday.';
+                caret.style.display = 'none';
+                enh.classList.add('d-in');
+                await sleep(2300);
+            });
+        }
+
+        // ——— Screenshot crossfade (Shredders, MERFISH) ———
+        function initCrossfade(frame) {
+            var layers = Array.prototype.slice.call(frame.querySelectorAll('img'));
+            if (layers.length < 2) return;
+            frame.insertAdjacentHTML('beforeend', '<div class="d-cap"></div>');
+            var cap = frame.lastElementChild;
+            loopDemo(frame, null, async function () {
+                for (var i = 0; i < layers.length; i++) {
+                    layers.forEach(function (im, k) {
+                        if (k > 0) im.classList.toggle('d-show', k === i);
+                    });
+                    var text = layers[i].getAttribute('data-caption');
+                    cap.classList.remove('d-in');
+                    if (text) {
+                        await sleep(260);
+                        cap.textContent = text;
+                        cap.classList.add('d-in');
+                    }
+                    await sleep(2500);
+                }
+            });
+        }
+
+        // ——— Pindrop: pin drop + score count (injected next to phone) ———
+        function initPindrop() {
+            var img = document.querySelector('img[src*="pindrop-ios"]');
+            if (!img) return;
+            var pair = img.closest('.screenshot-pair');
+            if (!pair) return;
+            var frame = document.createElement('div');
+            frame.className = 'browser-frame demo';
+            pair.insertBefore(frame, pair.firstChild);
+            loopDemo(frame, function () {
+                frame.insertAdjacentHTML('beforeend',
+                    '<div class="demo-stage d-space">' +
+                    '<div class="d-globe"><span class="d-pin"></span><span class="d-ring"></span></div>' +
+                    '<div class="d-score">&nbsp;</div>' +
+                    '<div class="d-sub d-fade">12 km off — nice drop</div>' +
+                    '</div>');
+                return frame.lastElementChild;
+            }, async function (stage) {
+                var pin = stage.querySelector('.d-pin'), ring = stage.querySelector('.d-ring'),
+                    score = stage.querySelector('.d-score'), sub = stage.querySelector('.d-sub');
+                pin.classList.remove('d-drop'); ring.classList.remove('d-go');
+                score.innerHTML = '&nbsp;'; sub.classList.remove('d-in');
+                await sleep(900);
+                pin.classList.add('d-drop');
+                await sleep(480);
+                ring.classList.add('d-go');
+                await countUp(score, 947, 900, ' / 1000');
+                sub.classList.add('d-in');
+                await sleep(2300);
+            });
+        }
+
+        // ——— Apogee: logged set + typed coach line (injected next to phone) ———
+        function initApogee() {
+            var img = document.querySelector('img[src*="apogee-train"]');
+            if (!img) return;
+            var pair = img.closest('.screenshot-pair');
+            if (!pair) return;
+            var frame = document.createElement('div');
+            frame.className = 'browser-frame demo';
+            pair.insertBefore(frame, pair.firstChild);
+            loopDemo(frame, function () {
+                frame.insertAdjacentHTML('beforeend',
+                    '<div class="demo-stage">' +
+                    '<div class="d-set"><b>Bench Press — set 3 of 3</b><span class="d-num"><span class="d-w">185</span> lb × <span class="d-r">0</span></span></div>' +
+                    '<div class="d-set d-fade"><b>Next session</b><span class="d-num d-next">185 lb</span></div>' +
+                    '<div class="d-coach"><span class="d-ctext"></span><span class="d-caret" style="display:none"></span></div>' +
+                    '</div>');
+                return frame.lastElementChild;
+            }, async function (stage) {
+                var reps = stage.querySelector('.d-r'), next = stage.querySelector('.d-next'),
+                    nextRow = stage.querySelector('.d-set.d-fade'), coach = stage.querySelector('.d-ctext'),
+                    caret = stage.querySelector('.d-coach .d-caret');
+                reps.textContent = '0'; coach.textContent = ''; nextRow.classList.remove('d-in'); next.textContent = '185 lb';
+                await sleep(700);
+                await countUp(reps, 8, 1100, '');
+                await sleep(500);
+                next.textContent = '190 lb';
+                nextRow.classList.add('d-in');
+                caret.style.display = '';
+                await typeText(coach, '+5 lb next time — you hit 8 reps on every set.', 30);
+                caret.style.display = 'none';
+                await sleep(2200);
+            });
+        }
+
+        var byKind = { locus: initLocus, workflow: initWorkflow, voiceink: initVoiceInk, xfade: initCrossfade };
+        document.querySelectorAll('[data-demo]').forEach(function (el) {
+            var init = byKind[el.getAttribute('data-demo')];
+            if (init) init(el);
+        });
+        initPindrop();
+        initApogee();
+    })();
+    </script>
 </body>
 </html>
